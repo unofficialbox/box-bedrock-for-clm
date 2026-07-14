@@ -13,4 +13,4 @@ Use one track per presentation. The Northstar contract package and governance ru
 - Use **Agentic Orchestration** when a supervisor selects tools or specialist agents dynamically across platforms.
 - Do not call the first track “fully agentic,” and do not describe the second as live until its managed integrations pass the technical validation.
 
-Shared setup, controls, sample data, and live identifiers remain in the repository-level docs. Each scenario directory owns its presenter script, component manifest, screenshot manifest, and readiness statement.
+Each scenario link opens one canonical, ordered guide containing orientation, architecture, flow, presenter script, screenshots, component readiness, and setup checks. Shared configuration, screenshots, generated galleries, and detailed runbooks remain single-source and are referenced from those guides.

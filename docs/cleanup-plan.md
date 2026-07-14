@@ -59,14 +59,9 @@ The scenario index now provides this boundary without hiding AgentCore as an uno
 
 ### 2. Consolidate Presenter Material
 
-The numbered `04-` runbook remains a supporting deep dive; its audience scripts now live under `docs/scenarios/agentic-orchestration/supporting-react-scripts/`. Continue consolidating only when doing so reduces navigation without duplicating scenario truth:
+Complete for the core presenter path. Each scenario now has one ordered guide containing architecture, flow, script, screenshots, readiness, and setup. The numbered `04-` runbook and audience scripts under `docs/scenarios/agentic-orchestration/supporting-react-scripts/` remain optional deep dives rather than required navigation.
 
-- scenario runbooks
-- three audience scripts
-- flow source and rendered flow
-- Markdown and JSON component manifests
-
-The presenter should be able to understand the complete demo by opening one directory.
+Keep shared diagrams, screenshots, galleries, runbooks, and JSON manifests single-source; scenario guides should embed or reference them rather than create copies.
 
 ### 3. Organize Box Configuration by Product Surface
 

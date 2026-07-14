@@ -13,8 +13,8 @@ Start with the [scenario selector](docs/scenarios/README.md), then use [setup an
 
 Scenario presentation packages:
 
-- [Governed Workflow script](docs/scenarios/governed-workflow/demo-script.md) · [gallery](output/html/governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
-- [Agentic Orchestration script](docs/scenarios/agentic-orchestration/demo-script.md) · [gallery](output/html/agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
+- [Governed Workflow single-page guide](docs/scenarios/governed-workflow/README.md) · [gallery](output/html/governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
+- [Agentic Orchestration single-page guide](docs/scenarios/agentic-orchestration/README.md) · [gallery](output/html/agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
 - Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
 
 The scenario is an enterprise commercial contract workflow for **Acme Robotics** negotiating a master services agreement (MSA), data processing addendum (DPA), statement of work (SOW), and order form with **Northstar Health**.
@@ -38,7 +38,7 @@ CLM teams lose time because contract content, structured deal data, obligations,
 | 5 | [ROI Analysis](docs/05-roi-analysis.md) | CLM value drivers, time compression model, and executive metrics |
 | 6 | [Competitive Landscape](docs/06-competitive-landscape.md) | CLM market positioning and Box + AWS differentiation |
 | 7 | [Handoff Progress](docs/08-handoff-progress.md) | Build checklist, sample-data plan, metadata model, and next actions |
-| 8 | [Scenario Packages](docs/scenarios/README.md) | Separate presenter docs, manifests, diagrams, galleries, and screenshot inventories |
+| 8 | [Scenario Packages](docs/scenarios/README.md) | Two ordered single-page guides referencing shared manifests, diagrams, galleries, and screenshots |
 | 9 | [Setup and Activation](docs/runbooks/05-demo-setup-and-activation.md) | End-to-end prerequisites, local rehearsal, Box verification, Salesforce/Agentforce deployment, activation, smoke test, and teardown |
 | 10 | [Manual-Task Register](docs/manual-task-register.md) | Complete inventory of human decisions, administrator work, confirmation gates, live validation, and per-demo reset tasks |
 | 11 | [Salesforce CLM Record Contract](docs/salesforce-clm-record-contract.md) | `CLM_Contract__c` schema, ownership, private sharing, idempotency, Box references, and intake mapping |

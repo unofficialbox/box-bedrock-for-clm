@@ -1,6 +1,6 @@
 # Supporting Box + Agentforce + React Scripts
 
-These supporting scripts present the React portion of Agentic Orchestration at three depths. They intentionally stop short of AgentCore, Strands, and Databricks; use the parent [Agentic Orchestration script](../demo-script.md) for the complete scenario.
+These supporting scripts present the React portion of Agentic Orchestration at three depths. They intentionally stop short of AgentCore, Strands, and Databricks; use the parent [Agentic Orchestration guide](../README.md#4-presenter-script) for the complete scenario.
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|

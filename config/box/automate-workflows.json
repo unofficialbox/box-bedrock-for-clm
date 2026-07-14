@@ -48,7 +48,7 @@
       },
       "entryPointVariation": {
         "key": "box-form-automate-https",
-        "script": "docs/scenarios/governed-workflow/demo-script.md",
+        "script": "docs/scenarios/governed-workflow/README.md#4-presenter-script",
         "sequence": [
           "Submit New Contract Request",
           "Run Extract and Box AI Agent",
