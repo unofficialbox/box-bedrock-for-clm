@@ -26,7 +26,7 @@ Use this checklist in the Box web UI to assemble the CLM dashboard used by the p
 11. Add a `Start a New Contract` Form block using `New Contract Request`; set presentation to **Open in New Tab**.
 12. Drag and resize the two action blocks into the third two-column row.
 13. Add or verify the card grid named `Northstar Deal Room`.
-8. Add these cards:
+14. Add these cards:
 
 | Card | Target |
 |------|--------|
@@ -37,24 +37,20 @@ Use this checklist in the Box web UI to assemble the CLM dashboard used by the p
 | Security Exhibit | File `2342636075017` |
 | Obligation Register | Folder `399081567921` |
 
-14. Add or verify a section named `Intake and Actions`.
-15. Add the published `New Contract Request` form.
-16. Add a pending-review task list with:
-
-| Review | Task ID |
-|--------|---------|
-| Legal review | `42899891150` |
-| Finance review | `42899881417` |
-| Privacy/security review | `42899893550` |
-
-17. Add a document table from `clmDocument`.
-18. Filter the document table to `approvalStatus = Pending` and `clauseRisk` equal to `Critical` or `High`.
-19. Add or verify the bottom section named `Executed Agreements and Renewals`.
-20. Add an executed-agreement folder view for folder `399080706253`.
-21. Add an obligation table from `clmObligation` filtered to `status = Open`.
-22. Set the app description to `Operational CLM cockpit for governed intake, document risk, approvals, approved clauses, execution, and renewal readiness.`
-23. Preview at desktop width and confirm the three two-column rows remain aligned.
-24. Save only after presenter confirmation.
+15. Add or verify a section named `Intake and Actions`.
+16. Add the published `New Contract Request` form.
+17. Verify the Legal, Finance, and Privacy/security review cards open their task-bearing review documents.
+18. Add a document table from `clmDocument`.
+19. Filter the document table to `approvalStatus = Pending` and `clauseRisk` equal to `Critical` or `High`.
+20. Add or verify the bottom section named `Executed Agreements and Renewals`.
+21. Add an executed-agreement folder view for folder `399080706253`.
+22. Add an obligation table from `clmObligation` filtered to `status = Open`.
+23. Add or verify the `Clause Library` page.
+24. Add the `Approved Standards` view, `Clause Source Files` folder, and `Standard vs Fallback` donut chart defined in the live spec.
+25. Set the app description to `Operational CLM cockpit for governed intake, document risk, approvals, approved clauses, execution, and renewal readiness.`
+26. Preview at desktop width and confirm the three two-column rows remain aligned.
+27. Confirm the `Clause Library` tab opens and all three blocks resolve to live content.
+28. Save only after presenter confirmation.
 
 ## Demo Validation
 
@@ -69,3 +65,4 @@ Before running the primary demo, confirm:
 | Pending reviews | Shows three incomplete review tasks |
 | Critical/high risk table | Shows MSA, DPA, SOW, and Order Form metadata |
 | Obligations table | Shows renewal notice obligation |
+| Clause Library | Tab opens; approved view, source folder, and standard/fallback chart resolve |

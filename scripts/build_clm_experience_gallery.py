@@ -89,12 +89,16 @@ EXPERIENCES = [
 
 
 def data_uri(path: Path) -> str:
+    """Return an embedded image data URI for a screenshot path."""
+
     suffix = path.suffix.lower()
     mime = "image/png" if suffix == ".png" else "image/jpeg"
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
 
 
 def render_card(item: dict[str, str], index: int) -> str:
+    """Render one gallery card and fail if its real screenshot is missing."""
+
     path = SCREENSHOTS / item["file"]
     if not path.exists():
         raise FileNotFoundError(path)
@@ -113,6 +117,8 @@ def render_card(item: dict[str, str], index: int) -> str:
 
 
 def build() -> None:
+    """Build the self-contained CLM gallery at the configured output path."""
+
     cards = "\n".join(render_card(item, i + 1) for i, item in enumerate(EXPERIENCES))
     document = f"""<!doctype html>
 <html lang="en">

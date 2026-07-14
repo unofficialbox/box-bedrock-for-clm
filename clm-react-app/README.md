@@ -72,6 +72,15 @@ The source project contains the complete non-secret OAuth configuration:
 
 The app requests only the Salesforce `Api` OAuth scope. Metadata enables client credentials, requires a consumer secret, uses the admin-preauthorized permission-set policy, relaxes IP restrictions for the trusted Box server-to-server client, and binds the dedicated `box.automate.clm+00dgl000003d0lrua0@boxdemo.com` Run As user. The consumer key is safe to version and is pinned to prevent accidental rotation. The consumer secret and access tokens must never be stored in this repository.
 
+Box Automate does not provide a stable, verified egress IP set for this connector, so the OAuth policy cannot use an IP allowlist without making the integration unreliable. The explicit compensating controls are:
+
+- a dedicated Salesforce Integration user on the minimum-access API-only profile;
+- only the `CLM_Box_Automate_Integration` permission set;
+- only the Salesforce `Api` OAuth scope;
+- administrator-preauthorized client credentials with a pinned consumer key;
+- administrator-managed secret storage in Box; and
+- workflow-level allowlisting of the CLM external-ID upsert and lookup operations, with the workflow inactive until idempotency testing passes.
+
 For org `00DgL000003D0LRUA0`, the automation script is idempotent and:
 
 1. Refuses to run against a different org ID.

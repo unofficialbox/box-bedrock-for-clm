@@ -34,6 +34,15 @@
           "permissionSetAssignmentId": "0PagL00000b40CHSAY",
           "consumerKey": "3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL",
           "ipRelaxationPolicy": "Bypass",
+          "ipPolicyRationale": "Box Automate has no stable verified egress IP set, so IP enforcement is not compatible with this managed connector.",
+          "compensatingControls": [
+            "Dedicated minimum-access API-only Run As user",
+            "CLM_Box_Automate_Integration permission set only",
+            "Salesforce Api OAuth scope only",
+            "Admin-preauthorized client credentials with pinned consumer key",
+            "Administrator-managed secret storage in Box",
+            "Workflow allowlist and inactive-until-idempotency-tested activation gate"
+          ],
           "deployedAt": "2026-07-14T07:57:23-04:00",
           "oauthPolicyUpdatedAt": "2026-07-14T10:10:08-04:00"
         },
