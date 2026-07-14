@@ -1,0 +1,121 @@
+{
+  "connectors": [
+    {
+      "key": "salesforce-clm-rest",
+      "name": "Salesforce CLM REST API",
+      "status": "external-client-app-deployed-run-as-configured-pending-box-secret-and-oauth-test",
+      "allowedDomain": "kadams-dev-ed.develop.my.salesforce.com",
+      "apiVersion": "67.0",
+      "purpose": "Use Salesforce standard REST resources for CLM record upsert and lookup; no custom Apex is required for intake.",
+      "authentication": {
+        "type": "OAuth 2.0",
+        "management": "Box Automate managed HTTPS connection",
+        "salesforceConfiguration": "Box_Automate_CLM External Client App, dedicated Salesforce Integration user, and CLM_Box_Automate_Integration permission set",
+        "externalClientAppMetadata": [
+          "clm-react-app/force-app/main/default/externalClientApps/Box_Automate_CLM.eca-meta.xml",
+          "clm-react-app/force-app/main/default/extlClntAppGlobalOauthSets/Box_Automate_CLM_glbloauth.ecaGlblOauth-meta.xml",
+          "clm-react-app/force-app/main/default/extlClntAppOauthSettings/Box_Automate_CLM_oauth.ecaOauth-meta.xml",
+          "clm-react-app/force-app/main/default/extlClntAppOauthPolicies/Box_Automate_CLM_oauthPlcy.ecaOauthPlcy-meta.xml"
+        ],
+        "legacyConnectedAppMetadata": "clm-react-app/force-app/main/default/connectedApps/Box_Automate_CLM_Integration.connectedApp-meta.xml",
+        "permissionSetMetadata": "clm-react-app/force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",
+        "automationScript": "clm-react-app/scripts/configure-clm-oauth.sh",
+        "flow": "OAuth 2.0 client credentials enabled by External Client App metadata",
+        "runAsUser": "box.automate.clm+00dgl000003d0lrua0@boxdemo.com",
+        "deployment": {
+          "orgAlias": "agentforce",
+          "orgId": "00DgL000003D0LRUA0",
+          "externalClientAppId": "0xIgL000000Ok89UAC",
+          "globalOauthSettingsId": "13PgL000000R7a5UAC",
+          "oauthSettingsId": "3SNgL000000NJMvWAO",
+          "oauthPolicyId": "0yOgL000000coILUAY",
+          "integrationUserId": "005gL00000KmN8TQAV",
+          "permissionSetId": "0PSgL00000IR6zpWAD",
+          "permissionSetAssignmentId": "0PagL00000b40CHSAY",
+          "consumerKey": "3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL",
+          "deployedAt": "2026-07-14T07:57:23-04:00"
+        },
+        "liveRestVerification": {
+          "verifiedAt": "2026-07-13T21:30:31-04:00",
+          "externalId": "CLM-REST-SMOKE-20260714-0109",
+          "recordId": "a7IgL000000WYWPUA4",
+          "createStatus": 201,
+          "updateStatus": 200,
+          "updateCreated": false,
+          "matchingRecordCount": 1,
+          "dataStorageRemainingMB": 1
+        },
+        "secretStorage": "Administrator-managed; never store tokens or client secrets in this repository."
+      },
+      "operations": {
+        "salesforceContractUpsert": {
+          "method": "PATCH",
+          "pathTemplate": "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}",
+          "purpose": "Create or update one CLM contract using the unique external contract ID.",
+          "entryPointVariation": "box-form-automate-https",
+          "invocationPolicy": "Only the Approved branch of CLM - Contract Intake Enrichment may invoke this operation.",
+          "salesforceObjectApiName": "CLM_Contract__c",
+          "externalIdField": "Contract_ID__c",
+          "recordContract": "config/salesforce/clm-contract-record.json",
+          "idempotencyKey": "contractId",
+          "requestBodyMapping": {
+            "Name": "<counterparty> <contractType>",
+            "Requester_Name__c": "requesterName",
+            "Requester_Email__c": "requesterEmail",
+            "Counterparty__c": "counterparty",
+            "Contract_Type__c": "contractType",
+            "Deal_Value__c": "dealValue",
+            "Term_Months__c": "termMonths",
+            "Region__c": "region",
+            "Data_Category__c": "dataCategory",
+            "Target_Signature_Date__c": "targetSignatureDate",
+            "Business_Owner_Name__c": "businessOwner",
+            "Business_Owner__c": "resolvedBusinessOwnerUserId",
+            "Risk_Level__c": "riskLevel",
+            "Special_Terms_Risk_Notes__c": "specialTermsRiskNotes",
+            "Box_Workspace_Folder_ID__c": "boxFolderId",
+            "Box_Workspace_URL__c": "boxFolderUrl",
+            "Box_Intake_File_ID__c": "boxIntakeFileId",
+            "Box_Redline_File_ID__c": "boxRedlineFileId",
+            "Intake_Workflow_Run_ID__c": "workflowRunId",
+            "Record_Source__c": "recordSource",
+            "Latest_Routing_Status__c": "routingStatus",
+            "Open_Review_Task_Count__c": "openReviewTaskCount",
+            "Last_Box_Sync__c": "lastBoxSync"
+          },
+          "expectedStatuses": {
+            "created": 201,
+            "updated": [200, 204]
+          },
+          "nextOperation": "salesforceContractLookup"
+        },
+        "salesforceContractLookup": {
+          "method": "GET",
+          "pathTemplate": "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c",
+          "purpose": "Return stable React launch context after either an insert or an update response.",
+          "requiredResponseFields": ["Id", "Contract_ID__c", "Box_Workspace_Folder_ID__c"],
+          "responseMapping": {
+            "recordId": "Id",
+            "contractId": "Contract_ID__c",
+            "boxFolderId": "Box_Workspace_Folder_ID__c"
+          },
+          "nextExperience": "Launch the React CLM workspace with recordId, contractId, and folderId=boxFolderId."
+        },
+        "routeRedlineFindings": {
+          "method": "POST",
+          "path": "/services/apexrest/clm/redline-routing",
+          "purpose": "Validate structured redline findings, resolve the configured domain experts, create or reuse one Box review task per domain, and return assignment status.",
+          "idempotencyKey": "contractId:redlineFileId:domain",
+          "requestSchema": "config/clm/redline-finding.schema.json",
+          "requiredResponse": ["contractId", "findingCount", "reviewAssignments"],
+          "implementation": "Custom Apex remains appropriate because this operation performs validation, expert resolution, and Box task orchestration."
+        },
+        "approvalPacketReady": {"method": "POST", "path": "/services/apexrest/clm/contract-events/approval"},
+        "executedAgreementActivated": {"method": "POST", "path": "/services/apexrest/clm/contract-events/executed"}
+      },
+      "payloadAllowlist": ["eventType", "contractId", "requesterName", "requesterEmail", "counterparty", "contractType", "dealValue", "termMonths", "region", "dataCategory", "targetSignatureDate", "businessOwner", "resolvedBusinessOwnerUserId", "riskLevel", "specialTermsRiskNotes", "boxItemId", "boxFolderId", "boxFolderUrl", "boxIntakeFileId", "boxRedlineFileId", "redlineFileId", "baselineItemId", "findingId", "section", "changeType", "domain", "summary", "fallbackClauseId", "sourceCitations", "classificationConfidence", "routingStatus", "workflowRunId", "recordSource", "openReviewTaskCount", "lastBoxSync", "status", "approvedSummary"],
+      "prohibitedPayload": ["contract file bytes", "access tokens", "connector secrets", "signer identity details", "unreviewed AI output"],
+      "activationRequirement": "Retrieve the External Client App consumer secret without storing it in source, configure the Box Automate managed OAuth connection with the recorded consumer key and secret, verify the same standard REST upsert and lookup through Box, then obtain presenter confirmation before enabling the workflow."
+    }
+  ]
+}

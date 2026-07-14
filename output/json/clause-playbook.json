@@ -1,0 +1,22 @@
+{
+  "limitationOfLiability": {
+    "standard": "Liability capped at fees paid in prior 12 months.",
+    "fallback": "Cap at 24 months fees with privacy and security carveouts.",
+    "escalateWhen": "Uncapped liability or consequential damages are included."
+  },
+  "paymentTerms": {
+    "standard": "Net 30 or Net 45.",
+    "fallback": "Net 60 with finance approval.",
+    "escalateWhen": "Net 90 or unilateral setoff appears."
+  },
+  "dataProcessing": {
+    "standard": "Approved DPA and security exhibit required before PHI processing.",
+    "fallback": "Customer DPA accepted after privacy and security review.",
+    "escalateWhen": "PHI is referenced without approved DPA/BAA/security exhibit."
+  },
+  "slaCredits": {
+    "standard": "Service credits capped at monthly fees.",
+    "fallback": "Higher capped credits with service owner approval.",
+    "escalateWhen": "Uncapped SLA credits or refund rights appear."
+  }
+}

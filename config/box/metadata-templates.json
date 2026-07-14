@@ -1,0 +1,77 @@
+{
+  "templates": [
+    {
+      "templateKey": "clmContract",
+      "displayName": "CLM Contract",
+      "fields": [
+        {"key": "contractId", "type": "string"},
+        {"key": "counterparty", "type": "string"},
+        {"key": "contractType", "type": "enum", "options": ["MSA Package", "DPA", "SOW", "Order Form", "Procurement Agreement"]},
+        {"key": "status", "type": "enum", "options": ["Intake", "Legal Review", "Business Review", "Approved", "Signature", "Executed", "Obligations Active"]},
+        {"key": "dealValue", "type": "float"},
+        {"key": "termMonths", "type": "float"},
+        {"key": "region", "type": "enum", "options": ["US", "EU", "APAC", "Global"]},
+        {"key": "dataCategory", "type": "enum", "options": ["None", "Personal Data", "PHI", "Financial Data", "Confidential"]},
+        {"key": "owner", "type": "string"},
+        {"key": "legalReviewer", "type": "string"},
+        {"key": "riskLevel", "type": "enum", "options": ["Low", "Medium", "High", "Critical"]},
+        {"key": "targetSignatureDate", "type": "date"},
+        {"key": "renewalDate", "type": "date"},
+        {"key": "noticeDeadline", "type": "date"}
+      ]
+    },
+    {
+      "templateKey": "clmDocument",
+      "displayName": "CLM Document",
+      "fields": [
+        {"key": "documentType", "type": "enum", "options": ["MSA", "DPA", "SOW", "Order Form", "Security Exhibit", "Insurance", "Approval Memo"]},
+        {"key": "versionStatus", "type": "enum", "options": ["Draft", "Redline", "Approved", "Executed"]},
+        {"key": "clauseRisk", "type": "enum", "options": ["Low", "Medium", "High", "Critical"]},
+        {"key": "aiSummaryStatus", "type": "enum", "options": ["Not Started", "Complete", "Needs Review"]},
+        {"key": "approvalStatus", "type": "enum", "options": ["Not Required", "Pending", "Approved", "Rejected"]},
+        {"key": "signatureStatus", "type": "enum", "options": ["Not Required", "Pending", "Signed"]}
+      ]
+    },
+    {
+      "templateKey": "clmObligation",
+      "displayName": "CLM Obligation",
+      "fields": [
+        {"key": "obligationType", "type": "enum", "options": ["Renewal Notice", "SLA Report", "Security Evidence", "Data Deletion", "Insurance", "Billing"]},
+        {"key": "owner", "type": "string"},
+        {"key": "dueDate", "type": "date"},
+        {"key": "sourceClause", "type": "string"},
+        {"key": "status", "type": "enum", "options": ["Open", "In Progress", "Complete", "Escalated"]},
+        {"key": "reminderWindowDays", "type": "float"}
+      ]
+    },
+    {
+      "templateKey": "clmClause",
+      "displayName": "CLM Clause",
+      "fields": [
+        {"key": "clauseId", "type": "string"},
+        {"key": "clauseFamily", "type": "enum", "options": ["Limitation of Liability", "Payment Terms", "Data Processing", "SLA Credits"]},
+        {"key": "position", "type": "enum", "options": ["Standard", "Approved Fallback"]},
+        {"key": "approvalStatus", "type": "enum", "options": ["Approved", "Under Review", "Retired"]},
+        {"key": "owner", "type": "string"},
+        {"key": "jurisdiction", "type": "enum", "options": ["Global", "US", "EU", "APAC"]},
+        {"key": "lastReviewed", "type": "date"},
+        {"key": "nextReview", "type": "date"},
+        {"key": "usageCount", "type": "float"}
+      ]
+    },
+    {
+      "templateKey": "clmRedlineReview",
+      "displayName": "CLM Redline Review",
+      "status": "specified-not-live",
+      "fields": [
+        {"key": "baselineItemId", "type": "string"},
+        {"key": "comparisonStatus", "type": "enum", "options": ["Not Started", "Processing", "Needs Triage", "Routed", "Complete", "Failed"]},
+        {"key": "findingCount", "type": "float"},
+        {"key": "highestRisk", "type": "enum", "options": ["Low", "Medium", "High", "Critical"]},
+        {"key": "reviewDomains", "type": "string"},
+        {"key": "openTaskCount", "type": "float"},
+        {"key": "lastCompared", "type": "date"}
+      ]
+    }
+  ]
+}

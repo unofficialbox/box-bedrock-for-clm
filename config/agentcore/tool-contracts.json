@@ -1,0 +1,64 @@
+{
+  "tools": [
+    {
+      "name": "box.searchPackage",
+      "layer": "Box agent",
+      "input": {"contractId": "string"},
+      "output": {"files": "array", "folders": "array"}
+    },
+    {
+      "name": "box.extractDocumentText",
+      "layer": "Box agent",
+      "input": {"fileId": "string"},
+      "output": {"text": "string", "pageMap": "array"}
+    },
+    {
+      "name": "box.applyMetadata",
+      "layer": "Box agent",
+      "input": {"objectId": "string", "templateKey": "string", "values": "object"},
+      "output": {"status": "string"}
+    },
+    {
+      "name": "salesforce.getOpportunity",
+      "layer": "Salesforce agent",
+      "input": {"opportunityId": "string"},
+      "output": {"accountName": "string", "amount": "number", "paymentTerms": "string", "products": "array"}
+    },
+    {
+      "name": "salesforce.routeApproval",
+      "layer": "Salesforce agent",
+      "input": {"contractId": "string", "approverRole": "string", "reason": "string", "slaHours": "number"},
+      "output": {"taskId": "string", "status": "string"}
+    },
+    {
+      "name": "databricks.queryClauseOutcomes",
+      "layer": "Databricks agent",
+      "input": {"clauseArea": "string"},
+      "output": {"standardAcceptedPct": "number", "fallbackAcceptedPct": "number", "avgNegotiationDays": "number"}
+    },
+    {
+      "name": "agentcore.emitTraceEvent",
+      "layer": "AgentCore supervisor",
+      "input": {"agent": "string", "action": "string", "status": "string", "details": "object"},
+      "output": {"traceEventId": "string", "timestamp": "string"}
+    },
+    {
+      "name": "agentcore.enforceGuardrail",
+      "layer": "AgentCore supervisor",
+      "input": {"guardrail": "string", "requestedAction": "string", "workflowState": "object"},
+      "output": {"allowed": "boolean", "reason": "string"}
+    },
+    {
+      "name": "databricks.queryCycleTimeBenchmarks",
+      "layer": "Databricks agent",
+      "input": {"contractType": "string", "riskLevel": "string"},
+      "output": {"medianCycleDays": "number", "p75CycleDays": "number", "benchmarkCohort": "string"}
+    },
+    {
+      "name": "box.createReviewTask",
+      "layer": "Box agent",
+      "input": {"fileId": "string", "message": "string", "assigneeLogin": "string", "dueInHours": "number"},
+      "output": {"taskId": "string", "assignmentId": "string", "status": "string"}
+    }
+  ]
+}

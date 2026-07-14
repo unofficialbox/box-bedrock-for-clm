@@ -1,0 +1,199 @@
+#!/usr/bin/env python3
+"""Build the offline CLM experience gallery from real product screenshots."""
+
+from __future__ import annotations
+
+import base64
+import html
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[1]
+SCREENSHOTS = ROOT / "output" / "screenshots"
+OUTPUT = ROOT / "output" / "html" / "clm-experience-gallery.html"
+
+EXPERIENCES = [
+    {
+        "file": "clm-react-workspace.png",
+        "eyebrow": "React workspace",
+        "title": "Northstar Health contract workspace",
+        "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Agentforce copilot rail.",
+    },
+    {
+        "file": "clm-react-approvals.png",
+        "eyebrow": "React approvals",
+        "title": "Human approval control center",
+        "description": "The running demo app's approval view, grounded in the live legal, finance, and privacy Box task identifiers.",
+    },
+    {
+        "file": "box-app-dashboard-draft.jpeg",
+        "eyebrow": "Box Apps",
+        "title": "Contract Lifecycle Management dashboard",
+        "description": "The real Box App dashboard with live workspace content, task views, contract workstreams, and portfolio signals.",
+    },
+    {
+        "file": "box-app-clause-library-live.jpeg",
+        "eyebrow": "Box Apps",
+        "title": "Clause Library dashboard page",
+        "description": "The saved Box App page combining the approved-clause view, source folder, and a live standard-versus-fallback chart.",
+    },
+    {
+        "file": "box-app-approved-standards-view.jpeg",
+        "eyebrow": "Box Apps view",
+        "title": "Approved clause standards",
+        "description": "The live metadata-backed Box Apps view over individual Markdown clause files in the CLM clause library.",
+    },
+    {
+        "file": "box-form-new-contract-request.jpeg",
+        "eyebrow": "Box Forms",
+        "title": "New Contract Request",
+        "description": "The published intake form used to capture requester, counterparty, commercial terms, target date, and the contract package.",
+    },
+    {
+        "file": "box-hub-clause-library-live.jpeg",
+        "eyebrow": "Box Hubs",
+        "title": "Acme Contract Clause Library",
+        "description": "The saved Hub, populated with the governed clause folder, current ownership, and review-cadence guidance so the experience feels maintained.",
+    },
+    {
+        "file": "automate-saved-draft.jpeg",
+        "eyebrow": "Box Automate",
+        "title": "Intake, Extract, and AI Agent",
+        "description": "The saved inactive workflow draft with the published form trigger, Enhanced Extract Agent, and Box Agent review instructions.",
+    },
+    {
+        "file": "automate-approval-flow.jpeg",
+        "eyebrow": "Box Automate",
+        "title": "Human validation gate",
+        "description": "The workflow's approval task and approved/rejected branches, preserving human accountability before downstream actions.",
+    },
+    {
+        "file": "automate-https-connector.jpeg",
+        "eyebrow": "Box Automate",
+        "title": "HTTPS connector stage",
+        "description": "The existing connector selection in the saved Box Automate draft. Before activation, update it to the specified Salesforce standard REST external-ID upsert and lookup operations, then configure the deployed origin and administrator-managed OAuth 2.0 connection.",
+    },
+    {
+        "file": "box-docgen-templates.jpeg",
+        "eyebrow": "Box Doc Gen",
+        "title": "CLM document templates",
+        "description": "The signed-in Box Doc Gen catalog containing the approval memo, commercial order summary, and renewal notice templates.",
+    },
+]
+
+
+def data_uri(path: Path) -> str:
+    suffix = path.suffix.lower()
+    mime = "image/png" if suffix == ".png" else "image/jpeg"
+    return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
+
+
+def render_card(item: dict[str, str], index: int) -> str:
+    path = SCREENSHOTS / item["file"]
+    if not path.exists():
+        raise FileNotFoundError(path)
+    return f"""
+      <article class="experience" id="experience-{index}">
+        <div class="copy">
+          <p class="eyebrow">{html.escape(item['eyebrow'])}</p>
+          <h2>{html.escape(item['title'])}</h2>
+          <p>{html.escape(item['description'])}</p>
+        </div>
+        <figure>
+          <img src="{data_uri(path)}" alt="{html.escape(item['title'])} real demo screenshot" loading="lazy">
+          <figcaption>Captured from the real CLM demo experience in the signed-in Box tenant or the running React app.</figcaption>
+        </figure>
+      </article>"""
+
+
+def build() -> None:
+    cards = "\n".join(render_card(item, i + 1) for i, item in enumerate(EXPERIENCES))
+    document = f"""<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Acme CLM Experience Gallery</title>
+  <style>
+    :root {{
+      color-scheme: dark;
+      --ink: #f6f7fb;
+      --muted: #aab1c2;
+      --line: rgba(255,255,255,.12);
+      --panel: rgba(20,24,35,.82);
+      --blue: #72a7ff;
+      --mint: #7ce7c6;
+      --radius: 24px;
+    }}
+    * {{ box-sizing: border-box; }}
+    html {{ scroll-behavior: smooth; }}
+    body {{
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 12% 0%, rgba(45,103,220,.28), transparent 34rem),
+        radial-gradient(circle at 90% 20%, rgba(37,183,143,.17), transparent 28rem),
+        #080b12;
+      font: 16px/1.55 Inter, ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }}
+    header, main, footer {{ width: min(1440px, calc(100% - 40px)); margin-inline: auto; }}
+    header {{ padding: 84px 0 56px; display: grid; grid-template-columns: 1.5fr 1fr; gap: 48px; align-items: end; }}
+    .kicker, .eyebrow {{ color: var(--mint); font-size: .78rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }}
+    h1 {{ margin: 10px 0 18px; max-width: 920px; font-size: clamp(2.8rem, 6vw, 6rem); line-height: .95; letter-spacing: -.055em; }}
+    header p {{ margin: 0; color: var(--muted); font-size: 1.08rem; max-width: 700px; }}
+    .status {{ border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--panel); backdrop-filter: blur(14px); }}
+    .status strong {{ display: block; margin-bottom: 8px; font-size: 1.15rem; }}
+    .status span {{ color: var(--muted); }}
+    main {{ display: grid; gap: 30px; padding-bottom: 72px; }}
+    .experience {{
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: linear-gradient(145deg, rgba(27,32,46,.94), rgba(12,15,23,.94));
+      box-shadow: 0 26px 90px rgba(0,0,0,.28);
+    }}
+    .copy {{ display: grid; grid-template-columns: 180px minmax(250px, 1fr) minmax(280px, .9fr); gap: 28px; align-items: start; padding: 30px 34px; border-bottom: 1px solid var(--line); }}
+    .copy p {{ margin: 0; color: var(--muted); }}
+    .copy .eyebrow {{ color: var(--mint); }}
+    h2 {{ margin: 0; font-size: clamp(1.35rem, 2.4vw, 2rem); line-height: 1.1; letter-spacing: -.025em; }}
+    figure {{ margin: 0; padding: 18px; }}
+    img {{ display: block; width: 100%; height: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,.1); background: #fff; }}
+    figcaption {{ padding: 13px 4px 0; color: #7f8799; font-size: .78rem; }}
+    footer {{ padding: 0 0 64px; color: #7f8799; }}
+    @media (max-width: 860px) {{
+      header {{ grid-template-columns: 1fr; padding-top: 52px; }}
+      .copy {{ grid-template-columns: 1fr; gap: 12px; padding: 24px; }}
+      .copy .eyebrow {{ margin-bottom: 2px; }}
+    }}
+    @media (prefers-reduced-motion: no-preference) {{
+      .experience {{ animation: settle .55s ease both; animation-delay: calc(var(--i, 0) * 40ms); }}
+      @keyframes settle {{ from {{ opacity: 0; transform: translateY(14px); }} to {{ opacity: 1; transform: none; }} }}
+    }}
+  </style>
+</head>
+<body>
+  <header>
+    <div>
+      <p class="kicker">Acme Robotics · Contract Lifecycle Management</p>
+      <h1>One contract journey. Eleven real experiences.</h1>
+      <p>An offline, self-contained visual walkthrough of the Box, Agentforce, and React CLM demo. Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
+    </div>
+    <aside class="status">
+      <strong>Capture state · July 13, 2026</strong>
+      <span>The Box App and Hub are shown in their saved live state. Automate is shown as a saved, inactive draft pending its update to Salesforce standard REST and a confirmed OAuth 2.0 connection.</span>
+    </aside>
+  </header>
+  <main>
+{cards}
+  </main>
+  <footer>Self-contained artifact · Embedded screenshots · No external fonts, scripts, stylesheets, or image references</footer>
+</body>
+</html>
+"""
+    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
+    OUTPUT.write_text(document, encoding="utf-8")
+    print(OUTPUT)
+
+
+if __name__ == "__main__":
+    build()

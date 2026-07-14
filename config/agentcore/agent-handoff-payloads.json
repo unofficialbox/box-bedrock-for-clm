@@ -1,0 +1,99 @@
+{
+  "demo": "CLM-2026-Northstar",
+  "payloads": [
+    {
+      "from": "clm-supervisor-agent",
+      "to": "box-contract-package-agent",
+      "intent": "validate_package",
+      "input": {
+        "contractId": "CLM-2026-Northstar",
+        "workspaceFolderId": "399081692991",
+        "requiredDocumentTypes": ["MSA", "DPA", "SOW", "Order Form", "Security Exhibit", "Insurance"]
+      },
+      "expectedOutput": {
+        "packageStatus": "complete",
+        "fileIds": {
+          "msa": "2342633195167",
+          "dpa": "2342633156726",
+          "sow": "2342622013520",
+          "orderForm": "2342633259967",
+          "securityExhibit": "2342636075017",
+          "insurance": "2342619758153"
+        }
+      }
+    },
+    {
+      "from": "clm-supervisor-agent",
+      "to": "salesforce-commercial-agent",
+      "intent": "compare_order_form_to_opportunity",
+      "input": {
+        "opportunityId": "006-demo-northstar",
+        "orderFormFileId": "2342633259967",
+        "structuredRecord": "output/json/northstar-clm-records.json"
+      },
+      "expectedOutput": {
+        "exceptions": [
+          {
+            "field": "paymentTerms",
+            "salesforceValue": "Net 45",
+            "documentValue": "Net 90",
+            "requiredApprover": "Finance"
+          }
+        ]
+      }
+    },
+    {
+      "from": "clm-supervisor-agent",
+      "to": "clause-risk-agent",
+      "intent": "compare_to_playbook",
+      "input": {
+        "documentFileIds": ["2342633195167", "2342633156726", "2342622013520", "2342633259967"],
+        "playbookFileId": "2342635779827"
+      },
+      "expectedOutput": {
+        "minimumFindings": ["Unlimited liability", "PHI processing", "Uncapped SLA credits", "Net 90 payment terms"],
+        "citationRequired": true
+      }
+    },
+    {
+      "from": "clause-risk-agent",
+      "to": "databricks-analytics-agent",
+      "intent": "enrich_clause_benchmarks",
+      "input": {
+        "clauseAreas": ["Limitation of Liability", "Payment Terms", "Data Processing", "SLA Credits"],
+        "analyticsSource": "output/csv/historical-clause-outcomes.csv"
+      },
+      "expectedOutput": {
+        "metrics": ["standardAcceptedPct", "fallbackAcceptedPct", "avgNegotiationDays", "renewalImpact"]
+      }
+    },
+    {
+      "from": "clm-supervisor-agent",
+      "to": "salesforce-approval-agent",
+      "intent": "route_required_approvals",
+      "input": {
+        "contractId": "CLM-2026-Northstar",
+        "riskLevel": "High",
+        "dataCategory": "PHI",
+        "dealValue": 2400000,
+        "paymentTermsException": true
+      },
+      "expectedOutput": {
+        "requiredApprovers": ["Finance", "Privacy", "Security", "Legal VP"]
+      }
+    },
+    {
+      "from": "clm-supervisor-agent",
+      "to": "obligation-monitor-agent",
+      "intent": "extract_candidate_obligations",
+      "input": {
+        "contractPackageFolderId": "399081692991",
+        "executionStatus": "draft"
+      },
+      "expectedOutput": {
+        "obligationsAreCandidatesOnly": true,
+        "minimumObligationTypes": ["Renewal Notice", "SLA Report", "Security Evidence", "Data Deletion", "Insurance"]
+      }
+    }
+  ]
+}

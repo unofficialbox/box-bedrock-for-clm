@@ -1,0 +1,108 @@
+{
+  "schemaVersion": "2.0",
+  "appName": "Contract Lifecycle Management",
+  "workspace": {
+    "name": "CLM-2026-Northstar",
+    "folderId": "399081692991",
+    "sharedLink": "https://kadams.ent.box.com/folder/399081692991"
+  },
+  "dashboardPurpose": "A native Box CLM operating cockpit for intake, risk review, approvals, governed clauses, execution, and obligation follow-up.",
+  "sourceTemplates": {
+    "contract": "clmContract",
+    "document": "clmDocument",
+    "obligation": "clmObligation",
+    "clause": "clmClause"
+  },
+  "design": {
+    "navigation": "left rail",
+    "defaultView": "Portfolio",
+    "tableDensity": "comfortable",
+    "statusFormatting": "colored pills",
+    "textWrapping": true,
+    "inlineEditing": ["owner", "legalReviewer", "status", "approvalStatus"],
+    "chartTypes": ["donut", "bar"]
+  },
+  "pages": [
+    {
+      "name": "Portfolio",
+      "purpose": "Executive pipeline and risk view",
+      "layout": "wide dashboard",
+      "blocks": [
+        {"type": "View", "label": "Active Contract Pipeline", "source": "clmContract", "display": "grid", "filters": ["status not in [Executed, Obligations Active]"], "columns": ["contractId", "counterparty", "status", "riskLevel", "dealValue", "owner", "targetSignatureDate"]},
+        {"type": "Chart", "label": "Contracts by Lifecycle", "chart": "donut", "source": "clmContract.status"},
+        {"type": "Chart", "label": "Risk Exposure", "chart": "bar", "source": "clmContract.riskLevel"},
+        {"type": "View", "label": "Signature Dates at Risk", "source": "clmContract", "display": "list", "filters": ["riskLevel in [High, Critical]"], "columns": ["counterparty", "riskLevel", "targetSignatureDate", "legalReviewer"]}
+      ]
+    },
+    {
+      "name": "Northstar Deal Room",
+      "purpose": "One-deal workspace for the live scenario",
+      "layout": "two-column deal room",
+      "blocks": [
+        {"type": "Folder", "label": "Contract Workspace", "targetId": "399081692991"},
+        {"type": "File", "label": "Critical Legal Redline", "targetId": "2342633195167", "taskId": "42899891150"},
+        {"type": "File", "label": "Commercial Mismatch", "targetId": "2342633259967", "taskId": "42899881417"},
+        {"type": "File", "label": "Privacy and Security Review", "targetId": "2342633156726", "taskId": "42899893550"},
+        {"type": "View", "label": "High-Risk Documents", "source": "clmDocument", "filters": ["clauseRisk in [High, Critical]", "approvalStatus = Pending"], "columns": ["documentType", "versionStatus", "clauseRisk", "aiSummaryStatus", "approvalStatus"]},
+        {"type": "Shortcut", "label": "Open Review Packets", "targetId": "399082148957"}
+      ]
+    },
+    {
+      "name": "Intake & Automation",
+      "purpose": "Create new requests and expose automation state",
+      "layout": "action dashboard",
+      "blocks": [
+        {"type": "Form", "label": "New Contract Request", "url": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858"},
+        {"type": "View", "label": "New Intake", "sourceFolderId": "399082115646", "display": "list", "columns": ["name", "updated", "owner"]},
+        {"type": "List", "label": "Pending Human Gates", "taskIds": ["42899891150", "42899881417", "42899893550"]},
+        {"type": "Shortcut", "label": "Track CLM Automations", "url": "https://kadams.ent.box.com/automate"},
+        {"type": "Shortcut", "label": "DocGen Templates", "targetId": "399363530207"}
+      ]
+    },
+    {
+      "name": "Clause Library",
+      "purpose": "Approved language and negotiation fallbacks",
+      "layout": "library dashboard",
+      "blocks": [
+        {"type": "View", "label": "Approved Standards", "source": "clmClause", "filters": ["approvalStatus = Approved", "position = Standard"], "columns": ["clauseId", "clauseFamily", "owner", "lastReviewed", "nextReview", "usageCount"]},
+        {"type": "View", "label": "Approved Fallbacks", "source": "clmClause", "filters": ["approvalStatus = Approved", "position = Approved Fallback"], "columns": ["clauseId", "clauseFamily", "owner", "lastReviewed"]},
+        {"type": "Chart", "label": "Most-Used Clause Families", "chart": "bar", "source": "clmClause.clauseFamily", "aggregate": "sum usageCount"},
+        {"type": "Chart", "label": "Standard vs Fallback", "chart": "donut", "source": "clmClause.position"},
+        {"type": "Folder", "label": "Clause Source Files", "targetId": "399419341582"},
+        {"type": "Shortcut", "label": "Acme Contract Clause Library Hub", "url": "HUB_URL_AFTER_PUBLISH"}
+      ]
+    },
+    {
+      "name": "Approvals & Signature",
+      "purpose": "Review readiness and execution",
+      "layout": "review board",
+      "blocks": [
+        {"type": "List", "label": "Pending Reviews", "taskIds": ["42899891150", "42899881417", "42899893550"]},
+        {"type": "Folder", "label": "Approval Packets", "targetId": "399082072259"},
+        {"type": "Folder", "label": "Signature", "targetId": "399081939679"},
+        {"type": "File", "label": "Approval Memo DocGen Template", "targetId": "2344242775119"},
+        {"type": "File", "label": "Order Summary DocGen Template", "targetId": "2344233767713"}
+      ]
+    },
+    {
+      "name": "Executed & Obligations",
+      "purpose": "Post-signature ownership and renewal readiness",
+      "layout": "operations dashboard",
+      "blocks": [
+        {"type": "Folder", "label": "Executed Agreements", "targetId": "399080706253"},
+        {"type": "View", "label": "Open Obligations", "source": "clmObligation", "filters": ["status in [Open, In Progress, Escalated]"], "columns": ["obligationType", "owner", "dueDate", "sourceClause", "status", "reminderWindowDays"]},
+        {"type": "Chart", "label": "Obligations by Owner", "chart": "bar", "source": "clmObligation.owner"},
+        {"type": "Chart", "label": "Obligation Status", "chart": "donut", "source": "clmObligation.status"},
+        {"type": "File", "label": "Renewal Notice DocGen Template", "targetId": "2344244747613"}
+      ]
+    }
+  ],
+  "manualBuildSteps": [
+    "Open the published Contract Lifecycle Management app in edit mode.",
+    "Add or rename pages in the order defined by this spec.",
+    "Configure Views with the metadata templates, filters, columns, pill formatting, text wrapping, and inline-edit fields shown here.",
+    "Add donut and bar Chart blocks only after representative metadata records exist.",
+    "Replace HUB_URL_AFTER_PUBLISH after the Hub is published.",
+    "Preview every page at desktop width, then publish only after presenter confirmation."
+  ]
+}

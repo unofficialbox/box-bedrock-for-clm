@@ -1,0 +1,27 @@
+{
+  "schemaVersion": "1.0",
+  "strategy": "Group all findings for the same contract, file, and domain into one Box review task.",
+  "confidenceThreshold": 0.85,
+  "fallback": {
+    "directoryKey": "legal-operations-triage",
+    "displayName": "Legal Operations Triage",
+    "boxLogin": "kadams@boxdemo.com",
+    "rule": "Use for unclassified findings, confidence below threshold, missing experts, or experts without file access."
+  },
+  "routes": [
+    {"domain": "Commercial Legal", "directoryKey": "commercial-counsel", "displayName": "Jordan Lee", "title": "Commercial Counsel", "boxLogin": null, "liveDemoTaskId": "42899891150"},
+    {"domain": "Finance", "directoryKey": "finance-director", "displayName": "Priya Shah", "title": "Finance Director", "boxLogin": null, "liveDemoTaskId": "42899881417"},
+    {"domain": "Privacy", "directoryKey": "privacy-counsel", "displayName": "Elena Torres", "title": "Privacy Counsel", "boxLogin": null, "liveDemoTaskId": "42899893550"},
+    {"domain": "Security", "directoryKey": "security-lead", "displayName": "Marcus Reed", "title": "Security Assurance Lead", "boxLogin": null, "liveDemoTaskId": "42899893550"},
+    {"domain": "Tax", "directoryKey": "tax-counsel", "displayName": "Tax Counsel", "title": "Tax Reviewer", "boxLogin": null, "liveDemoTaskId": null},
+    {"domain": "Service and SLA", "directoryKey": "service-owner", "displayName": "Service Owner", "title": "Service Delivery Owner", "boxLogin": null, "liveDemoTaskId": null},
+    {"domain": "Insurance", "directoryKey": "risk-manager", "displayName": "Risk Manager", "title": "Corporate Risk Manager", "boxLogin": null, "liveDemoTaskId": null}
+  ],
+  "activationRules": [
+    "Replace every null boxLogin used by the scenario with a real Box collaborator or managed group.",
+    "Verify the selected expert can access the redline file before creating a task.",
+    "Never infer a person or login from document text.",
+    "Do not create more than one open task for the same contract, file, and domain.",
+    "Keep the existing kadams@boxdemo.com assignments as demo triage until named experts are configured."
+  ]
+}

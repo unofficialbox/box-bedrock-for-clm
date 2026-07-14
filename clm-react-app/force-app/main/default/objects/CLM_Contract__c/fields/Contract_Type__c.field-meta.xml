@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contract_Type__c</fullName>
+    <label>Contract Type</label>
+    <required>true</required>
+    <type>Picklist</type>
+    <valueSet>
+        <restricted>true</restricted>
+        <valueSetDefinition>
+            <sorted>false</sorted>
+            <value><fullName>MSA Package</fullName><default>true</default><label>MSA Package</label></value>
+            <value><fullName>DPA</fullName><default>false</default><label>DPA</label></value>
+            <value><fullName>SOW</fullName><default>false</default><label>SOW</label></value>
+            <value><fullName>Order Form</fullName><default>false</default><label>Order Form</label></value>
+            <value><fullName>Procurement Agreement</fullName><default>false</default><label>Procurement Agreement</label></value>
+        </valueSetDefinition>
+    </valueSet>
+</CustomField>

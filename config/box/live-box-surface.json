@@ -1,0 +1,184 @@
+{
+  "enterpriseId": "5105484",
+  "owner": "Kyle Adams",
+  "login": "kadams@boxdemo.com",
+  "workspace": {
+    "name": "CLM-2026-Northstar",
+    "id": "399081692991",
+    "parent": {
+      "name": "All Files",
+      "id": "0"
+    },
+    "sharedLink": "https://kadams.ent.box.com/folder/399081692991"
+  },
+  "boxAppUrl": "https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn",
+  "boxFormUrl": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858",
+  "boxAppEnhancements": {
+    "status": "live",
+    "page": "Clause Library",
+    "viewUrl": "https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn/view/vBiTv7ZMarRKq9QpJ",
+    "sourceFolderId": "399419341582",
+    "blocks": [
+      "Approved Standards view",
+      "Clause Source Files folder",
+      "Standard vs Fallback donut chart"
+    ]
+  },
+  "metadataTemplates": {
+    "clmContract": "fe4e6fdb-659f-4931-9718-d03b624affdb",
+    "clmDocument": "8a6cc4c2-8425-48fa-b4f0-01711b777d4a",
+    "clmObligation": "964802ab-7da2-444e-9422-1b52fd4f5489",
+    "clmClause": "9ca0de81-5f96-4158-82f7-1251b28a9c6e"
+  },
+  "folders": {
+    "intake": "399082115646",
+    "draftsAndRedlines": "399080778184",
+    "reviewPackets": "399082148957",
+    "approvals": "399082072259",
+    "signature": "399081939679",
+    "executedAgreement": "399080706253",
+    "obligations": "399081567921",
+    "docgenTemplates": "399363530207",
+    "clauseLibrary": "399419341582",
+    "approvedClauseStandards": "399391233419",
+    "approvedClauseFallbacks": "399415052600",
+    "clauseGovernance": "399415016887"
+  },
+  "files": {
+    "northstar-msa-redline-v3.pdf": "2342633195167",
+    "northstar-dpa.pdf": "2342633156726",
+    "northstar-sow-implementation.pdf": "2342622013520",
+    "northstar-order-form.pdf": "2342633259967",
+    "northstar-security-exhibit.pdf": "2342636075017",
+    "northstar-insurance-certificate.pdf": "2342619758153",
+    "clause-playbook.json": "2342635779827",
+    "northstar-clm-records.json": "2342634498103",
+    "historical-clause-outcomes.csv": "2342621008641",
+    "CLM-DATA-001-standard.md": "2344316824098",
+    "CLM-DATA-002-fallback.md": "2344289869704",
+    "CLM-LIAB-001-standard.md": "2344312866990",
+    "CLM-LIAB-002-fallback.md": "2344282491830",
+    "CLM-PAY-001-standard.md": "2344303263817",
+    "CLM-PAY-002-fallback.md": "2344329796519",
+    "CLM-SLA-001-standard.md": "2344314507811",
+    "CLM-SLA-002-fallback.md": "2344314138659",
+    "clause-library-README.md": "2344321741416"
+  },
+  "hub": {
+    "name": "Acme Contract Clause Library",
+    "status": "live",
+    "id": "1312630996",
+    "url": "https://kadams.ent.box.com/hubs/1312630996",
+    "sourceFolderId": "399419341582"
+  },
+  "automate": {
+    "status": "saved-draft-inactive-update-required",
+    "workflowId": "399436615012",
+    "url": "https://kadams.ent.box.com/automate/workflow/edit/399436615012",
+    "workflowSpec": "config/box/automate-workflows.json",
+    "extractSpec": "config/box/extract-field-prompts.json",
+    "agentSpec": "config/box/ai-agent-specs.json",
+    "httpsConnectorSpec": "config/box/https-connectors.json",
+    "httpsConnectorBlocker": "Retrieve the deployed Box_Automate_CLM External Client App consumer secret, configure and test the Box OAuth 2.0 connection, and update the saved workflow to standard REST external-ID upsert and lookup before enabling it. Client credentials, the dedicated Run As user, permission-set authorization, and direct Salesforce REST create/update/lookup are already configured and verified."
+  },
+  "docgenTemplates": {
+    "catalogUrl": "https://kadams.ent.box.com/automate/docgen",
+    "folderUrl": "https://kadams.ent.box.com/folder/399363530207",
+    "sampleData": "config/box/docgen-template-data.json",
+    "templates": {
+      "approvalMemo": {
+        "fileName": "clm-approval-memo-template.docx",
+        "fileId": "2344242775119",
+        "markedAsDocgenTemplate": true
+      },
+      "orderSummary": {
+        "fileName": "clm-order-summary-template.docx",
+        "fileId": "2344233767713",
+        "markedAsDocgenTemplate": true
+      },
+      "renewalNotice": {
+        "fileName": "clm-renewal-notice-template.docx",
+        "fileId": "2344244747613",
+        "markedAsDocgenTemplate": true
+      }
+    }
+  },
+  "liveMetadata": {
+    "rootContractTemplate": "clmContract",
+    "documentTemplate": "clmDocument",
+    "obligationTemplate": "clmObligation",
+    "obligationMetadataParent": "folder_399081567921"
+  },
+  "liveWorkspaceEnhancements": {
+    "rootDescription": "CLM demo workspace for Northstar Health System. Use this root as the governed content and workflow source for contract metadata, live workstreams, review tasks, and obligation tracking.",
+    "rootTags": [
+      "CLM",
+      "Northstar",
+      "Agentforce-ready",
+      "AgentCore-ready"
+    ],
+    "fileDescriptionsAndTags": {
+      "northstar-msa-redline-v3.pdf": {
+        "description": "Critical legal redline: unlimited liability, auto-renewal ambiguity, termination language. Primary review artifact for Box AI and assistant demos.",
+        "tags": [
+          "CLM",
+          "MSA",
+          "Critical",
+          "Legal Review"
+        ]
+      },
+      "northstar-order-form.pdf": {
+        "description": "Commercial mismatch artifact: order form includes Net 90 terms while structured Salesforce-style record expects Net 45.",
+        "tags": [
+          "CLM",
+          "Order Form",
+          "High",
+          "Finance Review"
+        ]
+      },
+      "northstar-dpa.pdf": {
+        "description": "Privacy review artifact: DPA includes PHI processing language and security obligations requiring privacy/security approval.",
+        "tags": [
+          "CLM",
+          "DPA",
+          "High",
+          "Privacy Review"
+        ]
+      }
+    }
+  },
+  "liveTasks": {
+    "legalReview": {
+      "taskId": "42899891150",
+      "assignmentId": "92573629417",
+      "fileId": "2342633195167",
+      "fileName": "northstar-msa-redline-v3.pdf",
+      "assignedTo": "kadams@boxdemo.com",
+      "status": "incomplete",
+      "message": "Legal review: resolve unlimited liability, auto-renewal notice, and termination redlines before approval packet."
+    },
+    "financeReview": {
+      "taskId": "42899881417",
+      "assignmentId": "92573683142",
+      "fileId": "2342633259967",
+      "fileName": "northstar-order-form.pdf",
+      "assignedTo": "kadams@boxdemo.com",
+      "status": "incomplete",
+      "message": "Finance review: reconcile Net 90 order-form term against Salesforce expected Net 45 commercial record."
+    },
+    "privacySecurityReview": {
+      "taskId": "42899893550",
+      "assignmentId": "92573685345",
+      "fileId": "2342633156726",
+      "fileName": "northstar-dpa.pdf",
+      "assignedTo": "kadams@boxdemo.com",
+      "status": "incomplete",
+      "message": "Privacy/security review: confirm PHI processing language, DPA obligations, and security exhibit alignment."
+    }
+  },
+  "remainingManualBuild": [
+    "Update the saved workflow to the Salesforce standard REST upsert and lookup steps, configure OAuth 2.0, then explicitly approve Automate activation.",
+    "Submit one end-to-end New Contract Request smoke test and verify the uploaded package lands in intake folder 399082115646.",
+    "Create a Box Sign packet from the approved package when ready."
+  ]
+}

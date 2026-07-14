@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ExtlClntAppOauthConfigurablePolicies xmlns="http://soap.sforce.com/2006/04/metadata">
+    <clientCredentialsFlowUser>box.automate.clm+00dgl000003d0lrua0@boxdemo.com</clientCredentialsFlowUser>
+    <commaSeparatedPermissionSet>CLM_Box_Automate_Integration</commaSeparatedPermissionSet>
+    <externalClientApplication>Box_Automate_CLM</externalClientApplication>
+    <ipRelaxationPolicyType>Enforce</ipRelaxationPolicyType>
+    <isClientCredentialsFlowEnabled>true</isClientCredentialsFlowEnabled>
+    <isGuestCodeCredFlowEnabled>false</isGuestCodeCredFlowEnabled>
+    <isTokenExchangeFlowEnabled>false</isTokenExchangeFlowEnabled>
+    <label>Box_Automate_CLM_oauthPlcy</label>
+    <namedUserJwtSessionTimeoutType>UserSession</namedUserJwtSessionTimeoutType>
+    <permittedUsersPolicyType>AdminApprovedPreAuthorized</permittedUsersPolicyType>
+    <refreshTokenPolicyType>Zero</refreshTokenPolicyType>
+    <refreshTokenValidityPeriod>0</refreshTokenValidityPeriod>
+    <requiredSessionLevel>STANDARD</requiredSessionLevel>
+</ExtlClntAppOauthConfigurablePolicies>

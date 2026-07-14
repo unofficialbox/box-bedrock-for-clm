@@ -1,0 +1,22 @@
+flowchart LR
+    User["Legal, Sales, Finance, Privacy"] --> Intake["Box Form + Automate"]
+    Intake --> Validate["Human validates intake"]
+    Validate --> Rest["HTTPS Connector<br/>Salesforce standard REST"]
+    Rest --> Record["Salesforce CLM record"]
+    Record --> React["Salesforce Multi-Framework React app"]
+    React --> Box["Box CLM workspace"]
+    React --> Agentforce["Agentforce Contract Copilot"]
+    Agentforce --> Box
+    Box --> Compare["Redline + approved baseline<br/>cited structured findings"]
+    Compare --> Route["Domain expert routing<br/>one Box task per domain"]
+    Route --> React
+    Box --> Content["Contracts, metadata, tasks, DocGen, Sign"]
+    Agentforce --> Human["Human review and confirmation"]
+    Human --> Box
+
+    classDef surface fill:#e9f1ff,stroke:#1166e8,color:#071b33
+    classDef system fill:#f8fafc,stroke:#627a98,color:#071b33
+    classDef human fill:#fff1d6,stroke:#b16a00,color:#522f00
+    class React,Agentforce surface
+    class Intake,Rest,Record,Box,Compare,Route,Content system
+    class User,Validate,Human human

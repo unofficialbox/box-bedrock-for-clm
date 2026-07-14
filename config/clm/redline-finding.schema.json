@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://acme.example/schemas/clm/redline-finding.schema.json",
+  "title": "CLM Redline Finding",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "findingId",
+    "contractId",
+    "redlineFileId",
+    "baselineItemId",
+    "section",
+    "changeType",
+    "domain",
+    "riskLevel",
+    "summary",
+    "proposedText",
+    "approvedPosition",
+    "sourceCitations",
+    "classificationConfidence",
+    "routingStatus",
+    "reviewStatus"
+  ],
+  "properties": {
+    "findingId": {"type": "string", "pattern": "^RLF-[0-9]{3,}$"},
+    "contractId": {"type": "string", "minLength": 1},
+    "redlineFileId": {"type": "string", "pattern": "^[0-9]+$"},
+    "baselineItemId": {"type": "string", "minLength": 1},
+    "section": {"type": "string", "minLength": 1},
+    "changeType": {"enum": ["Added", "Deleted", "Replaced", "Moved"]},
+    "domain": {
+      "enum": [
+        "Commercial Legal",
+        "Privacy",
+        "Security",
+        "Finance",
+        "Tax",
+        "Service and SLA",
+        "Insurance",
+        "Unclassified"
+      ]
+    },
+    "riskLevel": {"enum": ["Low", "Medium", "High", "Critical"]},
+    "summary": {"type": "string", "minLength": 1},
+    "proposedText": {"type": "string"},
+    "approvedPosition": {"type": "string"},
+    "fallbackClauseId": {"type": ["string", "null"]},
+    "sourceCitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["boxItemId", "location"],
+        "properties": {
+          "boxItemId": {"type": "string", "pattern": "^[0-9]+$"},
+          "location": {"type": "string", "minLength": 1}
+        }
+      }
+    },
+    "classificationConfidence": {"type": "number", "minimum": 0, "maximum": 1},
+    "routingStatus": {"enum": ["Ready", "Needs Triage", "Assigned", "Failed"]},
+    "expertDirectoryKey": {"type": ["string", "null"]},
+    "boxTaskId": {"type": ["string", "null"], "pattern": "^[0-9]+$"},
+    "reviewStatus": {"enum": ["Pending", "Approved", "Rejected", "Resolved"]}
+  }
+}

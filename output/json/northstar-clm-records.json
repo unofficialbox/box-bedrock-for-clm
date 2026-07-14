@@ -1,0 +1,58 @@
+{
+  "contract": {
+    "contractId": "CLM-2026-Northstar",
+    "counterparty": "Northstar Health System",
+    "contractType": "MSA Package",
+    "status": "Legal Review",
+    "dealValue": 2400000,
+    "termMonths": 36,
+    "region": "US",
+    "dataCategory": "PHI",
+    "owner": "Maya Chen",
+    "legalReviewer": "Jordan Lee",
+    "riskLevel": "High",
+    "targetSignatureDate": "2026-07-31",
+    "renewalDate": "2029-07-31",
+    "noticeDeadline": "2029-04-30"
+  },
+  "salesforceOpportunity": {
+    "id": "006-demo-northstar",
+    "accountName": "Northstar Health System",
+    "stage": "Contracting",
+    "amount": 2400000,
+    "paymentTerms": "Net 45",
+    "closeDate": "2026-07-31",
+    "products": [
+      "Workflow Analytics",
+      "Robotics Ops Console",
+      "Premium Support"
+    ]
+  },
+  "approvalMatrix": [
+    {
+      "condition": "dealValue > 1000000",
+      "approver": "Finance",
+      "slaHours": 24
+    },
+    {
+      "condition": "dataCategory = PHI",
+      "approver": "Privacy",
+      "slaHours": 24
+    },
+    {
+      "condition": "dataCategory = PHI",
+      "approver": "Security",
+      "slaHours": 24
+    },
+    {
+      "condition": "riskLevel in High,Critical",
+      "approver": "Legal VP",
+      "slaHours": 48
+    },
+    {
+      "condition": "paymentTerms beyond Net 60",
+      "approver": "Finance",
+      "slaHours": 24
+    }
+  ]
+}
