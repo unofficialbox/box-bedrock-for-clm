@@ -1,14 +1,14 @@
 {
   "manifestVersion": "1.0.0",
   "scenario": {
-    "id": "clm-agentic-orchestration",
-    "name": "Northstar CLM - Agentic Orchestration",
+    "id": "clm-cross-platform-agentic-orchestration",
+    "name": "Northstar CLM - Cross-Platform Agentic Orchestration",
     "orchestrationModel": "supervisor-led multi-platform specialist agents",
     "contractId": "CLM-2026-0017"
   },
   "presenterSurface": "Salesforce Multi-Framework React",
   "included": [
-    "all Governed Workflow components",
+    "all Box Automate–Led Agentic Orchestration components",
     "Salesforce Agentforce CLM record, Contract Copilot, and Multi-Framework React UI Bundle",
     "Databricks analytics agent",
     "AWS Bedrock AgentCore supervisor",
@@ -25,18 +25,18 @@
     "agentcore": "specification-and-deterministic-local-trace"
   },
   "documentation": {
-    "guide": "docs/scenarios/agentic-orchestration/README.md",
+    "guide": "docs/scenarios/cross-platform-agentic-orchestration/README.md",
     "architectureSource": "docs/diagrams/clm-agentcore-architecture.mmd",
     "architectureRendered": "docs/diagrams/clm-agentcore-architecture.svg",
-    "flowSource": "docs/diagrams/agentic-orchestration-flow.mmd",
-    "flowRendered": "docs/diagrams/agentic-orchestration-flow.svg",
-    "portableGuide": "output/html/03-agentic-orchestration-guide.html",
-    "gallery": "output/html/04-agentic-orchestration-gallery.html",
+    "flowSource": "docs/diagrams/cross-platform-agentic-orchestration-flow.mmd",
+    "flowRendered": "docs/diagrams/cross-platform-agentic-orchestration-flow.svg",
+    "portableGuide": "output/html/03-cross-platform-agentic-orchestration-guide.html",
+    "gallery": "output/html/04-cross-platform-agentic-orchestration-gallery.html",
     "detailedRunbook": "docs/runbooks/03-agentcore-demo.md"
   },
   "screenshots": {
-    "sharedBox": "output/screenshots/governed-workflow/",
-    "scenarioSpecific": "output/screenshots/agentic-orchestration/"
+    "sharedBox": "output/screenshots/box-automate-agentic-orchestration/",
+    "scenarioSpecific": "output/screenshots/cross-platform-agentic-orchestration/"
   },
   "trace": "output/agentcore/northstar-agentcore-trace.json"
 }

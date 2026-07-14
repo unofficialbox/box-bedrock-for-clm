@@ -60,7 +60,7 @@
           "method": "POST",
           "endpoint": "/services/apexrest/clm/redline-routing",
           "status": "not implemented",
-          "requiredFor": "Agentic Orchestration live redline routing"
+          "requiredFor": "Cross-Platform Agentic Orchestration live redline routing"
         }
       },
       "prohibitedPayload": ["contract bytes", "Box access tokens", "connector secrets", "signer credentials", "unreviewed AI output"]

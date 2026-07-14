@@ -1,6 +1,6 @@
 # Supporting Box + Agentforce + React Scripts
 
-These supporting scripts present the React portion of Agentic Orchestration at three depths. They intentionally stop short of AgentCore, Strands, and Databricks; use the parent [Agentic Orchestration guide](../README.md#4-presenter-script) for the complete scenario.
+These supporting scripts present the React portion of Cross-Platform Agentic Orchestration at three depths. They intentionally stop short of AgentCore, Strands, and Databricks; use the parent [Cross-Platform Agentic Orchestration guide](../README.md#4-presenter-script) for the complete scenario.
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|
@@ -14,7 +14,7 @@ Supporting artifacts:
 - [Demo flow diagram](../../../diagrams/clm-box-agentforce-react-demo-flow.svg)
 - [Box Form entry-point diagram](../../../diagrams/clm-box-form-automate-entry.svg)
 - [Human-readable component manifest](component-manifest.md)
-- [Machine-readable scenario manifest](../../../../config/demo/agentic-orchestration-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 - [Agentforce action contract](../../../../config/agentforce/clm-react-agentforce-spec.json)
 
 ## Shared presenter rule

@@ -573,7 +573,7 @@ def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None
         "salesforce.integrationUsername": config.get("salesforce", {}).get("integrationUsername"),
         "salesforce.integrationEmail": config.get("salesforce", {}).get("integrationEmail"),
     }
-    if scenario == "agentic":
+    if scenario == "cross-platform-agentic-orchestration":
         required.update({
             "agentforce.agentId": config.get("agentforce", {}).get("agentId"),
             "agentforce.applicationId": config.get("agentforce", {}).get("applicationId"),
@@ -645,7 +645,14 @@ def parser() -> argparse.ArgumentParser:
     resolve_parser = sub.add_parser("resolve-config")
     resolve_parser.add_argument("--allow-unresolved", action="store_true")
     validate_parser = sub.add_parser("validate")
-    validate_parser.add_argument("--scenario", choices=["governed", "agentic"], default="governed")
+    validate_parser.add_argument(
+        "--scenario",
+        choices=[
+            "box-automate-agentic-orchestration",
+            "cross-platform-agentic-orchestration",
+        ],
+        default="box-automate-agentic-orchestration",
+    )
     validate_parser.add_argument("--offline", action="store_true", help="Validate local bindings without calling Box or Salesforce")
     return result
 

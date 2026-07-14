@@ -1,6 +1,6 @@
-# Agentic Orchestration
+# Cross-Platform Agentic Orchestration
 
-Supervisor-led CLM execution across the complete platform stack. AWS Bedrock AgentCore and Strands coordinate specialist agents across Box, Salesforce Agentforce, the Salesforce Multi-Framework React workspace, and Databricks while humans retain approval and signature authority.
+Supervisor-led CLM execution across a multi-platform stack. AWS Bedrock AgentCore and Strands coordinate specialist agents across Box, Salesforce Agentforce, the Salesforce Multi-Framework React workspace, and Databricks while humans retain approval and signature authority.
 
 ## Read this guide in order
 
@@ -26,7 +26,7 @@ Repository truth: the React experience and Box specifications are available; the
 
 ## 2. Architecture
 
-![Agentic Orchestration architecture](../../diagrams/clm-agentcore-architecture.svg)
+![Cross-Platform Agentic Orchestration architecture](../../diagrams/clm-agentcore-architecture.svg)
 
 AgentCore/Strands owns planning and specialist delegation. Box governs content, Salesforce Agentforce provides structured commercial context plus Salesforce-native assistance and actions, Databricks supplies analytical context, and React presents the joined workspace.
 
@@ -37,7 +37,7 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 
 ## 3. Flow
 
-![Agentic Orchestration flow](../../diagrams/agentic-orchestration-flow.svg)
+![Cross-Platform Agentic Orchestration flow](../../diagrams/cross-platform-agentic-orchestration-flow.svg)
 
 1. A Box or Salesforce event starts an AgentCore session.
 2. The supervisor selects Box, Salesforce Agentforce, and Databricks specialists.
@@ -46,7 +46,7 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 5. A human gate blocks signature and routes missing approvals.
 6. Approved work proceeds to Doc Gen, Box Sign, obligations, and audit evidence.
 
-- [Flow source](../../diagrams/agentic-orchestration-flow.mmd)
+- [Flow source](../../diagrams/cross-platform-agentic-orchestration-flow.mmd)
 
 [Continue to presenter script](#4-presenter-script)
 
@@ -75,25 +75,25 @@ Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies
 
 ## 5. Visual walkthrough
 
-The Box screenshots below reference the Governed Workflow source files. Only the React screenshots are scenario-specific.
+The Box screenshots below reference the Box Automate–Led Agentic Orchestration source files. Only the React screenshots are scenario-specific.
 
 ### Unified React workspace
 
-![Northstar React workspace](../../../output/screenshots/agentic-orchestration/clm-react-workspace.png)
+![Northstar React workspace](../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png)
 
-![React domain-expert review queue](../../../output/screenshots/agentic-orchestration/clm-react-redline-reviews.png)
+![React domain-expert review queue](../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-redline-reviews.png)
 
 ### Shared governed Box context
 
-![Box App portfolio dashboard](../../../output/screenshots/governed-workflow/box-app-dashboard-live.png)
+![Box App portfolio dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
 
-![Box App Clause Library](../../../output/screenshots/governed-workflow/box-app-clause-library-live.png)
+![Box App Clause Library](../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
 
-![Approved Clause Hub](../../../output/screenshots/governed-workflow/box-hub-clause-library-live.png)
+![Approved Clause Hub](../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
 
-![Human approval branch](../../../output/screenshots/governed-workflow/automate-approval-flow.png)
+![Human approval branch](../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../output/html/04-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/03-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
+Optional offline presentation: [self-contained visual gallery](../../../output/html/04-cross-platform-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/03-cross-platform-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -113,7 +113,7 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 
 ## 7. Setup and validation
 
-1. Complete [Operator Start Here](../../operator/00-start-here.md) and the Governed Workflow foundation first.
+1. Complete [Operator Start Here](../../operator/00-start-here.md) and the Box Automate–Led Agentic Orchestration foundation first.
 2. Run `python3 scripts/run_agentcore_mock.py` and validate `output/agentcore/northstar-agentcore-trace.json`.
 3. Start the React workspace with this environment's Salesforce record ID, contract ID, and generated Box workspace folder ID.
 4. Confirm Box content and the safe Salesforce Agentforce fallback render without browser secrets.
@@ -126,7 +126,7 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 - [Detailed AgentCore runbook](../../runbooks/03-agentcore-demo.md)
 - [Operator setup and activation](../../operator/00-start-here.md)
 - [Manual-task register](../../manual-task-register.md)
-- [Machine-readable scenario manifest](../../../config/demo/agentic-orchestration-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 - [Supporting React scripts](supporting-react-scripts/README.md)
 
 [Back to the scenario selector](../README.md)

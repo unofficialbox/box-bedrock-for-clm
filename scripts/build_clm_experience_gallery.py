@@ -97,25 +97,25 @@ REACT_EXPERIENCES = [
 ]
 
 for experience in BOX_EXPERIENCES:
-    experience["source"] = "governed-workflow"
+    experience["source"] = "box-automate-agentic-orchestration"
 
 for experience in REACT_EXPERIENCES:
-    experience["source"] = "agentic-orchestration"
+    experience["source"] = "cross-platform-agentic-orchestration"
 
 SCENARIOS = [
     {
         "order": "02",
-        "slug": "governed-workflow",
-        "title": "Governed Workflow",
-        "headline": "A controlled contract journey with agentic enrichment.",
-        "description": "A Box-centric walkthrough of Apps, Forms, Automate, Extract, agents, human approvals, Hubs, Doc Gen, and execution controls.",
+        "slug": "box-automate-agentic-orchestration",
+        "title": "Box Automate–Led Agentic Orchestration",
+        "headline": "Agentic contract operations directed by Box Automate.",
+        "description": "A workflow-directed orchestration of Apps, Forms, Automate, Extract, Box AI, Agentforce, human approvals, Hubs, Doc Gen, and execution controls.",
         "status": "Live Box surfaces. Automate is saved and inactive while its final OAuth smoke and activation remain gated.",
         "experiences": BOX_EXPERIENCES,
     },
     {
         "order": "04",
-        "slug": "agentic-orchestration",
-        "title": "Agentic Orchestration",
+        "slug": "cross-platform-agentic-orchestration",
+        "title": "Cross-Platform Agentic Orchestration",
         "headline": "The complete multi-platform CLM operating model.",
         "description": "The governed Box journey plus the Salesforce Agentforce experience in the Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
         "status": "Real Box and React screens. No live AWS AgentCore or Databricks screenshots are claimed.",

@@ -1,8 +1,8 @@
 {
   "manifestVersion": "1.0.0",
   "scenario": {
-    "id": "clm-governed-workflow",
-    "name": "Northstar CLM - Governed Workflow",
+    "id": "clm-box-automate-agentic-orchestration",
+    "name": "Northstar CLM - Box Automate–Led Agentic Orchestration",
     "orchestrationModel": "deterministic workflow with agentic enrichment",
     "contractId": "CLM-2026-0017"
   },
@@ -33,13 +33,13 @@
     "sign": "human-confirmation-required"
   },
   "documentation": {
-    "guide": "docs/scenarios/governed-workflow/README.md",
-    "architectureSource": "docs/diagrams/governed-workflow-architecture.mmd",
-    "architectureRendered": "docs/diagrams/governed-workflow-architecture.svg",
-    "flowSource": "docs/diagrams/governed-workflow-flow.mmd",
-    "flowRendered": "docs/diagrams/governed-workflow-flow.svg",
-    "portableGuide": "output/html/01-governed-workflow-guide.html",
-    "gallery": "output/html/02-governed-workflow-gallery.html"
+    "guide": "docs/scenarios/box-automate-agentic-orchestration/README.md",
+    "architectureSource": "docs/diagrams/box-automate-agentic-orchestration-architecture.mmd",
+    "architectureRendered": "docs/diagrams/box-automate-agentic-orchestration-architecture.svg",
+    "flowSource": "docs/diagrams/box-automate-agentic-orchestration-flow.mmd",
+    "flowRendered": "docs/diagrams/box-automate-agentic-orchestration-flow.svg",
+    "portableGuide": "output/html/01-box-automate-agentic-orchestration-guide.html",
+    "gallery": "output/html/02-box-automate-agentic-orchestration-gallery.html"
   },
-  "screenshots": "output/screenshots/governed-workflow/"
+  "screenshots": "output/screenshots/box-automate-agentic-orchestration/"
 }
