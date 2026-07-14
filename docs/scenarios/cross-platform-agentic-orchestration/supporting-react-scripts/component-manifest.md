@@ -1,4 +1,4 @@
-# Agentic Orchestration Component Manifest
+# Cross-Platform Agentic Orchestration Component Manifest
 
 This human-readable manifest uses logical names only. Target-environment IDs belong in the gitignored runtime configuration and bootstrap state.
 

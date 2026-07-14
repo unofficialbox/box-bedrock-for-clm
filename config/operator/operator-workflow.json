@@ -72,7 +72,7 @@
     {
       "id": "readiness",
       "owner": "operator",
-      "command": "python3 scripts/demo_operator.py validate --scenario governed",
+      "command": "python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration",
       "writesExternalState": false,
       "completeWhen": "Live Box resources, resolved portable specs, and the Salesforce data model validate."
     },
@@ -87,10 +87,10 @@
     {
       "id": "agentic-readiness",
       "owner": "AWS, Databricks, Agentforce, and demo operators",
-      "guide": "docs/operator/03-agentic-deployment.md",
-      "command": "python3 scripts/demo_operator.py validate --scenario agentic",
+      "guide": "docs/operator/03-cross-platform-deployment.md",
+      "command": "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration",
       "writesExternalState": false,
-      "appliesWhen": "Presenting managed Agentic Orchestration rather than local deterministic fixtures",
+      "appliesWhen": "Presenting managed Cross-Platform Agentic Orchestration rather than local deterministic fixtures",
       "completeWhen": "Required Agentforce, AgentCore, Databricks, Box, and Salesforce bindings validate and provider deployment tests are recorded."
     },
     {

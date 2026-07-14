@@ -6,8 +6,8 @@ This repository contains two presenter-ready CLM scenario packages built on the 
 
 | Scenario | Model | Primary surface | Scope |
 |---|---|---|---|
-| [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, Box and Agentforce agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
-| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Shared governed assets plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation; Box Automate remains inactive |
+| [Box Automate–Led Agentic Orchestration](docs/scenarios/box-automate-agentic-orchestration/README.md) | Workflow-directed agents inside Box Automate | Box | Forms, Apps, Automate, Extract, Box and Agentforce agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
+| [Cross-Platform Agentic Orchestration](docs/scenarios/cross-platform-agentic-orchestration/README.md) | Supervisor-directed agents across platforms | Salesforce Multi-Framework React | Shared governed assets plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation; Box Automate remains inactive |
 
 **New environment:** start with [CLM Demo Operator Start Here](docs/operator/00-start-here.md). It generates new Box and Salesforce bindings and never requires IDs from another environment.
 
@@ -16,11 +16,11 @@ This repository contains two presenter-ready CLM scenario packages built on the 
 Scenario presentation packages:
 
 - [00 portable operator setup guide](output/html/00-operator-setup-guide.html)
-- [Governed Workflow Markdown guide](docs/scenarios/governed-workflow/README.md) · [01 portable guide](output/html/01-governed-workflow-guide.html) · [02 visual gallery](output/html/02-governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
-- [Agentic Orchestration Markdown guide](docs/scenarios/agentic-orchestration/README.md) · [03 portable guide](output/html/03-agentic-orchestration-guide.html) · [04 visual gallery](output/html/04-agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
+- [Box Automate–Led Agentic Orchestration Markdown guide](docs/scenarios/box-automate-agentic-orchestration/README.md) · [01 portable guide](output/html/01-box-automate-agentic-orchestration-guide.html) · [02 visual gallery](output/html/02-box-automate-agentic-orchestration-gallery.html) · [manifest](config/demo/box-automate-agentic-orchestration-demo-manifest.json)
+- [Cross-Platform Agentic Orchestration Markdown guide](docs/scenarios/cross-platform-agentic-orchestration/README.md) · [03 portable guide](output/html/03-cross-platform-agentic-orchestration-guide.html) · [04 visual gallery](output/html/04-cross-platform-agentic-orchestration-gallery.html) · [manifest](config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 
 Review the numbered HTML files in order. Each **guide** contains the complete narrative, architecture, flow, presenter script, screenshots, readiness, and setup. Each **visual gallery** is the shorter screenshot-only companion.
-- Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
+- Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
 
 The scenario is an enterprise commercial contract workflow for **Acme Robotics** negotiating a master services agreement (MSA), data processing addendum (DPA), statement of work (SOW), and order form with **Northstar Health**.
 
@@ -28,7 +28,7 @@ The scenario is an enterprise commercial contract workflow for **Acme Robotics**
 
 ## Demo Thesis
 
-CLM teams lose time because contract content, structured deal data, obligations, risk positions, and approvals are split across systems. Governed Workflow shows the practical Box-led operating model; Agentic Orchestration shows the end-state supervisor-led platform. In both, Box remains authoritative for contract content and humans retain approval and signature authority.
+CLM teams lose time because contract content, structured deal data, obligations, risk positions, and approvals are split across systems. Box Automate–Led Agentic Orchestration shows agents working inside a designed business process; Cross-Platform Agentic Orchestration shows a supervisor dynamically coordinating specialists across systems. In both, Box remains authoritative for contract content and humans retain approval and signature authority.
 
 ---
 
@@ -36,7 +36,7 @@ CLM teams lose time because contract content, structured deal data, obligations,
 
 | # | Document | Description |
 |---|----------|-------------|
-| 1 | [Architecture](docs/01-architecture.md) | Shared foundations plus Governed Workflow and Agentic Orchestration architecture |
+| 1 | [Architecture](docs/01-architecture.md) | Shared foundations plus Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration architecture |
 | 2 | [Agent Definitions](docs/02-agent-definitions.md) | CLM agent specifications, prompts, action groups, guardrails, and outputs |
 | 3 | [Legal and Commercial References](docs/03-legal-commercial-references.md) | Demo-safe legal, privacy, revenue, and procurement reference model |
 | 4 | [Control Matrix](docs/04-control-matrix.md) | Contract controls mapped to Box, Agentforce, React, and human reviewers |
@@ -51,8 +51,8 @@ CLM teams lose time because contract content, structured deal data, obligations,
 
 | Status | Runbook | Purpose |
 |---|---|---|
-| Governed Workflow deep dive | [Box + Agentforce + React](docs/runbooks/04-box-agentforce-react-demo.md) | Supporting details for the controlled Box/Agentforce path and React handoff |
-| Agentic Orchestration deep dive | [AgentCore runbook](docs/runbooks/03-agentcore-demo.md) | Run or evaluate the supervisor-led multi-agent path |
+| Box Automate–Led deep dive | [Box + Agentforce + React](docs/runbooks/04-box-agentforce-react-demo.md) | Supporting details for the workflow-directed Box/Agentforce path and React handoff |
+| Cross-Platform deep dive | [AgentCore runbook](docs/runbooks/03-agentcore-demo.md) | Run or evaluate the supervisor-led multi-agent path |
 
 ---
 
@@ -113,10 +113,10 @@ Generated artifacts:
 | `output/docgen/clm-order-summary-template.docx` | Live Box DocGen commercial order summary template |
 | `output/docgen/clm-renewal-notice-template.docx` | Live Box DocGen renewal notice template |
 | `output/html/00-operator-setup-guide.html` | Complete, self-contained fresh-environment operator guide |
-| `output/html/01-governed-workflow-guide.html` | Complete, self-contained Governed Workflow narrative |
-| `output/html/02-governed-workflow-gallery.html` | Visual-only Governed Workflow gallery using real Box screens |
-| `output/html/03-agentic-orchestration-guide.html` | Complete, self-contained Agentic Orchestration narrative |
-| `output/html/04-agentic-orchestration-gallery.html` | Visual-only Agentic Orchestration gallery using real Box and React screens |
+| `output/html/01-box-automate-agentic-orchestration-guide.html` | Complete, self-contained Box Automate–Led Agentic Orchestration narrative |
+| `output/html/02-box-automate-agentic-orchestration-gallery.html` | Visual-only Box Automate–Led Agentic Orchestration gallery using real Box screens |
+| `output/html/03-cross-platform-agentic-orchestration-guide.html` | Complete, self-contained Cross-Platform Agentic Orchestration narrative |
+| `output/html/04-cross-platform-agentic-orchestration-gallery.html` | Visual-only Cross-Platform Agentic Orchestration gallery using real Box and React screens |
 
 Config artifacts:
 
@@ -139,8 +139,8 @@ Config artifacts:
 | `config/agentcore/agent-handoff-payloads.json` | Supervisor-to-agent handoff payload examples |
 | `config/agentforce/clm-react-agentforce-spec.json` | Shared Agentforce topics, actions, mutation confirmations, and guardrails used by both scenarios |
 | `config/salesforce/clm-contract-record.json` | `CLM_Contract__c` ownership, idempotency, field mapping, Box references, and intake contract |
-| `config/demo/governed-workflow-demo-manifest.json` | Governed Workflow runtime, readiness, documentation, and screenshot inventory |
-| `config/demo/agentic-orchestration-demo-manifest.json` | Agentic Orchestration runtime, readiness, documentation, trace, and screenshot inventory |
+| `config/demo/box-automate-agentic-orchestration-demo-manifest.json` | Box Automate–Led Agentic Orchestration runtime, readiness, documentation, and screenshot inventory |
+| `config/demo/cross-platform-agentic-orchestration-demo-manifest.json` | Cross-Platform Agentic Orchestration runtime, readiness, documentation, trace, and screenshot inventory |
 | `config/operator/operator-workflow.json` | Machine-readable phase, authority, confirmation, and completion contract for human or AI-assisted setup |
 | `config/runtime/demo-environment.example.json` | Secret-free per-environment input template; copy to the gitignored runtime file |
 
@@ -213,8 +213,8 @@ box-bedrock-for-clm/
 │   ├── 06-competitive-landscape.md
 │   ├── operator/                # canonical fresh-environment path
 │   ├── scenarios/
-│   │   ├── governed-workflow/
-│   │   └── agentic-orchestration/
+│   │   ├── box-automate-agentic-orchestration/
+│   │   └── cross-platform-agentic-orchestration/
 │   ├── diagrams/
 │   └── runbooks/
 ├── output/
@@ -224,8 +224,8 @@ box-bedrock-for-clm/
 │   ├── json/
 │   ├── pdf/
 │   └── screenshots/
-│       ├── governed-workflow/
-│       └── agentic-orchestration/
+│       ├── box-automate-agentic-orchestration/
+│       └── cross-platform-agentic-orchestration/
 ├── sample-data/
 │   └── README.md
 └── scripts/

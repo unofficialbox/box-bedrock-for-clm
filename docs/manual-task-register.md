@@ -37,7 +37,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-031 | Create a dedicated API-only integration user | Salesforce admin | Required | User has `CLM_Box_Automate_Integration` and no broad business access |
 | MT-032 | Create/configure the environment-specific External Client App | Salesforce admin | Required | Client credentials, `api` scope, Run As user, and admin preauthorization are set |
 | MT-033 | Configure the Box-managed OAuth connection | Box/Salesforce admins | Required | Token test succeeds without exposing the token |
-| MT-034 | Add the UI Bundle to a Lightning or Experience page | Salesforce admin | Required for Agentic Orchestration | Intended users can open it with record and Box context |
+| MT-034 | Add the UI Bundle to a Lightning or Experience page | Salesforce admin | Required for Cross-Platform Agentic Orchestration | Intended users can open it with record and Box context |
 | MT-035 | Configure Contract Copilot topics, actions, and guardrails | Agentforce admin | Required for live Agentforce | Cited reads work; mutations require confirmation |
 | MT-036 | Configure the Salesforce origin in the Box application | Box app admin | Required for live embedded Box | Only approved origins can load content |
 

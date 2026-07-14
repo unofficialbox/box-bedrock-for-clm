@@ -105,7 +105,7 @@ class DemoOperatorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = self.write_config(directory, box={"parentFolderId": "123", "enterpriseId": "456"})
             with self.assertRaisesRegex(demo_operator.OperatorError, "appUrl"):
-                demo_operator.validate(path, scenario="governed", offline=True)
+                demo_operator.validate(path, scenario="box-automate-agentic-orchestration", offline=True)
 
     def test_resolve_value_reports_and_replaces_bindings(self):
         unresolved = set()

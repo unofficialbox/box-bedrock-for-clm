@@ -6,13 +6,13 @@ Building this in a new environment? Complete [Operator Start Here](../operator/0
 
 | Track | Short name | Orchestration model | Presenter surface | Readiness |
 |---|---|---|---|---|
-| [Governed Workflow](governed-workflow/README.md) | Governed Workflow | Deterministic Box Automate stages with Extract, Box/Agentforce assistance, explicit conditions, and human approval gates | Box Form, Apps, Automate, Hub, tasks, Doc Gen, Sign | Live Box surfaces; Automate activation/OAuth smoke remains gated |
-| [Agentic Orchestration](agentic-orchestration/README.md) | Agentic Orchestration | AgentCore/Strands supervisor delegates to Box, Salesforce Agentforce, and Databricks specialists under human guardrails | Salesforce Multi-Framework React workspace plus all connected platforms | Local orchestration mock and React demo; managed AWS/Databricks deployment remains future work |
+| [Box Automate–Led Agentic Orchestration](box-automate-agentic-orchestration/README.md) | Box Automate–Led | A designed Box Automate sequence directs Extract, Box AI, and Agentforce work through explicit conditions and human gates | Box Form, Apps, Automate, Hub, tasks, Doc Gen, Sign | Build and validate per environment; activation and OAuth smoke remain gated |
+| [Cross-Platform Agentic Orchestration](cross-platform-agentic-orchestration/README.md) | Cross-Platform | An AgentCore/Strands supervisor dynamically delegates to Box, Salesforce Agentforce, and Databricks specialists | Salesforce Multi-Framework React workspace plus connected platforms | Local orchestration mock and React demo; managed AWS/Databricks deployment remains future work |
 
 ## Naming rule
 
-- Use **Governed Workflow** when the path is predetermined and agents enrich individual steps.
-- Use **Agentic Orchestration** when a supervisor selects tools or specialist agents dynamically across platforms.
-- Do not call the first track “fully agentic,” and do not describe the second as live until its managed integrations pass the technical validation.
+- Use **Box Automate–Led Agentic Orchestration** when the path is predetermined and agents enrich individual steps.
+- Use **Cross-Platform Agentic Orchestration** when a supervisor selects tools or specialist agents dynamically across platforms.
+- Describe the first as **workflow-directed** and the second as **supervisor-directed**. Do not describe managed integrations as live until they pass technical validation.
 
 Each scenario link opens one canonical, ordered guide containing orientation, architecture, flow, presenter script, screenshots, component readiness, and setup checks. Shared configuration, screenshots, generated galleries, and detailed runbooks remain single-source and are referenced from those guides.

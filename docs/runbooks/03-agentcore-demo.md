@@ -1,10 +1,10 @@
-# Runbook: Agentic Orchestration
+# Runbook: Cross-Platform Agentic Orchestration
 
 ## Goal
 
-Show the end-state multi-agent path: AWS Bedrock AgentCore and Strands coordinate Box agents for unstructured data, Salesforce Agentforce specialists for structured work, Databricks agents for governed analytics, and the Salesforce Multi-Framework React workspace as the presenter surface.
+Show the supervisor-directed multi-agent path: AWS Bedrock AgentCore and Strands coordinate Box agents for unstructured data, Salesforce Agentforce specialists for structured work, Databricks agents for governed analytics, and the Salesforce Multi-Framework React workspace as the presenter surface.
 
-Scenario package: [Agentic Orchestration](../scenarios/agentic-orchestration/README.md)
+Scenario package: [Cross-Platform Agentic Orchestration](../scenarios/cross-platform-agentic-orchestration/README.md)
 
 Readiness boundary: the orchestration trace is locally executable; do not represent AgentCore, Strands, or Databricks as deployed until their managed integrations and screenshots are verified.
 

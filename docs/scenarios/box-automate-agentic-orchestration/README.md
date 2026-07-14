@@ -1,4 +1,4 @@
-# Governed Workflow
+# Box Automate–Led Agentic Orchestration
 
 Deterministic CLM orchestration with agentic enrichment. Box is the operating surface, Box Automate controls the sequence, agents enrich evidence, and named people approve decisions.
 
@@ -23,18 +23,18 @@ Use this track when Box Apps, Forms, Automate, Hubs, metadata, tasks, Doc Gen, a
 
 ## 2. Architecture
 
-![Governed Workflow architecture](../../diagrams/governed-workflow-architecture.svg)
+![Box Automate–Led Agentic Orchestration architecture](../../diagrams/box-automate-agentic-orchestration-architecture.svg)
 
 The Box layer owns content, workflow state, clauses, tasks, generation, signature, and audit evidence. The HTTPS Connector crosses into Salesforce only after the human validation gate.
 
-- [Architecture source](../../diagrams/governed-workflow-architecture.mmd)
+- [Architecture source](../../diagrams/box-automate-agentic-orchestration-architecture.mmd)
 - [Shared architecture and control detail](../../01-architecture.md)
 
 [Continue to flow](#3-flow)
 
 ## 3. Flow
 
-![Governed Workflow flow](../../diagrams/governed-workflow-flow.svg)
+![Box Automate–Led Agentic Orchestration flow](../../diagrams/box-automate-agentic-orchestration-flow.svg)
 
 1. Start from the Box App and open the single contract-intake Form.
 2. Automate runs Extract and source-grounded agent review in a fixed sequence.
@@ -42,7 +42,7 @@ The Box layer owns content, workflow state, clauses, tasks, generation, signatur
 4. Only the approved branch invokes Salesforce standard REST.
 5. Box tasks, metadata, Doc Gen, Sign, and the clause Hub carry the lifecycle forward.
 
-- [Flow source](../../diagrams/governed-workflow-flow.mmd)
+- [Flow source](../../diagrams/box-automate-agentic-orchestration-flow.mmd)
 
 [Continue to presenter script](#4-presenter-script)
 
@@ -61,7 +61,7 @@ The Box layer owns content, workflow state, clauses, tasks, generation, signatur
 | 5. Record | “Approved evidence can now update the commercial system safely.” | Show the HTTPS Connector upsert and lookup result. | “The external ID prevents duplicates, and a person—not an agent—authorized the write.” |
 | 6. Redlines | “Each clause issue belongs with the right domain expert.” | Open Clause Library, Hub, and domain-owned review work. | “Approved language is reusable; exceptions have a named owner and citation.” |
 | 7. Execution | “Generation and signature remain controlled lifecycle events.” | Show Doc Gen templates, approval evidence, and Executed Agreements. | “People authorize generation and signature; Box retains the audit trail.” |
-| 8. Close | “This is governed automation with useful agentic assistance.” | Return to the portfolio view. | “Every mutation has a known stage, owner, and evidence trail.” |
+| 8. Close | “This is agentic orchestration directed by a governed workflow.” | Return to the portfolio view. | “Every mutation has a known stage, owner, and evidence trail.” |
 
 Required language: agents summarize, extract, compare, and recommend; people approve legal positions and signature. Describe Automate as live only after the target environment passes OAuth, idempotency, and activation checks.
 
@@ -69,33 +69,33 @@ Required language: agents summarize, extract, compare, and recommend; people app
 
 ## 5. Visual walkthrough
 
-These are the canonical Box screenshots. Agentic Orchestration references the same files rather than copying them.
+These are the canonical Box screenshots. Cross-Platform Agentic Orchestration references the same files rather than copying them.
 
 ### Portfolio and actions
 
-![Box App portfolio dashboard](../../../output/screenshots/governed-workflow/box-app-dashboard-live.png)
+![Box App portfolio dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
 
-![Box App actions and deal room](../../../output/screenshots/governed-workflow/box-app-dashboard-actions-live.png)
+![Box App actions and deal room](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-actions-live.png)
 
 ### Intake and deterministic automation
 
-![New Contract Request Form](../../../output/screenshots/governed-workflow/box-form-new-contract-request.png)
+![New Contract Request Form](../../../output/screenshots/box-automate-agentic-orchestration/box-form-new-contract-request.png)
 
-![Automate Extract and agents](../../../output/screenshots/governed-workflow/automate-intake-agents.png)
+![Automate Extract and agents](../../../output/screenshots/box-automate-agentic-orchestration/automate-intake-agents.png)
 
-![Automate human approval branch](../../../output/screenshots/governed-workflow/automate-approval-flow.png)
+![Automate human approval branch](../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-![Automate HTTPS Connector](../../../output/screenshots/governed-workflow/automate-https-connector.png)
+![Automate HTTPS Connector](../../../output/screenshots/box-automate-agentic-orchestration/automate-https-connector.png)
 
 ### Clauses and generation
 
-![Clause Library dashboard](../../../output/screenshots/governed-workflow/box-app-clause-library-live.png)
+![Clause Library dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
 
-![Approved Clause Hub](../../../output/screenshots/governed-workflow/box-hub-clause-library-live.png)
+![Approved Clause Hub](../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
 
-![Box Doc Gen templates](../../../output/screenshots/governed-workflow/box-docgen-templates.png)
+![Box Doc Gen templates](../../../output/screenshots/box-automate-agentic-orchestration/box-docgen-templates.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../output/html/02-governed-workflow-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/01-governed-workflow-guide.html).
+Optional offline presentation: [self-contained visual gallery](../../../output/html/02-box-automate-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/01-box-automate-agentic-orchestration-guide.html).
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -127,7 +127,7 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 
 - [Operator setup and activation](../../operator/00-start-here.md)
 - [Manual-task register](../../manual-task-register.md)
-- [Machine-readable scenario manifest](../../../config/demo/governed-workflow-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../config/demo/box-automate-agentic-orchestration-demo-manifest.json)
 - [Box Form blueprint](../../../config/box/form-blueprint.md)
 - [Box App blueprint](../../../config/box/box-app-blueprint.md)
 

@@ -17,10 +17,10 @@ The generated IDs are stored only in `config/runtime/bootstrap-state.json`. The 
 
 ## 1. Choose a scenario
 
-- **Governed Workflow:** Box-led, predictable Automate stages with agentic enrichment and human approval.
-- **Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
+- **Box Automate–Led Agentic Orchestration:** Box-led, predictable Automate stages with agentic enrichment and human approval.
+- **Cross-Platform Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
 
-New operators should build and rehearse **Governed Workflow first**. It is the foundation for both scenarios.
+New operators should build and rehearse **Box Automate–Led Agentic Orchestration first**. It is the foundation for both scenarios.
 
 ## 2. Confirm prerequisites
 
@@ -120,7 +120,7 @@ After recording the published App, Form, and Hub URLs in `demo-environment.json`
 
 ```bash
 python3 scripts/demo_operator.py resolve-config
-python3 scripts/demo_operator.py validate --scenario governed
+python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
 python3 -m unittest discover -s tests -v
 ```
 
@@ -130,8 +130,8 @@ Then run the [integrated smoke test](02-smoke-test.md). Do not present the envir
 
 Use the presenter script inside the selected scenario guide:
 
-1. [Governed Workflow](../scenarios/governed-workflow/README.md#4-presenter-script)
-2. [Agentic Orchestration](../scenarios/agentic-orchestration/README.md#4-presenter-script)
+1. [Box Automate–Led Agentic Orchestration](../scenarios/box-automate-agentic-orchestration/README.md#4-presenter-script)
+2. [Cross-Platform Agentic Orchestration](../scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
 
 Each step tells the audience what matters, shows one visible proof, then explains the outcome. Avoid narrating every click.
 

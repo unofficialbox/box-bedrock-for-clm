@@ -1,4 +1,4 @@
-# Agentic Orchestration Deployment Boundary
+# Cross-Platform Agentic Orchestration Deployment Boundary
 
 The repository currently supports two honest operating modes.
 
@@ -16,7 +16,7 @@ Deploy the Salesforce UI Bundle with `demo_operator.py salesforce-deploy`, open 
 Run:
 
 ```bash
-python3 scripts/demo_operator.py validate --scenario governed
+python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
 ```
 
 Do not claim managed AgentCore or Databricks execution.
@@ -37,7 +37,7 @@ Managed mode is not a one-command deployment in this repository. Before presenti
 Record the non-secret values in `config/runtime/demo-environment.json`, resolve the specs, then run:
 
 ```bash
-python3 scripts/demo_operator.py validate --scenario agentic
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 ```
 
 Passing that command proves required bindings and core Box/Salesforce resources exist; it does not replace cloud-provider deployment tests. Keep the scenario labeled **local/specification-backed** until those tests are recorded.

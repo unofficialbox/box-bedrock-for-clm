@@ -125,7 +125,7 @@ npm audit --omit=dev
 From the CLM root:
 
 ```bash
-python3 -m json.tool config/demo/agentic-orchestration-demo-manifest.json >/dev/null
+python3 -m json.tool config/demo/cross-platform-agentic-orchestration-demo-manifest.json >/dev/null
 python3 -m json.tool config/agentforce/clm-react-agentforce-spec.json >/dev/null
 python3 -m json.tool config/runtime/demo-environment.json >/dev/null
 ```

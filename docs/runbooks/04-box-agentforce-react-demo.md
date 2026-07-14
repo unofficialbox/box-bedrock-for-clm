@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is a supporting Box + Agentforce + React deep dive. Use [Governed Workflow](../scenarios/governed-workflow/README.md) for the Box-centric presenter path or [Agentic Orchestration](../scenarios/agentic-orchestration/README.md) for the complete multi-platform story.
+This is a supporting Box + Agentforce + React deep dive. Use [Box Automate–Led Agentic Orchestration](../scenarios/box-automate-agentic-orchestration/README.md) for the Box-centric presenter path or [Cross-Platform Agentic Orchestration](../scenarios/cross-platform-agentic-orchestration/README.md) for the cross-platform story.
 
 Before running this script, complete [CLM Demo Operator Start Here](../operator/00-start-here.md) and review the [manual-task register](../manual-task-register.md). Do not claim the integrated path is live unless the integrated smoke test passes.
 
@@ -10,14 +10,14 @@ Architecture: [rendered](../diagrams/clm-box-agentforce-react.svg) · [Mermaid s
 
 Presentation package:
 
-- [Executive walkthrough](../scenarios/agentic-orchestration/supporting-react-scripts/01-executive-walkthrough.md)
-- [Legal Operations walkthrough](../scenarios/agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md)
-- [Technical validation](../scenarios/agentic-orchestration/supporting-react-scripts/03-technical-validation.md)
-- [Box Form entry-point variation](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md)
+- [Executive walkthrough](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/01-executive-walkthrough.md)
+- [Legal Operations walkthrough](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md)
+- [Technical validation](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/03-technical-validation.md)
+- [Box Form entry-point variation](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md)
 - Demo flow: [rendered](../diagrams/clm-box-agentforce-react-demo-flow.svg) · [Mermaid source](../diagrams/clm-box-agentforce-react-demo-flow.mmd)
 - Box Form entry flow: [rendered](../diagrams/clm-box-form-automate-entry.svg) · [Mermaid source](../diagrams/clm-box-form-automate-entry.mmd)
-- [Component manifest](../scenarios/agentic-orchestration/supporting-react-scripts/component-manifest.md)
-- [Machine-readable manifest](../../config/demo/agentic-orchestration-demo-manifest.json)
+- [Component manifest](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/component-manifest.md)
+- [Machine-readable manifest](../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 
 ## Experience boundary
 
@@ -41,7 +41,7 @@ Presentation package:
 | Approval memo DocGen template | Generated approval memo template |
 | Renewal notice DocGen template | Generated renewal notice template |
 | Approved clause library | Target environment's governed clause folder and Hub |
-| Offline experience gallery | `output/html/04-agentic-orchestration-gallery.html` |
+| Offline experience gallery | `output/html/04-cross-platform-agentic-orchestration-gallery.html` |
 | Salesforce CLM record | Target environment's `CLM_Contract__c`; standard REST create/update/lookup must pass before activation |
 
 ## Presenter flow
@@ -49,7 +49,7 @@ Presentation package:
 Choose one entry point before the session:
 
 - **Existing-record entry:** open React with a prepared Salesforce record for a shorter, repeatable walkthrough.
-- **Box Form entry variation:** run [Box Form to Salesforce Record](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md), then continue in the React workspace. This variation requires the deployed object, configured Salesforce OAuth 2.0 REST connection, and an explicitly activated Automate workflow.
+- **Box Form entry variation:** run [Box Form to Salesforce Record](../scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md), then continue in the React workspace. This variation requires the deployed object, configured Salesforce OAuth 2.0 REST connection, and an explicitly activated Automate workflow.
 
 | Act | Show | Agentforce moment | Control |
 |---|---|---|---|

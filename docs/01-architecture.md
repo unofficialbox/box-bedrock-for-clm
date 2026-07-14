@@ -3,7 +3,7 @@
 ## Design Principles
 
 1. **One content foundation** - Box stores contract documents, signatures, metadata, versions, and audit trail for the demo.
-2. **Two explicit presenter paths** - Governed Workflow stays Box-centric; Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands without blurring readiness.
+2. **Two explicit presenter paths** - Box Automate–Led Agentic Orchestration stays Box-centric; Cross-Platform Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands without blurring readiness.
 3. **Human accountability** - AI drafts, summarizes, compares, extracts, and recommends. Humans approve legal positions, concessions, signatures, and obligations.
 4. **Composable integrations** - Box remains the system of record for unstructured contract content, Salesforce remains the system of record for structured deal data, and Databricks provides governed analytics context.
 5. **Reusable demo factory** - Domain-specific demos reuse the same abstraction layers, metadata conventions, agent patterns, and handoff workflow.
@@ -50,9 +50,9 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 ---
 
-## Scenario B: Agentic Orchestration
+## Scenario B: Cross-Platform Agentic Orchestration
 
-This is the end-state, supervisor-led scenario. Its architecture is intentional, but its current implementation status remains specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
+This is the supervisor-directed, cross-platform scenario. Its architecture is intentional, but its current implementation status remains specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
 
 Rendered diagram: [CLM AgentCore Architecture](diagrams/clm-agentcore-architecture.svg)
 
@@ -124,7 +124,7 @@ Box Sign + Obligation Monitor
 |-------|-------------------|-------------|---------------------|
 | Demo scenario | Persona, business object, high-stakes workflow | Commercial contract package | Asset campaign, government case file, claim, loan, portfolio review |
 | Content schema | Folder template + metadata templates | Contract workspace, documents, obligations | Asset library, evidence packet, policy, loan docs |
-| Scenario model | Governed workflow or agentic orchestration | Box-led deterministic path or supervisor-led full stack | Preserve the same two-track distinction |
+| Scenario model | Workflow-directed or supervisor-directed agentic orchestration | Box Automate-led path or cross-platform supervisor path | Preserve the same two-track distinction |
 | Agent roles | Intake, classify, risk, approve, monitor | Contract intake, clause risk, approval, obligations | Rename to domain-specific roles |
 | System connectors | Content, CRM, Databricks analytics | Box, Salesforce, Databricks | Box plus domain system and Databricks analytics |
 | Sample data | Synthetic PDFs + JSON records | MSA/DPA/SOW/order form | Domain-specific records and files |
@@ -146,15 +146,15 @@ Box Sign + Obligation Monitor
 
 ---
 
-## Scenario A: Governed Workflow
+## Scenario A: Box Automate–Led Agentic Orchestration
 
-This is the Box-centric, deterministic presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. React is not part of this presenter path.
+This is the workflow-directed, Box-centric presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. React is not part of this presenter path.
 
-Canonical guide: [Governed Workflow](scenarios/governed-workflow/README.md)
+Canonical guide: [Box Automate–Led Agentic Orchestration](scenarios/box-automate-agentic-orchestration/README.md)
 
-Architecture: [rendered](diagrams/governed-workflow-architecture.svg) · [source](diagrams/governed-workflow-architecture.mmd)
+Architecture: [rendered](diagrams/box-automate-agentic-orchestration-architecture.svg) · [source](diagrams/box-automate-agentic-orchestration-architecture.mmd)
 
-Flow: [rendered](diagrams/governed-workflow-flow.svg) · [source](diagrams/governed-workflow-flow.mmd)
+Flow: [rendered](diagrams/box-automate-agentic-orchestration-flow.svg) · [source](diagrams/box-automate-agentic-orchestration-flow.mmd)
 
 ### Variation rules
 
