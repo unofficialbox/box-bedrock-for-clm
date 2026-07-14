@@ -12,6 +12,9 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 
+mimetypes.add_type("image/svg+xml", ".svg")
+
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output" / "html"
 
@@ -136,6 +139,7 @@ def render_markdown(path: Path) -> RenderedMarkdown:
     blocks: list[str] = []
     paragraph: list[str] = []
     index = summary_index + 1
+    section_open = False
 
     def flush_paragraph() -> None:
         if not paragraph:
@@ -180,8 +184,10 @@ def render_markdown(path: Path) -> RenderedMarkdown:
             anchor = slugify(text)
             if level == 2:
                 sections.append((anchor, re.sub(r"[*`]", "", text)))
-                blocks.append("</section>")
+                if section_open:
+                    blocks.append("</section>")
                 blocks.append(f'<section class="guide-section" id="{anchor}">')
+                section_open = True
             blocks.append(
                 f'<h{level}>{render_inline(text, references)}</h{level}>'
             )
@@ -232,8 +238,8 @@ def render_markdown(path: Path) -> RenderedMarkdown:
         index += 1
 
     flush_paragraph()
-    body = "\n".join(blocks).replace("\n</section>\n<section", "\n<section", 1)
-    if sections:
+    body = "\n".join(blocks)
+    if section_open:
         body += "\n</section>"
     return RenderedMarkdown(
         title=title,
@@ -439,6 +445,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
         for anchor, label in rendered.sections
     )
     toc += '<a href="#offline-reference-index">Offline reference index</a>'
+    summary_html = render_inline(rendered.summary, rendered.references)
     reference_index = render_reference_index(rendered.references)
     document = f"""<!doctype html>
 <html lang="en">
@@ -466,7 +473,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
         <div class="hero-copy">
           <div class="scenario-label">{html.escape(str(scenario['label']))}</div>
           <h1>{html.escape(rendered.title)}</h1>
-          <p class="summary">{html.escape(rendered.summary)}</p>
+          <p class="summary">{summary_html}</p>
           <div class="offline-note">Portable edition · All styles, diagrams, and screenshots embedded</div>
         </div>
       </section>
