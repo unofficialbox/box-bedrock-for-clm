@@ -29,7 +29,7 @@ Contract package:
 | Architecture diagram | Created | Mermaid source and rendered SVG in `docs/diagrams/` |
 | Live Box workspace | Created | Kyle-owned `CLM-2026-Northstar` folder `399081692991` at the Box root in enterprise `5105484` |
 | Box App | Published | `Contract Lifecycle Management` is live at the URL recorded in `config/box/live-box-surface.json` |
-| Box App rich dashboard additions | Live | Home opens with two-column approval, risk, document-type, and package-status charts plus direct Form and Hub actions; Clause Library includes the approved-clause View, source folder, and standard/fallback chart |
+| Box App rich dashboard additions | Live | Home uses `Quick Actions & Portfolio` with approval, risk, document-type, and package-status charts plus the sole intake Form, Hub, and executed-agreement actions; the duplicate intake Form was removed. Clause Library includes the approved view, source folder, Hub shortcut, and position, family, and approval-status charts. |
 | Box metadata | Four live, one specified | `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` are live; `clmRedlineReview` is specified but not created |
 | Box tasks | Created | Legal, finance, and privacy/security review tasks assigned to `kadams@boxdemo.com` |
 | Box Form | Published | `New Contract Request` is live at the URL recorded in `config/box/live-box-surface.json` |
@@ -38,7 +38,7 @@ Contract package:
 | Box DocGen | Created | Approval memo, order-form summary, and renewal notice are marked as live DocGen templates in folder `399363530207` |
 | Box Automate | Saved draft, inactive; OAuth credential blocked | Workflow `399436615012` now uses the correct `Agentforce Dev` My Domain, OAuth 2.0, JSON header, and a deterministic standard REST `PATCH` smoke request. Box test attempts fail before Salesforce login because the supplied secret came from the legacy `Box Automate` app rather than `Box_Automate_CLM`; the GET lookup and dynamic field bindings remain after the CLM-specific secret is corrected. |
 | Clause library | Live content | Eight governed Markdown clauses plus README are uploaded under live folder `399419341582` with `clmClause` metadata |
-| Box Hub | Live | `Acme Contract Clause Library` Hub `1312630996` contains the live clause folder and governance content |
+| Box Hub | Live | `Acme Contract Clause Library` Hub `1312630996` contains the live clause folder, current-standard operations callout, intake/App/executed-agreement cards, and governance content |
 | Experience gallery | Complete | `output/html/clm-experience-gallery.html` embeds 12 current, page-viewport screenshots from the real Box and React demo experiences with no browser tabs or external references |
 | Box Sign | Not started | Needs execution packet flow |
 | Box + Agentforce + React demo | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and primary runbook are ready; live Salesforce deployment and runtime IDs remain |
@@ -98,7 +98,7 @@ Contract package:
      - `07 - Obligations`: `399081567921`
 
 5. **Create Box Form**
-   - New Contract Request
+   - New Contract Request (single dashboard Form entry point: `Start a New Contract`)
    - Fields: requester, counterparty, contract type, deal value, region, data category, target signature date, package upload.
 
 6. **Create Box App dashboard**
@@ -106,6 +106,7 @@ Contract package:
    - Live implementation spec: `config/box/box-app-dashboard-live-spec.json`.
    - UI build checklist: `config/box/box-app-builder-checklist.md`.
    - Manual boundary: create and publish the dashboard in Box Apps through the Box web UI, then add the published URL to `config/box/live-box-surface.json`.
+   - Current live layout: `Quick Actions & Portfolio`; charts plus `Approved Clause Hub`, `Start a New Contract`, and `Executed Agreements`; no repeated Form in `Intake and Actions`; Clause Library adds Hub access and three metadata charts.
 
 7. **Activate the Box + Agentforce + React demo**
    - React project: `clm-react-app/`.

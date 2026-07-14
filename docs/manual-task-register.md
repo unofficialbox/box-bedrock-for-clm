@@ -32,9 +32,9 @@ Status values:
 | MT-014 | Apply and verify contract, document, obligation, and clause metadata | Box content owner | Complete | App tables and file metadata show expected values |
 | MT-015 | Create/verify the three seeded review tasks | Legal Operations | Complete | Tasks `42899891150`, `42899881417`, `42899893550` remain human-owned |
 | MT-016 | Build/verify the **New Contract Request** Form and destination folder | Box Forms builder | Complete | Published Form opens and targets folder `399082115646` |
-| MT-017 | Build/verify the **Contract Lifecycle Management** App | Box Apps builder | Complete | Published App and Clause Library view open |
+| MT-017 | Build/verify the **Contract Lifecycle Management** App | Box Apps builder | Complete | Published Home shows charts plus one Form, Hub, and executed-agreement actions; Clause Library shows its view, folder, Hub shortcut, and three charts |
 | MT-018 | Publish or republish the App/Form after changes | Box Apps/Forms owner | Confirmation required | Owner confirms immediately before publish; URLs are recorded afterward |
-| MT-019 | Maintain the approved clause folders, README, ownership, review cadence, and Hub composition | Clause-library owner | Complete / ongoing | Hub `1312630996` shows eight clauses and governance content |
+| MT-019 | Maintain the approved clause folders, README, ownership, review cadence, and Hub composition | Clause-library owner | Complete / ongoing | Hub `1312630996` shows eight clauses, current-standard status, three operational cards, and governance content |
 | MT-020 | Publish new or revised approved clauses to the Hub | Clause-library owner | Confirmation required | Legal approval exists and final publish click is confirmed |
 | MT-021 | Verify the three DocGen templates are marked as templates | Box DocGen admin | Complete | IDs `2344242775119`, `2344233767713`, `2344244747613` open in the catalog |
 | MT-022 | Generate an approval memo, order summary, or renewal notice | Authorized reviewer | Confirmation required | User confirms immediately before DocGen creates the file |

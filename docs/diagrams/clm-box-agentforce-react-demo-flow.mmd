@@ -1,5 +1,8 @@
 flowchart TD
-    Start(["Submit New Contract Request"]) --> Automate["Box Automate<br/>Extract and Box Agent review"]
+    App["Box App CLM dashboard<br/>portfolio charts and quick actions"] --> Start(["Start a New Contract<br/>single Form entry point"])
+    App -.-> Hub
+    App -.-> Executed
+    Start --> Automate["Box Automate<br/>Extract and Box Agent review"]
     Automate --> IntakeGate{"Human validates<br/>intake enrichment?"}
     IntakeGate -- "No" --> IntakeRework["Return for correction"]
     IntakeRework --> Start
@@ -33,7 +36,7 @@ flowchart TD
     classDef blocked fill:#ffe8eb,stroke:#c63846,color:#7c1621,stroke-width:2px
     classDef terminal fill:#e7f7ec,stroke:#368453,color:#174a2b
 
-    class React,AgentReview surface
+    class App,React,AgentReview surface
     class Automate,CreateRecord,BoxEvidence,Hub,Findings,Tasks,DocGen,Sign,Executed,Obligations box
     class IntakeGate,RecordGate,Route,Gate,MemoConfirm decision
     class IntakeRework,IntegrationReview,Triage,Blocked blocked

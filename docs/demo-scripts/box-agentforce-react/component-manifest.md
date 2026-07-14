@@ -19,12 +19,12 @@ Explicitly excluded: AWS Bedrock AgentCore, Strands, Databricks, and external cu
 | React CLM workspace | Local verified | Yes | Contract, Box content, cited redline findings, and domain-grouped expert queues in `clm-react-app/force-app/main/default/uiBundles/clmreactapp` |
 | Agentforce Contract Copilot | Specified, not deployed | Yes | `config/agentforce/clm-react-agentforce-spec.json` |
 | Box CLM workspace | Live | Yes | Folder `399081692991` |
-| Box CLM app | Live | Yes, supporting dashboard | `https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn` |
+| Box CLM app | Live | Yes, supporting dashboard | `https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn`; production-style portfolio charts, one intake Form entry point, Hub and executed-agreement actions, and a metadata-rich Clause Library page |
 | New Contract Request form | Live | Box Form entry variation | `https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858` |
 | Approved clause library | Live content | Yes | Folder `399419341582`; eight Markdown clauses plus governance README |
 | Box Automate intake workflow | Saved draft, inactive | Yes | Workflow `399436615012`: Form trigger → Extract → Box Agent → human approval → HTTPS connector |
 | Salesforce CLM record creation | Object and metadata-managed External Client App deployed; direct REST upsert verified | Yes | `CLM_Contract__c` uses private sharing and unique `Contract_ID__c`; create/update/lookup passed against record `a7IgL000000WYWPUA4`; only the Box consumer-secret handoff and OAuth test remain |
-| Acme Contract Clause Library Hub | Live | Yes | Hub `1312630996`: live clause folder plus governance and review-cadence content |
+| Acme Contract Clause Library Hub | Live | Yes | Hub `1312630996`: live clause folder, current-standard operating context, intake/App/executed-agreement action cards, and governance content |
 | Offline experience gallery | Local verified | Presenter support | `output/html/clm-experience-gallery.html` |
 
 ## React components
