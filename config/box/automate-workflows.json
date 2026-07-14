@@ -1,107 +1,126 @@
 {
-  "schemaVersion": "1.0",
-  "tenant": "kadams.ent.box.com",
-  "workspaceFolderId": "399081692991",
+  "schemaVersion": "2.0",
+  "bindingModel": "Resolve with python3 scripts/demo_operator.py resolve-config",
   "designPrinciples": [
-    "Use Box content IDs rather than display names in AI Agent outcomes.",
-    "Place a human validation or approval task after every generative or extractive AI outcome.",
-    "Send only contract IDs, Box item IDs, workflow state, and approved summaries through HTTPS connectors; never send contract file bytes.",
-    "Keep draft workflows inactive until a presenter validates the trigger, permissions, and rollback path."
+    "Use resolved Box content IDs rather than display names in workflow bindings.",
+    "Place a human validation or approval task after every generative or extractive AI result.",
+    "Send only allowlisted structured fields through HTTPS connectors; never send contract bytes or secrets.",
+    "Keep workflows inactive until trigger, permissions, OAuth, idempotency, and rollback tests pass."
   ],
   "workflows": [
     {
-      "key": "redline-domain-review-routing",
-      "name": "CLM - Redline Domain Review Routing",
-      "status": "specified-not-live",
-      "trigger": {
-        "type": "Metadata updated",
-        "templateKey": "clmDocument",
-        "condition": "versionStatus equals Redline",
-        "folderId": "399080778184"
-      },
-      "steps": [
-        {"type": "AI Agent", "agentRef": "ai-agent-specs.json#redline-difference-router", "inputs": ["redlineFileId", "baselineItemId", "clauseLibraryFolderId"], "outputSchema": "../clm/redline-finding.schema.json"},
-        {"type": "Conditional split", "condition": "any finding is Unclassified or classificationConfidence is below 0.85", "branches": ["Legal Operations Triage", "Routing Ready"]},
-        {"type": "HTTPS Request", "connectorRef": "https-connectors.json#acme-clm-runtime", "operation": "routeRedlineFindings", "purpose": "Group findings by domain, resolve configured experts, create one Box review task per domain, and update Salesforce status", "requiredResponse": ["contractId", "findingCount", "reviewAssignments"]},
-        {"type": "Apply metadata", "templateKey": "clmRedlineReview", "valuesFrom": ["baselineItemId", "comparisonStatus", "findingCount", "highestRisk", "reviewDomains", "openTaskCount", "lastCompared"]},
-        {"type": "Create task", "name": "Review unclassified or low-confidence redline findings", "assigneeFrom": "config/clm/expert-routing.json#fallback.boxLogin", "when": "Legal Operations Triage", "required": true}
-      ],
-      "controls": [
-        "Never infer a user login from the contract.",
-        "Verify every task assignee is a collaborator before assignment.",
-        "Use one open task per contract, file, and domain.",
-        "Leave workflow inactive until named expert logins and the connector action are deployed."
-      ]
-    },
-    {
       "key": "contract-intake-enrichment",
       "name": "CLM - Contract Intake Enrichment",
-      "status": "saved-draft-inactive",
-      "workflowId": "399436615012",
-      "url": "https://kadams.ent.box.com/automate/workflow/edit/399436615012",
+      "required": true,
+      "initialStatus": "inactive",
       "trigger": {
         "type": "Box Forms submission",
         "formName": "New Contract Request",
-        "formUrl": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858",
-        "fallback": "File uploaded to folder",
-        "folderId": "399082115646"
+        "formUrl": "${box.formUrl}",
+        "destinationFolderId": "${box.folders.intake}"
       },
-      "entryPointVariation": {
-        "key": "box-form-automate-https",
-        "script": "docs/scenarios/governed-workflow/README.md#4-presenter-script",
-        "sequence": [
-          "Submit New Contract Request",
-          "Run Extract and Box AI Agent",
-          "Require human validation",
-          "Call Salesforce standard REST upsert and lookup only on Approved"
-        ]
+      "requiredFormVariables": [
+        "requesterName", "requesterEmail", "contractId", "counterparty", "contractType",
+        "dealValue", "termMonths", "region", "dataCategory", "targetSignatureDate",
+        "businessOwner", "submittedFileId", "specialTermsRiskNotes"
+      ],
+      "steps": [
+        {
+          "order": 1,
+          "type": "Extract Agent",
+          "name": "Contract Intake Extract",
+          "source": "submitted file",
+          "configurationRef": "config/box/extract-field-prompts.json#contractIntake",
+          "expectedOutput": ["contractType", "riskLevel", "keyIssues"]
+        },
+        {
+          "order": 2,
+          "type": "Box Agent",
+          "name": "CLM Contract Risk Triage",
+          "agentRef": "config/box/ai-agent-specs.json#contract-risk-triage",
+          "expectedOutput": ["riskLevel", "materialDeviations", "requiredReviewers", "evidenceItemIds"]
+        },
+        {
+          "order": 3,
+          "type": "Approval Task",
+          "name": "Validate extracted terms and approval brief",
+          "assignee": "${box.reviewers.primary}",
+          "required": true,
+          "outcomes": ["Approved", "Rejected"]
+        },
+        {
+          "order": 4,
+          "type": "Conditional Split",
+          "condition": "approval task outcome",
+          "approvedBranch": ["salesforceContractUpsert", "salesforceContractLookup"],
+          "rejectedBranch": "Stop and return the request for correction"
+        },
+        {
+          "order": 5,
+          "type": "HTTPS Request",
+          "operation": "salesforceContractUpsert",
+          "connectorRef": "config/box/https-connectors.json#salesforce-clm-rest"
+        },
+        {
+          "order": 6,
+          "type": "HTTPS Request",
+          "operation": "salesforceContractLookup",
+          "connectorRef": "config/box/https-connectors.json#salesforce-clm-rest",
+          "outputVariables": {
+            "recordId": "$.Id",
+            "contractId": "$.Contract_ID__c",
+            "boxFolderId": "$.Box_Workspace_Folder_ID__c"
+          }
+        }
+      ],
+      "testGate": {
+        "firstSubmission": "Creates one Salesforce record",
+        "duplicateSubmission": "Updates the same record",
+        "rejectedSubmission": "Makes no Salesforce request"
+      }
+    },
+    {
+      "key": "redline-domain-review-routing",
+      "name": "CLM - Redline Domain Review Routing",
+      "required": false,
+      "initialStatus": "inactive",
+      "trigger": {
+        "type": "Metadata updated",
+        "folderId": "${box.folders.drafts}",
+        "templateKey": "clmDocument",
+        "condition": "versionStatus equals Redline"
       },
-      "payloadConstruction": {
-        "formFields": ["requesterName", "requesterEmail", "counterparty", "contractType", "dealValue", "region", "dataCategory", "targetSignatureDate", "businessOwner", "specialTermsRiskNotes"],
-        "workflowDerivedFields": ["contractId", "boxFolderId", "boxFolderUrl", "boxIntakeFileId", "workflowRunId", "recordSource", "routingStatus", "openReviewTaskCount"],
-        "humanValidatedFields": ["riskLevel", "specialTermsRiskNotes"],
-        "recordSource": "Box Form",
-        "approvedBranchOnly": true
-      },
-      "liveSteps": [
-        {"type": "Extract", "agent": "Default Enhanced Extract Agent", "sourceFileId": "2342633195167", "configurationRef": "extract-field-prompts.json#contractIntake"},
-        {"type": "AI Agent", "agentRef": "ai-agent-specs.json#contract-risk-triage"},
-        {"type": "Approval Task", "name": "Validate Extract values and the Box Agent approval brief", "assignee": "kadams@boxdemo.com", "required": true},
-        {"type": "Conditional split", "condition": "approval task outcome", "branches": ["Approved", "Rejected"]},
-        {"type": "HTTPS Request", "connector": "Salesforce CLM REST API", "connectorRef": "https-connectors.json#salesforce-clm-rest", "operation": "salesforceContractUpsert", "purpose": "Upsert CLM_Contract__c through the standard Salesforce external-ID REST resource", "onRejected": "Do not call Salesforce; return the request for correction.", "onRetry": "Update the Salesforce record identified by contractId rather than create a duplicate.", "status": "salesforce-origin-oauth-object-deployment-unset"},
-        {"type": "HTTPS Request", "connector": "Salesforce CLM REST API", "connectorRef": "https-connectors.json#salesforce-clm-rest", "operation": "salesforceContractLookup", "purpose": "Return stable recordId, contractId, and boxFolderId after create or retry", "requiredResponse": ["recordId", "contractId", "boxFolderId"], "status": "salesforce-origin-oauth-object-deployment-unset"}
+      "steps": [
+        {"order": 1, "type": "Box Agent", "agentRef": "config/box/ai-agent-specs.json#redline-difference-router"},
+        {"order": 2, "type": "Conditional Split", "condition": "Unclassified or confidence below 0.85 routes to Legal Operations triage"},
+        {"order": 3, "type": "HTTPS Request", "operation": "routeRedlineFindings", "status": "requires custom Apex implementation"},
+        {"order": 4, "type": "Apply Metadata", "templateKey": "clmRedlineReview"},
+        {"order": 5, "type": "Create Task", "assignee": "${box.reviewers.primary}", "when": "Needs Triage"}
       ]
     },
     {
       "key": "approval-packet-readiness",
       "name": "CLM - Approval Packet Readiness",
-      "status": "draft",
-      "trigger": {
-        "type": "Task completed",
-        "taskIds": ["42899891150", "42899881417", "42899893550"]
-      },
+      "required": false,
+      "initialStatus": "inactive",
+      "trigger": "All required human review tasks completed",
       "steps": [
-        {"type": "AI Agent", "agentRef": "ai-agent-specs.json#approval-brief"},
-        {"type": "Create task", "name": "Confirm approval brief and remaining deviations", "assignee": "kadams@boxdemo.com", "required": true},
-        {"type": "Branch", "condition": "all required review tasks complete"},
-        {"type": "Box DocGen", "templateFileId": "2344242775119", "destinationFolderId": "399082072259"},
-        {"type": "Apply metadata", "templateKey": "clmContract", "values": {"status": "Approved"}},
-        {"type": "HTTPS Request", "connectorRef": "https-connectors.json#acme-clm-runtime", "operation": "approvalPacketReady"}
+        {"order": 1, "type": "Box Agent", "agentRef": "config/box/ai-agent-specs.json#approval-brief"},
+        {"order": 2, "type": "Human Confirmation", "purpose": "Approve Doc Gen creation"},
+        {"order": 3, "type": "Generate Document", "templateFileId": "${box.files.docgenApprovalMemo}", "destinationFolderId": "${box.folders.approvals}"}
       ]
     },
     {
       "key": "executed-agreement-obligations",
       "name": "CLM - Executed Agreement Obligations",
-      "status": "draft",
-      "trigger": {"type": "Box Sign request completed", "sourceFolderId": "399081939679"},
+      "required": false,
+      "initialStatus": "inactive",
+      "trigger": {"type": "File uploaded", "folderId": "${box.folders.executed}"},
       "steps": [
-        {"type": "Move or copy file", "destinationFolderId": "399080706253"},
-        {"type": "Extract", "configurationRef": "extract-field-prompts.json#executedObligations"},
-        {"type": "AI Agent", "agentRef": "ai-agent-specs.json#obligation-review"},
-        {"type": "Create task", "name": "Validate extracted obligations", "assignee": "kadams@boxdemo.com", "required": true},
-        {"type": "Loop", "over": "validated obligations", "outcomes": ["Create obligation record", "Assign owner task", "Set reminder date"]},
-        {"type": "Box DocGen", "templateFileId": "2344244747613", "destinationFolderId": "399081567921"},
-        {"type": "HTTPS Request", "connectorRef": "https-connectors.json#acme-clm-runtime", "operation": "executedAgreementActivated"}
+        {"order": 1, "type": "Extract Agent", "configurationRef": "config/box/extract-field-prompts.json#executedObligations"},
+        {"order": 2, "type": "Box Agent", "agentRef": "config/box/ai-agent-specs.json#obligation-review"},
+        {"order": 3, "type": "Approval Task", "assignee": "${box.reviewers.primary}"},
+        {"order": 4, "type": "Apply Metadata", "templateKey": "clmObligation", "destinationFolderId": "${box.folders.obligations}"}
       ]
     }
   ]

@@ -4,9 +4,9 @@
 
 This is a supporting Box + Agentforce + React deep dive. Use [Governed Workflow](../scenarios/governed-workflow/README.md) for the Box-centric presenter path or [Agentic Orchestration](../scenarios/agentic-orchestration/README.md) for the complete multi-platform story.
 
-Before running this script, complete [CLM Demo Setup and Activation](05-demo-setup-and-activation.md) and review the [manual-task register](../manual-task-register.md). Do not claim the integrated path is live unless the Level C smoke test passes.
+Before running this script, complete [CLM Demo Operator Start Here](../operator/00-start-here.md) and review the [manual-task register](../manual-task-register.md). Do not claim the integrated path is live unless the integrated smoke test passes.
 
-Source diagram: [Box + Agentforce + React architecture](../diagrams/clm-box-agentforce-react.mmd)
+Architecture: [rendered](../diagrams/clm-box-agentforce-react.svg) · [Mermaid source](../diagrams/clm-box-agentforce-react.mmd)
 
 Presentation package:
 
@@ -14,10 +14,10 @@ Presentation package:
 - [Legal Operations walkthrough](../scenarios/agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md)
 - [Technical validation](../scenarios/agentic-orchestration/supporting-react-scripts/03-technical-validation.md)
 - [Box Form entry-point variation](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md)
-- [Rendered demo flow](../diagrams/clm-box-agentforce-react-demo-flow.svg)
-- [Rendered Box Form entry flow](../diagrams/clm-box-form-automate-entry.svg)
+- Demo flow: [rendered](../diagrams/clm-box-agentforce-react-demo-flow.svg) · [Mermaid source](../diagrams/clm-box-agentforce-react-demo-flow.mmd)
+- Box Form entry flow: [rendered](../diagrams/clm-box-form-automate-entry.svg) · [Mermaid source](../diagrams/clm-box-form-automate-entry.mmd)
 - [Component manifest](../scenarios/agentic-orchestration/supporting-react-scripts/component-manifest.md)
-- [Machine-readable manifest](../../config/demo/box-agentforce-react-demo-manifest.json)
+- [Machine-readable manifest](../../config/demo/agentic-orchestration-demo-manifest.json)
 
 ## Experience boundary
 
@@ -33,16 +33,16 @@ Presentation package:
 
 | Asset | Value |
 |---|---|
-| Box workspace | [CLM-2026-Northstar](https://kadams.ent.box.com/folder/399081692991) |
-| Box CLM app | [Contract Lifecycle Management](https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn) |
-| New Contract Request form | [Published form](https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858) |
-| MSA redline | File `2342633195167` |
-| Legal / Finance / Privacy tasks | `42899891150` / `42899881417` / `42899893550` |
-| Approval memo DocGen template | File `2344242775119` |
-| Renewal notice DocGen template | File `2344244747613` |
-| Approved clause library | Folder `399419341582`; metadata template `9ca0de81-5f96-4158-82f7-1251b28a9c6e` |
-| Offline experience gallery | `output/html/agentic-orchestration-gallery.html` |
-| Salesforce CLM record | `CLM_Contract__c` and metadata-managed External Client App are deployed to `agentforce`; direct REST create/update/lookup passed with record `a7IgL000000WYWPUA4`; only the Box consumer-secret handoff and OAuth test remain |
+| Box workspace | Generated `CLM-2026-Northstar` workspace |
+| Box CLM app | Target environment's published **Contract Lifecycle Management** App |
+| New Contract Request form | Target environment's published Form |
+| MSA redline | Generated `northstar-msa-redline-v3.pdf` |
+| Legal / Finance / Privacy tasks | Human-owned tasks created in the target environment |
+| Approval memo DocGen template | Generated approval memo template |
+| Renewal notice DocGen template | Generated renewal notice template |
+| Approved clause library | Target environment's governed clause folder and Hub |
+| Offline experience gallery | `output/html/04-agentic-orchestration-gallery.html` |
+| Salesforce CLM record | Target environment's `CLM_Contract__c`; standard REST create/update/lookup must pass before activation |
 
 ## Presenter flow
 
@@ -55,7 +55,7 @@ Choose one entry point before the session:
 |---|---|---|---|
 | 0. Intake | Submit the published Box Form, then show Automate through Extract, Box Agent, and human validation. | Explain the candidate enrichment prepared for the structured record. | The HTTPS connector remains downstream of human approval. |
 | 1. Create Salesforce record | Run the approved HTTPS branch and show the newly created Salesforce CLM record plus returned record ID. | Resolve the new record with its Box workspace context. | Record creation is idempotent and uses only validated, allowlisted fields. |
-| 2. Open contract | Launch the React workspace with `recordId`, `contractId=CLM-2026-0017`, and `folderId=399081692991`. | Ask for a package summary with Box file citations. | Salesforce holds structured context; Box remains authoritative for content. |
+| 2. Open contract | Launch React with the returned record ID, contract ID, and generated Box workspace folder ID. | Ask for a package summary with Box file citations. | Salesforce holds structured context; Box remains authoritative for content. |
 | 3. Inspect and route redlines | Open the MSA redline and approved-clause Hub/View, then switch to **Redline reviews**. | Compare the redline to the governed Markdown clauses; return cited findings, domain, risk, confidence, and fallback. | Expert selection comes only from the configured directory; uncertain findings go to Legal Operations triage. |
 | 4. Explain blockers | Show the Commercial Legal, Finance, and Privacy queues with their named experts. | Ask why signature is blocked and who owns each decision. | Findings are consolidated into one human-owned Box task per domain. |
 | 5. Prepare packet | Return to the workspace. | Draft an approval memo with Box DocGen after presenter confirmation. | File creation requires confirmation; approval does not occur automatically. |
@@ -65,7 +65,7 @@ Choose one entry point before the session:
 ## Local rehearsal
 
 ```bash
-cd clm-react-app/force-app/main/default/uiBundles/clmreactapp
+cd clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
 npm install
 npm test -- --run
 npm run build
@@ -90,10 +90,10 @@ Local mode intentionally shows a safe fallback file list and Agentforce prompt c
 - Configure the standard Salesforce REST external-ID upsert and lookup operations for validated, allowlisted Box intake values.
 - Use `Contract_ID__c` for standard REST idempotency, then map the external-ID lookup response to `recordId`, `contractId`, and `boxFolderId`.
 - Configure the Agentforce agent/application IDs at runtime or with `VITE_AGENTFORCE_*` build variables.
-- Implement the same-origin downscoped token endpoint documented in `clm-react-app/README.md`.
+- Implement the same-origin downscoped token endpoint documented in `clm-salesforce-project/README.md`.
 - Register the actions and guardrails from `config/agentforce/clm-react-agentforce-spec.json`.
 - Verify Box application CORS for the deployed Salesforce/Experience domain.
-- Rehearse with `recordId=<returned-salesforce-id>&contractId=CLM-2026-0017&folderId=399081692991`.
+- Rehearse with `recordId=<returned-salesforce-id>&contractId=<contract-id>&folderId=<generated-workspace-folder-id>`.
 
 ## Pass criteria
 

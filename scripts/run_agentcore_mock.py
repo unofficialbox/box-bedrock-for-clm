@@ -22,6 +22,34 @@ def read_clause_outcomes(path: Path) -> dict[str, dict[str, str]]:
         return {row["clauseArea"]: row for row in rows}
 
 
+def box_context() -> dict:
+    """Use this operator's bootstrap state when present, otherwise local fixtures."""
+
+    state_path = ROOT / "config" / "runtime" / "bootstrap-state.json"
+    if state_path.exists():
+        box = read_json(state_path).get("box", {})
+        return {
+            "workspaceId": box.get("folders", {}).get("workspace", "runtime-workspace"),
+            "files": box.get("files", {}),
+            "source": "operator-bootstrap-state",
+        }
+
+    names = [
+        "northstar-msa-redline-v3.pdf",
+        "northstar-dpa.pdf",
+        "northstar-sow-implementation.pdf",
+        "northstar-order-form.pdf",
+        "northstar-security-exhibit.pdf",
+        "northstar-insurance-certificate.pdf",
+    ]
+    files = {
+        name: f"local-fixture:{name}"
+        for name in names
+        if (ROOT / "output" / "pdf" / name).exists()
+    }
+    return {"workspaceId": "local-fixture", "files": files, "source": "generated-local-assets"}
+
+
 def event(agent: str, action: str, status: str, details: dict) -> dict:
     return {
         "timestamp": datetime.now(UTC).isoformat(),
@@ -36,7 +64,7 @@ def main() -> None:
     records = read_json(ROOT / "output" / "json" / "northstar-clm-records.json")
     playbook = read_json(ROOT / "output" / "json" / "clause-playbook.json")
     outcomes = read_clause_outcomes(ROOT / "output" / "csv" / "historical-clause-outcomes.csv")
-    live_box = read_json(ROOT / "config" / "box" / "live-box-surface.json")
+    box = box_context()
 
     contract = records["contract"]
     opportunity = records["salesforceOpportunity"]
@@ -52,12 +80,13 @@ def main() -> None:
                 "contractId": contract["contractId"],
                 "routingMode": "supervisor",
                 "framework": "Strands",
-                "workspaceFolderId": live_box["workspace"]["id"],
+                "workspaceFolderId": box["workspaceId"],
+                "workspaceSource": box["source"],
             },
         )
     )
 
-    files = live_box["files"]
+    files = box["files"]
     required_docs = [
         "northstar-msa-redline-v3.pdf",
         "northstar-dpa.pdf",
@@ -73,7 +102,7 @@ def main() -> None:
             "validate_package",
             "complete" if not missing_docs else "needs_attention",
             {
-                "folderId": live_box["workspace"]["id"],
+                "folderId": box["workspaceId"],
                 "requiredDocuments": required_docs,
                 "missingDocuments": missing_docs,
             },

@@ -1,120 +1,36 @@
 {
+  "schemaVersion": "2.0",
   "name": "Contract Copilot",
-  "variation": "box-agentforce-react",
-  "scope": {
-    "included": [
-      "Box",
-      "Agentforce",
-      "Salesforce Multi-Framework React UI Bundle"
-    ],
-    "excluded": [
-      "AWS Bedrock AgentCore",
-      "Strands",
-      "Databricks",
-      "external custom middleware"
-    ]
-  },
   "context": {
     "contractId": "CLM-2026-0017",
-    "salesforceRecordId": null,
     "salesforceObjectApiName": "CLM_Contract__c",
-    "salesforceRecordContract": "config/salesforce/clm-contract-record.json",
-    "boxWorkspaceFolderId": "399081692991",
-    "boxWorkspaceUrl": "https://kadams.ent.box.com/folder/399081692991"
+    "boxWorkspaceFolderId": "${box.folders.workspace}",
+    "boxWorkspaceUrl": "https://${box.hostname}/folder/${box.folders.workspace}"
   },
   "topics": [
-    {
-      "name": "Contract package review",
-      "actions": [
-        "resolve_contract_context",
-        "list_box_contract_files",
-        "summarize_box_contract_package",
-        "compare_redline_to_clause_playbook",
-        "get_redline_review_queue"
-      ]
-    },
-    {
-      "name": "Approval readiness",
-      "actions": [
-        "get_box_review_tasks",
-        "explain_signature_blockers",
-        "draft_box_docgen_approval_memo"
-      ]
-    },
-    {
-      "name": "Post-signature obligations",
-      "actions": [
-        "extract_candidate_obligations",
-        "draft_box_docgen_renewal_notice"
-      ]
-    }
+    {"name": "Contract package review", "actions": ["resolve_contract_context", "list_box_contract_files", "summarize_box_contract_package", "compare_redline_to_clause_playbook", "get_redline_review_queue"]},
+    {"name": "Approval readiness", "actions": ["get_box_review_tasks", "explain_signature_blockers", "draft_box_docgen_approval_memo"]},
+    {"name": "Post-signature obligations", "actions": ["extract_candidate_obligations", "draft_box_docgen_renewal_notice"]}
   ],
   "actions": {
-    "resolve_contract_context": {
-      "input": ["salesforceRecordId", "contractId", "boxFolderId"],
-      "output": ["contract", "workspace", "status"],
-      "mutates": false
-    },
-    "list_box_contract_files": {
-      "input": ["boxFolderId"],
-      "output": ["files", "metadata", "versions"],
-      "mutates": false
-    },
-    "summarize_box_contract_package": {
-      "input": ["boxFolderId"],
-      "output": ["summary", "risks", "sourceCitations"],
-      "mutates": false
-    },
-    "compare_redline_to_clause_playbook": {
-      "input": ["redlineFileId", "baselineItemId", "playbookFileId"],
-      "output": ["redlineFindings", "fallbackOptions", "sourceCitations"],
-      "outputSchema": "config/clm/redline-finding.schema.json",
-      "mutates": false
-    },
-    "get_redline_review_queue": {
-      "input": ["contractId"],
-      "output": ["findingsByDomain", "expertAssignments", "unclassifiedFindings", "boxTasks"],
-      "mutates": false
-    },
-    "get_box_review_tasks": {
-      "input": ["contractId"],
-      "output": ["legalTask", "financeTask", "privacySecurityTask"],
-      "mutates": false
-    },
-    "explain_signature_blockers": {
-      "input": ["contractId"],
-      "output": ["blocked", "reasons", "requiredHumanDecisions"],
-      "mutates": false
-    },
-    "draft_box_docgen_approval_memo": {
-      "input": ["contractId", "templateFileId"],
-      "output": ["draftFileId", "sourceCitations"],
-      "mutates": true,
-      "confirmationRequired": true,
-      "templateFileId": "2344242775119"
-    },
-    "extract_candidate_obligations": {
-      "input": ["executedAgreementFileId"],
-      "output": ["candidateObligations", "sourceCitations"],
-      "mutates": false
-    },
-    "draft_box_docgen_renewal_notice": {
-      "input": ["contractId", "templateFileId"],
-      "output": ["draftFileId"],
-      "mutates": true,
-      "confirmationRequired": true,
-      "templateFileId": "2344244747613"
-    }
+    "resolve_contract_context": {"input": ["salesforceRecordId", "contractId", "boxFolderId"], "output": ["contract", "workspace", "status"], "mutates": false},
+    "list_box_contract_files": {"input": ["boxFolderId"], "output": ["files", "metadata", "versions"], "mutates": false},
+    "summarize_box_contract_package": {"input": ["boxFolderId"], "output": ["summary", "risks", "sourceCitations"], "mutates": false},
+    "compare_redline_to_clause_playbook": {"input": ["redlineFileId", "baselineItemId", "clauseLibraryFolderId"], "output": ["redlineFindings", "fallbackOptions", "sourceCitations"], "outputSchema": "config/clm/redline-finding.schema.json", "mutates": false},
+    "get_redline_review_queue": {"input": ["contractId"], "output": ["findingsByDomain", "expertAssignments", "unclassifiedFindings", "boxTasks"], "mutates": false},
+    "get_box_review_tasks": {"input": ["contractId"], "output": ["legalTask", "financeTask", "privacySecurityTask"], "mutates": false},
+    "explain_signature_blockers": {"input": ["contractId"], "output": ["blocked", "reasons", "requiredHumanDecisions"], "mutates": false},
+    "draft_box_docgen_approval_memo": {"input": ["contractId", "templateFileId"], "templateFileId": "${box.files.docgenApprovalMemo}", "output": ["draftFileId", "sourceCitations"], "mutates": true, "confirmationRequired": true},
+    "extract_candidate_obligations": {"input": ["executedAgreementFileId"], "output": ["candidateObligations", "sourceCitations"], "mutates": false},
+    "draft_box_docgen_renewal_notice": {"input": ["contractId", "templateFileId"], "templateFileId": "${box.files.docgenRenewalNotice}", "output": ["draftFileId"], "mutates": true, "confirmationRequired": true}
   },
   "guardrails": [
     "Use Box as the source of truth for contract content and cite source files.",
-    "Use CLM_Contract__c only for validated structured context and Box references; never copy contract file bytes into Salesforce.",
-    "Treat Salesforce record creation as an upstream, human-validated Automate event; do not invent or silently create a record.",
-    "Never approve legal language or complete a Box approval task on behalf of a human.",
-    "Resolve expert assignments only from config/clm/expert-routing.json; never infer a person or login from contract text.",
-    "Send unclassified or low-confidence redline findings to Legal Operations triage.",
+    "Never copy contract bytes into Salesforce.",
+    "Never approve legal language or complete a human review task.",
+    "Resolve experts only from the maintained directory.",
+    "Route unclassified or low-confidence findings to Legal Operations triage.",
     "Never create a Box Sign request until all required human approvals are complete.",
-    "Require confirmation before DocGen creates a new file.",
-    "Do not send content or derived data to AWS, Databricks, or another external runtime in this variation."
+    "Require confirmation before Doc Gen creates a file."
   ]
 }

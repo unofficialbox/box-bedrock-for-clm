@@ -25,20 +25,20 @@ Rendered version: [Box Form entry-point flow](../../../diagrams/clm-box-form-aut
 
 | Surface | Value |
 |---|---|
-| Published Form | [New Contract Request](https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858) |
-| Intake folder | `399082115646` |
-| Saved workflow | [CLM - Contract Intake Enrichment](https://kadams.ent.box.com/automate/workflow/edit/399436615012) |
+| Published Form | Target environment's **New Contract Request** URL |
+| Intake folder | Generated `01 - Intake` folder |
+| Saved workflow | Target environment's **CLM - Contract Intake Enrichment** |
 | Connector operations | `salesforceContractUpsert`, then `salesforceContractLookup` |
 | Salesforce API | Standard sObject Rows by External ID REST resource |
 | Salesforce object | `CLM_Contract__c` |
 
-The workflow is currently a saved inactive draft and must be updated to the standard REST operations. The Salesforce object, origin, API version, and OAuth 2.0 connection are not yet configured in a confirmed org. Do not present this variation as live end to end until the integrated smoke test passes.
+Treat the workflow as inactive until the target environment's Salesforce object, origin, API version, OAuth connection, standard REST operations, and integrated smoke test are complete.
 
 ## Pre-demo setup
 
-1. Complete Level C setup in [Setup and Activation](../../../runbooks/05-demo-setup-and-activation.md).
+1. Complete [Operator Start Here](../../../operator/00-start-here.md) and the integrated smoke test.
 2. Use a clearly labeled non-production request and a unique `contractId`.
-3. Confirm the workflow targets the published Form and intake folder `399082115646`.
+3. Confirm the workflow targets the published Form and generated intake folder.
 4. Confirm the HTTPS Connector points to the intended Salesforce test org and uses an administrator-managed OAuth 2.0 connection.
 5. Have the Salesforce CLM record list and React launch page open in separate tabs.
 6. Obtain explicit confirmation immediately before activating the Box Automate workflow.
@@ -69,7 +69,7 @@ Open the published Form, enter the demo values, upload the contract package, and
 
 > The process begins where the requester already works. Box captures the request and contract package together, so the workflow starts with governed content rather than a detached CRM record.
 
-Verify that the submission appears in intake folder `399082115646` and record the created Box intake file ID.
+Verify that the submission appears in the generated intake folder and record the created Box intake file ID.
 
 ### 2. Show Automate enrichment
 
@@ -117,14 +117,14 @@ Confirm the successful response includes:
 {
   "recordId": "<salesforce-record-id>",
   "contractId": "<contract-id>",
-  "boxFolderId": "399081692991"
+  "boxFolderId": "<generated-workspace-folder-id>"
 }
 ```
 
 Open React with:
 
 ```text
-recordId=<salesforce-record-id>&contractId=<contract-id>&folderId=399081692991
+recordId=<salesforce-record-id>&contractId=<contract-id>&folderId=<generated-workspace-folder-id>
 ```
 
 Then continue with Act 1 of the selected executive, Legal Operations, or technical walkthrough.

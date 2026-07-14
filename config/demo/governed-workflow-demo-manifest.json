@@ -27,10 +27,10 @@
     "Strands"
   ],
   "readiness": {
-    "boxSurfaces": "live",
-    "automate": "saved-draft-inactive-final-oauth-smoke-pending",
-    "salesforceRest": "direct-upsert-and-lookup-verified",
-    "sign": "packet-not-created"
+    "boxSurfaces": "build-and-validate-per-environment",
+    "automate": "keep-inactive-until-oauth-and-idempotency-tests-pass",
+    "salesforceRest": "validate-standard-upsert-and-lookup-per-environment",
+    "sign": "human-confirmation-required"
   },
   "documentation": {
     "guide": "docs/scenarios/governed-workflow/README.md",
@@ -38,7 +38,8 @@
     "architectureRendered": "docs/diagrams/governed-workflow-architecture.svg",
     "flowSource": "docs/diagrams/governed-workflow-flow.mmd",
     "flowRendered": "docs/diagrams/governed-workflow-flow.svg",
-    "gallery": "output/html/governed-workflow-gallery.html"
+    "portableGuide": "output/html/01-governed-workflow-guide.html",
+    "gallery": "output/html/02-governed-workflow-gallery.html"
   },
   "screenshots": "output/screenshots/governed-workflow/"
 }

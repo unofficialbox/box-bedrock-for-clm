@@ -57,7 +57,8 @@
     "playbook": "output/json/clause-playbook.json",
     "analytics": "output/csv/historical-clause-outcomes.csv",
     "documents": "output/pdf/",
-    "liveBoxSurface": "config/box/live-box-surface.json",
+    "runtimeBindings": "config/runtime/demo-environment.json",
+    "bootstrapState": "config/runtime/bootstrap-state.json",
     "handoffPayloads": "config/agentcore/agent-handoff-payloads.json"
   },
   "localMock": {

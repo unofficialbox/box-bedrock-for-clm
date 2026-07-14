@@ -11,18 +11,18 @@
 
 ## Live anchors
 
-| Component | Live value |
+| Component | Target-environment value |
 |---|---|
-| Box workspace | Folder `399081692991` |
-| MSA redline | File `2342633195167` |
-| DPA | File `2342633156726` |
-| Order form | File `2342633259967` |
-| Clause playbook | File `2342635779827` |
-| Legal task | `42899891150` |
-| Finance task | `42899881417` |
-| Privacy/Security task | `42899893550` |
-| Approval memo template | `2344242775119` |
-| Renewal notice template | `2344244747613` |
+| Box workspace | Generated `CLM-2026-Northstar` folder |
+| MSA redline | Generated `northstar-msa-redline-v3.pdf` |
+| DPA | Generated `northstar-dpa.pdf` |
+| Order form | Generated `northstar-order-form.pdf` |
+| Clause playbook | Target environment's approved clause folder and Hub |
+| Legal task | Human-owned Legal review task |
+| Finance task | Human-owned Finance review task |
+| Privacy/Security task | Human-owned Privacy/Security review task |
+| Approval memo template | Generated approval memo template |
+| Renewal notice template | Generated renewal notice template |
 
 ## Script
 
@@ -32,7 +32,7 @@
 
 - Review the validated Box intake and approved Automate branch.
 - Create the Salesforce CLM record through the configured HTTPS operation and capture the returned record ID.
-- Open the React app with `recordId=<returned-salesforce-id>&contractId=CLM-2026-0017&folderId=399081692991`.
+- Open React with `recordId=<returned-salesforce-id>&contractId=<contract-id>&folderId=<generated-workspace-folder-id>`.
 - Review counterparty, contract type, value, term, risk, and status.
 - Open the Box workspace panel.
 
@@ -65,7 +65,7 @@ Then open **Redline reviews** in React.
 
 - Show four cited findings consolidated into Commercial Legal, Finance, and Privacy expert queues.
 - Open the Commercial Legal group to show the removed liability cap and shortened renewal notice together.
-- Point out the intended named expert, current Box task ID, classification confidence, and live demo-triage assignee.
+- Point out the intended named expert, target environment's Box task ID, classification confidence, and triage assignee.
 - Explain that production assignment requires a configured Box collaborator login; low-confidence or unclassified findings go to Legal Operations triage.
 
 **Expected findings**
@@ -118,9 +118,9 @@ Agentforce may show fallback options and recommend a routing domain. The configu
 
 **Show**
 
-- Signature folder `399081939679`.
-- Obligations folder `399081567921`.
-- Renewal notice template `2344244747613`.
+- Generated `05 - Signature` folder.
+- Generated `07 - Obligations` folder.
+- Generated renewal notice template.
 
 **Explain**
 

@@ -9,9 +9,7 @@
   "presenterSurface": "Salesforce Multi-Framework React",
   "included": [
     "all Governed Workflow components",
-    "Salesforce CLM record",
-    "Salesforce Multi-Framework React UI Bundle",
-    "Agentforce Contract Copilot",
+    "Salesforce Agentforce CLM record, Contract Copilot, and Multi-Framework React UI Bundle",
     "Databricks analytics agent",
     "AWS Bedrock AgentCore supervisor",
     "Strands specialist agents",
@@ -19,10 +17,10 @@
     "human approval gates"
   ],
   "readiness": {
-    "boxSurfaces": "live",
-    "reactWorkspace": "local-verified",
-    "salesforceMetadata": "deployed",
-    "agentforce": "specified-not-deployed",
+    "boxSurfaces": "build-and-validate-per-environment",
+    "reactWorkspace": "local-tests-and-build-verified-deploy-per-environment",
+    "salesforceMetadata": "portable-deployment-provided",
+    "agentforce": "portable-specification-configure-per-environment",
     "databricks": "synthetic-dataset-and-tool-contract",
     "agentcore": "specification-and-deterministic-local-trace"
   },
@@ -32,7 +30,8 @@
     "architectureRendered": "docs/diagrams/clm-agentcore-architecture.svg",
     "flowSource": "docs/diagrams/agentic-orchestration-flow.mmd",
     "flowRendered": "docs/diagrams/agentic-orchestration-flow.svg",
-    "gallery": "output/html/agentic-orchestration-gallery.html",
+    "portableGuide": "output/html/03-agentic-orchestration-guide.html",
+    "gallery": "output/html/04-agentic-orchestration-gallery.html",
     "detailedRunbook": "docs/runbooks/03-agentcore-demo.md"
   },
   "screenshots": {

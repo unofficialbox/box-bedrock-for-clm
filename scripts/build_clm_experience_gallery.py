@@ -29,7 +29,7 @@ BOX_EXPERIENCES = [
         "file": "box-app-clause-library-live.png",
         "eyebrow": "Box Apps",
         "title": "Clause Library dashboard page",
-        "description": "The published Box App page combines the approved-clause view, source folder, Hub shortcut, and live position, clause-family, and approval-status charts.",
+        "description": "The published Box App page combines the Approved Standards view, governed source files, and a live Standard versus Approved Fallback portfolio chart.",
     },
     {
         "file": "box-app-approved-standards-view.png",
@@ -86,7 +86,7 @@ REACT_EXPERIENCES = [
         "file": "clm-react-workspace.png",
         "eyebrow": "React workspace",
         "title": "Northstar Health contract workspace",
-        "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Agentforce copilot rail.",
+        "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Salesforce Agentforce copilot rail.",
     },
     {
         "file": "clm-react-redline-reviews.png",
@@ -104,6 +104,7 @@ for experience in REACT_EXPERIENCES:
 
 SCENARIOS = [
     {
+        "order": "02",
         "slug": "governed-workflow",
         "title": "Governed Workflow",
         "headline": "A controlled contract journey with agentic enrichment.",
@@ -112,10 +113,11 @@ SCENARIOS = [
         "experiences": BOX_EXPERIENCES,
     },
     {
+        "order": "04",
         "slug": "agentic-orchestration",
         "title": "Agentic Orchestration",
         "headline": "The complete multi-platform CLM operating model.",
-        "description": "The governed Box journey plus the Salesforce Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
+        "description": "The governed Box journey plus the Salesforce Agentforce experience in the Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
         "status": "Real Box and React screens. No live AWS AgentCore or Databricks screenshots are claimed.",
         "experiences": REACT_EXPERIENCES + BOX_EXPERIENCES,
     },
@@ -166,7 +168,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acme CLM · {html.escape(str(scenario['title']))}</title>
+  <title>Acme CLM Visual Gallery · {html.escape(str(scenario['title']))}</title>
   <style>
     :root {{
       color-scheme: dark;
@@ -227,7 +229,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
 <body>
   <header>
     <div>
-      <p class="kicker">Acme Robotics · {html.escape(str(scenario['title']))}</p>
+      <p class="kicker">Acme Robotics · Visual Gallery · {html.escape(str(scenario['title']))}</p>
       <h1>{html.escape(str(scenario['headline']))}</h1>
       <p>{html.escape(str(scenario['description']))} Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
     </div>
@@ -239,12 +241,12 @@ def build_scenario(scenario: dict[str, object]) -> Path:
   <main>
 {cards}
   </main>
-  <footer>Self-contained artifact · Embedded screenshots · No external fonts, scripts, stylesheets, or image references</footer>
+  <footer>Visual-only companion · Embedded real-demo screenshots · No external fonts, scripts, stylesheets, or image references</footer>
 </body>
 </html>
 """
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT / f"{slug}-gallery.html"
+    output_path = OUTPUT / f"{scenario['order']}-{slug}-gallery.html"
     output_path.write_text(document, encoding="utf-8")
     return output_path
 

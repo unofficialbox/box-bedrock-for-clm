@@ -2,10 +2,12 @@
 
 Use one track per presentation. The Northstar contract package and governance rules are shared, but the runtime story and screenshots are intentionally separate.
 
+Building this in a new environment? Complete [Operator Start Here](../operator/00-start-here.md) before using either presenter guide.
+
 | Track | Short name | Orchestration model | Presenter surface | Readiness |
 |---|---|---|---|---|
 | [Governed Workflow](governed-workflow/README.md) | Governed Workflow | Deterministic Box Automate stages with Extract, Box/Agentforce assistance, explicit conditions, and human approval gates | Box Form, Apps, Automate, Hub, tasks, Doc Gen, Sign | Live Box surfaces; Automate activation/OAuth smoke remains gated |
-| [Agentic Orchestration](agentic-orchestration/README.md) | Agentic Orchestration | AgentCore/Strands supervisor delegates to Box, Salesforce, Agentforce, and Databricks specialists under human guardrails | Salesforce Multi-Framework React workspace plus all connected platforms | Local orchestration mock and React demo; managed AWS/Databricks deployment remains future work |
+| [Agentic Orchestration](agentic-orchestration/README.md) | Agentic Orchestration | AgentCore/Strands supervisor delegates to Box, Salesforce Agentforce, and Databricks specialists under human guardrails | Salesforce Multi-Framework React workspace plus all connected platforms | Local orchestration mock and React demo; managed AWS/Databricks deployment remains future work |
 
 ## Naming rule
 

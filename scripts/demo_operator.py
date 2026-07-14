@@ -1,0 +1,677 @@
+#!/usr/bin/env python3
+"""Bootstrap and validate the CLM demo in a new customer environment."""
+
+from __future__ import annotations
+
+import argparse
+import json
+import shutil
+import subprocess
+import sys
+import re
+from pathlib import Path
+from typing import Any
+from urllib.parse import urlparse
+
+
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
+STATE_PATH = ROOT / "config/runtime/bootstrap-state.json"
+FOLDERS = [
+    "01 - Intake",
+    "02 - Drafts and Redlines",
+    "03 - Review Packets",
+    "04 - Approvals",
+    "05 - Signature",
+    "06 - Executed Agreement",
+    "07 - Obligations",
+    "08 - DocGen Templates",
+    "Approved Clauses",
+]
+FOLDER_BINDINGS = {
+    "workspace": "workspace",
+    "intake": "01 - Intake",
+    "drafts": "02 - Drafts and Redlines",
+    "reviewPackets": "03 - Review Packets",
+    "approvals": "04 - Approvals",
+    "signature": "05 - Signature",
+    "executed": "06 - Executed Agreement",
+    "obligations": "07 - Obligations",
+    "docgen": "08 - DocGen Templates",
+    "clauses": "Approved Clauses",
+}
+FILE_BINDINGS = {
+    "msaRedline": "northstar-msa-redline-v3.pdf",
+    "dpa": "northstar-dpa.pdf",
+    "sow": "northstar-sow-implementation.pdf",
+    "orderForm": "northstar-order-form.pdf",
+    "securityExhibit": "northstar-security-exhibit.pdf",
+    "insurance": "northstar-insurance-certificate.pdf",
+    "docgenApprovalMemo": "clm-approval-memo-template.docx",
+    "docgenOrderSummary": "clm-order-summary-template.docx",
+    "docgenRenewalNotice": "clm-renewal-notice-template.docx",
+}
+PORTABLE_SPECS = [
+    "config/box/automate-workflows.json",
+    "config/box/https-connectors.json",
+    "config/box/ai-agent-specs.json",
+    "config/agentforce/clm-react-agentforce-spec.json",
+    "config/salesforce/clm-contract-record.json",
+    "config/agentcore/agent-handoff-payloads.json",
+    "config/clm/expert-routing.json",
+]
+UPLOADS = {
+    "02 - Drafts and Redlines": [
+        "output/pdf/northstar-msa-redline-v3.pdf",
+        "output/pdf/northstar-dpa.pdf",
+        "output/pdf/northstar-sow-implementation.pdf",
+        "output/pdf/northstar-order-form.pdf",
+        "output/pdf/northstar-security-exhibit.pdf",
+        "output/pdf/northstar-insurance-certificate.pdf",
+    ],
+    "08 - DocGen Templates": [
+        "output/docgen/clm-approval-memo-template.docx",
+        "output/docgen/clm-order-summary-template.docx",
+        "output/docgen/clm-renewal-notice-template.docx",
+    ],
+    "Approved Clauses": [
+        "sample-data/clauses/README.md",
+        "sample-data/clauses/approved/CLM-DATA-001-standard.md",
+        "sample-data/clauses/approved/CLM-DATA-002-fallback.md",
+        "sample-data/clauses/approved/CLM-LIAB-001-standard.md",
+        "sample-data/clauses/approved/CLM-LIAB-002-fallback.md",
+        "sample-data/clauses/approved/CLM-PAY-001-standard.md",
+        "sample-data/clauses/approved/CLM-PAY-002-fallback.md",
+        "sample-data/clauses/approved/CLM-SLA-001-standard.md",
+        "sample-data/clauses/approved/CLM-SLA-002-fallback.md",
+    ],
+}
+
+
+class OperatorError(RuntimeError):
+    pass
+
+
+def load_json(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        try:
+            display_path = path.relative_to(ROOT)
+        except ValueError:
+            display_path = path
+        raise OperatorError(
+            f"Missing {display_path}. Copy config/runtime/demo-environment.example.json "
+            "to config/runtime/demo-environment.json and fill in your environment values."
+        )
+    return json.loads(path.read_text(encoding="utf-8"))
+
+
+def run(command: list[str], *, cwd: Path = ROOT, dry_run: bool = False) -> str:
+    printable = " ".join(command)
+    if dry_run:
+        print(f"DRY RUN  {printable}")
+        return ""
+    result = subprocess.run(command, cwd=cwd, check=False, text=True, capture_output=True)
+    if result.returncode:
+        raise OperatorError(f"Command failed ({result.returncode}): {printable}\n{result.stderr.strip()}")
+    return result.stdout.strip()
+
+
+def run_json(command: list[str], *, cwd: Path = ROOT) -> Any:
+    output = run(command, cwd=cwd)
+    try:
+        return json.loads(output)
+    except json.JSONDecodeError as error:
+        raise OperatorError(f"Command returned invalid JSON: {' '.join(command)}") from error
+
+
+def try_run_json(command: list[str], *, cwd: Path = ROOT) -> Any | None:
+    result = subprocess.run(command, cwd=cwd, check=False, text=True, capture_output=True)
+    if result.returncode:
+        return None
+    try:
+        return json.loads(result.stdout)
+    except json.JSONDecodeError:
+        return None
+
+
+def find_box_item(parent_id: str, name: str, item_type: str) -> str | None:
+    payload = run_json(["box", "folders:items", parent_id, "--fields", "id,type,name", "--max-items", "1000", "--json"])
+    if isinstance(payload, dict):
+        payload = payload.get("entries") or payload.get("items") or []
+    for item in payload:
+        if item.get("type") == item_type and item.get("name") == name:
+            return str(item["id"])
+    return None
+
+
+def require_tools(names: list[str]) -> list[str]:
+    return [name for name in names if shutil.which(name) is None]
+
+
+def box_identity() -> dict[str, Any]:
+    payload = run_json(["box", "users:get", "me", "--json"])
+    if isinstance(payload, list):
+        payload = payload[0]
+    return payload
+
+
+def salesforce_identity(alias: str) -> dict[str, Any]:
+    payload = run_json(["sf", "org", "display", "--target-org", alias, "--json"], cwd=ROOT / "clm-salesforce-project")
+    return payload.get("result", payload)
+
+
+def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -> None:
+    config = load_json(config_path)
+    tools = ["python3"]
+    if platform in ("all", "box"):
+        tools.append("box")
+    if platform in ("all", "salesforce"):
+        tools.extend(["sf", "npm"])
+    missing_tools = require_tools(tools)
+    problems: list[str] = []
+    if missing_tools:
+        problems.append("missing commands: " + ", ".join(missing_tools))
+    if platform in ("all", "salesforce"):
+        if not config.get("salesforce", {}).get("orgAlias"):
+            problems.append("salesforce.orgAlias is blank")
+        if not config.get("salesforce", {}).get("orgId"):
+            problems.append("salesforce.orgId is blank")
+    if platform in ("all", "box"):
+        if not config.get("box", {}).get("parentFolderId"):
+            problems.append("box.parentFolderId is blank")
+        if str(config.get("box", {}).get("parentFolderId")) == "0" and not config.get("box", {}).get("allowRootFolder"):
+            problems.append("box.parentFolderId is 0 but box.allowRootFolder is not true")
+        if not config.get("box", {}).get("enterpriseId"):
+            problems.append("box.enterpriseId is blank")
+        if not config.get("box", {}).get("operatorLogin"):
+            problems.append("box.operatorLogin is blank")
+    source_paths = []
+    if platform in ("all", "box"):
+        source_paths.append(ROOT / "config/box/metadata-templates.json")
+    if platform in ("all", "salesforce"):
+        source_paths.append(ROOT / "clm-salesforce-project/sfdx-project.json")
+    for path in source_paths:
+        if not path.exists():
+            problems.append(f"missing repository file: {path.relative_to(ROOT)}")
+    if problems:
+        raise OperatorError("Doctor found setup issues:\n- " + "\n- ".join(problems))
+    if not offline and platform in ("all", "box"):
+        box_user = box_identity()
+        actual_enterprise = str(box_user.get("enterprise", {}).get("id") or "")
+        if actual_enterprise != str(config["box"]["enterpriseId"]):
+            raise OperatorError(f"Box enterprise mismatch: authenticated {actual_enterprise or 'unknown'}, configured {config['box']['enterpriseId']}.")
+        expected_login = config["box"].get("operatorLogin")
+        if expected_login and box_user.get("login") != expected_login:
+            raise OperatorError(f"Box user mismatch: authenticated {box_user.get('login')}, configured {expected_login}.")
+        run_json(["box", "folders:get", str(config["box"]["parentFolderId"]), "--json"])
+    if not offline and platform in ("all", "salesforce"):
+        sf_org = salesforce_identity(config["salesforce"]["orgAlias"])
+        if str(sf_org.get("id") or "") != str(config["salesforce"]["orgId"]):
+            raise OperatorError(f"Salesforce org mismatch: authenticated {sf_org.get('id') or 'unknown'}, configured {config['salesforce']['orgId']}.")
+    scope = "local prerequisites" if offline else "authenticated identity, target scope, and local prerequisites"
+    print(f"Doctor passed for {platform}: {scope} are valid.")
+
+
+def generate_assets(dry_run: bool) -> None:
+    for script in ["generate_sample_contract_assets.py", "generate_docgen_templates.py", "run_agentcore_mock.py"]:
+        run([sys.executable, str(ROOT / "scripts" / script)], dry_run=dry_run)
+    action = "Would generate" if dry_run else "Generated"
+    print(f"{action} sample contracts, Doc Gen templates, and the local AgentCore trace.")
+
+
+def box_template_command(template: dict[str, Any]) -> list[str]:
+    command = [
+        "box", "metadata-templates:create",
+        "--display-name", template["displayName"],
+        "--template-key", template["templateKey"],
+        "--json", "--yes",
+    ]
+    for field in template["fields"]:
+        flag = {"string": "--string", "enum": "--enum", "date": "--date", "float": "--number"}[field["type"]]
+        command.extend([flag, field["key"], "--field-key", field["key"]])
+        for option in field.get("options", []):
+            command.extend(["--option", option])
+    return command
+
+
+def parse_id(output: str) -> str:
+    if not output:
+        return "DRY_RUN"
+    payload = json.loads(output)
+    if isinstance(payload, list):
+        payload = payload[0]
+    identifier = payload.get("id") or payload.get("templateKey")
+    if not identifier:
+        raise OperatorError("A create command returned JSON without an id or templateKey.")
+    return str(identifier)
+
+
+def save_state(state: dict[str, Any]) -> None:
+    STATE_PATH.parent.mkdir(parents=True, exist_ok=True)
+    STATE_PATH.write_text(json.dumps(state, indent=2) + "\n", encoding="utf-8")
+
+
+def box_foundation(config_path: Path, *, dry_run: bool) -> None:
+    config = load_json(config_path)
+    doctor(config_path, offline=dry_run, platform="box")
+    parent_id = str(config["box"].get("parentFolderId") or "0")
+    state: dict[str, Any] = load_json(STATE_PATH) if STATE_PATH.exists() and not dry_run else {}
+    box_state = state.setdefault("box", {})
+    folders = box_state.setdefault("folders", {})
+    templates_state = box_state.setdefault("metadataTemplates", {})
+    files_state = box_state.setdefault("files", {})
+
+    root_id = folders.get("workspace")
+    if not root_id:
+        existing_root = None if dry_run else find_box_item(parent_id, "CLM-2026-Northstar", "folder")
+        if existing_root:
+            root_id = existing_root
+            print(f"REUSE    existing Box workspace: {root_id}")
+        else:
+            root_output = run(
+                ["box", "folders:create", parent_id, "CLM-2026-Northstar", "--json", "--yes"],
+                dry_run=dry_run,
+            )
+            root_id = parse_id(root_output)
+        folders["workspace"] = root_id
+        if not dry_run:
+            save_state(state)
+    for name in FOLDERS:
+        if name in folders:
+            print(f"SKIP     folder already recorded: {name}")
+            continue
+        existing_folder = None if dry_run else find_box_item(root_id, name, "folder")
+        if existing_folder:
+            folders[name] = existing_folder
+            print(f"REUSE    existing folder: {name}")
+        else:
+            output = run(["box", "folders:create", root_id, name, "--json", "--yes"], dry_run=dry_run)
+            folders[name] = parse_id(output)
+        if not dry_run:
+            save_state(state)
+
+    templates = load_json(ROOT / "config/box/metadata-templates.json")["templates"]
+    for template in templates:
+        if template["templateKey"] in templates_state:
+            print(f"SKIP     metadata template already recorded: {template['templateKey']}")
+            continue
+        existing_template = None if dry_run else try_run_json([
+            "box", "metadata-templates:get", template["templateKey"], "--scope", "enterprise", "--json"
+        ])
+        if existing_template:
+            if isinstance(existing_template, list):
+                existing_template = existing_template[0]
+            templates_state[template["templateKey"]] = str(existing_template.get("id") or existing_template.get("templateKey"))
+            print(f"REUSE    existing metadata template: {template['templateKey']}")
+        else:
+            output = run(box_template_command(template), dry_run=dry_run)
+            templates_state[template["templateKey"]] = parse_id(output)
+        if not dry_run:
+            save_state(state)
+
+    for folder_name, relative_paths in UPLOADS.items():
+        folder_id = folders[folder_name]
+        for relative_path in relative_paths:
+            source = ROOT / relative_path
+            if source.name in files_state:
+                print(f"SKIP     file already recorded: {source.name}")
+                continue
+            if not dry_run and not source.exists():
+                raise OperatorError(f"Missing generated asset: {relative_path}. Run generate-assets first.")
+            existing_file = None if dry_run else find_box_item(folder_id, source.name, "file")
+            if existing_file:
+                files_state[source.name] = existing_file
+                print(f"REUSE    existing file: {source.name}")
+            else:
+                output = run(
+                    ["box", "files:upload", str(source), "--parent-id", folder_id, "--json", "--yes"],
+                    dry_run=dry_run,
+                )
+                files_state[source.name] = parse_id(output)
+            if not dry_run:
+                save_state(state)
+
+    if not dry_run:
+        try:
+            display_state_path = STATE_PATH.relative_to(ROOT)
+        except ValueError:
+            display_state_path = STATE_PATH
+        print(f"Wrote local IDs to {display_state_path} (gitignored).")
+    action = "Box foundation plan validated" if dry_run else "Box foundation complete"
+    print(f"{action}. Apps, Forms, Automate, Hub, metadata values, and publishing remain browser tasks.")
+
+
+def metadata_data(values: dict[str, Any]) -> list[str]:
+    result: list[str] = []
+    for key, value in values.items():
+        if isinstance(value, (int, float)):
+            rendered = f"#{value}"
+        else:
+            rendered = str(value)
+        result.extend(["--data", f"{key}={rendered}"])
+    return result
+
+
+def seed_metadata(config_path: Path, *, dry_run: bool) -> None:
+    doctor(config_path, offline=dry_run, platform="box")
+    if not STATE_PATH.exists() and not dry_run:
+        raise OperatorError("Box bootstrap state is missing. Run box-foundation first.")
+    state = load_json(STATE_PATH) if STATE_PATH.exists() else {"box": {"folders": {}, "files": {}}}
+    box_state = state.setdefault("box", {})
+    folders = box_state.setdefault("folders", {})
+    files = box_state.setdefault("files", {})
+    seeded = box_state.setdefault("metadataSeeds", {})
+    if dry_run and not STATE_PATH.exists():
+        folders.update({"workspace": "DRY_RUN", **{name: "DRY_RUN" for name in FOLDERS}})
+        files.update({Path(path).name: "DRY_RUN" for paths in UPLOADS.values() for path in paths})
+
+    seeds: list[tuple[str, str, str, dict[str, Any]]] = [
+        ("folder", "workspace", "clmContract", {
+            "contractId": "CLM-2026-0017", "counterparty": "Northstar Health System",
+            "contractType": "MSA Package", "status": "Legal Review", "dealValue": 2400000,
+            "termMonths": 36, "region": "US", "dataCategory": "PHI", "owner": "Jordan Lee",
+            "legalReviewer": "Legal Operations", "riskLevel": "Critical",
+            "targetSignatureDate": "2026-08-31T00:00:00Z", "renewalDate": "2029-08-31T00:00:00Z",
+            "noticeDeadline": "2029-05-31T00:00:00Z",
+        }),
+        ("folder", "07 - Obligations", "clmObligation", {
+            "obligationType": "Renewal Notice", "owner": "Customer Success",
+            "dueDate": "2029-05-31T00:00:00Z", "sourceClause": "MSA Section 12.2",
+            "status": "Open", "reminderWindowDays": 90,
+        }),
+    ]
+    document_values = {
+        "northstar-msa-redline-v3.pdf": ("MSA", "Redline", "Critical", "Needs Review", "Pending"),
+        "northstar-dpa.pdf": ("DPA", "Redline", "High", "Complete", "Pending"),
+        "northstar-sow-implementation.pdf": ("SOW", "Draft", "Medium", "Complete", "Pending"),
+        "northstar-order-form.pdf": ("Order Form", "Redline", "High", "Complete", "Pending"),
+        "northstar-security-exhibit.pdf": ("Security Exhibit", "Approved", "Medium", "Complete", "Approved"),
+        "northstar-insurance-certificate.pdf": ("Insurance", "Approved", "Low", "Complete", "Approved"),
+    }
+    for filename, values in document_values.items():
+        seeds.append(("file", filename, "clmDocument", {
+            "documentType": values[0], "versionStatus": values[1], "clauseRisk": values[2],
+            "aiSummaryStatus": values[3], "approvalStatus": values[4], "signatureStatus": "Not Required",
+        }))
+    clause_families = {"DATA": "Data Processing", "LIAB": "Limitation of Liability", "PAY": "Payment Terms", "SLA": "SLA Credits"}
+    clause_files = sorted(name for name in files if name.startswith("CLM-") and name.endswith(".md"))
+    for index, filename in enumerate(clause_files):
+        parts = filename.removesuffix(".md").split("-")
+        clause_id = "-".join(parts[:3])
+        seeds.append(("file", filename, "clmClause", {
+            "clauseId": clause_id, "clauseFamily": clause_families[parts[1]],
+            "position": "Standard" if filename.endswith("standard.md") else "Approved Fallback",
+            "approvalStatus": "Approved", "owner": "Legal Operations", "jurisdiction": "Global",
+            "lastReviewed": "2026-07-01T00:00:00Z", "nextReview": "2027-01-15T00:00:00Z",
+            "usageCount": 12 + index * 7,
+        }))
+
+    for item_type, key, template_key, values in seeds:
+        seed_key = f"{item_type}:{key}:{template_key}"
+        if seed_key in seeded:
+            print(f"SKIP     metadata already recorded: {seed_key}")
+            continue
+        item_id = folders.get(key) if item_type == "folder" else files.get(key)
+        if not item_id:
+            if dry_run:
+                item_id = "DRY_RUN"
+            else:
+                raise OperatorError(f"Missing Box {item_type} binding for metadata seed: {key}")
+        existing_metadata = None if dry_run else try_run_json([
+            "box", f"{item_type}s:metadata:get", str(item_id), "--template-key", template_key, "--scope", "enterprise", "--json"
+        ])
+        if existing_metadata:
+            seeded[seed_key] = "existing"
+            save_state(state)
+            print(f"REUSE    existing metadata: {seed_key}")
+            continue
+        command = ["box", f"{item_type}s:metadata:create", str(item_id), "--template-key", template_key, "--json", "--yes"]
+        command.extend(metadata_data(values))
+        run(command, dry_run=dry_run)
+        seeded[seed_key] = "DRY_RUN" if dry_run else "applied"
+        if not dry_run:
+            save_state(state)
+    action = "Metadata seed plan validated" if dry_run else "Representative Box metadata applied"
+    print(f"{action}.")
+
+
+def flatten_config(value: Any, prefix: str = "") -> dict[str, Any]:
+    flattened: dict[str, Any] = {}
+    if isinstance(value, dict):
+        for key, child in value.items():
+            child_prefix = f"{prefix}.{key}" if prefix else key
+            flattened.update(flatten_config(child, child_prefix))
+    elif not isinstance(value, list):
+        flattened[prefix] = value
+    return flattened
+
+
+def runtime_bindings(config: dict[str, Any], state: dict[str, Any]) -> dict[str, Any]:
+    bindings = flatten_config(config)
+    box_state = state.get("box", {})
+    folders = box_state.get("folders", {})
+    files = box_state.get("files", {})
+    templates = box_state.get("metadataTemplates", {})
+    for logical, stored_key in FOLDER_BINDINGS.items():
+        bindings[f"box.folders.{logical}"] = folders.get(stored_key, "")
+    for logical, filename in FILE_BINDINGS.items():
+        bindings[f"box.files.{logical}"] = files.get(filename, "")
+    for key, value in templates.items():
+        bindings[f"box.metadataTemplates.{key}"] = value
+    reviewers = config.get("box", {}).get("reviewerLogins", [])
+    bindings["box.reviewers.primary"] = reviewers[0] if reviewers else ""
+    return bindings
+
+
+TOKEN_PATTERN = re.compile(r"\$\{([A-Za-z0-9_.]+)\}")
+
+
+def resolve_value(value: Any, bindings: dict[str, Any], unresolved: set[str]) -> Any:
+    if isinstance(value, dict):
+        return {key: resolve_value(child, bindings, unresolved) for key, child in value.items()}
+    if isinstance(value, list):
+        return [resolve_value(child, bindings, unresolved) for child in value]
+    if not isinstance(value, str):
+        return value
+    full = TOKEN_PATTERN.fullmatch(value)
+    if full:
+        key = full.group(1)
+        replacement = bindings.get(key)
+        if replacement in (None, ""):
+            unresolved.add(key)
+            return value
+        return replacement
+    def replace(match: re.Match[str]) -> str:
+        key = match.group(1)
+        replacement = bindings.get(key)
+        if replacement in (None, ""):
+            unresolved.add(key)
+            return match.group(0)
+        return str(replacement)
+    return TOKEN_PATTERN.sub(replace, value)
+
+
+def resolve_config(config_path: Path, *, allow_unresolved: bool) -> None:
+    config = load_json(config_path)
+    state = load_json(STATE_PATH)
+    bindings = runtime_bindings(config, state)
+    unresolved: set[str] = set()
+    output_root = ROOT / "config/runtime/generated"
+    for relative in PORTABLE_SPECS:
+        source = ROOT / relative
+        resolved = resolve_value(load_json(source), bindings, unresolved)
+        destination = output_root / Path(relative).relative_to("config")
+        destination.parent.mkdir(parents=True, exist_ok=True)
+        destination.write_text(json.dumps(resolved, indent=2) + "\n", encoding="utf-8")
+    if unresolved and not allow_unresolved:
+        raise OperatorError("Unresolved runtime bindings: " + ", ".join(sorted(unresolved)))
+    print(f"Generated {len(PORTABLE_SPECS)} resolved specs under {output_root.relative_to(ROOT)}.")
+    if unresolved:
+        print("Unresolved until browser/admin setup: " + ", ".join(sorted(unresolved)))
+
+
+def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
+    config = load_json(config_path)
+    doctor(config_path, offline=dry_run, platform="salesforce")
+    alias = config["salesforce"].get("orgAlias")
+    if not alias:
+        raise OperatorError("salesforce.orgAlias is required.")
+    expected_org_id = config["salesforce"].get("orgId")
+    if not expected_org_id:
+        raise OperatorError("salesforce.orgId is required as an explicit deployment guard.")
+    project = ROOT / "clm-salesforce-project"
+    if dry_run:
+        run(["sf", "org", "display", "--target-org", alias, "--json"], cwd=project, dry_run=True)
+    else:
+        actual_org = salesforce_identity(alias)
+        if str(actual_org.get("id") or "") != str(expected_org_id):
+            raise OperatorError(f"Refusing deployment: authenticated Salesforce org {actual_org.get('id') or 'unknown'} does not match configured {expected_org_id}.")
+    sources = [
+        "force-app/main/default/objects/CLM_Contract__c",
+        "force-app/main/default/layouts/CLM_Contract__c-CLM Contract Layout.layout-meta.xml",
+        "force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",
+        "force-app/main/default/permissionsets/CLM_Demo_Operator.permissionset-meta.xml",
+        "force-app/main/default/tabs/CLM_Contract__c.tab-meta.xml",
+        "force-app/main/default/uiBundles",
+    ]
+    command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
+    for source in sources:
+        command.extend(["--source-dir", source])
+    run(command, cwd=project, dry_run=dry_run)
+    run(["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias], cwd=project, dry_run=dry_run)
+    action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, tab, layout, and UI Bundle deployed"
+    print(f"{action}.")
+
+
+def validate_urls(config: dict[str, Any]) -> list[str]:
+    problems: list[str] = []
+    hostname = config.get("box", {}).get("hostname", "")
+    for key in ["appUrl", "formUrl", "hubUrl", "workflowUrl"]:
+        value = config.get("box", {}).get(key)
+        if value and urlparse(value).hostname != hostname:
+            problems.append(f"box.{key} hostname does not match box.hostname")
+    salesforce_url = config.get("salesforce", {}).get("myDomainUrl")
+    if salesforce_url and urlparse(salesforce_url).scheme != "https":
+        problems.append("salesforce.myDomainUrl must be an https URL")
+    return problems
+
+
+def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None:
+    config = load_json(config_path)
+    required = {
+        "box.hostname": config.get("box", {}).get("hostname"),
+        "box.appUrl": config.get("box", {}).get("appUrl"),
+        "box.formUrl": config.get("box", {}).get("formUrl"),
+        "box.hubUrl": config.get("box", {}).get("hubUrl"),
+        "box.workflowUrl": config.get("box", {}).get("workflowUrl"),
+        "box.enterpriseId": config.get("box", {}).get("enterpriseId"),
+        "box.operatorLogin": config.get("box", {}).get("operatorLogin"),
+        "box.reviewerLogins": config.get("box", {}).get("reviewerLogins"),
+        "salesforce.orgAlias": config.get("salesforce", {}).get("orgAlias"),
+        "salesforce.orgId": config.get("salesforce", {}).get("orgId"),
+        "salesforce.myDomainUrl": config.get("salesforce", {}).get("myDomainUrl"),
+        "salesforce.integrationUsername": config.get("salesforce", {}).get("integrationUsername"),
+        "salesforce.integrationEmail": config.get("salesforce", {}).get("integrationEmail"),
+    }
+    if scenario == "agentic":
+        required.update({
+            "agentforce.agentId": config.get("agentforce", {}).get("agentId"),
+            "agentforce.applicationId": config.get("agentforce", {}).get("applicationId"),
+            "agentcore.runtimeArn": config.get("agentcore", {}).get("runtimeArn"),
+            "agentcore.region": config.get("agentcore", {}).get("region"),
+            "databricks.workspaceUrl": config.get("databricks", {}).get("workspaceUrl"),
+            "databricks.warehouseId": config.get("databricks", {}).get("warehouseId"),
+        })
+    missing = [key for key, value in required.items() if not value]
+    if missing:
+        raise OperatorError("Environment is not presentation-ready; missing: " + ", ".join(missing))
+    url_problems = validate_urls(config)
+    if url_problems:
+        raise OperatorError("Environment URL validation failed:\n- " + "\n- ".join(url_problems))
+    if not STATE_PATH.exists():
+        raise OperatorError("Box bootstrap state is missing. Run box-foundation first.")
+    state = load_json(STATE_PATH)
+    box_state = state.get("box", {})
+    required_folders = ["workspace", *FOLDERS]
+    missing_folders = [key for key in required_folders if not box_state.get("folders", {}).get(key)]
+    missing_files = [filename for paths in UPLOADS.values() for filename in [Path(path).name for path in paths] if not box_state.get("files", {}).get(filename)]
+    missing_templates = [item["templateKey"] for item in load_json(ROOT / "config/box/metadata-templates.json")["templates"] if not box_state.get("metadataTemplates", {}).get(item["templateKey"])]
+    if missing_folders or missing_files or missing_templates:
+        raise OperatorError(f"Bootstrap state is incomplete: folders={missing_folders}, files={missing_files}, templates={missing_templates}")
+    if len(box_state.get("metadataSeeds", {})) < 16:
+        raise OperatorError("Deterministic metadata seed is incomplete. Run seed-metadata.")
+    generated_root = ROOT / "config/runtime/generated"
+    missing_generated = []
+    unresolved_generated: set[str] = set()
+    for relative in PORTABLE_SPECS:
+        path = generated_root / Path(relative).relative_to("config")
+        if not path.exists():
+            missing_generated.append(str(path.relative_to(ROOT)))
+            continue
+        unresolved_generated.update(TOKEN_PATTERN.findall(path.read_text(encoding="utf-8")))
+    if missing_generated:
+        raise OperatorError("Resolved runtime specs are missing: " + ", ".join(missing_generated))
+    if unresolved_generated:
+        raise OperatorError("Resolved runtime specs still contain bindings: " + ", ".join(sorted(unresolved_generated)))
+    if not offline:
+        doctor(config_path, offline=False, platform="all")
+        for folder_id in box_state["folders"].values():
+            run_json(["box", "folders:get", str(folder_id), "--json"])
+        for file_id in box_state["files"].values():
+            run_json(["box", "files:get", str(file_id), "--json"])
+        for template_key in box_state["metadataTemplates"]:
+            run_json(["box", "metadata-templates:get", template_key, "--scope", "enterprise", "--json"])
+        sf_result = run_json([
+            "sf", "data", "query", "--target-org", config["salesforce"]["orgAlias"], "--json",
+            "--query", "SELECT QualifiedApiName FROM EntityDefinition WHERE QualifiedApiName='CLM_Contract__c'",
+        ], cwd=ROOT / "clm-salesforce-project")
+        records = sf_result.get("result", {}).get("records", [])
+        if not records:
+            raise OperatorError("Salesforce CLM_Contract__c is not present in the configured org.")
+    scope = "local bindings" if offline else "live Box resources, Salesforce data model, and local bindings"
+    print(f"{scenario.title()} readiness validation passed for {scope}. Complete the smoke-test checklist before presenting.")
+
+
+def parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(description=__doc__)
+    result.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
+    sub = result.add_subparsers(dest="command", required=True)
+    doctor_parser = sub.add_parser("doctor")
+    doctor_parser.add_argument("--offline", action="store_true", help="Check local prerequisites without calling Box or Salesforce")
+    doctor_parser.add_argument("--platform", choices=["all", "box", "salesforce"], default="all")
+    for name in ["generate-assets", "box-foundation", "seed-metadata", "salesforce-deploy"]:
+        command = sub.add_parser(name)
+        command.add_argument("--dry-run", action="store_true")
+    resolve_parser = sub.add_parser("resolve-config")
+    resolve_parser.add_argument("--allow-unresolved", action="store_true")
+    validate_parser = sub.add_parser("validate")
+    validate_parser.add_argument("--scenario", choices=["governed", "agentic"], default="governed")
+    validate_parser.add_argument("--offline", action="store_true", help="Validate local bindings without calling Box or Salesforce")
+    return result
+
+
+def main() -> int:
+    args = parser().parse_args()
+    try:
+        if args.command == "doctor":
+            doctor(args.config, offline=args.offline, platform=args.platform)
+        elif args.command == "generate-assets":
+            generate_assets(args.dry_run)
+        elif args.command == "box-foundation":
+            box_foundation(args.config, dry_run=args.dry_run)
+        elif args.command == "seed-metadata":
+            seed_metadata(args.config, dry_run=args.dry_run)
+        elif args.command == "salesforce-deploy":
+            salesforce_deploy(args.config, dry_run=args.dry_run)
+        elif args.command == "resolve-config":
+            resolve_config(args.config, allow_unresolved=args.allow_unresolved)
+        elif args.command == "validate":
+            validate(args.config, scenario=args.scenario, offline=args.offline)
+    except (OperatorError, json.JSONDecodeError) as error:
+        print(f"ERROR: {error}", file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

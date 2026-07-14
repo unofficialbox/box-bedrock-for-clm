@@ -14,7 +14,7 @@ Supporting artifacts:
 - [Demo flow diagram](../../../diagrams/clm-box-agentforce-react-demo-flow.svg)
 - [Box Form entry-point diagram](../../../diagrams/clm-box-form-automate-entry.svg)
 - [Human-readable component manifest](component-manifest.md)
-- [Machine-readable component manifest](../../../../config/demo/box-agentforce-react-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../../config/demo/agentic-orchestration-demo-manifest.json)
 - [Agentforce action contract](../../../../config/agentforce/clm-react-agentforce-spec.json)
 
 ## Shared presenter rule

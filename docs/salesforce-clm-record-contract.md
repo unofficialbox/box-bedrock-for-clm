@@ -47,7 +47,7 @@ Salesforce stores validated structured context and Box references. Contract file
 
 Machine-readable mapping: `config/salesforce/clm-contract-record.json`.
 
-Deployable metadata: `clm-react-app/force-app/main/default/objects/CLM_Contract__c/`.
+Deployable metadata: `clm-salesforce-project/force-app/main/default/objects/CLM_Contract__c/`.
 
 ## Intake integration
 
@@ -92,7 +92,7 @@ The authoritative mapping is the `fieldMappings` array in `config/salesforce/clm
 - Form values are written only after the Box human-validation gate.
 - `riskLevel` is written only when a human validated the Extract/AI result.
 - `boxFolderId` must be the allowlisted workspace associated with the intake.
-- `boxFolderUrl` must use `kadams.ent.box.com` for this live demo.
+- `boxFolderUrl` must use the hostname recorded for the target Box enterprise.
 - The uploaded package stays in Box; Salesforce receives only its Box file ID.
 
 ## Deployment acceptance criteria

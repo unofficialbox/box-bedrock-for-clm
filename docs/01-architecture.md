@@ -128,7 +128,7 @@ Box Sign + Obligation Monitor
 | Agent roles | Intake, classify, risk, approve, monitor | Contract intake, clause risk, approval, obligations | Rename to domain-specific roles |
 | System connectors | Content, CRM, Databricks analytics | Box, Salesforce, Databricks | Box plus domain system and Databricks analytics |
 | Sample data | Synthetic PDFs + JSON records | MSA/DPA/SOW/order form | Domain-specific records and files |
-| Handoff | Build state and live IDs | Box app, metadata, forms, agents | Same status doc |
+| Runtime state | Gitignored environment and bootstrap bindings | Box App, metadata, Forms, agents | Same portable binding contract |
 
 ---
 

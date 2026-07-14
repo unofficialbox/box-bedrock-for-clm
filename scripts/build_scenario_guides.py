@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build portable, self-contained HTML guides for both CLM demo scenarios."""
+"""Build portable, self-contained HTML guides for CLM setup and both scenarios."""
 
 from __future__ import annotations
 
@@ -21,6 +21,22 @@ OUTPUT = ROOT / "output" / "html"
 
 SCENARIOS = (
     {
+        "order": "00",
+        "slug": "operator-setup",
+        "sources": [
+            ROOT / "docs" / "operator" / "00-start-here.md",
+            ROOT / "docs" / "operator" / "04-entitlement-checklist.md",
+            ROOT / "docs" / "operator" / "01-browser-configuration.md",
+            ROOT / "docs" / "operator" / "02-smoke-test.md",
+            ROOT / "docs" / "operator" / "03-agentic-deployment.md",
+            ROOT / "docs" / "operator" / "AI-OPERATOR.md",
+        ],
+        "accent": "#f4c86a",
+        "accent_2": "#5a95ff",
+        "label": "Fresh-environment setup for human and AI-assisted operators",
+    },
+    {
+        "order": "01",
         "slug": "governed-workflow",
         "source": ROOT / "docs" / "scenarios" / "governed-workflow" / "README.md",
         "accent": "#72e3bd",
@@ -28,6 +44,7 @@ SCENARIOS = (
         "label": "Box-centered, deterministic orchestration",
     },
     {
+        "order": "03",
         "slug": "agentic-orchestration",
         "source": ROOT / "docs" / "scenarios" / "agentic-orchestration" / "README.md",
         "accent": "#a98bff",
@@ -126,14 +143,14 @@ class RenderedMarkdown:
     embedded_assets: list[Path]
 
 
-def render_markdown(path: Path) -> RenderedMarkdown:
+def render_markdown(path: Path, references: ReferenceIndex | None = None) -> RenderedMarkdown:
     """Convert the repo's deliberately simple scenario Markdown to HTML."""
 
     lines = path.read_text(encoding="utf-8").splitlines()
     title = lines[0].removeprefix("# ").strip()
     summary_index = next(index for index, line in enumerate(lines[1:], start=1) if line.strip())
     summary = lines[summary_index].strip()
-    references = ReferenceIndex()
+    references = references or ReferenceIndex()
     embedded_assets: list[Path] = []
     sections: list[tuple[str, str]] = []
     blocks: list[str] = []
@@ -157,6 +174,21 @@ def render_markdown(path: Path) -> RenderedMarkdown:
             index += 1
             continue
 
+        if stripped.startswith("```"):
+            flush_paragraph()
+            language = stripped.removeprefix("```").strip()
+            index += 1
+            code_lines: list[str] = []
+            while index < len(lines) and not lines[index].strip().startswith("```"):
+                code_lines.append(lines[index])
+                index += 1
+            if index >= len(lines):
+                raise ValueError(f"Unclosed code fence in {path}")
+            index += 1
+            language_class = f' class="language-{html.escape(language, quote=True)}"' if language else ""
+            blocks.append(f"<pre><code{language_class}>{html.escape(chr(10).join(code_lines))}</code></pre>")
+            continue
+
         image = re.fullmatch(r"!\[([^\]]*)\]\(([^)]+)\)", stripped)
         if image:
             flush_paragraph()
@@ -168,8 +200,10 @@ def render_markdown(path: Path) -> RenderedMarkdown:
             asset_class = "diagram" if asset.suffix.lower() == ".svg" else "screenshot"
             blocks.append(
                 '<figure class="product-shot">'
-                f'<img class="{asset_class}" src="{data_uri(asset)}" alt="{html.escape(alt, quote=True)}" '
-                'decoding="sync">'
+                f'<button class="zoom-trigger" type="button" aria-label="Open {html.escape(alt, quote=True)} at full size">'
+                f'<img class="{asset_class}" src="{data_uri(asset)}" alt="{html.escape(alt, quote=True)}" decoding="sync">'
+                '<span class="zoom-hint" aria-hidden="true">Open full size</span>'
+                '</button>'
                 f"<figcaption>{html.escape(alt)} · Embedded from the canonical demo asset</figcaption>"
                 "</figure>"
             )
@@ -251,6 +285,39 @@ def render_markdown(path: Path) -> RenderedMarkdown:
     )
 
 
+def render_sources(paths: list[Path]) -> RenderedMarkdown:
+    """Combine canonical Markdown documents into one portable guide without copying them."""
+
+    references = ReferenceIndex()
+    documents = [render_markdown(path, references) for path in paths]
+    primary = documents[0]
+    body = [primary.body]
+    sections = list(primary.sections)
+    embedded_assets = list(primary.embedded_assets)
+
+    for document in documents[1:]:
+        anchor = slugify(document.title)
+        sections.append((anchor, document.title))
+        sections.extend(document.sections)
+        body.append(
+            f'<section class="guide-section document-divider" id="{anchor}">'
+            f"<h2>{html.escape(document.title)}</h2>"
+            f"<p>{render_inline(document.summary, references)}</p>"
+            "</section>"
+        )
+        body.append(document.body)
+        embedded_assets.extend(document.embedded_assets)
+
+    return RenderedMarkdown(
+        title=primary.title,
+        summary=primary.summary,
+        body="\n".join(body),
+        sections=sections,
+        references=references,
+        embedded_assets=embedded_assets,
+    )
+
+
 def render_reference_index(references: ReferenceIndex) -> str:
     """Render links as inert text so recipients retain provenance offline."""
 
@@ -309,6 +376,8 @@ def stylesheet(accent: str, accent_2: str) -> str:
       font: .88em/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
       overflow-wrap: anywhere;
     }}
+    pre {{ margin: 24px 0; padding: 18px 20px; overflow-x: auto; border: 1px solid var(--line); border-radius: 14px; background: #080c14; }}
+    pre code {{ padding: 0; border: 0; background: transparent; white-space: pre; }}
     .shell {{ width: min(1540px, calc(100% - 36px)); margin: 0 auto; }}
     .masthead {{
       position: sticky;
@@ -385,9 +454,21 @@ def stylesheet(accent: str, accent_2: str) -> str:
     th {{ color: var(--accent); background: rgba(255,255,255,.035); font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; }}
     tbody tr:last-child td {{ border-bottom: 0; }}
     .product-shot {{ margin: 28px 0 52px; padding: 13px; border: 1px solid var(--line); border-radius: var(--radius); background: linear-gradient(145deg, var(--surface-2), var(--surface)); box-shadow: 0 24px 76px rgba(0,0,0,.25); }}
+    .zoom-trigger {{ position: relative; display: block; width: 100%; padding: 0; overflow: hidden; border: 0; border-radius: 13px; color: var(--ink); background: transparent; cursor: zoom-in; text-align: left; }}
     .product-shot img {{ display: block; width: 100%; height: auto; border: 1px solid rgba(255,255,255,.1); border-radius: 13px; background: #fff; }}
     .product-shot img.diagram {{ max-height: 780px; object-fit: contain; }}
+    .zoom-hint {{ position: absolute; right: 14px; bottom: 14px; padding: 8px 11px; border: 1px solid rgba(255,255,255,.24); border-radius: 999px; color: #fff; background: rgba(8,11,18,.82); box-shadow: 0 8px 24px rgba(0,0,0,.28); font-size: .78rem; font-weight: 700; opacity: .88; transition: opacity .16s ease, transform .16s ease; }}
+    .zoom-trigger:hover .zoom-hint, .zoom-trigger:focus-visible .zoom-hint {{ opacity: 1; transform: translateY(-2px); }}
     .product-shot figcaption {{ padding: 11px 4px 0; color: var(--faint); font-size: .78rem; }}
+    .image-modal {{ width: min(96vw, 1680px); height: 94vh; max-width: none; max-height: none; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 20px; color: var(--ink); background: #090d15; box-shadow: 0 36px 140px rgba(0,0,0,.72); }}
+    .image-modal::backdrop {{ background: rgba(2,4,8,.84); backdrop-filter: blur(8px); }}
+    .modal-frame {{ display: grid; grid-template-rows: auto minmax(0, 1fr); height: 100%; }}
+    .modal-toolbar {{ display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 62px; padding: 12px 16px 12px 22px; border-bottom: 1px solid var(--line); background: var(--surface); }}
+    .modal-toolbar strong {{ overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }}
+    .modal-close {{ flex: none; padding: 9px 13px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: rgba(255,255,255,.06); font: inherit; cursor: pointer; }}
+    .modal-canvas {{ overflow: auto; padding: 22px; background: #05070c; }}
+    .modal-canvas img {{ display: block; width: auto; min-width: min(1200px, 90vw); max-width: none; height: auto; margin: 0 auto; border-radius: 12px; background: #fff; }}
+    .modal-canvas img.diagram {{ width: 1200px; min-width: 1200px; }}
     .reference-index > ol {{ display: grid; gap: 10px; padding: 0; list-style: none; counter-reset: refs; }}
     .reference-index li {{ counter-increment: refs; display: grid; grid-template-columns: minmax(190px, .65fr) minmax(0, 1.35fr); gap: 18px; max-width: none; padding: 16px 0; border-bottom: 1px solid var(--line); }}
     .reference-index li::before {{ content: counter(refs); color: var(--accent); font-weight: 750; }}
@@ -414,11 +495,15 @@ def stylesheet(accent: str, accent_2: str) -> str:
       .guide-section {{ padding: 50px 0; }}
       .reference-index li {{ grid-template-columns: 24px 1fr; }}
       .reference-index li code {{ grid-column: 2; }}
+      .image-modal {{ width: 100vw; height: 100dvh; border: 0; border-radius: 0; }}
+      .modal-toolbar {{ min-height: 56px; padding-left: 14px; }}
+      .modal-canvas {{ padding: 12px; }}
+      .modal-canvas img.diagram {{ width: 1000px; min-width: 1000px; }}
     }}
     @media print {{
       :root {{ color-scheme: light; }}
       body {{ color: #151821; background: #fff; font-size: 10pt; }}
-      .masthead, .toc, .print-button {{ display: none !important; }}
+      .masthead, .toc, .print-button, .zoom-hint, .image-modal {{ display: none !important; }}
       .layout {{ display: block; }}
       main {{ padding: 0; }}
       .hero {{ min-height: 0; padding: 30pt; border: 1px solid #bbb; color: #111; background: #f2f5fa; box-shadow: none; break-after: page; }}
@@ -438,8 +523,10 @@ def stylesheet(accent: str, accent_2: str) -> str:
 
 
 def build_scenario(scenario: dict[str, object]) -> Path:
-    source = Path(scenario["source"])
-    rendered = render_markdown(source)
+    if "sources" in scenario:
+        rendered = render_sources([Path(path) for path in scenario["sources"]])
+    else:
+        rendered = render_markdown(Path(scenario["source"]))
     toc = "".join(
         f'<a href="#{html.escape(anchor, quote=True)}">{html.escape(label)}</a>'
         for anchor, label in rendered.sections
@@ -483,12 +570,45 @@ def build_scenario(scenario: dict[str, object]) -> Path:
       </article>
     </main>
   </div>
+  <dialog class="image-modal" id="image-modal" aria-labelledby="image-modal-title">
+    <div class="modal-frame">
+      <div class="modal-toolbar">
+        <strong id="image-modal-title">Expanded demo image</strong>
+        <button class="modal-close" type="button">Close</button>
+      </div>
+      <div class="modal-canvas"><img alt=""></div>
+    </div>
+  </dialog>
   <footer><div class="shell">Self-contained scenario guide · Generated from the canonical Markdown without modifying it · No external assets or links</div></footer>
+  <script>
+    (() => {{
+      const dialog = document.querySelector("#image-modal");
+      const modalImage = dialog.querySelector(".modal-canvas img");
+      const modalTitle = dialog.querySelector("#image-modal-title");
+      const closeButton = dialog.querySelector(".modal-close");
+      document.querySelectorAll(".zoom-trigger").forEach((trigger) => {{
+        trigger.addEventListener("click", () => {{
+          const source = trigger.querySelector("img");
+          modalImage.src = source.currentSrc || source.src;
+          modalImage.alt = source.alt;
+          modalImage.className = source.className;
+          modalTitle.textContent = source.alt;
+          dialog.showModal();
+          closeButton.focus();
+        }});
+      }});
+      closeButton.addEventListener("click", () => dialog.close());
+      dialog.addEventListener("click", (event) => {{
+        if (event.target === dialog) dialog.close();
+      }});
+      dialog.addEventListener("close", () => modalImage.removeAttribute("src"));
+    }})();
+  </script>
 </body>
 </html>
 """
     OUTPUT.mkdir(parents=True, exist_ok=True)
-    output_path = OUTPUT / f"{scenario['slug']}-guide.html"
+    output_path = OUTPUT / f"{scenario['order']}-{scenario['slug']}-guide.html"
     output_path.write_text(document, encoding="utf-8")
     validate_document(output_path, rendered)
     return output_path
@@ -501,15 +621,23 @@ class PortableHTMLValidator(HTMLParser):
         super().__init__()
         self.errors: list[str] = []
         self.images = 0
+        self.zoom_triggers = 0
+        self.dialogs = 0
         self.sections: set[str] = set()
 
     def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
         attributes = dict(attrs)
         if tag == "img":
-            self.images += 1
-            src = attributes.get("src", "")
-            if not src.startswith("data:image/"):
-                self.errors.append(f"non-embedded image: {src}")
+            src = attributes.get("src")
+            if src:
+                self.images += 1
+                if not src.startswith("data:image/"):
+                    self.errors.append(f"non-embedded image: {src}")
+        classes = (attributes.get("class") or "").split()
+        if "zoom-trigger" in classes:
+            self.zoom_triggers += 1
+        if tag == "dialog":
+            self.dialogs += 1
         if tag in {"link", "iframe"} or (tag == "script" and attributes.get("src")):
             self.errors.append(f"external-capable element: {tag}")
         href = attributes.get("href")
@@ -529,6 +657,12 @@ def validate_document(path: Path, rendered: RenderedMarkdown) -> None:
         parser.errors.append(
             f"embedded image count {parser.images} != {len(rendered.embedded_assets)}"
         )
+    if parser.zoom_triggers != len(rendered.embedded_assets):
+        parser.errors.append(
+            f"zoom trigger count {parser.zoom_triggers} != {len(rendered.embedded_assets)}"
+        )
+    if parser.dialogs != 1:
+        parser.errors.append(f"image modal count {parser.dialogs} != 1")
     if missing_sections:
         parser.errors.append(f"missing sections: {sorted(missing_sections)}")
     if parser.errors:

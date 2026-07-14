@@ -9,12 +9,17 @@ This repository contains two presenter-ready CLM scenario packages built on the 
 | [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, Box and Agentforce agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
 | [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Shared governed assets plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation; Box Automate remains inactive |
 
-Start with the [scenario selector](docs/scenarios/README.md), then use [setup and activation](docs/runbooks/05-demo-setup-and-activation.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md).
+**New environment:** start with [CLM Demo Operator Start Here](docs/operator/00-start-here.md). It generates new Box and Salesforce bindings and never requires IDs from another environment.
+
+**Presenting the demo:** choose a track in the [scenario selector](docs/scenarios/README.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md).
 
 Scenario presentation packages:
 
-- [Governed Workflow single-page guide](docs/scenarios/governed-workflow/README.md) · [gallery](output/html/governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
-- [Agentic Orchestration single-page guide](docs/scenarios/agentic-orchestration/README.md) · [gallery](output/html/agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
+- [00 portable operator setup guide](output/html/00-operator-setup-guide.html)
+- [Governed Workflow Markdown guide](docs/scenarios/governed-workflow/README.md) · [01 portable guide](output/html/01-governed-workflow-guide.html) · [02 visual gallery](output/html/02-governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
+- [Agentic Orchestration Markdown guide](docs/scenarios/agentic-orchestration/README.md) · [03 portable guide](output/html/03-agentic-orchestration-guide.html) · [04 visual gallery](output/html/04-agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
+
+Review the numbered HTML files in order. Each **guide** contains the complete narrative, architecture, flow, presenter script, screenshots, readiness, and setup. Each **visual gallery** is the shorter screenshot-only companion.
 - Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
 
 The scenario is an enterprise commercial contract workflow for **Acme Robotics** negotiating a master services agreement (MSA), data processing addendum (DPA), statement of work (SOW), and order form with **Northstar Health**.
@@ -37,20 +42,16 @@ CLM teams lose time because contract content, structured deal data, obligations,
 | 4 | [Control Matrix](docs/04-control-matrix.md) | Contract controls mapped to Box, Agentforce, React, and human reviewers |
 | 5 | [ROI Analysis](docs/05-roi-analysis.md) | CLM value drivers, time compression model, and executive metrics |
 | 6 | [Competitive Landscape](docs/06-competitive-landscape.md) | CLM market positioning and Box + AWS differentiation |
-| 7 | [Handoff Progress](docs/08-handoff-progress.md) | Build checklist, sample-data plan, metadata model, and next actions |
+| 7 | [Operator Start Here](docs/operator/00-start-here.md) | Fresh-environment bootstrap, automation, browser tasks, and validation |
 | 8 | [Scenario Packages](docs/scenarios/README.md) | Two ordered single-page guides referencing shared manifests, diagrams, galleries, and screenshots |
-| 9 | [Setup and Activation](docs/runbooks/05-demo-setup-and-activation.md) | End-to-end prerequisites, local rehearsal, Box verification, Salesforce/Agentforce deployment, activation, smoke test, and teardown |
-| 10 | [Manual-Task Register](docs/manual-task-register.md) | Complete inventory of human decisions, administrator work, confirmation gates, live validation, and per-demo reset tasks |
-| 11 | [Salesforce CLM Record Contract](docs/salesforce-clm-record-contract.md) | `CLM_Contract__c` schema, ownership, private sharing, idempotency, Box references, and intake mapping |
-
-Repository organization recommendations: [Cleanup plan](docs/cleanup-plan.md).
+| 9 | [Manual-Task Register](docs/manual-task-register.md) | Complete inventory of human decisions, administrator work, confirmation gates, live validation, and per-demo reset tasks |
+| 10 | [Salesforce CLM Record Contract](docs/salesforce-clm-record-contract.md) | `CLM_Contract__c` schema, ownership, private sharing, idempotency, Box references, and intake mapping |
 
 ### Runbooks
 
 | Status | Runbook | Purpose |
 |---|---|---|
 | Governed Workflow deep dive | [Box + Agentforce + React](docs/runbooks/04-box-agentforce-react-demo.md) | Supporting details for the controlled Box/Agentforce path and React handoff |
-| Operator setup | [Setup and Activation](docs/runbooks/05-demo-setup-and-activation.md) | Bring the demo from local rehearsal through full integrated activation |
 | Agentic Orchestration deep dive | [AgentCore runbook](docs/runbooks/03-agentcore-demo.md) | Run or evaluate the supervisor-led multi-agent path |
 
 ---
@@ -111,8 +112,11 @@ Generated artifacts:
 | `output/docgen/clm-approval-memo-template.docx` | Live Box DocGen approval memo template |
 | `output/docgen/clm-order-summary-template.docx` | Live Box DocGen commercial order summary template |
 | `output/docgen/clm-renewal-notice-template.docx` | Live Box DocGen renewal notice template |
-| `output/html/governed-workflow-gallery.html` | Self-contained Box-centric Governed Workflow gallery |
-| `output/html/agentic-orchestration-gallery.html` | Self-contained full-stack gallery using real Box and React screens |
+| `output/html/00-operator-setup-guide.html` | Complete, self-contained fresh-environment operator guide |
+| `output/html/01-governed-workflow-guide.html` | Complete, self-contained Governed Workflow narrative |
+| `output/html/02-governed-workflow-gallery.html` | Visual-only Governed Workflow gallery using real Box screens |
+| `output/html/03-agentic-orchestration-guide.html` | Complete, self-contained Agentic Orchestration narrative |
+| `output/html/04-agentic-orchestration-gallery.html` | Visual-only Agentic Orchestration gallery using real Box and React screens |
 
 Config artifacts:
 
@@ -120,15 +124,13 @@ Config artifacts:
 |------|---------|
 | `config/box/metadata-templates.json` | Box metadata template definitions |
 | `config/box/folder-template.md` | Workspace folder template |
+| `config/box/form-blueprint.md` | Canonical Form fields, options, confirmation, and validation |
 | `config/box/box-app-blueprint.md` | Box App dashboard blueprint |
-| `config/box/box-app-builder-checklist.md` | Click-by-click Box App web UI build checklist |
-| `config/box/box-app-dashboard-live-spec.json` | Live Box App dashboard block spec with folder, file, and task IDs |
-| `config/box/live-box-surface.json` | Live Box IDs for the created workspace, metadata templates, folders, and files |
-| `config/box/docgen-template-data.json` | Sample merge payloads for the three live DocGen templates |
-| `config/box/automate-workflows.json` | Automate workflow stages, guardrails, and live object bindings |
+| `config/box/docgen-template-data.json` | Portable sample merge payloads for the three Doc Gen templates |
+| `config/box/automate-workflows.json` | Portable workflow stages and guardrails; resolve bindings with `demo_operator.py` |
 | `config/box/extract-field-prompts.json` | Field-level Extract prompts and validation expectations |
 | `config/box/ai-agent-specs.json` | Box AI Agent instructions and human-review boundary |
-| `config/box/https-connectors.json` | Salesforce standard REST external-ID upsert/lookup, deployed External Client App IDs, live REST verification, and the remaining Box-managed consumer-secret/OAuth test |
+| `config/box/https-connectors.json` | Portable standard REST external-ID operations with runtime binding tokens |
 | `config/clm/redline-finding.schema.json` | Structured contract for cited, risk-classified redline findings |
 | `config/clm/expert-routing.json` | Deterministic domain-to-expert directory with Legal Operations fallback |
 | `config/box/hub-blueprint.md` | Lived-in approved clause Hub content and governance blueprint |
@@ -139,11 +141,13 @@ Config artifacts:
 | `config/salesforce/clm-contract-record.json` | `CLM_Contract__c` ownership, idempotency, field mapping, Box references, and intake contract |
 | `config/demo/governed-workflow-demo-manifest.json` | Governed Workflow runtime, readiness, documentation, and screenshot inventory |
 | `config/demo/agentic-orchestration-demo-manifest.json` | Agentic Orchestration runtime, readiness, documentation, trace, and screenshot inventory |
+| `config/operator/operator-workflow.json` | Machine-readable phase, authority, confirmation, and completion contract for human or AI-assisted setup |
+| `config/runtime/demo-environment.example.json` | Secret-free per-environment input template; copy to the gitignored runtime file |
 
-React application:
+Salesforce project UI Bundle:
 
 ```bash
-cd clm-react-app/force-app/main/default/uiBundles/clmreactapp
+cd clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
 npm install
 npm test -- --run
 npm run build -- --mode standalone
@@ -178,7 +182,7 @@ This CLM variation is intentionally structured as a template for later use-case 
 | Agent inventory | Keep intake, review, risk, approval, obligation/follow-up agents; rename for domain |
 | Dashboard pattern | Keep KPI, pipeline, risk, workstream, and action cards |
 | Sample-data generator | Produce realistic PDFs and JSON records per domain |
-| Handoff doc | Track live Box/Salesforce/AWS build state for each variation |
+| Runtime state | Record each operator's generated Box/Salesforce bindings in ignored runtime files |
 
 ---
 
@@ -187,19 +191,17 @@ This CLM variation is intentionally structured as a template for later use-case 
 ```text
 box-bedrock-for-clm/
 ├── README.md
-├── clm-react-app/
+├── clm-salesforce-project/
 │   └── force-app/main/default/
 │       ├── objects/CLM_Contract__c/
-│       ├── externalClientApps/Box_Automate_CLM.eca-meta.xml
-│       ├── extlClntAppGlobalOauthSets/
-│       ├── extlClntAppOauthSettings/
-│       ├── extlClntAppOauthPolicies/
 │       ├── permissionsets/
 │       └── uiBundles/clmreactapp/
 ├── config/
 │   ├── agentcore/
 │   ├── agentforce/
 │   ├── demo/
+│   ├── operator/
+│   ├── runtime/                 # example plus gitignored environment bindings
 │   ├── salesforce/
 │   └── box/
 ├── docs/
@@ -209,7 +211,7 @@ box-bedrock-for-clm/
 │   ├── 04-control-matrix.md
 │   ├── 05-roi-analysis.md
 │   ├── 06-competitive-landscape.md
-│   ├── 08-handoff-progress.md
+│   ├── operator/                # canonical fresh-environment path
 │   ├── scenarios/
 │   │   ├── governed-workflow/
 │   │   └── agentic-orchestration/
@@ -228,6 +230,7 @@ box-bedrock-for-clm/
 │   └── README.md
 └── scripts/
     ├── README.md
+    ├── demo_operator.py
     ├── build_clm_experience_gallery.py
     ├── generate_sample_contract_assets.py
     └── run_agentcore_mock.py

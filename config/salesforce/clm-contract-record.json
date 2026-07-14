@@ -69,7 +69,7 @@
     {"source": "riskLevel", "target": "Risk_Level__c", "required": false, "humanValidated": true},
     {"source": "specialTermsRiskNotes", "target": "Special_Terms_Risk_Notes__c", "required": false},
     {"source": "boxFolderId", "target": "Box_Workspace_Folder_ID__c", "required": true, "validation": "digits only and allowlisted workspace"},
-    {"source": "boxFolderUrl", "target": "Box_Workspace_URL__c", "required": true, "validation": "kadams.ent.box.com URL"},
+    {"source": "boxFolderUrl", "target": "Box_Workspace_URL__c", "required": true, "validation": "${box.hostname} URL"},
     {"source": "boxIntakeFileId", "target": "Box_Intake_File_ID__c", "required": true, "validation": "digits only"},
     {"source": "boxRedlineFileId", "target": "Box_Redline_File_ID__c", "required": false, "validation": "digits only"},
     {"source": "workflowRunId", "target": "Intake_Workflow_Run_ID__c", "required": true},

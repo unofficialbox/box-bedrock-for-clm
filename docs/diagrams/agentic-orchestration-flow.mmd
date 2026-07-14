@@ -1,7 +1,7 @@
 flowchart LR
     Event["Box or Salesforce event"] --> Supervisor["AgentCore Strands supervisor<br/>plan, memory and trace"]
     Supervisor --> BoxAgent["Box package and clause agents"]
-    Supervisor --> SFAgent["Salesforce and Agentforce agents"]
+    Supervisor --> SFAgent["Salesforce Agentforce specialists"]
     Supervisor --> DBXAgent["Databricks analytics agent"]
     BoxAgent --> Evidence["Governed files, metadata,<br/>tasks and citations"]
     SFAgent --> Record["CLM record, commercial truth<br/>and approval context"]

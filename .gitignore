@@ -9,6 +9,7 @@ lerna-debug.log*
 
 # Local OS and Python cache files
 .DS_Store
+.tmp/
 __pycache__/
 *.py[cod]
 
@@ -83,6 +84,11 @@ web_modules/
 .env.test.local
 .env.production.local
 .env.local
+
+# Generated per-operator environment bindings (copy from the example)
+config/runtime/demo-environment.json
+config/runtime/bootstrap-state.json
+config/runtime/generated/
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache

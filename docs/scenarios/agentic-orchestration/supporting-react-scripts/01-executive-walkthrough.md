@@ -13,7 +13,7 @@
 ## Pre-demo state
 
 - Prepare a validated New Contract Request and the Salesforce standard REST OAuth 2.0 connection.
-- Open the React workspace at contract `CLM-2026-0017` and Box folder `399081692991`.
+- Open the React workspace with the test contract and generated Box workspace folder.
 - Keep the **Workspace** view selected.
 - Confirm the Northstar banner shows **Critical** risk and **Approval blocked** status.
 - Do not complete any of the three Box review tasks before the demo.
@@ -27,7 +27,7 @@
 - Submit or open the validated Box intake.
 - Show the Automate approval gate, then the approved HTTPS branch.
 - Show the newly created Salesforce CLM record and returned record ID.
-- Open the React workspace using that record ID and Box folder `399081692991`.
+- Open the React workspace using that record ID and the generated Box workspace folder ID.
 
 **Land**
 
@@ -91,7 +91,7 @@ Agentforce explains and classifies the work. The maintained expert directory con
 
 **Show**
 
-- Approval memo template file `2344242775119`.
+- The generated approval memo Doc Gen template.
 - Explain that Box Sign remains blocked until the live Box tasks are complete.
 
 ## Close

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Show the end-state multi-agent path: AWS Bedrock AgentCore and Strands coordinate Box agents for unstructured data, Salesforce and Agentforce agents for structured work, Databricks agents for governed analytics, and the Salesforce Multi-Framework React workspace as the presenter surface.
+Show the end-state multi-agent path: AWS Bedrock AgentCore and Strands coordinate Box agents for unstructured data, Salesforce Agentforce specialists for structured work, Databricks agents for governed analytics, and the Salesforce Multi-Framework React workspace as the presenter surface.
 
 Scenario package: [Agentic Orchestration](../scenarios/agentic-orchestration/README.md)
 

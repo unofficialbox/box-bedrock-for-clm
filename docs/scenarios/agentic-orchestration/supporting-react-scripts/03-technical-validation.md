@@ -30,7 +30,7 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 
 **Show**
 
-- `config/box/automate-workflows.json` and the saved workflow ID `399436615012`.
+- `config/box/automate-workflows.json` and the target environment's saved workflow.
 - The approval task before the standard REST upsert and lookup stages.
 - The `CLM_Contract__c` object, private sharing, unique `Contract_ID__c`, and mapping in `config/salesforce/clm-contract-record.json`.
 - The upsert status and external-ID lookup response mapped to `recordId`, `contractId`, and `boxFolderId`.
@@ -45,7 +45,7 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 
 **Show**
 
-- `clm-react-app/force-app/main/default/uiBundles/clmreactapp/`.
+- `clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp/`.
 - `clmreactapp.uibundle-meta.xml` with target `Experience`.
 - `src/Workspace.tsx`, `src/components/BoxWorkspace.tsx`, and `src/components/AgentforcePanel.tsx`.
 
@@ -73,9 +73,9 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 
 **Show**
 
-- `getClmPageContext()` accepts the returned Salesforce `recordId` with contract `CLM-2026-0017` and folder `399081692991`.
+- `getClmPageContext()` accepts the returned Salesforce record ID, contract ID, and generated Box folder ID.
 - `getAgentContextPrompt()` instructs Agentforce to use Box as source of truth and cite files.
-- `config/box/live-box-surface.json` as the live-ID authority.
+- The gitignored `config/runtime/bootstrap-state.json` as the target environment's generated-ID authority.
 
 **Test prompt**
 
@@ -114,7 +114,7 @@ The UI, action contract, and presenter script all enforce the same decision boun
 ### Act 6 — Run the verification gate (4 minutes)
 
 ```bash
-cd clm-react-app/force-app/main/default/uiBundles/clmreactapp
+cd clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
 npm run lint
 npm test -- --run
 npm run build -- --mode standalone
@@ -125,9 +125,9 @@ npm audit --omit=dev
 From the CLM root:
 
 ```bash
-python3 -m json.tool config/demo/box-agentforce-react-demo-manifest.json >/dev/null
+python3 -m json.tool config/demo/agentic-orchestration-demo-manifest.json >/dev/null
 python3 -m json.tool config/agentforce/clm-react-agentforce-spec.json >/dev/null
-python3 -m json.tool config/box/live-box-surface.json >/dev/null
+python3 -m json.tool config/runtime/demo-environment.json >/dev/null
 ```
 
 ## Technical pass criteria
