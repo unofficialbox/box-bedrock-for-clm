@@ -96,6 +96,12 @@ REACT_EXPERIENCES = [
     },
 ]
 
+for experience in BOX_EXPERIENCES:
+    experience["source"] = "governed-workflow"
+
+for experience in REACT_EXPERIENCES:
+    experience["source"] = "agentic-orchestration"
+
 SCENARIOS = [
     {
         "slug": "governed-workflow",
@@ -124,10 +130,10 @@ def data_uri(path: Path) -> str:
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
 
 
-def render_card(screenshot_dir: Path, item: dict[str, str], index: int) -> str:
+def render_card(item: dict[str, str], index: int) -> str:
     """Render one gallery card and fail if its real screenshot is missing."""
 
-    path = screenshot_dir / item["file"]
+    path = SCREENSHOTS / item["source"] / item["file"]
     if not path.exists():
         raise FileNotFoundError(path)
     return f"""
@@ -151,9 +157,8 @@ def build_scenario(scenario: dict[str, object]) -> Path:
     experiences = scenario["experiences"]
     if not isinstance(experiences, list):
         raise TypeError("scenario experiences must be a list")
-    screenshot_dir = SCREENSHOTS / slug
     cards = "\n".join(
-        render_card(screenshot_dir, item, i + 1)
+        render_card(item, i + 1)
         for i, item in enumerate(experiences)
     )
     document = f"""<!doctype html>

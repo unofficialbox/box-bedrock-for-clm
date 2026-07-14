@@ -6,8 +6,8 @@ This repository contains two presenter-ready CLM scenario packages built on the 
 
 | Scenario | Model | Primary surface | Scope |
 |---|---|---|---|
-| [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
-| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Everything in Governed Workflow plus Agentforce, Salesforce, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation |
+| [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, Box and Agentforce agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
+| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Everything in Governed Workflow plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation |
 
 Start with the [scenario selector](docs/scenarios/README.md), then use [setup and activation](docs/runbooks/05-demo-setup-and-activation.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md).
 
@@ -135,7 +135,7 @@ Config artifacts:
 | `config/agentcore/agentcore-orchestration-spec.json` | Multi-agent orchestration spec |
 | `config/agentcore/tool-contracts.json` | Box, Salesforce, and Databricks tool contracts |
 | `config/agentcore/agent-handoff-payloads.json` | Supervisor-to-agent handoff payload examples |
-| `config/agentforce/clm-react-agentforce-spec.json` | Agentforce topics, actions, mutation confirmations, and guardrails used by Agentic Orchestration |
+| `config/agentforce/clm-react-agentforce-spec.json` | Shared Agentforce topics, actions, mutation confirmations, and guardrails used by both scenarios |
 | `config/salesforce/clm-contract-record.json` | `CLM_Contract__c` ownership, idempotency, field mapping, Box references, and intake contract |
 | `config/demo/governed-workflow-demo-manifest.json` | Governed Workflow runtime, readiness, documentation, and screenshot inventory |
 | `config/demo/agentic-orchestration-demo-manifest.json` | Agentic Orchestration runtime, readiness, documentation, trace, and screenshot inventory |

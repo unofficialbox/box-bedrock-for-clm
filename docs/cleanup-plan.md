@@ -61,7 +61,7 @@ The scenario index now provides this boundary without hiding AgentCore as an uno
 
 The numbered `04-` runbook remains a supporting deep dive; its audience scripts now live under `docs/scenarios/agentic-orchestration/supporting-react-scripts/`. Continue consolidating only when doing so reduces navigation without duplicating scenario truth:
 
-- primary runbook
+- scenario runbooks
 - three audience scripts
 - flow source and rendered flow
 - Markdown and JSON component manifests

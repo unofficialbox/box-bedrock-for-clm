@@ -1,13 +1,13 @@
 # Agentic Orchestration Screenshot Manifest
 
-All current images are under `output/screenshots/agentic-orchestration/`. The folder includes the governed Box journey plus the real running React workspace.
+The gallery combines the shared governed Box screenshots under `output/screenshots/governed-workflow/` with React-only screenshots under `output/screenshots/agentic-orchestration/`. This keeps every captured Box surface in one source of truth while preserving a separate Agentic Orchestration gallery and manifest.
 
 | Experience group | Files |
 |---|---|
-| Box dashboard and clauses | `box-app-dashboard-live.png`, `box-app-dashboard-actions-live.png`, `box-app-clause-library-live.png`, `box-app-approved-standards-view.png` |
-| Intake and workflow | `box-form-new-contract-request.png`, `automate-intake-agents.png`, `automate-saved-draft.png`, `automate-approval-flow.png`, `automate-https-connector.png` |
-| Knowledge and generation | `box-hub-clause-library-live.png`, `box-docgen-templates.png` |
-| Salesforce React | `clm-react-workspace.png`, `clm-react-redline-reviews.png` |
+| Shared Box dashboard and clauses | `governed-workflow/box-app-dashboard-live.png`, `governed-workflow/box-app-dashboard-actions-live.png`, `governed-workflow/box-app-clause-library-live.png`, `governed-workflow/box-app-approved-standards-view.png` |
+| Shared intake and workflow | `governed-workflow/box-form-new-contract-request.png`, `governed-workflow/automate-intake-agents.png`, `governed-workflow/automate-saved-draft.png`, `governed-workflow/automate-approval-flow.png`, `governed-workflow/automate-https-connector.png` |
+| Shared knowledge and generation | `governed-workflow/box-hub-clause-library-live.png`, `governed-workflow/box-docgen-templates.png` |
+| Salesforce React | `agentic-orchestration/clm-react-workspace.png`, `agentic-orchestration/clm-react-redline-reviews.png` |
 
 ## Screenshot gaps
 

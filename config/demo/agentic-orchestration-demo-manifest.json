@@ -36,6 +36,9 @@
     "gallery": "output/html/agentic-orchestration-gallery.html",
     "detailedRunbook": "docs/runbooks/03-agentcore-demo.md"
   },
-  "screenshots": "output/screenshots/agentic-orchestration/",
+  "screenshots": {
+    "sharedBox": "output/screenshots/governed-workflow/",
+    "scenarioSpecific": "output/screenshots/agentic-orchestration/"
+  },
   "trace": "output/agentcore/northstar-agentcore-trace.json"
 }
