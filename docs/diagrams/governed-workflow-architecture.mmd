@@ -1,0 +1,23 @@
+flowchart TB
+    Presenter["Legal Operations presenter"] --> App["Box App<br/>portfolio, risk and actions"]
+
+    subgraph Box["Box governed operating layer"]
+        App --> Form["Box Form<br/>contract intake"]
+        Form --> Automate["Box Automate<br/>deterministic sequence"]
+        Automate --> Extract["Extract Agent<br/>draft structured evidence"]
+        Extract --> Agents["Box and Agentforce agents<br/>source-grounded review"]
+        Agents --> Tasks["Human approval tasks<br/>named domain owners"]
+        Agents --> Hub["Approved Clause Hub<br/>standards and fallbacks"]
+        Tasks --> Content["Metadata, Doc Gen,<br/>Sign and audit history"]
+    end
+
+    Tasks -->|"Approved only"| Connector["HTTPS Connector"]
+    Connector --> Salesforce["Salesforce standard REST<br/>external-ID upsert and lookup"]
+    Humans["Legal, Finance, Privacy,<br/>Security and Sales"] --> Tasks
+
+    classDef box fill:#e9f1ff,stroke:#1166e8,color:#071b33
+    classDef system fill:#f8fafc,stroke:#627a98,color:#071b33
+    classDef human fill:#fff1d6,stroke:#b16a00,color:#522f00
+    class App,Form,Automate,Extract,Agents,Tasks,Hub,Content box
+    class Connector,Salesforce system
+    class Presenter,Humans human

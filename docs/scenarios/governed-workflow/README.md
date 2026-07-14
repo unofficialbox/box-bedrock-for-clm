@@ -1,23 +1,130 @@
 # Governed Workflow
 
-**Deterministic CLM orchestration with agentic enrichment.** Box is the operating surface. Box Automate controls the sequence; Extract and Agentforce/Box agents enrich evidence; named people approve decisions.
+Deterministic CLM orchestration with agentic enrichment. Box is the operating surface, Box Automate controls the sequence, agents enrich evidence, and named people approve decisions.
 
-## Use this track when
+## Read this guide in order
 
-- the audience wants a credible near-term operating model;
-- Box Apps, Forms, Automate, Hubs, metadata, tasks, Doc Gen, and Sign should lead;
-- predictable routing, auditability, and human gates matter more than autonomous planning;
-- Salesforce record creation is a governed integration outcome, not the presenter workspace.
+[1. Orientation](#1-orientation) → [2. Architecture](#2-architecture) → [3. Flow](#3-flow) → [4. Presenter script](#4-presenter-script) → [5. Visual walkthrough](#5-visual-walkthrough) → [6. Components and readiness](#6-components-and-readiness) → [7. Setup and validation](#7-setup-and-validation)
 
-## Presenter package
+Everything required for the main presentation is on this page. Links in **References** are optional operator or technical detail.
 
-- [Demo script](demo-script.md)
-- [Component manifest](component-manifest.md)
-- [Screenshot manifest](screenshot-manifest.md)
-- [Flow diagram](../../diagrams/governed-workflow-flow.svg)
-- [Self-contained gallery](../../../output/html/governed-workflow-gallery.html)
-- [Machine-readable manifest](../../../config/demo/governed-workflow-demo-manifest.json)
+## 1. Orientation
 
-## Runtime boundary
+Use this track when Box Apps, Forms, Automate, Hubs, metadata, tasks, Doc Gen, and Sign should lead; predictable routing and auditability matter more than autonomous planning; and Salesforce record creation is an integration outcome rather than the presenter workspace.
 
-Included: Box, Box Automate, Extract, Box AI/Agentforce agents, HTTPS Connector, and human approvals. Salesforce may receive the validated CLM record through standard REST. Salesforce React, Databricks, AgentCore, and Strands are not part of the presenter path.
+| Boundary | Included |
+|---|---|
+| Presenter surface | Box App, Form, Automate, Hub, tasks, Doc Gen, Sign |
+| Agentic work | Extract plus Box and Agentforce agents for source-grounded enrichment |
+| Structured handoff | Salesforce standard REST external-ID upsert and lookup after human approval |
+| Excluded | Salesforce React, Databricks, AWS Bedrock AgentCore, Strands |
+
+[Continue to architecture](#2-architecture)
+
+## 2. Architecture
+
+![Governed Workflow architecture](../../diagrams/governed-workflow-architecture.svg)
+
+The Box layer owns content, workflow state, clauses, tasks, generation, signature, and audit evidence. The HTTPS Connector crosses into Salesforce only after the human validation gate.
+
+- [Architecture source](../../diagrams/governed-workflow-architecture.mmd)
+- [Shared architecture and control detail](../../01-architecture.md)
+
+[Continue to flow](#3-flow)
+
+## 3. Flow
+
+![Governed Workflow flow](../../diagrams/governed-workflow-flow.svg)
+
+1. Start from the Box App and open the single contract-intake Form.
+2. Automate runs Extract and source-grounded agent review in a fixed sequence.
+3. A named person accepts or rejects the draft evidence.
+4. Only the approved branch invokes Salesforce standard REST.
+5. Box tasks, metadata, Doc Gen, Sign, and the clause Hub carry the lifecycle forward.
+
+- [Flow source](../../diagrams/governed-workflow-flow.mmd)
+
+[Continue to presenter script](#4-presenter-script)
+
+## 4. Presenter script
+
+**Duration:** 12–15 minutes
+
+**Audience:** Legal Operations, Sales Operations, security, and business sponsors
+
+1. **Open the Box App.** Show portfolio status, risk, document type, package status, and the three operational actions.
+2. **Start a contract.** Open the sole `Start a New Contract` Form and explain that the submission lands in governed Box content.
+3. **Show deterministic enrichment.** Follow Form submission → Extract → Box/Agentforce review → human approval. Emphasize that the route is designed, inspectable, and repeatable.
+4. **Show the control point.** Explain that rejected work returns for correction and the HTTPS Connector is unavailable until approval.
+5. **Create the structured record.** On approval, the connector performs the Salesforce external-ID upsert and lookup. An agent does not authorize this write.
+6. **Review redlines and clauses.** Show the metadata-backed Clause Library page and the lived-in approved-clause Hub. Explain deterministic expert routing by domain.
+7. **Generate and execute.** Show Doc Gen templates, approval evidence, and the executed-agreement destination. Signature remains human-authorized.
+8. **Close on governance.** Box remains the content system of record; every mutation has a known stage, owner, and audit trail.
+
+Required language: agents summarize, extract, compare, and recommend; people approve legal positions and signature. Describe the live Automate workflow as inactive until OAuth testing and activation are complete.
+
+[Continue to the visual walkthrough](#5-visual-walkthrough)
+
+## 5. Visual walkthrough
+
+These are the canonical Box screenshots. Agentic Orchestration references the same files rather than copying them.
+
+### Portfolio and actions
+
+![Box App portfolio dashboard](../../../output/screenshots/governed-workflow/box-app-dashboard-live.png)
+
+![Box App actions and deal room](../../../output/screenshots/governed-workflow/box-app-dashboard-actions-live.png)
+
+### Intake and deterministic automation
+
+![New Contract Request Form](../../../output/screenshots/governed-workflow/box-form-new-contract-request.png)
+
+![Automate Extract and agents](../../../output/screenshots/governed-workflow/automate-intake-agents.png)
+
+![Automate human approval branch](../../../output/screenshots/governed-workflow/automate-approval-flow.png)
+
+![Automate HTTPS Connector](../../../output/screenshots/governed-workflow/automate-https-connector.png)
+
+### Clauses and generation
+
+![Clause Library dashboard](../../../output/screenshots/governed-workflow/box-app-clause-library-live.png)
+
+![Approved Clause Hub](../../../output/screenshots/governed-workflow/box-hub-clause-library-live.png)
+
+![Box Doc Gen templates](../../../output/screenshots/governed-workflow/box-docgen-templates.png)
+
+Optional offline presentation: [self-contained gallery](../../../output/html/governed-workflow-gallery.html).
+
+[Continue to components and readiness](#6-components-and-readiness)
+
+## 6. Components and readiness
+
+| Component | Role | Status |
+|---|---|---|
+| Box App and Form | Portfolio and single intake entry | Live |
+| Box Automate | Form → Extract → agent review → approval → connector | Saved draft; inactive |
+| Extract and Box/Agentforce agents | Structured evidence and source-grounded recommendations | Configured/specification-backed |
+| HTTPS Connector | Salesforce external-ID upsert and lookup | Configured; final OAuth smoke pending |
+| Metadata, tasks, Clause Hub | Status, risk, named ownership, approved positions | Live/seeded |
+| Box Doc Gen | Approval memo, order summary, renewal notice | Live templates |
+| Box Sign | Human-authorized execution | Packet not created |
+
+[Continue to setup and validation](#7-setup-and-validation)
+
+## 7. Setup and validation
+
+1. Open the [live Box App](https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn), [Form](https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858), and [Clause Hub](https://kadams.ent.box.com/hubs/1312630996).
+2. Confirm the App has one intake Form entry, the Clause Hub action, and Executed Agreements action.
+3. Confirm workflow `399436615012` remains inactive unless the owner explicitly authorizes activation.
+4. Confirm the Extract, agent, approval, and connector stages match the flow above.
+5. Confirm the three review tasks remain human-owned and signature stays blocked while required work is incomplete.
+6. Rebuild the offline gallery with `python3 scripts/build_clm_experience_gallery.py` after replacing a screenshot.
+
+### References
+
+- [Full setup and activation](../../runbooks/05-demo-setup-and-activation.md)
+- [Manual-task register](../../manual-task-register.md)
+- [Machine-readable scenario manifest](../../../config/demo/governed-workflow-demo-manifest.json)
+- [Box web UI build queue](../../../box-web-ui-build-queue.md)
+
+[Back to the scenario selector](../README.md)

@@ -33,10 +33,9 @@
     "sign": "packet-not-created"
   },
   "documentation": {
-    "index": "docs/scenarios/governed-workflow/README.md",
-    "script": "docs/scenarios/governed-workflow/demo-script.md",
-    "componentManifest": "docs/scenarios/governed-workflow/component-manifest.md",
-    "screenshotManifest": "docs/scenarios/governed-workflow/screenshot-manifest.md",
+    "guide": "docs/scenarios/governed-workflow/README.md",
+    "architectureSource": "docs/diagrams/governed-workflow-architecture.mmd",
+    "architectureRendered": "docs/diagrams/governed-workflow-architecture.svg",
     "flowSource": "docs/diagrams/governed-workflow-flow.mmd",
     "flowRendered": "docs/diagrams/governed-workflow-flow.svg",
     "gallery": "output/html/governed-workflow-gallery.html"

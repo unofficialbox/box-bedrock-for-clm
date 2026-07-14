@@ -148,50 +148,27 @@ Box Sign + Obligation Monitor
 
 ## Scenario A: Governed Workflow
 
-This is the Box-centric, deterministic presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. The existing React diagram remains a supporting continuation for teams that want to open the resulting Salesforce record, but React is not required for this scenario.
+This is the Box-centric, deterministic presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. React is not part of this presenter path.
 
-Rendered diagram: [Box + Agentforce + React architecture](diagrams/clm-box-agentforce-react.svg)
+Canonical guide: [Governed Workflow](scenarios/governed-workflow/README.md)
 
-Source: [Mermaid diagram](diagrams/clm-box-agentforce-react.mmd)
+Architecture: [rendered](diagrams/governed-workflow-architecture.svg) · [source](diagrams/governed-workflow-architecture.mmd)
 
-Scenario flow: [Rendered demo flow](diagrams/clm-box-agentforce-react-demo-flow.svg) · [Mermaid source](diagrams/clm-box-agentforce-react-demo-flow.mmd)
-
-```mermaid
-flowchart LR
-    User["Legal, Sales, Finance, Privacy"] --> App["Box App dashboard<br/>portfolio, actions, clause views"]
-    App --> Intake["Box Form + Automate"]
-    App --> Hub["Approved Clause Hub"]
-    App --> Executed["Executed agreements"]
-    Intake --> Validate["Human validates Extract and AI output"]
-    Validate --> Record["Create Salesforce CLM record"]
-    Record --> React["Salesforce Multi-Framework React app"]
-    React --> Box["Box CLM workspace"]
-    React --> Agentforce["Agentforce Contract Copilot"]
-    Agentforce --> Box
-    Box --> Compare["Redline + approved baseline<br/>cited structured findings"]
-    Compare --> Route["Expert directory routing<br/>one Box task per domain"]
-    Route --> React
-    Box --> Content["Contracts, metadata, tasks, DocGen, Sign"]
-    Agentforce --> Human["Human review and confirmation"]
-    Human --> Box
-    Hub --> Box
-    Executed --> Box
-```
+Flow: [rendered](diagrams/governed-workflow-flow.svg) · [source](diagrams/governed-workflow-flow.mmd)
 
 ### Variation rules
 
 | Rule | Implementation |
 |---|---|
-| Box remains authoritative | The React client uses live Box workspace/file/task IDs and Agentforce cites Box sources. |
-| Salesforce record creation is governed | Only validated intake reaches the standard REST external-ID upsert and lookup; the returned record ID becomes React and Agentforce context. |
-| No browser secrets | Salesforce returns a short-lived, downscoped Box token through a same-origin endpoint. |
+| Box remains authoritative | Live Box workspace, file, metadata, clause, and task IDs anchor the workflow; agents cite Box sources. |
+| Salesforce record creation is governed | Only validated intake reaches the standard REST external-ID upsert and lookup. |
 | Agentforce does not decide | Legal positions, approvals, and signature authorization remain human actions. |
 | Routing is deterministic | Domains resolve through `config/clm/expert-routing.json`; low-confidence, unclassified, inaccessible, and unconfigured assignments go to Legal Operations triage. |
 | Tasks are consolidated | The routing action creates or reuses one open task per contract, redline file, and domain. |
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
 | No external agent runtime | No request is sent to AgentCore, Strands, Databricks, or custom middleware. |
 
-Implementation: [`clm-react-app/`](../clm-react-app/README.md)
+Workflow contract: [`config/box/automate-workflows.json`](../config/box/automate-workflows.json)
 
 Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../config/agentforce/clm-react-agentforce-spec.json)
 

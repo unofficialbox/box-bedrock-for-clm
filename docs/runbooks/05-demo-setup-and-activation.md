@@ -425,7 +425,7 @@ Record the Salesforce record ID, Box workflow run ID, created/reused task IDs, t
 ## 11. Presenter preparation
 
 - Choose [Governed Workflow](../scenarios/governed-workflow/README.md) or [Agentic Orchestration](../scenarios/agentic-orchestration/README.md) before opening presenter surfaces.
-- Use the selected scenario's demo script and screenshot manifest; use the audience-specific scripts under `docs/scenarios/agentic-orchestration/supporting-react-scripts/` only as supporting detail.
+- Follow the selected scenario's single-page guide in order; use the audience-specific scripts under `docs/scenarios/agentic-orchestration/supporting-react-scripts/` only as optional supporting detail.
 - Open the Box workspace, App, Hub, Salesforce record, and React page before the session.
 - Verify all named experts are available or use the documented demo-triage fallback.
 - Keep live tasks incomplete if the story requires **Signature blocked**.

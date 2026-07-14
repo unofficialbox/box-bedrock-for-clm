@@ -27,10 +27,9 @@
     "agentcore": "specification-and-deterministic-local-trace"
   },
   "documentation": {
-    "index": "docs/scenarios/agentic-orchestration/README.md",
-    "script": "docs/scenarios/agentic-orchestration/demo-script.md",
-    "componentManifest": "docs/scenarios/agentic-orchestration/component-manifest.md",
-    "screenshotManifest": "docs/scenarios/agentic-orchestration/screenshot-manifest.md",
+    "guide": "docs/scenarios/agentic-orchestration/README.md",
+    "architectureSource": "docs/diagrams/clm-agentcore-architecture.mmd",
+    "architectureRendered": "docs/diagrams/clm-agentcore-architecture.svg",
     "flowSource": "docs/diagrams/agentic-orchestration-flow.mmd",
     "flowRendered": "docs/diagrams/agentic-orchestration-flow.svg",
     "gallery": "output/html/agentic-orchestration-gallery.html",

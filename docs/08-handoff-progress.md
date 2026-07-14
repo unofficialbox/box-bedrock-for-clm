@@ -20,7 +20,7 @@ Contract package:
 |------|--------|-------|
 | CLM directory | Created | `/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm` |
 | README | Current | Defines separate Governed Workflow and Agentic Orchestration presenter tracks |
-| Core docs | Current | Each scenario has its own script, component manifest, screenshot manifest, machine-readable manifest, diagram, and gallery |
+| Core docs | Current | Each scenario has one ordered guide containing architecture, flow, presenter script, screenshots, readiness, and setup; shared assets remain single-source |
 | Runbooks | Separated | Governed Workflow leads with Box; Agentic Orchestration uses the AgentCore/Strands runbook and React presenter surface |
 | Sample data | Generated | Synthetic PDFs, JSON records, playbook, and analytics CSV in `output/` |
 | Generation script | Created | `scripts/generate_sample_contract_assets.py` |
@@ -43,7 +43,7 @@ Contract package:
 | Box Sign | Not started | Needs execution packet flow |
 | Box + Agentforce + React supporting flow | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and supporting split runbook are ready; live Salesforce deployment and runtime IDs remain |
 | Redline expert router | Local specification complete | Structured finding schema, deterministic expert directory, triage controls, domain-grouped React queues, and Agentforce/HTTPS contracts are ready; named Box collaborators and live workflow activation remain |
-| Presentation package | Complete | Executive, Legal Operations, and technical scripts; reusable Box Form → Automate → HTTPS Connector entry module; rendered flows; JSON and Markdown component manifests |
+| Presentation package | Complete | Two ordered single-page scenario guides; optional executive, Legal Operations, and technical React appendices; reusable Form entry module; rendered diagrams; JSON manifests |
 | Operator documentation | Complete | `docs/runbooks/05-demo-setup-and-activation.md` covers end-to-end bring-up; `docs/manual-task-register.md` inventories all known manual and confirmation-gated tasks |
 | Salesforce CLM record | Object and metadata-managed External Client App deployed; REST upsert verified in `agentforce` | `CLM_Contract__c`, permission set `0PSgL00000IR6zpWAD`, External Client App `0xIgL000000Ok89UAC`, OAuth policy `0yOgL000000coILUAY`, and dedicated Run As user `005gL00000KmN8TQAV` are live in org `00DgL000003D0LRUA0`; external-ID create/update/lookup passed with record `a7IgL000000WYWPUA4`, exactly one matching record, and `DataStorageMB remaining = 1`; only the consumer-secret handoff and Box OAuth test remain |
 | AWS AgentCore | Future | High-complexity tier uses AgentCore Strands agents with Box, Salesforce, and Databricks |
