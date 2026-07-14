@@ -1,6 +1,6 @@
 # Demo Component Manifest
 
-Machine-readable source: [`config/demo/box-agentforce-react-demo-manifest.json`](../../../config/demo/box-agentforce-react-demo-manifest.json)
+Machine-readable source: [`config/demo/box-agentforce-react-demo-manifest.json`](../../../../config/demo/box-agentforce-react-demo-manifest.json)
 
 ## Runtime scope
 
@@ -25,7 +25,7 @@ Explicitly excluded: AWS Bedrock AgentCore, Strands, Databricks, and external cu
 | Box Automate intake workflow | Saved draft, inactive | Yes | Workflow `399436615012`: Form trigger → Extract → Box Agent → human approval → HTTPS connector |
 | Salesforce CLM record creation | Object and metadata-managed External Client App deployed; direct REST upsert verified | Yes | `CLM_Contract__c` uses private sharing and unique `Contract_ID__c`; create/update/lookup passed against record `a7IgL000000WYWPUA4`; only the Box consumer-secret handoff and OAuth test remain |
 | Acme Contract Clause Library Hub | Live | Yes | Hub `1312630996`: live clause folder, current-standard operating context, intake/App/executed-agreement action cards, and governance content |
-| Offline experience gallery | Local verified | Presenter support | `output/html/clm-experience-gallery.html` |
+| Offline experience gallery | Local verified | Presenter support | `output/html/agentic-orchestration-gallery.html` |
 
 ## React components
 
@@ -116,7 +116,7 @@ The existing live tasks remain assigned to `kadams@boxdemo.com` as demo triage. 
 | Template | File ID | Used in flow |
 |---|---|---|
 | Approval memo | `2344242775119` | Yes, after confirmation |
-| Order summary | `2344233767713` | Available, not in the primary flow |
+| Order summary | `2344233767713` | Available, not in this supporting flow |
 | Renewal notice | `2344244747613` | Yes, after confirmation |
 
 ## Agentforce action boundary
@@ -146,12 +146,12 @@ Not included:
 |---|---|
 | Setup and activation guide | `docs/runbooks/05-demo-setup-and-activation.md` |
 | Manual-task register | `docs/manual-task-register.md` |
-| Executive script | `docs/demo-scripts/box-agentforce-react/01-executive-walkthrough.md` |
-| Legal Operations script | `docs/demo-scripts/box-agentforce-react/02-legal-operations-walkthrough.md` |
-| Technical validation script | `docs/demo-scripts/box-agentforce-react/03-technical-validation.md` |
+| Executive script | `docs/scenarios/agentic-orchestration/supporting-react-scripts/01-executive-walkthrough.md` |
+| Legal Operations script | `docs/scenarios/agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md` |
+| Technical validation script | `docs/scenarios/agentic-orchestration/supporting-react-scripts/03-technical-validation.md` |
 | Demo-flow source | `docs/diagrams/clm-box-agentforce-react-demo-flow.mmd` |
 | Rendered demo flow | `docs/diagrams/clm-box-agentforce-react-demo-flow.svg` |
-| Self-contained experience gallery | `output/html/clm-experience-gallery.html` |
+| Self-contained experience gallery | `output/html/agentic-orchestration-gallery.html` |
 
 ## Remaining live activation components
 

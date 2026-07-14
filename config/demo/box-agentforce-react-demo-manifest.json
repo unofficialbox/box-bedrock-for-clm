@@ -26,8 +26,8 @@
     "liveBoxIds": "config/box/live-box-surface.json",
     "agentforceContract": "config/agentforce/clm-react-agentforce-spec.json",
     "reactProject": "clm-react-app/",
-    "demoScripts": "docs/demo-scripts/box-agentforce-react/",
-    "boxFormEntryPointScript": "docs/demo-scripts/box-agentforce-react/04-box-form-automate-entry.md",
+    "demoScripts": "docs/scenarios/agentic-orchestration/supporting-react-scripts/",
+    "boxFormEntryPointScript": "docs/scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md",
     "setupGuide": "docs/runbooks/05-demo-setup-and-activation.md",
     "manualTaskRegister": "docs/manual-task-register.md"
   },
@@ -43,7 +43,7 @@
       "key": "box-form-automate-https",
       "name": "Box Form to Salesforce CLM record",
       "status": "live-box-surfaces-and-salesforce-rest-verified-pending-box-oauth-secret-and-test",
-      "script": "docs/demo-scripts/box-agentforce-react/04-box-form-automate-entry.md",
+      "script": "docs/scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md",
       "diagram": "docs/diagrams/clm-box-form-automate-entry.svg",
       "start": "Submit the published New Contract Request Box Form",
       "sequence": [
@@ -345,22 +345,22 @@
     "scripts": [
       {
         "name": "Executive walkthrough",
-        "path": "docs/demo-scripts/box-agentforce-react/01-executive-walkthrough.md",
+        "path": "docs/scenarios/agentic-orchestration/supporting-react-scripts/01-executive-walkthrough.md",
         "durationMinutes": 12
       },
       {
         "name": "Legal operations walkthrough",
-        "path": "docs/demo-scripts/box-agentforce-react/02-legal-operations-walkthrough.md",
+        "path": "docs/scenarios/agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md",
         "durationMinutes": 25
       },
       {
         "name": "Technical validation",
-        "path": "docs/demo-scripts/box-agentforce-react/03-technical-validation.md",
+        "path": "docs/scenarios/agentic-orchestration/supporting-react-scripts/03-technical-validation.md",
         "durationMinutes": 30
       },
       {
         "name": "Box Form entry-point variation",
-        "path": "docs/demo-scripts/box-agentforce-react/04-box-form-automate-entry.md",
+        "path": "docs/scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md",
         "durationMinutes": 7
       }
     ],
@@ -370,7 +370,7 @@
       "type": "process-flow"
     },
     "experienceGallery": {
-      "path": "output/html/clm-experience-gallery.html",
+      "path": "output/html/agentic-orchestration-gallery.html",
       "builder": "scripts/build_clm_experience_gallery.py",
       "screenshotCount": 11,
       "externalReferences": false

@@ -1,0 +1,41 @@
+{
+  "manifestVersion": "1.0.0",
+  "scenario": {
+    "id": "clm-agentic-orchestration",
+    "name": "Northstar CLM - Agentic Orchestration",
+    "orchestrationModel": "supervisor-led multi-platform specialist agents",
+    "contractId": "CLM-2026-0017"
+  },
+  "presenterSurface": "Salesforce Multi-Framework React",
+  "included": [
+    "all Governed Workflow components",
+    "Salesforce CLM record",
+    "Salesforce Multi-Framework React UI Bundle",
+    "Agentforce Contract Copilot",
+    "Databricks analytics agent",
+    "AWS Bedrock AgentCore supervisor",
+    "Strands specialist agents",
+    "AgentCore memory, guardrails, and traces",
+    "human approval gates"
+  ],
+  "readiness": {
+    "boxSurfaces": "live",
+    "reactWorkspace": "local-verified",
+    "salesforceMetadata": "deployed",
+    "agentforce": "specified-not-deployed",
+    "databricks": "synthetic-dataset-and-tool-contract",
+    "agentcore": "specification-and-deterministic-local-trace"
+  },
+  "documentation": {
+    "index": "docs/scenarios/agentic-orchestration/README.md",
+    "script": "docs/scenarios/agentic-orchestration/demo-script.md",
+    "componentManifest": "docs/scenarios/agentic-orchestration/component-manifest.md",
+    "screenshotManifest": "docs/scenarios/agentic-orchestration/screenshot-manifest.md",
+    "flowSource": "docs/diagrams/agentic-orchestration-flow.mmd",
+    "flowRendered": "docs/diagrams/agentic-orchestration-flow.svg",
+    "gallery": "output/html/agentic-orchestration-gallery.html",
+    "detailedRunbook": "docs/runbooks/03-agentcore-demo.md"
+  },
+  "screenshots": "output/screenshots/agentic-orchestration/",
+  "trace": "output/agentcore/northstar-agentcore-trace.json"
+}

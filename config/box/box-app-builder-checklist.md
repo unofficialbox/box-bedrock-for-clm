@@ -1,6 +1,6 @@
 # Box App Builder Checklist: CLM Dashboard
 
-Use this checklist in the Box web UI to assemble the CLM dashboard used by the primary demo.
+Use this checklist in the Box web UI to assemble the CLM dashboard used by Governed Workflow and reused by Agentic Orchestration.
 
 ## Source Workspace
 
@@ -56,7 +56,7 @@ Use this checklist in the Box web UI to assemble the CLM dashboard used by the p
 
 ## Demo Validation
 
-Before running the primary demo, confirm:
+Before running either scenario, confirm:
 
 | Check | Expected Result |
 |-------|-----------------|

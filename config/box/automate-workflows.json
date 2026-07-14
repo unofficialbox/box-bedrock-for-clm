@@ -48,7 +48,7 @@
       },
       "entryPointVariation": {
         "key": "box-form-automate-https",
-        "script": "docs/demo-scripts/box-agentforce-react/04-box-form-automate-entry.md",
+        "script": "docs/scenarios/governed-workflow/demo-script.md",
         "sequence": [
           "Submit New Contract Request",
           "Run Extract and Box AI Agent",

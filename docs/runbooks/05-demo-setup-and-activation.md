@@ -399,7 +399,7 @@ Do not activate on implied approval from earlier setup work.
 
 ## 10. Run the integrated smoke test
 
-Use a clearly labeled non-production request. This test is also the activation gate for the [Box Form entry-point variation](../demo-scripts/box-agentforce-react/04-box-form-automate-entry.md).
+Use a clearly labeled non-production request. This test is also the activation gate for the [Box Form entry-point variation](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md).
 
 1. Submit the published **New Contract Request** Form with the Northstar defaults from `box-web-ui-build-queue.md`.
 2. Confirm the upload lands in intake folder `399082115646`.
@@ -424,8 +424,8 @@ Record the Salesforce record ID, Box workflow run ID, created/reused task IDs, t
 
 ## 11. Presenter preparation
 
-- Use [the primary demo runbook](04-box-agentforce-react-demo.md).
-- Choose the executive, legal-operations, or technical script under `docs/demo-scripts/box-agentforce-react/`.
+- Choose [Governed Workflow](../scenarios/governed-workflow/README.md) or [Agentic Orchestration](../scenarios/agentic-orchestration/README.md) before opening presenter surfaces.
+- Use the selected scenario's demo script and screenshot manifest; use the audience-specific scripts under `docs/scenarios/agentic-orchestration/supporting-react-scripts/` only as supporting detail.
 - Open the Box workspace, App, Hub, Salesforce record, and React page before the session.
 - Verify all named experts are available or use the documented demo-triage fallback.
 - Keep live tasks incomplete if the story requires **Signature blocked**.

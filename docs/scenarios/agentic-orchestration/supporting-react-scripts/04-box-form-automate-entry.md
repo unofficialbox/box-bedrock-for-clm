@@ -19,7 +19,7 @@ flowchart LR
     Context --> React["Open React CLM workspace"]
 ```
 
-Rendered version: [Box Form entry-point flow](../../diagrams/clm-box-form-automate-entry.svg).
+Rendered version: [Box Form entry-point flow](../../../diagrams/clm-box-form-automate-entry.svg).
 
 ## Live anchors
 
@@ -36,7 +36,7 @@ The workflow is currently a saved inactive draft and must be updated to the stan
 
 ## Pre-demo setup
 
-1. Complete Level C setup in [Setup and Activation](../../runbooks/05-demo-setup-and-activation.md).
+1. Complete Level C setup in [Setup and Activation](../../../runbooks/05-demo-setup-and-activation.md).
 2. Use a clearly labeled non-production request and a unique `contractId`.
 3. Confirm the workflow targets the published Form and intake folder `399082115646`.
 4. Confirm the HTTPS Connector points to the intended Salesforce test org and uses an administrator-managed OAuth 2.0 connection.

@@ -1,0 +1,15 @@
+flowchart LR
+    App["Box App<br/>portfolio and actions"] --> Form["Box Form<br/>New Contract Request"]
+    Form --> Extract["Extract Agent<br/>draft structured evidence"]
+    Extract --> Review["Box and Agentforce agents<br/>source-grounded review"]
+    Review --> Gate{"Human validation"}
+    Gate -- "Reject" --> Rework["Return for correction"]
+    Rework --> Form
+    Gate -- "Approve" --> Connector["HTTPS Connector<br/>Salesforce REST upsert and lookup"]
+    Connector --> Tasks["Box tasks, metadata,<br/>Doc Gen and Sign"]
+    Hub["Approved Clause Hub"] --> Review
+
+    classDef box fill:#e9f1ff,stroke:#1166e8,color:#071b33
+    classDef human fill:#fff1d6,stroke:#b16a00,color:#522f00
+    class App,Form,Extract,Review,Connector,Tasks,Hub box
+    class Gate,Rework human

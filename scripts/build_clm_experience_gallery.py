@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Build the offline CLM experience gallery from real product screenshots."""
+"""Build separate offline CLM galleries from real product screenshots."""
 
 from __future__ import annotations
 
@@ -10,21 +10,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / "output" / "screenshots"
-OUTPUT = ROOT / "output" / "html" / "clm-experience-gallery.html"
+OUTPUT = ROOT / "output" / "html"
 
-EXPERIENCES = [
-    {
-        "file": "clm-react-workspace.png",
-        "eyebrow": "React workspace",
-        "title": "Northstar Health contract workspace",
-        "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Agentforce copilot rail.",
-    },
-    {
-        "file": "clm-react-redline-reviews.png",
-        "eyebrow": "React redline reviews",
-        "title": "Domain expert review queue",
-        "description": "The running demo app groups cited differences into human-owned Commercial Legal, Finance, and Privacy reviews grounded in live Box task identifiers.",
-    },
+BOX_EXPERIENCES = [
     {
         "file": "box-app-dashboard-live.png",
         "eyebrow": "Box Apps",
@@ -62,6 +50,12 @@ EXPERIENCES = [
         "description": "The published Hub combines the governed clause folder, current-standard status, intake/App/executed-agreement cards, and review-cadence guidance.",
     },
     {
+        "file": "automate-intake-agents.png",
+        "eyebrow": "Box Automate",
+        "title": "Extract and agent enrichment",
+        "description": "The real workflow builder shows deterministic Extract and Box Agent stages before the human decision point.",
+    },
+    {
         "file": "automate-saved-draft.png",
         "eyebrow": "Box Automate",
         "title": "Intake, Extract, and AI Agent",
@@ -87,6 +81,40 @@ EXPERIENCES = [
     },
 ]
 
+REACT_EXPERIENCES = [
+    {
+        "file": "clm-react-workspace.png",
+        "eyebrow": "React workspace",
+        "title": "Northstar Health contract workspace",
+        "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Agentforce copilot rail.",
+    },
+    {
+        "file": "clm-react-redline-reviews.png",
+        "eyebrow": "React redline reviews",
+        "title": "Domain expert review queue",
+        "description": "The running demo app groups cited differences into human-owned Commercial Legal, Finance, and Privacy reviews grounded in live Box task identifiers.",
+    },
+]
+
+SCENARIOS = [
+    {
+        "slug": "governed-workflow",
+        "title": "Governed Workflow",
+        "headline": "A controlled contract journey with agentic enrichment.",
+        "description": "A Box-centric walkthrough of Apps, Forms, Automate, Extract, agents, human approvals, Hubs, Doc Gen, and execution controls.",
+        "status": "Live Box surfaces. Automate is saved and inactive while its final OAuth smoke and activation remain gated.",
+        "experiences": BOX_EXPERIENCES,
+    },
+    {
+        "slug": "agentic-orchestration",
+        "title": "Agentic Orchestration",
+        "headline": "The complete multi-platform CLM operating model.",
+        "description": "The governed Box journey plus the Salesforce Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
+        "status": "Real Box and React screens. No live AWS AgentCore or Databricks screenshots are claimed.",
+        "experiences": REACT_EXPERIENCES + BOX_EXPERIENCES,
+    },
+]
+
 
 def data_uri(path: Path) -> str:
     """Return an embedded image data URI for a screenshot path."""
@@ -96,10 +124,10 @@ def data_uri(path: Path) -> str:
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
 
 
-def render_card(item: dict[str, str], index: int) -> str:
+def render_card(screenshot_dir: Path, item: dict[str, str], index: int) -> str:
     """Render one gallery card and fail if its real screenshot is missing."""
 
-    path = SCREENSHOTS / item["file"]
+    path = screenshot_dir / item["file"]
     if not path.exists():
         raise FileNotFoundError(path)
     return f"""
@@ -116,16 +144,24 @@ def render_card(item: dict[str, str], index: int) -> str:
       </article>"""
 
 
-def build() -> None:
-    """Build the self-contained CLM gallery at the configured output path."""
+def build_scenario(scenario: dict[str, object]) -> Path:
+    """Build one self-contained scenario gallery."""
 
-    cards = "\n".join(render_card(item, i + 1) for i, item in enumerate(EXPERIENCES))
+    slug = str(scenario["slug"])
+    experiences = scenario["experiences"]
+    if not isinstance(experiences, list):
+        raise TypeError("scenario experiences must be a list")
+    screenshot_dir = SCREENSHOTS / slug
+    cards = "\n".join(
+        render_card(screenshot_dir, item, i + 1)
+        for i, item in enumerate(experiences)
+    )
     document = f"""<!doctype html>
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Acme CLM Experience Gallery</title>
+  <title>Acme CLM · {html.escape(str(scenario['title']))}</title>
   <style>
     :root {{
       color-scheme: dark;
@@ -186,13 +222,13 @@ def build() -> None:
 <body>
   <header>
     <div>
-      <p class="kicker">Acme Robotics · Contract Lifecycle Management</p>
-      <h1>One contract journey. Twelve real experiences.</h1>
-      <p>An offline, self-contained visual walkthrough of the Box, Agentforce, and React CLM demo. Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
+      <p class="kicker">Acme Robotics · {html.escape(str(scenario['title']))}</p>
+      <h1>{html.escape(str(scenario['headline']))}</h1>
+      <p>{html.escape(str(scenario['description']))} Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
     </div>
     <aside class="status">
       <strong>Capture state · July 14, 2026</strong>
-      <span>The Box App and Hub are shown in their saved live state. Automate is shown as a saved, inactive draft with Salesforce standard REST configured and its OAuth test pending the CLM-specific consumer secret.</span>
+      <span>{html.escape(str(scenario['status']))}</span>
     </aside>
   </header>
   <main>
@@ -202,9 +238,17 @@ def build() -> None:
 </body>
 </html>
 """
-    OUTPUT.parent.mkdir(parents=True, exist_ok=True)
-    OUTPUT.write_text(document, encoding="utf-8")
-    print(OUTPUT)
+    OUTPUT.mkdir(parents=True, exist_ok=True)
+    output_path = OUTPUT / f"{slug}-gallery.html"
+    output_path.write_text(document, encoding="utf-8")
+    return output_path
+
+
+def build() -> None:
+    """Build both scenario galleries."""
+
+    for scenario in SCENARIOS:
+        print(build_scenario(scenario))
 
 
 if __name__ == "__main__":
