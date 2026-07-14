@@ -106,4 +106,4 @@ Local mode intentionally shows a safe fallback file list and Agentforce prompt c
 - No action allows Agentforce to approve a clause or send for signature.
 - DocGen mutations require presenter confirmation.
 - No network path to AWS, Strands, or Databricks is present in this variation.
-- The experience gallery loads offline with embedded screenshots and no external references.
+- The experience gallery loads offline with 12 current, embedded screenshots from real demo surfaces, no browser tabs, and no external references.

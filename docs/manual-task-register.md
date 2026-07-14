@@ -51,7 +51,7 @@ Status values:
 | MT-033 | Implement `routeRedlineFindings` with schema validation and task idempotency | Salesforce developer | Required | Tests cover success, duplicate, triage, authorization, and Box failure |
 | MT-034 | Implement the same-origin downscoped Box-token endpoint | Salesforce + Box developers | Required | Authorized folder succeeds; arbitrary/unauthorized folder fails |
 | MT-035 | Implement approval-ready and executed-agreement event endpoints | Salesforce developer | Required for full lifecycle | Allowlisted payload tests pass |
-| MT-036 | Deploy the `Box_Automate_CLM` External Client App, enable client credentials, set its dedicated Run As integration user, and store the consumer credentials in Box Automate | Salesforce/Box admins | Salesforce metadata complete; Box secret handoff remains | ECA `0xIgL000000Ok89UAC`, policy `0yOgL000000coILUAY`, user `005gL00000KmN8TQAV`, and permission assignment `0PagL00000b40CHSAY` exist; retrieve the consumer secret and configure Box without storing it in the repository |
+| MT-036 | Retrieve the `Box_Automate_CLM` consumer secret and store it in the Box-managed OAuth connection | Salesforce/Box admins | Required | Salesforce metadata is complete: ECA `0xIgL000000Ok89UAC`, policy `0yOgL000000coILUAY`, user `005gL00000KmN8TQAV`, and assignment `0PagL00000b40CHSAY`; copy the secret directly from Salesforce Setup into Box without putting it in chat, source, screenshots, or shell history |
 | MT-037 | Authenticate the Salesforce CLI and verify the target org | Salesforce operator | Required / per deploy | Alias and org ID reviewed before deployment |
 | MT-038 | Deploy `CLM_Contract__c`, its layout, tab, and `CLM_Demo_Operator`; assign the permission set | Salesforce operator | Required | Object is private, fields/layout exist, and the intended operator has access |
 | MT-039 | Deploy `clmreactapp` | Salesforce operator | Required | UI Bundle deployment succeeds in the intended org |
@@ -91,13 +91,15 @@ Status values:
 | MT-071 | Build **CLM - Redline Domain Review Routing** | Box Automate builder | Required | Inactive workflow matches the spec and folder `399080778184` |
 | MT-072 | Build **CLM - Approval Packet Readiness** | Box Automate builder | Optional / full lifecycle | Inactive workflow matches task and DocGen gates |
 | MT-073 | Build **CLM - Executed Agreement Obligations** | Box Automate builder | Optional / full lifecycle | Inactive workflow matches Sign, Extract, review, and reminder gates |
-| MT-074 | Set the Salesforce domain, supported API version, External Client App, and administrator-managed OAuth 2.0 connection | Box/Salesforce admins | Salesforce complete; Box connection required | Domain, API version, ECA, client credentials, Run As user, permission set, and standard REST paths are configured; retrieve the consumer secret and test the Box-managed connection |
+| MT-074 | Test the Box-managed OAuth 2.0 connection and bind the saved workflow to standard REST `PATCH` + `GET` | Box/Salesforce admins | Blocked on CLM-specific consumer secret | The inactive `PATCH` request is saved on connector `Agentforce Dev`, but 2026-07-14 tests failed before Salesforce login because the UI-visible legacy `Box Automate` secret does not match `Box_Automate_CLM`. Retrieve or rotate the secret for consumer key `3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL`, update Box, rerun `PATCH` twice, then add and test the `GET` lookup. |
 | MT-075 | Validate connector payload allowlist and prohibited fields | Security + integration owner | Required | Test proves file bytes, tokens, signer details, and unreviewed output are rejected |
 | MT-076 | Review trigger scope, test plan, rollback, and idempotency for each workflow | Workflow owner | Required before activation | Review evidence recorded |
 | MT-077 | Activate any Box Automate workflow | Demo owner + Box Automate admin | Confirmation required | Explicit approval obtained immediately before the final activation click |
 | MT-078 | Disable a workflow after testing or when unexpected behavior occurs | Box Automate admin | Per run / incident | Workflow is inactive and run IDs are recorded |
 
 ## G. Integrated smoke test
+
+Latest verified run: 2026-07-14. The published Form created Box intake file `2346653850589` in folder `399082115646`. The Salesforce lookup returned zero matching `CLM_Contract__c` records, confirming the current boundary at the inactive Automate workflow.
 
 | ID | Manual task | Owner | Status | Evidence / completion condition |
 |---|---|---|---|---|
@@ -124,7 +126,7 @@ Status values:
 | MT-101 | Pre-open Box workspace, App, Hub, Salesforce record, and React page | Presenter | Per presentation | All surfaces load under the correct accounts |
 | MT-102 | Confirm task states support the intended **Signature blocked** story | Legal Operations | Per presentation | Required tasks are incomplete at demo start |
 | MT-103 | Confirm named experts are available or disclose use of demo triage | Presenter | Per presentation | Routing story matches live state |
-| MT-104 | Capture new screenshots only from the real demo surfaces | Demo maintainer | After material UI change | Screenshot shows the actual Box or React demo, not documentation |
+| MT-104 | Capture new screenshots only from the real demo surfaces and page viewport | Demo maintainer | After material UI change | Screenshot shows the actual Box or React demo, not documentation, browser tabs, the address bar, or unrelated desktop content |
 | MT-105 | Rebuild and inspect the self-contained gallery after screenshot changes | Demo maintainer | After screenshot change | `output/html/clm-experience-gallery.html` opens offline |
 | MT-106 | Record test files, records, tasks, workflow runs, and generated outputs | Demo operator | Per run | Run log supports cleanup and audit |
 | MT-107 | Disable temporary workflows and restore intended task states | Box/Salesforce operators | Per run | Next rehearsal begins from the documented state |

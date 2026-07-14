@@ -348,6 +348,31 @@ The object, external ID, upsert path template, and lookup path template are alre
 
 Store OAuth client material and tokens in Box/Salesforce administrator-managed connection storage, never in this repository.
 
+#### Remaining administrator steps
+
+1. In Salesforce Setup, open **External Client App Manager** and select **Box Automate CLM Integration** (`Box_Automate_CLM`).
+2. Open **Settings**, then **Consumer Key and Secret**. Complete Salesforce identity verification if prompted.
+3. Copy the **Consumer Secret**. Do not paste it into chat, a terminal command, a repository file, or a screenshot.
+4. Open Box Automate workflow [CLM - Contract Intake Enrichment](https://kadams.ent.box.com/automate/workflow/edit/399436615012).
+5. Create or update the administrator-managed OAuth 2.0 connection with these values:
+
+   | Setting | Value |
+   |---|---|
+   | Grant type | Client Credentials |
+   | Token URL | `https://kadams-dev-ed.develop.my.salesforce.com/services/oauth2/token` |
+   | Client ID | `3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL` |
+   | Client secret | The secret copied directly from Salesforce |
+   | Scope | `api` only if Box requires a value; otherwise leave the optional field empty |
+
+6. Test the managed connection. A successful token test is the only acceptable credential check; do not expose the returned access token.
+7. Configure the approved branch to call the existing `salesforceContractUpsert` `PATCH`, followed by `salesforceContractLookup` `GET`, from `config/box/https-connectors.json`.
+8. Run the duplicate-safe test with a clearly labeled demo `contractId`: the first `PATCH` creates one record, the second updates it, and both `GET` requests return the same Salesforce ID.
+9. Leave the workflow inactive. Obtain the confirmation in section 9.3 immediately before the final activation click.
+
+Do not select the similarly named legacy **Box Automate** app. Its consumer secret does not match the pinned `Box_Automate_CLM` client ID. The dedicated Run As user is already set by deployed metadata; it does not need to be selected again in Box.
+
+If Salesforce rotates the secret later, update only the Box-managed connection and retest it. The consumer key is pinned in metadata; do not generate a new key unless rotation is intentional.
+
 ### 9.2 Validate inactive workflows
 
 For each workflow, confirm trigger scope, test folder, assignees, branches, connector payload, rollback behavior, and idempotency before activation:

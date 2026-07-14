@@ -72,7 +72,7 @@ Sections:
 
 | Section | Blocks |
 |---------|--------|
-| Contract Overview | `Active Contract Pipeline` metadata table from `clmContract`; `Risk Status` chart from `clmContract.riskLevel`; `Lifecycle Status` chart from `clmContract.status` |
+| Portfolio & Actions | Two-column rows: `Document Approval Status` donut from `clmDocument.approvalStatus`; `Document Risk Profile` donut from `clmDocument.clauseRisk`; `Documents by Type` bar from `clmDocument.documentType`; `Contract Package Status` bar from `clmDocument.versionStatus`; `Approved Clause Hub` shortcut; `Start a New Contract` Form block |
 | Northstar Deal Room | Folder/file cards for workspace `399081692991`, MSA redline `2342633195167`, order form `2342633259967`, DPA `2342633156726`, security exhibit `2342636075017`, obligation folder `399081567921` |
 | Intake and Actions | Embed `New Contract Request` form; document table from `clmDocument` filtered to pending high/critical risk. Live UI note: this Box Apps builder exposes no task-specific block, so the task-bearing review documents represent tasks `42899891150`, `42899881417`, and `42899893550`. |
 | Executed Agreements and Renewals | Folder view for `399080706253`; obligations table from `clmObligation` filtered to `status = Open` |
@@ -101,4 +101,6 @@ Sections:
 | Form submits | New request lands in folder `399082115646` |
 | Deal room cards | Cards open live folders/files and review artifacts |
 | Pending reviews | Shows legal, finance, and privacy/security tasks |
+| Portfolio charts | Shows approval, clause-risk, document-type, and version-status breakdowns from live `clmDocument` metadata |
+| Action row | Opens the published intake Form and Hub `1312630996` |
 | URL manifest | `boxAppUrl` and `boxFormUrl` are populated in `config/box/live-box-surface.json` |

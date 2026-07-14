@@ -3,7 +3,8 @@
     <clientCredentialsFlowUser>box.automate.clm+00dgl000003d0lrua0@boxdemo.com</clientCredentialsFlowUser>
     <commaSeparatedPermissionSet>CLM_Box_Automate_Integration</commaSeparatedPermissionSet>
     <externalClientApplication>Box_Automate_CLM</externalClientApplication>
-    <ipRelaxationPolicyType>Enforce</ipRelaxationPolicyType>
+    <!-- Box Automate has no stable egress IP set. Bypass is paired with the dedicated minimum-access Run As user, API-only scope, admin preauthorization, and an administrator-managed secret. -->
+    <ipRelaxationPolicyType>Bypass</ipRelaxationPolicyType>
     <isClientCredentialsFlowEnabled>true</isClientCredentialsFlowEnabled>
     <isGuestCodeCredFlowEnabled>false</isGuestCodeCredFlowEnabled>
     <isTokenExchangeFlowEnabled>false</isTokenExchangeFlowEnabled>

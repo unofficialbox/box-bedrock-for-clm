@@ -133,7 +133,7 @@ Config artifacts:
 | `config/box/automate-workflows.json` | Automate workflow stages, guardrails, and live object bindings |
 | `config/box/extract-field-prompts.json` | Field-level Extract prompts and validation expectations |
 | `config/box/ai-agent-specs.json` | Box AI Agent instructions and human-review boundary |
-| `config/box/https-connectors.json` | Salesforce standard REST external-ID upsert/lookup plus remaining custom lifecycle operations; deployed origin, API version, and OAuth connection remain unresolved |
+| `config/box/https-connectors.json` | Salesforce standard REST external-ID upsert/lookup, deployed External Client App IDs, live REST verification, and the remaining Box-managed consumer-secret/OAuth test |
 | `config/clm/redline-finding.schema.json` | Structured contract for cited, risk-classified redline findings |
 | `config/clm/expert-routing.json` | Deterministic domain-to-expert directory with Legal Operations fallback |
 | `config/box/hub-blueprint.md` | Lived-in approved clause Hub content and governance blueprint |
@@ -158,6 +158,8 @@ Rebuild the offline experience gallery after replacing any screenshot:
 ```bash
 python3 scripts/build_clm_experience_gallery.py
 ```
+
+Capture screenshots from the real Box or React page viewport only. Do not include browser tabs, the address bar, or unrelated desktop content.
 
 Run the high-complexity local mock from this directory:
 

@@ -13,8 +13,28 @@
   },
   "boxAppUrl": "https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn",
   "boxFormUrl": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858",
+  "boxFormSmokeTest": {
+    "date": "2026-07-14",
+    "status": "box-intake-passed-salesforce-not-created",
+    "counterparty": "Northstar Health System - CLM Smoke 2026-07-14",
+    "destinationFolderId": "399082115646",
+    "uploadedFileId": "2346653850589",
+    "uploadedFileUrl": "https://kadams.ent.box.com/file/2346653850589",
+    "salesforceMatches": 0,
+    "note": "The published Form submitted successfully and Box created the intake file. No CLM_Contract__c record was created because workflow 399436615012 remains an inactive draft pending the OAuth connection and standard REST connector update."
+  },
   "boxAppEnhancements": {
     "status": "live",
+    "homeSection": "Portfolio & Actions",
+    "appDescription": "Operational CLM cockpit for governed intake, document risk, approvals, approved clauses, execution, and renewal readiness.",
+    "homeBlocks": [
+      "Document Approval Status donut",
+      "Document Risk Profile donut",
+      "Documents by Type bar chart",
+      "Contract Package Status bar chart",
+      "Approved Clause Hub shortcut",
+      "Start a New Contract form"
+    ],
     "page": "Clause Library",
     "viewUrl": "https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn/view/vBiTv7ZMarRKq9QpJ",
     "sourceFolderId": "399419341582",
@@ -178,7 +198,6 @@
   },
   "remainingManualBuild": [
     "Update the saved workflow to the Salesforce standard REST upsert and lookup steps, configure OAuth 2.0, then explicitly approve Automate activation.",
-    "Submit one end-to-end New Contract Request smoke test and verify the uploaded package lands in intake folder 399082115646.",
     "Create a Box Sign packet from the approved package when ready."
   ]
 }
