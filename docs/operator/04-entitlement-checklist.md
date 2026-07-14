@@ -17,7 +17,7 @@ Have administrators complete this before external writes. Product names and avai
 | Salesforce metadata deployment | Both | Salesforce admin | `sf org display` matches the configured org and the operator can validate a deployment |
 | Salesforce API-only integration user | Box Automate–Led Agentic Orchestration | Salesforce admin | Minimum-access integration profile/license is available |
 | Salesforce External Client App | Box Automate–Led Agentic Orchestration | Salesforce admin | External Client App Manager allows client credentials and Run As configuration |
-| Salesforce Agentforce | Agentic/agent-assisted features | Agentforce admin | Agent builder and required action registration surfaces open |
+| Salesforce Agentforce | Both | Agentforce admin | Agent builder and required action registration surfaces open |
 | Salesforce UI Bundle | Cross-Platform Agentic Orchestration | Salesforce admin | UI Bundle metadata can deploy and be placed on the intended page |
 | AWS AgentCore/Strands | Managed Agentic mode only | AWS admin | Runtime, roles, network path, trace, and cost controls pass deployment tests |
 | Databricks | Managed Agentic mode only | Databricks admin | Read-only warehouse/query path returns the synthetic analytics dataset |
