@@ -372,7 +372,7 @@
     "experienceGallery": {
       "path": "output/html/agentic-orchestration-gallery.html",
       "builder": "scripts/build_clm_experience_gallery.py",
-      "screenshotCount": 11,
+      "screenshotCount": 13,
       "externalReferences": false
     },
     "runbook": "docs/runbooks/04-box-agentforce-react-demo.md",

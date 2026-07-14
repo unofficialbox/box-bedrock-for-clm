@@ -41,7 +41,7 @@ Contract package:
 | Box Hub | Live | `Acme Contract Clause Library` Hub `1312630996` contains the live clause folder, current-standard operations callout, intake/App/executed-agreement cards, and governance content |
 | Experience galleries | Complete | Separate Governed Workflow and Agentic Orchestration HTML galleries embed only their scenario screenshots with no browser tabs or external references |
 | Box Sign | Not started | Needs execution packet flow |
-| Box + Agentforce + React demo | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and primary runbook are ready; live Salesforce deployment and runtime IDs remain |
+| Box + Agentforce + React supporting flow | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and supporting split runbook are ready; live Salesforce deployment and runtime IDs remain |
 | Redline expert router | Local specification complete | Structured finding schema, deterministic expert directory, triage controls, domain-grouped React queues, and Agentforce/HTTPS contracts are ready; named Box collaborators and live workflow activation remain |
 | Presentation package | Complete | Executive, Legal Operations, and technical scripts; reusable Box Form → Automate → HTTPS Connector entry module; rendered flows; JSON and Markdown component manifests |
 | Operator documentation | Complete | `docs/runbooks/05-demo-setup-and-activation.md` covers end-to-end bring-up; `docs/manual-task-register.md` inventories all known manual and confirmation-gated tasks |

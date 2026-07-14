@@ -21,6 +21,6 @@
 
 ## Runtime boundary
 
-Included: Box, Box Automate and content services, Agentforce agents, Salesforce records and Multi-Framework React, Databricks analytics, AWS Bedrock AgentCore, Strands agents, and human approval controls.
+Included: Box content services, Agentforce agents, Salesforce records and Multi-Framework React, Databricks analytics, AWS Bedrock AgentCore, Strands agents, and human approval controls. Box Automate is present as a shared intake asset but remains inactive and is not executed in this scenario's presenter path.
 
 Current truth: the React experience and Box surfaces are available; the AgentCore flow is represented by a deterministic local trace. Do not present managed AWS or Databricks screens as live until deployed and captured.

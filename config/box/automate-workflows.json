@@ -53,8 +53,7 @@
           "Submit New Contract Request",
           "Run Extract and Box AI Agent",
           "Require human validation",
-          "Call Salesforce standard REST upsert and lookup only on Approved",
-          "Open React with returned Salesforce and Box context"
+          "Call Salesforce standard REST upsert and lookup only on Approved"
         ]
       },
       "payloadConstruction": {
