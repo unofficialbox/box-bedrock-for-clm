@@ -7,7 +7,7 @@ This repository contains two presenter-ready CLM scenario packages built on the 
 | Scenario | Model | Primary surface | Scope |
 |---|---|---|---|
 | [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, Box and Agentforce agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
-| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Everything in Governed Workflow plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation |
+| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Shared governed assets plus the React workspace, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation; Box Automate remains inactive |
 
 Start with the [scenario selector](docs/scenarios/README.md), then use [setup and activation](docs/runbooks/05-demo-setup-and-activation.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md).
 
