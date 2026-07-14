@@ -20,61 +20,67 @@ EXPERIENCES = [
         "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Agentforce copilot rail.",
     },
     {
-        "file": "clm-react-approvals.png",
-        "eyebrow": "React approvals",
-        "title": "Human approval control center",
-        "description": "The running demo app's approval view, grounded in the live legal, finance, and privacy Box task identifiers.",
+        "file": "clm-react-redline-reviews.png",
+        "eyebrow": "React redline reviews",
+        "title": "Domain expert review queue",
+        "description": "The running demo app groups cited differences into human-owned Commercial Legal, Finance, and Privacy reviews grounded in live Box task identifiers.",
     },
     {
-        "file": "box-app-dashboard-draft.jpeg",
+        "file": "box-app-dashboard-live.png",
         "eyebrow": "Box Apps",
         "title": "Contract Lifecycle Management dashboard",
-        "description": "The real Box App dashboard with live workspace content, task views, contract workstreams, and portfolio signals.",
+        "description": "The published Box App cockpit with live approval, risk, document-type, and package-status charts arranged in a production two-column layout, plus direct intake and approved-clause actions.",
     },
     {
-        "file": "box-app-clause-library-live.jpeg",
+        "file": "box-app-dashboard-actions-live.png",
+        "eyebrow": "Box Apps actions",
+        "title": "Intake, clauses, and deal room",
+        "description": "The published dashboard action row opens the governed intake Form and approved-clause Hub directly, followed by live Northstar workspace and contract-document cards.",
+    },
+    {
+        "file": "box-app-clause-library-live.png",
         "eyebrow": "Box Apps",
         "title": "Clause Library dashboard page",
         "description": "The saved Box App page combining the approved-clause view, source folder, and a live standard-versus-fallback chart.",
     },
     {
-        "file": "box-app-approved-standards-view.jpeg",
+        "file": "box-app-approved-standards-view.png",
         "eyebrow": "Box Apps view",
         "title": "Approved clause standards",
         "description": "The live metadata-backed Box Apps view over individual Markdown clause files in the CLM clause library.",
     },
     {
-        "file": "box-form-new-contract-request.jpeg",
+        "file": "box-form-new-contract-request.png",
         "eyebrow": "Box Forms",
         "title": "New Contract Request",
         "description": "The published intake form used to capture requester, counterparty, commercial terms, target date, and the contract package.",
     },
     {
-        "file": "box-hub-clause-library-live.jpeg",
+        "file": "box-hub-clause-library-live.png",
         "eyebrow": "Box Hubs",
         "title": "Acme Contract Clause Library",
         "description": "The saved Hub, populated with the governed clause folder, current ownership, and review-cadence guidance so the experience feels maintained.",
     },
     {
-        "file": "automate-saved-draft.jpeg",
+        "file": "automate-saved-draft.png",
         "eyebrow": "Box Automate",
         "title": "Intake, Extract, and AI Agent",
         "description": "The saved inactive workflow draft with the published form trigger, Enhanced Extract Agent, and Box Agent review instructions.",
     },
     {
-        "file": "automate-approval-flow.jpeg",
+        "file": "automate-approval-flow.png",
         "eyebrow": "Box Automate",
         "title": "Human validation gate",
         "description": "The workflow's approval task and approved/rejected branches, preserving human accountability before downstream actions.",
     },
     {
-        "file": "automate-https-connector.jpeg",
+        "file": "automate-https-connector.png",
         "eyebrow": "Box Automate",
         "title": "HTTPS connector stage",
-        "description": "The existing connector selection in the saved Box Automate draft. Before activation, update it to the specified Salesforce standard REST external-ID upsert and lookup operations, then configure the deployed origin and administrator-managed OAuth 2.0 connection.",
+        "description": "The saved Salesforce standard REST external-ID PATCH request with the deployed My Domain, OAuth 2.0, JSON header, and deterministic smoke payload. Testing remains blocked until the CLM-specific consumer secret replaces the legacy app secret.",
     },
     {
-        "file": "box-docgen-templates.jpeg",
+        "file": "box-docgen-templates.png",
         "eyebrow": "Box Doc Gen",
         "title": "CLM document templates",
         "description": "The signed-in Box Doc Gen catalog containing the approval memo, commercial order summary, and renewal notice templates.",
@@ -175,12 +181,12 @@ def build() -> None:
   <header>
     <div>
       <p class="kicker">Acme Robotics · Contract Lifecycle Management</p>
-      <h1>One contract journey. Eleven real experiences.</h1>
+      <h1>One contract journey. Twelve real experiences.</h1>
       <p>An offline, self-contained visual walkthrough of the Box, Agentforce, and React CLM demo. Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
     </div>
     <aside class="status">
-      <strong>Capture state · July 13, 2026</strong>
-      <span>The Box App and Hub are shown in their saved live state. Automate is shown as a saved, inactive draft pending its update to Salesforce standard REST and a confirmed OAuth 2.0 connection.</span>
+      <strong>Capture state · July 14, 2026</strong>
+      <span>The Box App and Hub are shown in their saved live state. Automate is shown as a saved, inactive draft with Salesforce standard REST configured and its OAuth test pending the CLM-specific consumer secret.</span>
     </aside>
   </header>
   <main>

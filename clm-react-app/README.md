@@ -70,7 +70,7 @@ The source project contains the complete non-secret OAuth configuration:
 - `force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml`
 - `scripts/configure-clm-oauth.sh`
 
-The app requests only the Salesforce `Api` OAuth scope. Metadata enables client credentials, requires a consumer secret, uses the admin-preauthorized permission-set policy, and binds the dedicated `box.automate.clm+00dgl000003d0lrua0@boxdemo.com` Run As user. The consumer key is safe to version and is pinned to prevent accidental rotation. The consumer secret and access tokens must never be stored in this repository.
+The app requests only the Salesforce `Api` OAuth scope. Metadata enables client credentials, requires a consumer secret, uses the admin-preauthorized permission-set policy, relaxes IP restrictions for the trusted Box server-to-server client, and binds the dedicated `box.automate.clm+00dgl000003d0lrua0@boxdemo.com` Run As user. The consumer key is safe to version and is pinned to prevent accidental rotation. The consumer secret and access tokens must never be stored in this repository.
 
 For org `00DgL000003D0LRUA0`, the automation script is idempotent and:
 
@@ -81,6 +81,19 @@ For org `00DgL000003D0LRUA0`, the automation script is idempotent and:
 5. Verifies the user, assignment, and app.
 
 The only remaining secret-bearing step is to retrieve the External Client App consumer secret and store it with the recorded consumer key in the Box Automate managed OAuth 2.0 connection. Then test the token and standard REST external-ID upsert/lookup before activating the workflow.
+
+Operator values for that Box-managed connection:
+
+- Salesforce External Client App: `Box Automate CLM Integration`
+- Client ID / consumer key: `3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL`
+- Token URL: `https://kadams-dev-ed.develop.my.salesforce.com/services/oauth2/token`
+- Grant type: OAuth 2.0 client credentials
+- Scope: `api` if Box requires a scope value; otherwise leave the optional scope field empty
+- Secret: retrieve it in Salesforce Setup and paste it directly into Box; never place it in chat, source, screenshots, or shell history
+
+Do not use the similarly named legacy **Box Automate** app. Its consumer secret does not match the pinned `Box_Automate_CLM` client ID. If the CLM app is not visible in External Client App Manager, retrieve or rotate its OAuth consumer secret through Salesforce's supported External Client App credentials administration path before retrying Box.
+
+Use Box workflow `399436615012` for the connection test. Keep the workflow inactive until its REST steps and idempotency test pass and the demo owner explicitly approves activation.
 
 The legacy `Box_Automate_CLM_Integration` Connected App metadata remains in source as a fallback for older orgs; it is not the primary configuration.
 

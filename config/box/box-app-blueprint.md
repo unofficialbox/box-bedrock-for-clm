@@ -17,14 +17,18 @@
 
 ## Sections
 
-### 1. Contract Overview
+### 1. Portfolio & Actions
 
 | Block | Source |
 |-------|--------|
-| Contract pipeline table | `clmContract` metadata |
-| Risk status donut | `riskLevel` |
-| Status chart | `status` |
-| Target signature date view | `targetSignatureDate` |
+| Document Approval Status donut | `clmDocument.approvalStatus` |
+| Document Risk Profile donut | `clmDocument.clauseRisk` |
+| Documents by Type bar | `clmDocument.documentType` |
+| Contract Package Status bar | `clmDocument.versionStatus` |
+| Approved Clause Hub shortcut | `https://kadams.ent.box.com/hubs/1312630996` |
+| Start a New Contract form | Published `New Contract Request` form, open in a new tab |
+
+Use two equal chart columns. Keep approval and risk in the first row, document type and package status in the second row, and the Hub and Form actions in the third row.
 
 ### 2. Northstar Deal Room
 
@@ -58,4 +62,4 @@ Make the Box App feel like an operational dashboard, not a sparse file browser. 
 
 ## Manual Build Boundary
 
-The live Box workspace, metadata, uploaded files, tags, descriptions, and review tasks are already created. The Box App dashboard itself still needs to be assembled in Box Apps through the Box web UI; the CLI does not expose a dashboard-builder command. Use `config/box/box-app-builder-checklist.md` as the click-by-click build checklist.
+The live Box workspace, metadata, uploaded files, tags, descriptions, review tasks, Form, Hub, and dashboard are published. The Box App builder remains a browser-only maintenance boundary; the CLI does not expose a dashboard-builder command. Use `config/box/box-app-builder-checklist.md` when rebuilding or changing the live layout.

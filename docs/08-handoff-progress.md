@@ -29,16 +29,17 @@ Contract package:
 | Architecture diagram | Created | Mermaid source and rendered SVG in `docs/diagrams/` |
 | Live Box workspace | Created | Kyle-owned `CLM-2026-Northstar` folder `399081692991` at the Box root in enterprise `5105484` |
 | Box App | Published | `Contract Lifecycle Management` is live at the URL recorded in `config/box/live-box-surface.json` |
-| Box App rich dashboard additions | Live | Clause Library page includes the live approved-clause View, source folder, and standard/fallback chart |
+| Box App rich dashboard additions | Live | Home opens with two-column approval, risk, document-type, and package-status charts plus direct Form and Hub actions; Clause Library includes the approved-clause View, source folder, and standard/fallback chart |
 | Box metadata | Four live, one specified | `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` are live; `clmRedlineReview` is specified but not created |
 | Box tasks | Created | Legal, finance, and privacy/security review tasks assigned to `kadams@boxdemo.com` |
 | Box Form | Published | `New Contract Request` is live at the URL recorded in `config/box/live-box-surface.json` |
+| Box Form smoke test | Box intake passed; downstream activation pending | On 2026-07-14 the published Form created intake file `2346653850589` in folder `399082115646`; Salesforce returned zero matching `CLM_Contract__c` records because Automate workflow `399436615012` remains inactive |
 | Box AI / AI Studio | Staged in Automate | Box Agent instructions review the live MSA against the approved clause library and require human validation |
 | Box DocGen | Created | Approval memo, order-form summary, and renewal notice are marked as live DocGen templates in folder `399363530207` |
-| Box Automate | Saved draft, inactive; update required | Workflow `399436615012` contains the Form trigger, Extract fields, Box Agent, approval task, and branches; replace the prior connector selection with standard Salesforce REST external-ID upsert and lookup, then configure origin and OAuth 2.0 |
+| Box Automate | Saved draft, inactive; OAuth credential blocked | Workflow `399436615012` now uses the correct `Agentforce Dev` My Domain, OAuth 2.0, JSON header, and a deterministic standard REST `PATCH` smoke request. Box test attempts fail before Salesforce login because the supplied secret came from the legacy `Box Automate` app rather than `Box_Automate_CLM`; the GET lookup and dynamic field bindings remain after the CLM-specific secret is corrected. |
 | Clause library | Live content | Eight governed Markdown clauses plus README are uploaded under live folder `399419341582` with `clmClause` metadata |
 | Box Hub | Live | `Acme Contract Clause Library` Hub `1312630996` contains the live clause folder and governance content |
-| Experience gallery | Complete | `output/html/clm-experience-gallery.html` embeds 11 screenshots from the real Box and React demo experiences with no external references |
+| Experience gallery | Complete | `output/html/clm-experience-gallery.html` embeds 12 current, page-viewport screenshots from the real Box and React demo experiences with no browser tabs or external references |
 | Box Sign | Not started | Needs execution packet flow |
 | Box + Agentforce + React demo | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and primary runbook are ready; live Salesforce deployment and runtime IDs remain |
 | Redline expert router | Local specification complete | Structured finding schema, deterministic expert directory, triage controls, domain-grouped React queues, and Agentforce/HTTPS contracts are ready; named Box collaborators and live workflow activation remain |
@@ -60,6 +61,8 @@ Contract package:
 - Created dedicated Salesforce Integration user `box.automate.clm+00dgl000003d0lrua0@boxdemo.com` (`005gL00000KmN8TQAV`) on the minimum-access API-only profile and assigned only `CLM_Box_Automate_Integration` (`0PagL00000b40CHSAY`, plus the platform-generated integration-license permission set).
 - Added idempotent reconciliation script `clm-react-app/scripts/configure-clm-oauth.sh`; repeated execution completed successfully without creating duplicate users, permission assignments, or apps.
 - Pinned the generated consumer key in metadata with key and secret rotation disabled for repeat deployments. The consumer secret is intentionally not retrievable through Metadata API and must be transferred directly into the Box-managed OAuth connection.
+- Deployed OAuth IP policy `Bypass` for the trusted Box server-to-server client (deployment `0AfgL00000R9BXmSAN`). Tooling verification confirms client credentials, the API scope, dedicated Run As user, preauthorized permission set, and OAuth plugin are enabled.
+- Saved the inactive Box workflow with connector `Agentforce Dev`, API v67.0 external-ID `PATCH`, `Content-Type: application/json`, and a deterministic smoke payload. Repeated tests return Box `Request Failed` with no Salesforce login-history event, isolating the remaining failure to the consumer secret. Salesforce Setup currently exposes only the older `Box Automate` app, whose secret does not match the pinned `Box_Automate_CLM` consumer key.
 
 ---
 

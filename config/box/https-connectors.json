@@ -3,7 +3,7 @@
     {
       "key": "salesforce-clm-rest",
       "name": "Salesforce CLM REST API",
-      "status": "external-client-app-deployed-run-as-configured-pending-box-secret-and-oauth-test",
+      "status": "box-request-configured-inactive-oauth-blocked-by-clm-secret-handoff",
       "allowedDomain": "kadams-dev-ed.develop.my.salesforce.com",
       "apiVersion": "67.0",
       "purpose": "Use Salesforce standard REST resources for CLM record upsert and lookup; no custom Apex is required for intake.",
@@ -33,7 +33,9 @@
           "permissionSetId": "0PSgL00000IR6zpWAD",
           "permissionSetAssignmentId": "0PagL00000b40CHSAY",
           "consumerKey": "3MVG9dAEux2v1sLvqwMv.uh.fDj5.dT8YnFSByxksfuDj98cOZNQ_wZR2AVRszo9bAJ0cpGPaJu4xAJyBmoUL",
-          "deployedAt": "2026-07-14T07:57:23-04:00"
+          "ipRelaxationPolicy": "Bypass",
+          "deployedAt": "2026-07-14T07:57:23-04:00",
+          "oauthPolicyUpdatedAt": "2026-07-14T10:10:08-04:00"
         },
         "liveRestVerification": {
           "verifiedAt": "2026-07-13T21:30:31-04:00",
@@ -44,6 +46,15 @@
           "updateCreated": false,
           "matchingRecordCount": 1,
           "dataStorageRemainingMB": 1
+        },
+        "boxOauthVerification": {
+          "testedAt": "2026-07-14T10:12:00-04:00",
+          "workflowId": "399436615012",
+          "boxConnector": "Agentforce Dev",
+          "request": "PATCH /services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/CLM-BOX-AUTOMATE-SMOKE-20260714-1410",
+          "status": "failed-token-acquisition",
+          "evidence": "Box returned Request Failed and Salesforce LoginHistory recorded no OAuth login. The secret copied from the UI-visible legacy Box Automate app does not match the pinned Box_Automate_CLM consumer key.",
+          "nextAction": "Retrieve or rotate the consumer secret for Box Automate CLM Integration, update the Box-managed credential, and rerun the inactive PATCH test before configuring the GET lookup."
         },
         "secretStorage": "Administrator-managed; never store tokens or client secrets in this repository."
       },
