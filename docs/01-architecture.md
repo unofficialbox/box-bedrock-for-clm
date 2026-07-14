@@ -3,7 +3,7 @@
 ## Design Principles
 
 1. **One content foundation** - Box stores contract documents, signatures, metadata, versions, and audit trail for the demo.
-2. **One presenter path** - The React UI Bundle, Agentforce, and live Box surfaces form a single end-to-end CLM experience.
+2. **Two explicit presenter paths** - Governed Workflow stays Box-centric; Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands without blurring readiness.
 3. **Human accountability** - AI drafts, summarizes, compares, extracts, and recommends. Humans approve legal positions, concessions, signatures, and obligations.
 4. **Composable integrations** - Box remains the system of record for unstructured contract content, Salesforce remains the system of record for structured deal data, and Databricks provides governed analytics context.
 5. **Reusable demo factory** - Domain-specific demos reuse the same abstraction layers, metadata conventions, agent patterns, and handoff workflow.
@@ -50,7 +50,9 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 ---
 
-## Optional Future: Custom AWS AgentCore Architecture
+## Scenario B: Agentic Orchestration
+
+This is the end-state, supervisor-led scenario. Its architecture is intentional, but its current implementation status remains specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
 
 Rendered diagram: [CLM AgentCore Architecture](diagrams/clm-agentcore-architecture.svg)
 
@@ -122,7 +124,7 @@ Box Sign + Obligation Monitor
 |-------|-------------------|-------------|---------------------|
 | Demo scenario | Persona, business object, high-stakes workflow | Commercial contract package | Asset campaign, government case file, claim, loan, portfolio review |
 | Content schema | Folder template + metadata templates | Contract workspace, documents, obligations | Asset library, evidence packet, policy, loan docs |
-| Experience tier | Low, medium, high demo style | Box App, coworker, AgentCore | Same three tiers |
+| Scenario model | Governed workflow or agentic orchestration | Box-led deterministic path or supervisor-led full stack | Preserve the same two-track distinction |
 | Agent roles | Intake, classify, risk, approve, monitor | Contract intake, clause risk, approval, obligations | Rename to domain-specific roles |
 | System connectors | Content, CRM, Databricks analytics | Box, Salesforce, Databricks | Box plus domain system and Databricks analytics |
 | Sample data | Synthetic PDFs + JSON records | MSA/DPA/SOW/order form | Domain-specific records and files |
@@ -144,9 +146,9 @@ Box Sign + Obligation Monitor
 
 ---
 
-## Primary Architecture: Box + Agentforce + React
+## Scenario A: Governed Workflow
 
-This is the presenter-facing architecture. The only runtime participants are Box, Agentforce, and the Salesforce Multi-Framework React UI Bundle. The Salesforce platform hosts the UI and Agentforce; it is not presented as a separate integration tier.
+This is the Box-centric, deterministic presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. The existing React diagram remains a supporting continuation for teams that want to open the resulting Salesforce record, but React is not required for this scenario.
 
 Rendered diagram: [Box + Agentforce + React architecture](diagrams/clm-box-agentforce-react.svg)
 

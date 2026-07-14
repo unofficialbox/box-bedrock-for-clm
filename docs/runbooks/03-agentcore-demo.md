@@ -1,8 +1,12 @@
-# Runbook: Multi-Agent Workflow Orchestration Demo
+# Runbook: Agentic Orchestration
 
 ## Goal
 
-Show the highest AI maturity path: purpose-built multi-agent workflow orchestration using Bedrock AgentCore as the orchestration layer, Box agents for unstructured data, Salesforce agents for structured data, and Databricks agents for governed data-lake analytics.
+Show the end-state multi-agent path: AWS Bedrock AgentCore and Strands coordinate Box agents for unstructured data, Salesforce and Agentforce agents for structured work, Databricks agents for governed analytics, and the Salesforce Multi-Framework React workspace as the presenter surface.
+
+Scenario package: [Agentic Orchestration](../scenarios/agentic-orchestration/README.md)
+
+Readiness boundary: the orchestration trace is locally executable; do not represent AgentCore, Strands, or Databricks as deployed until their managed integrations and screenshots are verified.
 
 ## Agent Layers
 

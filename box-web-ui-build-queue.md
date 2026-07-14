@@ -30,7 +30,7 @@ python3 update-box-web-urls.py --app-url '<published-clm-app-url>' --form-url '<
 2. Build the CLM Box App dashboard.
 3. Publish both.
 4. Update `config/box/live-box-surface.json` with the published URLs.
-5. Re-run the primary demo from `docs/runbooks/04-box-agentforce-react-demo.md`.
+5. Re-run the Governed Workflow scenario from `docs/scenarios/governed-workflow/demo-script.md`.
 
 ## New Contract Request Form
 

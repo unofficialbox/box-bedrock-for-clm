@@ -19,9 +19,9 @@ Contract package:
 | Area | Status | Notes |
 |------|--------|-------|
 | CLM directory | Created | `/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm` |
-| README | Current | Defines one primary Box + Agentforce + React demo and an optional AgentCore experiment |
-| Core docs | Current | Architecture, controls, scripts, live handoff, and component manifests reflect the primary demo |
-| Runbooks | Consolidated | `04-box-agentforce-react-demo.md` is primary; `03-agentcore-demo.md` is an optional prototype |
+| README | Current | Defines separate Governed Workflow and Agentic Orchestration presenter tracks |
+| Core docs | Current | Each scenario has its own script, component manifest, screenshot manifest, machine-readable manifest, diagram, and gallery |
+| Runbooks | Separated | Governed Workflow leads with Box; Agentic Orchestration uses the AgentCore/Strands runbook and React presenter surface |
 | Sample data | Generated | Synthetic PDFs, JSON records, playbook, and analytics CSV in `output/` |
 | Generation script | Created | `scripts/generate_sample_contract_assets.py` |
 | Box config | Drafted | Metadata templates, folder template, and Box App blueprint under `config/box/` |
@@ -39,7 +39,7 @@ Contract package:
 | Box Automate | Saved draft, inactive; OAuth credential blocked | Workflow `399436615012` now uses the correct `Agentforce Dev` My Domain, OAuth 2.0, JSON header, and a deterministic standard REST `PATCH` smoke request. Box test attempts fail before Salesforce login because the supplied secret came from the legacy `Box Automate` app rather than `Box_Automate_CLM`; the GET lookup and dynamic field bindings remain after the CLM-specific secret is corrected. |
 | Clause library | Live content | Eight governed Markdown clauses plus README are uploaded under live folder `399419341582` with `clmClause` metadata |
 | Box Hub | Live | `Acme Contract Clause Library` Hub `1312630996` contains the live clause folder, current-standard operations callout, intake/App/executed-agreement cards, and governance content |
-| Experience gallery | Complete | `output/html/clm-experience-gallery.html` embeds 12 current, page-viewport screenshots from the real Box and React demo experiences with no browser tabs or external references |
+| Experience galleries | Complete | Separate Governed Workflow and Agentic Orchestration HTML galleries embed only their scenario screenshots with no browser tabs or external references |
 | Box Sign | Not started | Needs execution packet flow |
 | Box + Agentforce + React demo | Local implementation complete | React UI Bundle, Agentforce action contract, architecture diagram, and primary runbook are ready; live Salesforce deployment and runtime IDs remain |
 | Redline expert router | Local specification complete | Structured finding schema, deterministic expert directory, triage controls, domain-grouped React queues, and Agentforce/HTTPS contracts are ready; named Box collaborators and live workflow activation remain |

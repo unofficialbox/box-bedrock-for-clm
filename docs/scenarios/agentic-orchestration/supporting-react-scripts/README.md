@@ -1,6 +1,6 @@
-# Box + Agentforce + React CLM Demo Scripts
+# Supporting Box + Agentforce + React Scripts
 
-These scripts present the same Northstar CLM scenario at three depths. All three use only Box, Agentforce, and the Salesforce Multi-Framework React app. The optional Form-led entry module can replace the opening of any walkthrough.
+These supporting scripts present the React portion of Agentic Orchestration at three depths. They intentionally stop short of AgentCore, Strands, and Databricks; use the parent [Agentic Orchestration script](../demo-script.md) for the complete scenario.
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|
@@ -11,11 +11,11 @@ These scripts present the same Northstar CLM scenario at three depths. All three
 
 Supporting artifacts:
 
-- [Demo flow diagram](../../diagrams/clm-box-agentforce-react-demo-flow.svg)
-- [Box Form entry-point diagram](../../diagrams/clm-box-form-automate-entry.svg)
+- [Demo flow diagram](../../../diagrams/clm-box-agentforce-react-demo-flow.svg)
+- [Box Form entry-point diagram](../../../diagrams/clm-box-form-automate-entry.svg)
 - [Human-readable component manifest](component-manifest.md)
-- [Machine-readable component manifest](../../../config/demo/box-agentforce-react-demo-manifest.json)
-- [Agentforce action contract](../../../config/agentforce/clm-react-agentforce-spec.json)
+- [Machine-readable component manifest](../../../../config/demo/box-agentforce-react-demo-manifest.json)
+- [Agentforce action contract](../../../../config/agentforce/clm-react-agentforce-spec.json)
 
 ## Shared presenter rule
 

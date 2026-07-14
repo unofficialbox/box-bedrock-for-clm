@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This is the primary CLM demo. It uses only Box, Agentforce, and the Salesforce-hosted Multi-Framework React app. It does not call AWS Bedrock AgentCore, Strands, Databricks, or external custom middleware.
+This is a supporting Box + Agentforce + React deep dive. Use [Governed Workflow](../scenarios/governed-workflow/README.md) for the Box-centric presenter path or [Agentic Orchestration](../scenarios/agentic-orchestration/README.md) for the complete multi-platform story.
 
 Before running this script, complete [CLM Demo Setup and Activation](05-demo-setup-and-activation.md) and review the [manual-task register](../manual-task-register.md). Do not claim the integrated path is live unless the Level C smoke test passes.
 
@@ -10,13 +10,13 @@ Source diagram: [Box + Agentforce + React architecture](../diagrams/clm-box-agen
 
 Presentation package:
 
-- [Executive walkthrough](../demo-scripts/box-agentforce-react/01-executive-walkthrough.md)
-- [Legal Operations walkthrough](../demo-scripts/box-agentforce-react/02-legal-operations-walkthrough.md)
-- [Technical validation](../demo-scripts/box-agentforce-react/03-technical-validation.md)
-- [Box Form entry-point variation](../demo-scripts/box-agentforce-react/04-box-form-automate-entry.md)
+- [Executive walkthrough](../scenarios/agentic-orchestration/supporting-react-scripts/01-executive-walkthrough.md)
+- [Legal Operations walkthrough](../scenarios/agentic-orchestration/supporting-react-scripts/02-legal-operations-walkthrough.md)
+- [Technical validation](../scenarios/agentic-orchestration/supporting-react-scripts/03-technical-validation.md)
+- [Box Form entry-point variation](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md)
 - [Rendered demo flow](../diagrams/clm-box-agentforce-react-demo-flow.svg)
 - [Rendered Box Form entry flow](../diagrams/clm-box-form-automate-entry.svg)
-- [Component manifest](../demo-scripts/box-agentforce-react/component-manifest.md)
+- [Component manifest](../scenarios/agentic-orchestration/supporting-react-scripts/component-manifest.md)
 - [Machine-readable manifest](../../config/demo/box-agentforce-react-demo-manifest.json)
 
 ## Experience boundary
@@ -41,7 +41,7 @@ Presentation package:
 | Approval memo DocGen template | File `2344242775119` |
 | Renewal notice DocGen template | File `2344244747613` |
 | Approved clause library | Folder `399419341582`; metadata template `9ca0de81-5f96-4158-82f7-1251b28a9c6e` |
-| Offline experience gallery | `output/html/clm-experience-gallery.html` |
+| Offline experience gallery | `output/html/agentic-orchestration-gallery.html` |
 | Salesforce CLM record | `CLM_Contract__c` and metadata-managed External Client App are deployed to `agentforce`; direct REST create/update/lookup passed with record `a7IgL000000WYWPUA4`; only the Box consumer-secret handoff and OAuth test remain |
 
 ## Presenter flow
@@ -49,7 +49,7 @@ Presentation package:
 Choose one entry point before the session:
 
 - **Existing-record entry:** open React with a prepared Salesforce record for a shorter, repeatable walkthrough.
-- **Box Form entry variation:** run [Box Form to Salesforce Record](../demo-scripts/box-agentforce-react/04-box-form-automate-entry.md), then continue in the React workspace. This variation requires the deployed object, configured Salesforce OAuth 2.0 REST connection, and an explicitly activated Automate workflow.
+- **Box Form entry variation:** run [Box Form to Salesforce Record](../scenarios/agentic-orchestration/supporting-react-scripts/04-box-form-automate-entry.md), then continue in the React workspace. This variation requires the deployed object, configured Salesforce OAuth 2.0 REST connection, and an explicitly activated Automate workflow.
 
 | Act | Show | Agentforce moment | Control |
 |---|---|---|---|

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Make the primary Box + Agentforce + React demo obvious while preserving the optional AgentCore prototype and all live Box identifiers.
+Keep the Governed Workflow and Agentic Orchestration presenter packages obvious while preserving shared live Box identifiers.
 
 ## Recommended Target Structure
 
@@ -31,7 +31,7 @@ box-agentforce-clm-demo/
 │   ├── screenshots/
 │   └── experience-gallery.html
 ├── experiments/
-│   └── agentcore/               # optional, excluded from primary demo path
+│   └── agentcore/               # Agentic Orchestration runtime assets
 ├── docs/
 │   ├── architecture.md
 │   ├── controls.md
@@ -43,7 +43,7 @@ box-agentforce-clm-demo/
 
 ## Consolidation Recommendations
 
-### 1. Isolate AgentCore
+### 1. Keep AgentCore bounded to Agentic Orchestration
 
 Move the following into `experiments/agentcore/` as one bounded unit:
 
@@ -55,11 +55,11 @@ Move the following into `experiments/agentcore/` as one bounded unit:
 - `output/agentcore/`
 - AgentCore-only analytics fixtures after confirming they are not used by the React demo
 
-This is the highest-value structural change because the current directory and README no longer present AgentCore as the main demo.
+The scenario index now provides this boundary without hiding AgentCore as an unowned experiment.
 
 ### 2. Consolidate Presenter Material
 
-Replace the numbered `04-` runbook and nested `docs/demo-scripts/box-agentforce-react/` path with a single `demo/` package containing:
+The numbered `04-` runbook remains a supporting deep dive; its audience scripts now live under `docs/scenarios/agentic-orchestration/supporting-react-scripts/`. Continue consolidating only when doing so reduces navigation without duplicating scenario truth:
 
 - primary runbook
 - three audience scripts
@@ -102,7 +102,7 @@ Delete `.DS_Store`, Python `__pycache__`, obsolete `*-draft` screenshots, and th
 
 ### 7. Rename the Repository Last
 
-The current `box-bedrock-for-clm` name no longer describes the primary demo. After AgentCore is isolated and references are updated, rename it to `box-agentforce-clm-demo` or `box-clm-agentforce-react`.
+The current `box-bedrock-for-clm` name now accommodates both tracks. Defer any repository rename until the managed Agentic Orchestration runtime is deployed and the long-term product emphasis is clear.
 
 Renaming should be the final step because it affects scripts, local links, Salesforce project references, and any future Git remote.
 

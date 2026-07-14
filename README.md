@@ -1,27 +1,21 @@
-# Box + Agentforce + React: Contract Lifecycle Management
+# Contract Lifecycle Management Demo Scenarios
 
 ## Overview
 
-This repository contains one primary CLM demo: a Salesforce Multi-Framework React contract workspace with embedded Agentforce and governed Box content.
+This repository contains two presenter-ready CLM scenario packages built on the same Northstar contract data and governance model.
 
-| Runtime | Responsibility |
-|---|---|
-| Box | Contracts, metadata, tasks, Forms, Apps, Automate, Hub, Doc Gen, Sign, and audit history |
-| Agentforce | Source-cited contract analysis, explanations, drafting, and routing |
-| React UI Bundle | Presenter-facing Salesforce contract record, Box workspace, redline findings, and domain-expert review experience |
+| Scenario | Model | Primary surface | Scope |
+|---|---|---|---|
+| [Governed Workflow](docs/scenarios/governed-workflow/README.md) | Deterministic workflow with agentic enrichment | Box | Forms, Apps, Automate, Extract, agents, approvals, Hubs, Doc Gen, Sign, and governed Salesforce REST handoff |
+| [Agentic Orchestration](docs/scenarios/agentic-orchestration/README.md) | Supervisor-led specialist agents | Salesforce Multi-Framework React | Everything in Governed Workflow plus Agentforce, Salesforce, Databricks, AWS Bedrock AgentCore, Strands, memory, traces, and dynamic delegation |
 
-Start with [setup and activation](docs/runbooks/05-demo-setup-and-activation.md), then use [the demo runbook](docs/runbooks/04-box-agentforce-react-demo.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md). AWS AgentCore assets remain as an optional future architecture experiment; they are not a separate presenter demo.
+Start with the [scenario selector](docs/scenarios/README.md), then use [setup and activation](docs/runbooks/05-demo-setup-and-activation.md). Every browser/admin/approval task is tracked in the [manual-task register](docs/manual-task-register.md).
 
-Scenario presentation package:
+Scenario presentation packages:
 
-- [Executive demo script](docs/demo-scripts/box-agentforce-react/01-executive-walkthrough.md)
-- [Legal Operations demo script](docs/demo-scripts/box-agentforce-react/02-legal-operations-walkthrough.md)
-- [Technical validation script](docs/demo-scripts/box-agentforce-react/03-technical-validation.md)
-- [Box Form entry-point variation](docs/demo-scripts/box-agentforce-react/04-box-form-automate-entry.md)
-- [Rendered demo flow](docs/diagrams/clm-box-agentforce-react-demo-flow.svg)
-- [Rendered Box Form entry flow](docs/diagrams/clm-box-form-automate-entry.svg)
-- [Demo component manifest](docs/demo-scripts/box-agentforce-react/component-manifest.md)
-- [Machine-readable manifest](config/demo/box-agentforce-react-demo-manifest.json)
+- [Governed Workflow script](docs/scenarios/governed-workflow/demo-script.md) · [gallery](output/html/governed-workflow-gallery.html) · [manifest](config/demo/governed-workflow-demo-manifest.json)
+- [Agentic Orchestration script](docs/scenarios/agentic-orchestration/demo-script.md) · [gallery](output/html/agentic-orchestration-gallery.html) · [manifest](config/demo/agentic-orchestration-demo-manifest.json)
+- Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
 
 The scenario is an enterprise commercial contract workflow for **Acme Robotics** negotiating a master services agreement (MSA), data processing addendum (DPA), statement of work (SOW), and order form with **Northstar Health**.
 
@@ -29,7 +23,7 @@ The scenario is an enterprise commercial contract workflow for **Acme Robotics**
 
 ## Demo Thesis
 
-CLM teams lose time because contract content, structured deal data, obligations, risk positions, and approvals are split across systems. Validated Box intake creates the structured Salesforce CLM record, Box remains the governed content and workflow layer, Agentforce provides source-cited assistance, and the React UI Bundle presents one coherent contract workspace. Humans retain approval and signature authority.
+CLM teams lose time because contract content, structured deal data, obligations, risk positions, and approvals are split across systems. Governed Workflow shows the practical Box-led operating model; Agentic Orchestration shows the end-state supervisor-led platform. In both, Box remains authoritative for contract content and humans retain approval and signature authority.
 
 ---
 
@@ -37,14 +31,14 @@ CLM teams lose time because contract content, structured deal data, obligations,
 
 | # | Document | Description |
 |---|----------|-------------|
-| 1 | [Architecture](docs/01-architecture.md) | Primary Box + Agentforce + React architecture and optional AgentCore expansion |
+| 1 | [Architecture](docs/01-architecture.md) | Shared foundations plus Governed Workflow and Agentic Orchestration architecture |
 | 2 | [Agent Definitions](docs/02-agent-definitions.md) | CLM agent specifications, prompts, action groups, guardrails, and outputs |
 | 3 | [Legal and Commercial References](docs/03-legal-commercial-references.md) | Demo-safe legal, privacy, revenue, and procurement reference model |
 | 4 | [Control Matrix](docs/04-control-matrix.md) | Contract controls mapped to Box, Agentforce, React, and human reviewers |
 | 5 | [ROI Analysis](docs/05-roi-analysis.md) | CLM value drivers, time compression model, and executive metrics |
 | 6 | [Competitive Landscape](docs/06-competitive-landscape.md) | CLM market positioning and Box + AWS differentiation |
 | 7 | [Handoff Progress](docs/08-handoff-progress.md) | Build checklist, sample-data plan, metadata model, and next actions |
-| 8 | [Demo Runbook](docs/runbooks/04-box-agentforce-react-demo.md) | Primary CLM walkthrough with no AgentCore, Strands, or Databricks dependency |
+| 8 | [Scenario Packages](docs/scenarios/README.md) | Separate presenter docs, manifests, diagrams, galleries, and screenshot inventories |
 | 9 | [Setup and Activation](docs/runbooks/05-demo-setup-and-activation.md) | End-to-end prerequisites, local rehearsal, Box verification, Salesforce/Agentforce deployment, activation, smoke test, and teardown |
 | 10 | [Manual-Task Register](docs/manual-task-register.md) | Complete inventory of human decisions, administrator work, confirmation gates, live validation, and per-demo reset tasks |
 | 11 | [Salesforce CLM Record Contract](docs/salesforce-clm-record-contract.md) | `CLM_Contract__c` schema, ownership, private sharing, idempotency, Box references, and intake mapping |
@@ -55,9 +49,9 @@ Repository organization recommendations: [Cleanup plan](docs/cleanup-plan.md).
 
 | Status | Runbook | Purpose |
 |---|---|---|
-| Primary | [Box + Agentforce + React](docs/runbooks/04-box-agentforce-react-demo.md) | Run the live Box surfaces and Salesforce UI Bundle as one CLM demo |
+| Governed Workflow deep dive | [Box + Agentforce + React](docs/runbooks/04-box-agentforce-react-demo.md) | Supporting details for the controlled Box/Agentforce path and React handoff |
 | Operator setup | [Setup and Activation](docs/runbooks/05-demo-setup-and-activation.md) | Bring the demo from local rehearsal through full integrated activation |
-| Optional experiment | [AgentCore Prototype](docs/runbooks/03-agentcore-demo.md) | Evaluate a future multi-agent architecture outside the presenter flow |
+| Agentic Orchestration deep dive | [AgentCore runbook](docs/runbooks/03-agentcore-demo.md) | Run or evaluate the supervisor-led multi-agent path |
 
 ---
 
@@ -77,7 +71,7 @@ Repository organization recommendations: [Cleanup plan](docs/cleanup-plan.md).
 
 ## Demo Components
 
-| Component | Role in the primary demo |
+| Component | Role across the two scenarios |
 |----------------|----------|
 | Box Apps | CLM dashboard with deal pipeline, risk status, pending approvals, and contract workstreams |
 | Box Forms | New contract request intake with requester, counterparty, value, contract type, and upload fields |
@@ -117,7 +111,8 @@ Generated artifacts:
 | `output/docgen/clm-approval-memo-template.docx` | Live Box DocGen approval memo template |
 | `output/docgen/clm-order-summary-template.docx` | Live Box DocGen commercial order summary template |
 | `output/docgen/clm-renewal-notice-template.docx` | Live Box DocGen renewal notice template |
-| `output/html/clm-experience-gallery.html` | Self-contained visual walkthrough using screenshots from the real Box and React demo experiences |
+| `output/html/governed-workflow-gallery.html` | Self-contained Box-centric Governed Workflow gallery |
+| `output/html/agentic-orchestration-gallery.html` | Self-contained full-stack gallery using real Box and React screens |
 
 Config artifacts:
 
@@ -140,9 +135,10 @@ Config artifacts:
 | `config/agentcore/agentcore-orchestration-spec.json` | Multi-agent orchestration spec |
 | `config/agentcore/tool-contracts.json` | Box, Salesforce, and Databricks tool contracts |
 | `config/agentcore/agent-handoff-payloads.json` | Supervisor-to-agent handoff payload examples |
-| `config/agentforce/clm-react-agentforce-spec.json` | Agentforce topics, actions, mutation confirmations, and guardrails for the primary demo |
+| `config/agentforce/clm-react-agentforce-spec.json` | Agentforce topics, actions, mutation confirmations, and guardrails used by Agentic Orchestration |
 | `config/salesforce/clm-contract-record.json` | `CLM_Contract__c` ownership, idempotency, field mapping, Box references, and intake contract |
-| `config/demo/box-agentforce-react-demo-manifest.json` | Complete machine-readable inventory of included runtime, React, Box, Agentforce, and presenter components |
+| `config/demo/governed-workflow-demo-manifest.json` | Governed Workflow runtime, readiness, documentation, and screenshot inventory |
+| `config/demo/agentic-orchestration-demo-manifest.json` | Agentic Orchestration runtime, readiness, documentation, trace, and screenshot inventory |
 
 React application:
 
@@ -159,7 +155,7 @@ Rebuild the offline experience gallery after replacing any screenshot:
 python3 scripts/build_clm_experience_gallery.py
 ```
 
-Capture screenshots from the real Box or React page viewport only. Do not include browser tabs, the address bar, or unrelated desktop content.
+Capture screenshots from the real Box or React page viewport only. Store them under the matching scenario directory. Do not include browser tabs, the address bar, or unrelated desktop content. Do not create simulated AWS or Databricks screenshots.
 
 Run the high-complexity local mock from this directory:
 
@@ -214,19 +210,25 @@ box-bedrock-for-clm/
 │   ├── 05-roi-analysis.md
 │   ├── 06-competitive-landscape.md
 │   ├── 08-handoff-progress.md
-│   ├── demo-scripts/
-│   │   └── box-agentforce-react/
+│   ├── scenarios/
+│   │   ├── governed-workflow/
+│   │   └── agentic-orchestration/
 │   ├── diagrams/
 │   └── runbooks/
 ├── output/
 │   ├── csv/
 │   ├── agentcore/
+│   ├── html/
 │   ├── json/
-│   └── pdf/
+│   ├── pdf/
+│   └── screenshots/
+│       ├── governed-workflow/
+│       └── agentic-orchestration/
 ├── sample-data/
 │   └── README.md
 └── scripts/
     ├── README.md
+    ├── build_clm_experience_gallery.py
     ├── generate_sample_contract_assets.py
     └── run_agentcore_mock.py
 ```

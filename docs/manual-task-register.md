@@ -127,7 +127,7 @@ Latest verified run: 2026-07-14. The published Form created Box intake file `234
 | MT-102 | Confirm task states support the intended **Signature blocked** story | Legal Operations | Per presentation | Required tasks are incomplete at demo start |
 | MT-103 | Confirm named experts are available or disclose use of demo triage | Presenter | Per presentation | Routing story matches live state |
 | MT-104 | Capture new screenshots only from the real demo surfaces and page viewport | Demo maintainer | After material UI change | Screenshot shows the actual Box or React demo, not documentation, browser tabs, the address bar, or unrelated desktop content |
-| MT-105 | Rebuild and inspect the self-contained gallery after screenshot changes | Demo maintainer | After screenshot change | `output/html/clm-experience-gallery.html` opens offline |
+| MT-105 | Rebuild and inspect both self-contained scenario galleries after screenshot changes | Demo maintainer | After screenshot change | `output/html/governed-workflow-gallery.html` and `output/html/agentic-orchestration-gallery.html` open offline |
 | MT-106 | Record test files, records, tasks, workflow runs, and generated outputs | Demo operator | Per run | Run log supports cleanup and audit |
 | MT-107 | Disable temporary workflows and restore intended task states | Box/Salesforce operators | Per run | Next rehearsal begins from the documented state |
 | MT-108 | Delete records/files/tasks or remove collaborators | Content/system owner | Confirmation required | Exact objects and downstream impact confirmed before deletion |

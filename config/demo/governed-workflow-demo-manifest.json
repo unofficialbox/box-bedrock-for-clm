@@ -1,0 +1,45 @@
+{
+  "manifestVersion": "1.0.0",
+  "scenario": {
+    "id": "clm-governed-workflow",
+    "name": "Northstar CLM - Governed Workflow",
+    "orchestrationModel": "deterministic workflow with agentic enrichment",
+    "contractId": "CLM-2026-0017"
+  },
+  "presenterSurface": "Box",
+  "included": [
+    "Box Apps",
+    "Box Forms",
+    "Box Automate",
+    "Box Extract",
+    "Box AI and Agentforce agents",
+    "Box metadata and tasks",
+    "Box Hubs",
+    "Box Doc Gen",
+    "Box Sign",
+    "Salesforce standard REST record upsert and lookup",
+    "human approval gates"
+  ],
+  "excludedFromPresenterPath": [
+    "Salesforce Multi-Framework React",
+    "Databricks",
+    "AWS Bedrock AgentCore",
+    "Strands"
+  ],
+  "readiness": {
+    "boxSurfaces": "live",
+    "automate": "saved-draft-inactive-final-oauth-smoke-pending",
+    "salesforceRest": "direct-upsert-and-lookup-verified",
+    "sign": "packet-not-created"
+  },
+  "documentation": {
+    "index": "docs/scenarios/governed-workflow/README.md",
+    "script": "docs/scenarios/governed-workflow/demo-script.md",
+    "componentManifest": "docs/scenarios/governed-workflow/component-manifest.md",
+    "screenshotManifest": "docs/scenarios/governed-workflow/screenshot-manifest.md",
+    "flowSource": "docs/diagrams/governed-workflow-flow.mmd",
+    "flowRendered": "docs/diagrams/governed-workflow-flow.svg",
+    "gallery": "output/html/governed-workflow-gallery.html"
+  },
+  "screenshots": "output/screenshots/governed-workflow/"
+}
