@@ -29,19 +29,19 @@ EXPERIENCES = [
         "file": "box-app-dashboard-live.png",
         "eyebrow": "Box Apps",
         "title": "Contract Lifecycle Management dashboard",
-        "description": "The published Box App cockpit with live approval, risk, document-type, and package-status charts arranged in a production two-column layout, plus direct intake and approved-clause actions.",
+        "description": "The published Box App cockpit with live approval, risk, document-type, and package-status charts, plus direct intake, approved-clause, and executed-agreement actions.",
     },
     {
         "file": "box-app-dashboard-actions-live.png",
         "eyebrow": "Box Apps actions",
         "title": "Intake, clauses, and deal room",
-        "description": "The published dashboard action row opens the governed intake Form and approved-clause Hub directly, followed by live Northstar workspace and contract-document cards.",
+        "description": "The published dashboard action row keeps one governed intake Form alongside approved-clause and executed-agreement shortcuts, followed by live Northstar workspace and contract-document cards.",
     },
     {
         "file": "box-app-clause-library-live.png",
         "eyebrow": "Box Apps",
         "title": "Clause Library dashboard page",
-        "description": "The saved Box App page combining the approved-clause view, source folder, and a live standard-versus-fallback chart.",
+        "description": "The published Box App page combines the approved-clause view, source folder, Hub shortcut, and live position, clause-family, and approval-status charts.",
     },
     {
         "file": "box-app-approved-standards-view.png",
@@ -59,7 +59,7 @@ EXPERIENCES = [
         "file": "box-hub-clause-library-live.png",
         "eyebrow": "Box Hubs",
         "title": "Acme Contract Clause Library",
-        "description": "The saved Hub, populated with the governed clause folder, current ownership, and review-cadence guidance so the experience feels maintained.",
+        "description": "The published Hub combines the governed clause folder, current-standard status, intake/App/executed-agreement cards, and review-cadence guidance.",
     },
     {
         "file": "automate-saved-draft.png",

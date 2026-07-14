@@ -181,6 +181,9 @@ These are demo-triage assignments. Do not claim named expert routing is live unt
 - Follow `box-web-ui-build-queue.md` if the Form or App must be recreated.
 - Follow `config/box/box-app-builder-checklist.md` for the App blocks and filters.
 - Follow `config/box/hub-blueprint.md` for clause-library composition and governance.
+- Confirm the App Home page uses `Quick Actions & Portfolio`, with portfolio charts and exactly one intake Form block labeled `Start a New Contract`, plus `Approved Clause Hub` and `Executed Agreements` actions.
+- Confirm the App Clause Library page shows the approved view, source folder, Hub shortcut, and clause-position, family, and approval-status charts.
+- Confirm the Hub shows the governed clause source, the current-standard operations callout, and working links for intake, the CLM dashboard, and executed agreements.
 - Confirm the DocGen template folder contains:
   - Approval memo: `2344242775119`
   - Order summary: `2344233767713`

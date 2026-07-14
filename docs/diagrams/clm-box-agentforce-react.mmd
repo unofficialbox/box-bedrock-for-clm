@@ -1,5 +1,8 @@
 flowchart LR
-    User["Legal, Sales, Finance, Privacy"] --> Intake["Box Form + Automate"]
+    User["Legal, Sales, Finance, Privacy"] --> App["Box App CLM dashboard<br/>portfolio, quick actions, clause views"]
+    App --> Intake["Box Form + Automate"]
+    App --> Hub["Approved Clause Hub<br/>standards, fallbacks, ownership"]
+    App --> Executed["Executed agreements<br/>obligations and renewals"]
     Intake --> Validate["Human validates intake"]
     Validate --> Rest["HTTPS Connector<br/>Salesforce standard REST"]
     Rest --> Record["Salesforce CLM record"]
@@ -13,10 +16,12 @@ flowchart LR
     Box --> Content["Contracts, metadata, tasks, DocGen, Sign"]
     Agentforce --> Human["Human review and confirmation"]
     Human --> Box
+    Hub --> Box
+    Executed --> Box
 
     classDef surface fill:#e9f1ff,stroke:#1166e8,color:#071b33
     classDef system fill:#f8fafc,stroke:#627a98,color:#071b33
     classDef human fill:#fff1d6,stroke:#b16a00,color:#522f00
-    class React,Agentforce surface
-    class Intake,Rest,Record,Box,Compare,Route,Content system
+    class App,React,Agentforce surface
+    class Intake,Rest,Record,Box,Hub,Executed,Compare,Route,Content system
     class User,Validate,Human human

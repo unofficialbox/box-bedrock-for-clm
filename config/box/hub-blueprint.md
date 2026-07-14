@@ -11,14 +11,14 @@ A lived-in legal operations destination for approved standards and fallbacks. Th
 - **Hero copy:** Start with the standard. Use a fallback only when the business reason is documented. Escalate exceptions before they reach signature.
 - **Audience:** Sales, Deal Desk, Legal, Privacy, Security, Finance, and Procurement
 
-## Sections
+## Live composition
 
-1. **Start here** — `Approved Clause Library` overview, owner contacts, and the last governance review.
-2. **Most used standards** — liability, payment, data processing, and SLA standard positions ordered by `usageCount`.
-3. **Approved fallbacks** — the four fallback files with visible approval notes.
-4. **Recently reviewed** — files sorted by `lastReviewed`, including a short “what changed” caption.
-5. **Negotiation signals** — links to the Apps risk view, pending review tasks, and the Northstar deal room.
-6. **Governance** — review cadence, clause owners, retirement rules, and a link to request a new clause through the Box Form.
+1. **Clause source** — the governed `09 - Clause Library` folder remains the source of truth.
+2. **Clause Operations** — a current-standard callout reports eight approved files, four domain owners, the July review, and named-expert routing for customer paper.
+3. **Action cards** — `Start a Contract`, `Open CLM Dashboard`, and `Executed Agreements` connect the Hub to intake, portfolio work, and signed records.
+4. **Governance & review cadence** — the July privacy refresh, quarterly ownership, retirement rules, and demo-only disclaimer remain visible below the operational actions.
+
+The Box-native blue banner, compact operations summary, and three-card action row intentionally echo the React workspace's blue operational styling without duplicating its custom UI.
 
 ## Lived-in details
 
@@ -27,6 +27,7 @@ A lived-in legal operations destination for approved standards and fallbacks. Th
 - Pin `CLM-LIAB-001`, `CLM-DATA-001`, and `CLM-PAY-001` as most-used content.
 - Feature a “July privacy refresh” callout for the DPA clauses.
 - Add a quarterly review note and a clear demo-only/legal-disclaimer footer.
+- Keep the three operational link cards current whenever the Form, App, or executed-agreement URL changes.
 
 ## Publishing guardrail
 

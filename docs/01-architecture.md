@@ -156,7 +156,10 @@ Scenario flow: [Rendered demo flow](diagrams/clm-box-agentforce-react-demo-flow.
 
 ```mermaid
 flowchart LR
-    User["Legal, Sales, Finance, Privacy"] --> Intake["Box Form + Automate"]
+    User["Legal, Sales, Finance, Privacy"] --> App["Box App dashboard<br/>portfolio, actions, clause views"]
+    App --> Intake["Box Form + Automate"]
+    App --> Hub["Approved Clause Hub"]
+    App --> Executed["Executed agreements"]
     Intake --> Validate["Human validates Extract and AI output"]
     Validate --> Record["Create Salesforce CLM record"]
     Record --> React["Salesforce Multi-Framework React app"]
@@ -169,6 +172,8 @@ flowchart LR
     Box --> Content["Contracts, metadata, tasks, DocGen, Sign"]
     Agentforce --> Human["Human review and confirmation"]
     Human --> Box
+    Hub --> Box
+    Executed --> Box
 ```
 
 ### Variation rules

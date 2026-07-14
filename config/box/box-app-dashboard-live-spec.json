@@ -28,7 +28,7 @@
       "name": "Home",
       "sections": [
         {
-          "name": "Portfolio & Actions",
+          "name": "Quick Actions & Portfolio",
           "layout": "two-column charts with action row",
           "blocks": [
             {"type": "Chart", "label": "Document Approval Status", "chart": "donut", "source": "clmDocument.approvalStatus", "liveValues": {"Pending": 5, "Approved": 1}},
@@ -36,7 +36,8 @@
             {"type": "Chart", "label": "Documents by Type", "chart": "bar", "source": "clmDocument.documentType"},
             {"type": "Chart", "label": "Contract Package Status", "chart": "bar", "source": "clmDocument.versionStatus", "liveValues": {"Draft": 4, "Redline": 1, "Approved": 1}},
             {"type": "Shortcut", "label": "Approved Clause Hub", "url": "https://kadams.ent.box.com/hubs/1312630996", "subtitle": "Standards, approved fallbacks, owners, and review cadence"},
-            {"type": "Form", "label": "Start a New Contract", "form": "New Contract Request", "url": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858", "presentation": "Open in New Tab", "subtitle": "Submit a governed intake request and contract package"}
+            {"type": "Form", "label": "Start a New Contract", "form": "New Contract Request", "url": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858", "presentation": "Open in New Tab", "subtitle": "Submit a governed intake request and contract package"},
+            {"type": "Shortcut", "label": "Executed Agreements", "url": "https://kadams.ent.box.com/folder/399080706253", "subtitle": "Signed contracts, obligations, and renewal-ready records"}
           ]
         },
         {
@@ -53,7 +54,6 @@
         {
           "name": "Intake and Actions",
           "blocks": [
-            {"type": "Form", "label": "New Contract Request", "url": "https://kadams.ent.box.com/f/c83f2ab35ee74a519b5fbc2859e2a858"},
             {"type": "View", "label": "Pending High-Risk Reviews", "source": "clmDocument", "filters": ["approvalStatus = Pending", "clauseRisk in [High, Critical]"], "taskIds": ["42899891150", "42899881417", "42899893550"]}
           ]
         },
@@ -74,21 +74,25 @@
           "blocks": [
             {"type": "View", "label": "Approved Standards", "source": "clmClause", "filters": ["approvalStatus = Approved", "position = Standard"], "viewUrl": "https://kadams.ent.box.com/app/KyZohNNwCy6Y6ccmn/view/vBiTv7ZMarRKq9QpJ"},
             {"type": "Folder", "label": "Clause Source Files", "targetId": "399419341582"},
-            {"type": "Chart", "label": "Standard vs Fallback", "chart": "donut", "source": "clmClause.position"}
+            {"type": "Shortcut", "label": "Open Approved Clause Hub", "url": "https://kadams.ent.box.com/hubs/1312630996", "subtitle": "Published standards, approved fallbacks, owners, and review cadence"},
+            {"type": "Chart", "label": "Standard vs Fallback", "chart": "donut", "source": "clmClause.position"},
+            {"type": "Chart", "label": "Clauses by Family", "chart": "donut", "source": "clmClause.clauseFamily"},
+            {"type": "Chart", "label": "Clause Approval Status", "chart": "donut", "source": "clmClause.approvalStatus"}
           ]
         }
       ]
     }
   ],
   "validation": [
-    "Home opens with Portfolio & Actions first.",
+    "Home opens with Quick Actions & Portfolio first.",
     "Approval and risk donut charts render side by side.",
     "Document type and package status bar charts render side by side.",
-    "Approved Clause Hub opens Hub 1312630996.",
+    "Approved Clause Hub opens Hub 1312630996 and Executed Agreements opens folder 399080706253.",
     "Start a New Contract opens the published New Contract Request form.",
+    "Only the Start a New Contract Form block is present; Intake and Actions does not duplicate the form.",
     "Deal room cards and metadata-backed review and obligation views resolve to live content.",
     "Clause Library opens from the top page tabs.",
-    "Approved Standards view and Clause Source Files folder resolve to live content.",
-    "Standard vs Fallback chart renders successfully."
+    "Approved Standards view, Clause Source Files folder, and Open Approved Clause Hub shortcut resolve to live content.",
+    "Standard vs Fallback, Clauses by Family, and Clause Approval Status charts render successfully."
   ]
 }

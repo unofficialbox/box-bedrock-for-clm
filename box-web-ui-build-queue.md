@@ -72,10 +72,21 @@ Sections:
 
 | Section | Blocks |
 |---------|--------|
-| Portfolio & Actions | Two-column rows: `Document Approval Status` donut from `clmDocument.approvalStatus`; `Document Risk Profile` donut from `clmDocument.clauseRisk`; `Documents by Type` bar from `clmDocument.documentType`; `Contract Package Status` bar from `clmDocument.versionStatus`; `Approved Clause Hub` shortcut; `Start a New Contract` Form block |
+| Quick Actions & Portfolio | Two-column chart rows: `Document Approval Status` donut from `clmDocument.approvalStatus`; `Document Risk Profile` donut from `clmDocument.clauseRisk`; `Documents by Type` bar from `clmDocument.documentType`; `Contract Package Status` bar from `clmDocument.versionStatus`. The same top dashboard section includes `Approved Clause Hub`, the single `Start a New Contract` Form block, and `Executed Agreements` shortcut. |
 | Northstar Deal Room | Folder/file cards for workspace `399081692991`, MSA redline `2342633195167`, order form `2342633259967`, DPA `2342633156726`, security exhibit `2342636075017`, obligation folder `399081567921` |
-| Intake and Actions | Embed `New Contract Request` form; document table from `clmDocument` filtered to pending high/critical risk. Live UI note: this Box Apps builder exposes no task-specific block, so the task-bearing review documents represent tasks `42899891150`, `42899881417`, and `42899893550`. |
+| Intake and Actions | Document table from `clmDocument` filtered to pending high/critical risk. Do not add a second Form block; `Start a New Contract` is the sole dashboard intake action. Live UI note: this Box Apps builder exposes no task-specific block, so the task-bearing review documents represent tasks `42899891150`, `42899881417`, and `42899893550`. |
 | Executed Agreements and Renewals | Folder view for `399080706253`; obligations table from `clmObligation` filtered to `status = Open` |
+
+Clause Library page:
+
+| Block | Source |
+|-------|--------|
+| Approved Standards | `clmClause`, filtered to approved standard positions |
+| Clause Source Files | Folder `399419341582` |
+| Open Approved Clause Hub | Hub `1312630996` |
+| Standard vs Fallback | Donut from `clmClause.position` |
+| Clauses by Family | Donut from `clmClause.clauseFamily` |
+| Clause Approval Status | Donut from `clmClause.approvalStatus` |
 
 ## Live IDs
 
@@ -102,5 +113,6 @@ Sections:
 | Deal room cards | Cards open live folders/files and review artifacts |
 | Pending reviews | Shows legal, finance, and privacy/security tasks |
 | Portfolio charts | Shows approval, clause-risk, document-type, and version-status breakdowns from live `clmDocument` metadata |
-| Action row | Opens the published intake Form and Hub `1312630996` |
+| Action row | Opens the single published intake Form, Hub `1312630996`, and executed-agreement folder `399080706253` |
+| Clause Library page | Shows the approved view, source folder, Hub shortcut, and three live clause-metadata charts |
 | URL manifest | `boxAppUrl` and `boxFormUrl` are populated in `config/box/live-box-surface.json` |
