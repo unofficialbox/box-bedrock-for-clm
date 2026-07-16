@@ -3,11 +3,19 @@
 
 from __future__ import annotations
 
+import base64
 from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output" / "html" / "07-customer-solution-datasheet.html"
+BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
+
+
+def asset_data_uri(filename: str, media_type: str) -> str:
+    """Return a brand asset as an embedded data URI for offline delivery."""
+    encoded = base64.b64encode((BRAND_ASSETS / filename).read_bytes()).decode("ascii")
+    return f"data:{media_type};base64,{encoded}"
 
 
 def icon(name: str) -> str:
@@ -31,6 +39,11 @@ def icon(name: str) -> str:
 
 
 def build() -> Path:
+    box_logo = asset_data_uri("box-logo-blue.svg", "image/svg+xml")
+    salesforce_logo = asset_data_uri("salesforce-logo.jpeg", "image/jpeg")
+    databricks_logo = asset_data_uri(
+        "databricks-primary-lockup-full-color.png", "image/png"
+    )
     document = f'''<!doctype html>
 <html lang="en">
 <head>
@@ -62,7 +75,7 @@ def build() -> Path:
     svg {{ width: 25px; height: 25px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }}
     .page {{ width: min(1120px, calc(100% - 40px)); margin: 0 auto; }}
     .brand {{ display: flex; align-items: center; gap: 18px; padding: 34px 0 20px; color: var(--ink); font-size: 1.1rem; font-weight: 760; letter-spacing: .18em; text-transform: uppercase; }}
-    .box {{ color: var(--blue); font-size: 2.5rem; font-weight: 880; letter-spacing: -.09em; text-transform: lowercase; }}
+    .brand-logo {{ display: block; width: 76px; height: 41px; object-fit: contain; }}
     h1, h2, h3 {{ font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif; }}
     .hero {{ display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.3fr); gap: 58px; align-items: center; padding: 28px 0 46px; }}
     .hero > * {{ min-width: 0; }}
@@ -120,10 +133,12 @@ def build() -> Path:
     .system-grid {{ display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }}
     .system {{ position: relative; padding: 28px; border: 1px solid var(--line); border-radius: 14px; box-shadow: 0 8px 24px rgba(17,50,91,.06); }}
     .system:not(:last-child)::after {{ content: ""; position: absolute; top: 50%; right: -27px; width: 26px; border-top: 2px dotted #b9c7da; }}
-    .system-logo {{ min-height: 52px; display: grid; place-items: center; margin-bottom: 12px; font-weight: 850; }}
-    .system:nth-child(1) .system-logo {{ color: var(--blue); font-size: 2.3rem; letter-spacing: -.08em; }}
-    .system:nth-child(2) .system-logo {{ color: #048fbe; font-size: 1.25rem; }}
-    .system:nth-child(3) .system-logo {{ color: #ef4d37; font-size: 1.3rem; }}
+    .system-logo {{ min-height: 84px; display: grid; place-items: center; margin-bottom: 14px; }}
+    .system-logo img {{ display: block; max-width: 100%; object-fit: contain; }}
+    .box-logo {{ width: 92px; height: 50px; }}
+    .salesforce-logo {{ width: 220px; height: 84px; }}
+    .databricks-logo {{ width: 174px; height: auto; }}
+    .system-name {{ min-height: 23px; margin: -5px 0 10px; color: var(--ink); font-size: .78rem; font-weight: 740; letter-spacing: .01em; }}
     .system h3 {{ margin: 0; font: 760 1rem/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }} .system p {{ margin: 7px 0 0; color: var(--muted); font-size: .82rem; }}
     .example {{ padding: 35px; border: 1px solid #eadfc7; border-radius: var(--radius); background: #fffbf3; }}
     .example h2 {{ margin: 0 0 28px; text-align: center; font-size: 2rem; letter-spacing: -.03em; }}
@@ -162,7 +177,7 @@ def build() -> Path:
   </style>
 </head>
 <body>
-  <header class="brand page"><span class="box">box</span><span>Solutions</span></header>
+  <header class="brand page"><img class="brand-logo" src="{box_logo}" alt="Box"><span>Solutions</span></header>
   <main class="page">
     <section class="hero" aria-labelledby="hero-title">
       <div>
@@ -199,7 +214,7 @@ def build() -> Path:
     <section class="systems" aria-labelledby="systems-title">
       <h2 class="section-title" id="systems-title">One experience. Your trusted systems.</h2>
       <p class="section-lead">The information and context you need—connected behind the experience.</p>
-      <div class="system-grid"><article class="system"><div class="system-logo">box</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo">Salesforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article><article class="system"><div class="system-logo">Databricks</div><h3>Insights and outcomes</h3><p>Business intelligence from governed data.</p></article></div>
+      <div class="system-grid"><article class="system"><div class="system-logo"><img class="box-logo" src="{box_logo}" alt="Box"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo"><img class="salesforce-logo" src="{salesforce_logo}" alt="Salesforce"></div><div class="system-name">Salesforce Agentforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article><article class="system"><div class="system-logo"><img class="databricks-logo" src="{databricks_logo}" alt="Databricks"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Insights and outcomes</h3><p>Business intelligence from governed data.</p></article></div>
     </section>
 
     <section class="example" aria-labelledby="example-title">
