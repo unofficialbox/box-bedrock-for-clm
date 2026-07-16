@@ -9,6 +9,7 @@ Available scripts:
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
+| `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
 | `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
 
@@ -63,6 +64,12 @@ Rebuild the complete portable guides:
 python3 scripts/build_scenario_guides.py
 ```
 
+Rebuild the executive marketecture:
+
+```bash
+python3 scripts/build_executive_marketecture.py
+```
+
 Review outputs in this order:
 
 1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
@@ -70,5 +77,6 @@ Review outputs in this order:
 3. `output/html/02-box-automate-agentic-orchestration-gallery.html` — visual-only companion.
 4. `output/html/03-cross-platform-agentic-orchestration-guide.html` — complete narrative.
 5. `output/html/04-cross-platform-agentic-orchestration-gallery.html` — visual-only companion.
+6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.
 
-Guide diagrams and screenshots open in a full-size dialog. All five files remain self-contained with no external assets.
+Guide diagrams and screenshots open in a full-size dialog. All six files remain self-contained with no external assets.
