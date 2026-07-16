@@ -20,6 +20,7 @@ Scenario presentation packages:
 - [Cross-Platform Agentic Orchestration Markdown guide](docs/scenarios/cross-platform-agentic-orchestration/README.md) · [03 portable guide](output/html/03-cross-platform-agentic-orchestration-guide.html) · [04 visual gallery](output/html/04-cross-platform-agentic-orchestration-gallery.html) · [manifest](config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 - [05 executive marketecture](output/html/05-executive-marketecture.html) — business value, governance, phased delivery, target architecture, and real-product proof for IT decision makers
 - [06 AgentCore agent-experience marketecture](output/html/06-agentcore-agent-experience-marketecture.html) — AgentCore Agents as the primary experience over governed Box, Salesforce Agentforce, and Databricks systems of record
+- [07 customer solution datasheet](output/html/07-customer-solution-datasheet.html) — nontechnical tell/show/tell overview for generalists, sales teams, customers, and IT decision makers
 - [Marketecture design concepts](docs/design/marketecture-concepts/README.md) — committed visual references, explicitly separated from real-demo screenshot evidence
 
 Review the numbered HTML files in order. Each **guide** contains the complete narrative, architecture, flow, presenter script, screenshots, readiness, and setup. Each **visual gallery** is the shorter screenshot-only companion.
@@ -122,6 +123,7 @@ Generated artifacts:
 | `output/html/04-cross-platform-agentic-orchestration-gallery.html` | Visual-only Cross-Platform Agentic Orchestration gallery using real Box and React screens |
 | `output/html/05-executive-marketecture.html` | Executive, non-technical marketecture for IT and business decision makers |
 | `output/html/06-agentcore-agent-experience-marketecture.html` | Executive variation with AgentCore Agents as the primary employee experience |
+| `output/html/07-customer-solution-datasheet.html` | Customer-facing Box Solutions datasheet centered on experience, outcomes, and the CLM starting point |
 
 Config artifacts:
 
