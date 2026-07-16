@@ -56,12 +56,6 @@ BOX_EXPERIENCES = [
         "description": "The real workflow builder shows deterministic Extract and Box Agent stages before the human decision point.",
     },
     {
-        "file": "automate-saved-draft.png",
-        "eyebrow": "Box Automate",
-        "title": "Intake, Extract, and AI Agent",
-        "description": "The saved inactive workflow draft with the published form trigger, Enhanced Extract Agent, and Box Agent review instructions.",
-    },
-    {
         "file": "automate-approval-flow.png",
         "eyebrow": "Box Automate",
         "title": "Human validation gate",
@@ -71,7 +65,7 @@ BOX_EXPERIENCES = [
         "file": "automate-https-connector.png",
         "eyebrow": "Box Automate",
         "title": "HTTPS connector stage",
-        "description": "The saved Salesforce standard REST external-ID PATCH request with the deployed My Domain, OAuth 2.0, JSON header, and deterministic smoke payload. Testing remains blocked until the CLM-specific consumer secret replaces the legacy app secret.",
+        "description": "The saved Salesforce standard REST external-ID PATCH request with the deployed My Domain, OAuth 2.0 credentials, and deterministic smoke contract identifier. Final OAuth smoke and workflow activation remain operator-gated.",
     },
     {
         "file": "box-docgen-templates.png",
