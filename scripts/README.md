@@ -10,6 +10,7 @@ Available scripts:
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
+| `build_agentcore_primary_marketecture.py` | Build the AgentCore-primary experience variation over governed Box, Salesforce Agentforce, and Databricks systems of record |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
 | `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
 
@@ -70,6 +71,12 @@ Rebuild the executive marketecture:
 python3 scripts/build_executive_marketecture.py
 ```
 
+Build the AgentCore-primary experience variation:
+
+```bash
+python3 scripts/build_agentcore_primary_marketecture.py
+```
+
 Review outputs in this order:
 
 1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
@@ -78,5 +85,6 @@ Review outputs in this order:
 4. `output/html/03-cross-platform-agentic-orchestration-guide.html` — complete narrative.
 5. `output/html/04-cross-platform-agentic-orchestration-gallery.html` — visual-only companion.
 6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.
+7. `output/html/06-agentcore-agent-experience-marketecture.html` — AgentCore Agents as the primary employee experience.
 
-Guide diagrams and screenshots open in a full-size dialog. All six files remain self-contained with no external assets.
+Guide diagrams and screenshots open in a full-size dialog. All seven files remain self-contained with no external assets.
