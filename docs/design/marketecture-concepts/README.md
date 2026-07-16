@@ -9,4 +9,4 @@ These images are visual design references for the generated executive HTML artif
 | [Box Solutions SDK naming concept](07-box-solutions-sdk-concept.png) | Naming study only | Positions the framework as reusable solution-building capabilities, with CLM as one implementation |
 | [Box Solutions Harness naming concept](08-box-solutions-harness-concept.png) | Naming study only | Positions the framework as a governed assembly and orchestration foundation, with CLM as one implementation |
 
-The generated HTML files use code-native text, interactions, responsive layouts, and embedded real-demo proof screenshots. The concept PNGs preserve the visual design intent for future iterations. The SDK and Harness variants are naming studies; they do not yet have corresponding HTML artifacts.
+The generated HTML files use code-native text, interactions, responsive layouts, and embedded real-demo proof screenshots. The concept PNGs preserve the visual design intent for future iterations. The SDK and Harness variants are clean-background, 300-DPI naming studies; they do not yet have corresponding HTML artifacts.
