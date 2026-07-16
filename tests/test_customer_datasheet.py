@@ -32,7 +32,23 @@ class CustomerDatasheetTests(unittest.TestCase):
         self.assertNotIn("Powered by governed agent orchestration", document)
         self.assertNotIn("API", document)
         self.assertNotIn("database", document.lower())
+        self.assertGreaterEqual(document.count("data:image/svg+xml;base64,"), 2)
+        self.assertEqual(document.count("data:image/png;base64,"), 1)
+        self.assertEqual(document.count("data:image/jpeg;base64,"), 1)
+        self.assertIn('alt="Box"', document)
+        self.assertIn('alt="Salesforce"', document)
+        self.assertIn('alt="Databricks"', document)
         self.assertIsNone(re.search(r'(?:src|href)=["\']https?://', document))
+
+    def test_official_brand_assets_are_available(self) -> None:
+        assets = ROOT / "docs" / "design" / "brand-assets"
+        for filename in (
+            "box-logo-blue.svg",
+            "salesforce-logo.jpeg",
+            "databricks-primary-lockup-full-color.png",
+        ):
+            with self.subTest(filename=filename):
+                self.assertGreater((assets / filename).stat().st_size, 500)
 
 
 if __name__ == "__main__":
