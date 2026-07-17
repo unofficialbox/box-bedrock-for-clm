@@ -6,7 +6,7 @@ from __future__ import annotations
 import html
 from pathlib import Path
 
-from build_executive_marketecture import PROOF, data_uri, icon
+from build_executive_marketecture import PROOF, asset_data_uri, data_uri, icon
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -67,6 +67,13 @@ def proof_cards() -> str:
 
 
 def build() -> Path:
+    aws_logo = asset_data_uri("aws-cloud-logo-dark.svg", "image/svg+xml")
+    agentcore_logo = asset_data_uri("amazon-bedrock-agentcore.svg", "image/svg+xml")
+    box_logo = asset_data_uri("box-logo-blue.svg", "image/svg+xml")
+    salesforce_logo = asset_data_uri("salesforce-logo.jpeg", "image/jpeg")
+    databricks_logo = asset_data_uri(
+        "databricks-primary-lockup-full-color.png", "image/png"
+    )
     agent_json = str(
         [
             {
@@ -86,8 +93,8 @@ def build() -> Path:
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Executive marketecture with AgentCore Agents as the primary contract experience.">
-  <title>Acme CLM · AgentCore Agent Experience</title>
+  <meta name="description" content="Executive marketecture for orchestrating contract work across content, data, and teams.">
+  <title>Acme CLM · Coordinated Contract Work</title>
   <style>
     :root {{
       color-scheme: light;
@@ -113,9 +120,9 @@ def build() -> Path:
     svg {{ width: 22px; height: 22px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }}
     .shell {{ width: min(1240px, calc(100% - 40px)); margin-inline: auto; }}
     header {{ min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }}
-    .brand {{ display: flex; align-items: center; gap: 18px; font-weight: 750; }}
-    .brand-mark {{ color: var(--violet); font-size: 1.4rem; font-weight: 850; }}
-    .brand span:last-child {{ padding-left: 18px; border-left: 1px solid var(--line); }}
+    .brand {{ display: flex; align-items: center; gap: 12px; font-weight: 750; }}
+    .brand .aws-logo, .brand .agentcore-logo {{ width: 38px; height: 38px; border-radius: 8px; }}
+    .brand span:last-child {{ margin-left: 6px; padding-left: 18px; border-left: 1px solid var(--line); }}
     header small {{ color: var(--muted); }}
     .hero {{ padding: 74px 0 38px; }}
     h1, h2 {{ margin: 0; font-family: ui-serif, Georgia, Cambria, "Times New Roman", serif; font-weight: 620; letter-spacing: -.045em; }}
@@ -157,12 +164,16 @@ def build() -> Path:
     .message strong {{ display: block; font-size: .8rem; }} .message p {{ margin: 6px 0 0; color: var(--muted); font-size: .79rem; }}
     .truth {{ margin-top: 14px; padding: 13px 16px; color: #554178; background: var(--violet-soft); border-radius: 10px; font-size: .78rem; }}
     .section {{ padding: 78px 0; border-top: 1px solid var(--line); }}
+    #architecture {{ padding-top: 64px; border-top: 0; }}
+    #architecture .section-head h1 {{ font-size: clamp(2.9rem, 5vw, 4.7rem); line-height: .98; }}
     .section-head {{ display: grid; grid-template-columns: 1.2fr .8fr; gap: 48px; align-items: end; margin-bottom: 34px; }}
     h2 {{ font-size: clamp(2.6rem, 5.2vw, 4.7rem); line-height: 1; }}
     .section-head p {{ margin: 0; color: var(--muted); }}
     .architecture {{ display: grid; grid-template-columns: 190px 1fr; gap: 22px 30px; align-items: stretch; }}
     .layer-label {{ align-self: center; color: var(--muted); font-size: .73rem; font-weight: 800; letter-spacing: .11em; text-transform: uppercase; }}
     .primary-layer {{ padding: 28px 30px; display: grid; grid-template-columns: 1fr repeat(4, 100px); gap: 18px; align-items: center; color: #fff; border-radius: var(--radius); background: var(--violet); box-shadow: 0 16px 40px rgba(104,66,216,.22); }}
+    .agentcore-lockup {{ display: grid; grid-template-columns: 42px 54px 1fr; gap: 12px; align-items: center; }}
+    .agentcore-lockup .aws-logo {{ width: 42px; height: 42px; border-radius: 8px; }} .agentcore-lockup .agentcore-logo {{ width: 54px; height: 54px; border-radius: 10px; }}
     .primary-layer h3 {{ margin: 0; font-size: 1.35rem; }} .primary-layer p {{ margin: 5px 0 0; color: #e5ddff; font-size: .84rem; }}
     .capability {{ padding-left: 18px; text-align: center; border-left: 1px solid rgba(255,255,255,.28); font-size: .8rem; }}
     .capability svg {{ display: block; margin: 0 auto 5px; }}
@@ -170,6 +181,8 @@ def build() -> Path:
     .source-card {{ min-height: 260px; padding: 24px; border: 1.5px solid; border-radius: var(--radius); background: #fff; }}
     .source-card.box {{ border-color: #6ca8ef; }} .source-card.salesforce {{ border-color: #67babb; }} .source-card.databricks {{ border-color: #e4a766; }}
     .source-card .system {{ margin: 0 0 20px; font-size: 1.35rem; font-weight: 850; }} .source-card.box .system {{ color: var(--blue); }} .source-card.salesforce .system {{ color: var(--teal); }} .source-card.databricks .system {{ color: var(--amber); }}
+    .source-card .system-logo {{ display: flex; justify-content: flex-start; align-items: center; min-height: 72px; margin-bottom: 16px; }} .source-card .system-logo img {{ display: block; max-width: 100%; object-fit: contain; }} .source-card .logo-box {{ width: 96px; height: 54px; }} .source-card .logo-databricks {{ width: 174px; height: auto; }}
+    .salesforce-logo-frame {{ position: relative; width: 176px; height: 72px; overflow: hidden; }} .source-card .system-logo .logo-salesforce {{ position: absolute; top: 50%; left: 50%; width: 238px; max-width: none; height: 134px; object-fit: contain; transform: translate(-50%, -50%); }}
     .source-card h3 {{ margin: 0; font-size: 1rem; }} .source-card p {{ color: var(--muted); }} .source-card ul {{ margin: 16px 0 0; padding-left: 20px; color: var(--muted); font-size: .86rem; }} .source-card li + li {{ margin-top: 8px; }}
     .governance {{ padding: 20px 24px; display: grid; grid-template-columns: 180px repeat(6, 1fr); gap: 12px; align-items: center; color: #123b71; border: 1px solid #88b5eb; border-radius: 14px; background: var(--blue-soft); }}
     .governance strong {{ display: flex; align-items: center; gap: 10px; }} .governance span {{ text-align: center; font-size: .78rem; }}
@@ -192,14 +205,14 @@ def build() -> Path:
     dialog {{ width: min(1500px, calc(100% - 32px)); max-height: calc(100vh - 32px); padding: 0; border: 0; border-radius: 18px; box-shadow: 0 28px 100px rgba(0,0,0,.35); }} dialog::backdrop {{ background: rgba(4,14,29,.76); }} .dialog-head {{ position: sticky; top: 0; z-index: 1; display: flex; justify-content: space-between; align-items: center; padding: 14px 18px; color: #fff; background: var(--ink); }} .dialog-head button {{ width: 36px; height: 36px; color: #fff; border: 1px solid rgba(255,255,255,.3); border-radius: 50%; background: transparent; cursor: pointer; }} dialog img {{ display: block; width: 100%; }}
     @media (max-width: 980px) {{
       .workbench {{ grid-template-columns: 220px 1fr; }} .conversation {{ grid-column: 1/-1; border-left: 0; border-top: 1px solid var(--line); }}
-      .architecture {{ grid-template-columns: 1fr; }} .layer-label {{ margin-top: 12px; }} .primary-layer {{ grid-template-columns: 1fr repeat(2,100px); }} .sources {{ grid-template-columns: 1fr; }} .governance {{ grid-template-columns: repeat(3,1fr); }} .governance strong {{ grid-column: 1/-1; }}
+      .architecture {{ grid-template-columns: 1fr; }} .layer-label {{ margin-top: 12px; }} .primary-layer {{ grid-template-columns: 1fr repeat(2,100px); }} .agentcore-lockup {{ grid-column: 1/-1; }} .sources {{ grid-template-columns: 1fr; }} .governance {{ grid-template-columns: repeat(3,1fr); }} .governance strong {{ grid-column: 1/-1; }}
       .work-flow {{ grid-template-columns: 1fr; }} .work-step {{ min-height: 0; display: grid; grid-template-columns: 60px 100px 1fr; align-items: center; text-align: left; border-right: 0; border-bottom: 1px solid var(--line); }} .work-step:last-child {{ border-bottom: 0; }} .work-step::after {{ display: none; }} .work-step span {{ margin: 0; }} .work-step p {{ margin: 0; }}
       .section-head, .decision {{ grid-template-columns: 1fr; }}
     }}
     @media (max-width: 680px) {{
       .shell {{ width: min(100% - 24px,1240px); }} header small {{ display: none; }} .hero {{ padding-top: 48px; }} h1 {{ font-size: clamp(3rem,16vw,4.7rem); }}
       .workbench {{ grid-template-columns: 1fr; }} .agent-list {{ border-right: 0; border-bottom: 1px solid var(--line); }} .brief-grid {{ grid-template-columns: repeat(2,1fr); }} .source {{ grid-template-columns: 88px 1fr; }} .source em {{ grid-column: 2; }} .approval {{ align-items: flex-start; flex-direction: column; }}
-      .primary-layer {{ grid-template-columns: 1fr 1fr; }} .primary-layer > div:first-child {{ grid-column: 1/-1; }} .capability {{ border-left: 0; border-top: 1px solid rgba(255,255,255,.25); padding: 12px 0 0; }}
+      .primary-layer {{ grid-template-columns: 1fr 1fr; }} .agentcore-lockup {{ grid-template-columns: 36px 46px 1fr; }} .agentcore-lockup .aws-logo {{ width: 36px; height: 36px; }} .agentcore-lockup .agentcore-logo {{ width: 46px; height: 46px; }} .capability {{ border-left: 0; border-top: 1px solid rgba(255,255,255,.25); padding: 12px 0 0; }}
       .governance {{ grid-template-columns: repeat(2,1fr); }} .work-step {{ grid-template-columns: 52px 76px 1fr; padding: 18px 12px; }} .outcome-grid,.proof-grid,.checks {{ grid-template-columns: 1fr; }} footer .shell {{ flex-direction: column; }}
     }}
     @media (prefers-reduced-motion: reduce) {{ html {{ scroll-behavior: auto; }} .proof-image img {{ transition: none; }} }}
@@ -207,11 +220,24 @@ def build() -> Path:
   </style>
 </head>
 <body>
-  <header class="shell"><div class="brand"><span class="brand-mark">AgentCore</span><span>Contract Agent Experience</span></div><small>Executive marketecture · agents as the primary experience</small></header>
+  <header class="shell"><div class="brand"><img class="aws-logo" data-brand-logo="aws" src="{aws_logo}" alt="AWS"><img class="agentcore-logo" data-brand-logo="agentcore" src="{agentcore_logo}" alt="Amazon Bedrock AgentCore"><span>Contract Work Orchestration</span></div><small>Executive marketecture · coordinated contract work</small></header>
   <main>
+    <section class="section" id="architecture"><div class="shell">
+      <div class="section-head"><h1>Orchestrate contract work across content, data, and teams.</h1><p>Amazon Bedrock AgentCore coordinates specialized agents across Box, Salesforce Agentforce, and Databricks—bringing the context, controls, and human approvals required at each stage of the contract lifecycle.</p></div>
+      <div class="architecture">
+        <div class="layer-label">Orchestration and action</div><div class="primary-layer"><div class="agentcore-lockup"><img class="aws-logo" data-brand-logo="aws" src="{aws_logo}" alt="AWS"><img class="agentcore-logo" data-brand-logo="agentcore" src="{agentcore_logo}" alt="Amazon Bedrock AgentCore"><div><h3>Amazon Bedrock AgentCore</h3><p>Coordinates specialized agents, context, actions, and oversight</p></div></div><div class="capability">{icon('understand')}Plan</div><div class="capability">{icon('target')}Reason</div><div class="capability">{icon('execute')}Act</div><div class="capability">{icon('learn')}Monitor</div></div>
+        <div class="layer-label">Content, business data, and analytics</div><div class="sources">
+          <article class="source-card box"><div class="system-logo"><img class="logo-box" data-brand-logo="box" src="{box_logo}" alt="Box"></div><h3>Unstructured content</h3><p>Contracts, redlines, clauses, evidence, signatures, and collaboration history.</p><ul><li>Versioned content</li><li>Metadata and classification</li><li>Retention, legal hold, and audit</li></ul></article>
+          <article class="source-card salesforce"><div class="system-logo"><span class="salesforce-logo-frame"><img class="logo-salesforce" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></span></div><h3>Structured business context</h3><p>Accounts, opportunities, quotes, commercial terms, approvals, and owners.</p><ul><li>Master business data</li><li>Workflow and approval state</li><li>Customer and deal context</li></ul></article>
+          <article class="source-card databricks"><div class="system-logo"><img class="logo-databricks" data-brand-logo="databricks" src="{databricks_logo}" alt="Databricks"></div><h3>Curated analytical intelligence</h3><p>Historical outcomes, portfolio trends, comparable positions, and predictive signals.</p><ul><li>Governed data products</li><li>Models and analytical insights</li><li>Performance measurement</li></ul></article>
+        </div>
+        <div class="layer-label">Controls embedded in every step</div><div class="governance"><strong>{icon('shield')} Apply policy to every agent and action</strong><span>Identity</span><span>Policy</span><span>Audit</span><span>Retention</span><span>Data protection</span><span>Human approval</span></div>
+      </div>
+    </div></section>
+
     <section class="hero shell">
-      <h1>One agent experience. Every contract system.</h1>
-      <p class="lead">AgentCore agents plan, reason, and act across governed enterprise content, business context, and curated analytical intelligence—while people retain decision authority.</p>
+      <h1>Coordinate agents, systems, and experts around every contract.</h1>
+      <p class="lead">Specialized agents plan, reason, and act across enterprise content, business context, and analytical intelligence. People review the evidence and approve consequential actions.</p>
       <div class="workbench" aria-label="Illustrative AgentCore contract workbench">
         <aside class="agent-list"><h3>Specialist agents</h3>{agent_buttons()}</aside>
         <section class="brief">
@@ -221,22 +247,9 @@ def build() -> Path:
           <div class="panel"><h3>Proposed next action</h3><p class="recommendation" id="agent-recommendation">{html.escape(AGENTS[0]['recommendation'])}</p></div>
           <div class="approval"><div><strong>Human approval required</strong><small>Review the recommendation before any external action.</small></div><span>Awaiting decision</span></div>
         </section>
-        <aside class="conversation"><h3>Agent conversation</h3><div class="message"><strong>You</strong><p>Summarize the risk and recommend the next governed step.</p></div><div class="message agent"><strong id="agent-name">{html.escape(AGENTS[0]['name'])}</strong><p id="agent-summary">{html.escape(AGENTS[0]['summary'])}</p></div><div class="truth">Illustrative primary experience. Real Box and React evidence appears below; managed AgentCore and Databricks deployment remains a readiness gate.</div></aside>
+        <aside class="conversation"><h3>Agent conversation</h3><div class="message"><strong>You</strong><p>Summarize the risk and recommend the next governed step.</p></div><div class="message agent"><strong id="agent-name">{html.escape(AGENTS[0]['name'])}</strong><p id="agent-summary">{html.escape(AGENTS[0]['summary'])}</p></div><div class="truth">Illustrative orchestration experience. Real Box and React evidence appears below; managed AgentCore and Databricks deployment remains a readiness gate.</div></aside>
       </div>
     </section>
-
-    <section class="section" id="architecture"><div class="shell">
-      <div class="section-head"><h2>Agents on top. Systems of record below. Humans govern across.</h2><p>The employee interacts with one agent experience. Box, Salesforce Agentforce, and Databricks operate headlessly behind AgentCore while remaining authoritative for their own data and controls.</p></div>
-      <div class="architecture">
-        <div class="layer-label">Primary experience</div><div class="primary-layer"><div><h3>AWS Bedrock AgentCore</h3><p>Primary employee experience and cross-platform orchestration layer</p></div><div class="capability">{icon('understand')}Plan</div><div class="capability">{icon('target')}Reason</div><div class="capability">{icon('execute')}Act</div><div class="capability">{icon('learn')}Monitor</div></div>
-        <div class="layer-label">Governed systems of record</div><div class="sources">
-          <article class="source-card box"><p class="system">box</p><h3>Unstructured content</h3><p>Contracts, redlines, clauses, evidence, signatures, and collaboration history.</p><ul><li>Versioned content</li><li>Metadata and classification</li><li>Retention, legal hold, and audit</li></ul></article>
-          <article class="source-card salesforce"><p class="system">Salesforce Agentforce</p><h3>Structured business context</h3><p>Accounts, opportunities, quotes, commercial terms, approvals, and owners.</p><ul><li>Master business data</li><li>Workflow and approval state</li><li>Customer and deal context</li></ul></article>
-          <article class="source-card databricks"><p class="system">Databricks</p><h3>Curated analytical intelligence</h3><p>Historical outcomes, portfolio trends, comparable positions, and predictive signals.</p><ul><li>Governed data products</li><li>Models and analytical insights</li><li>Performance measurement</li></ul></article>
-        </div>
-        <div class="layer-label">Governance across all layers</div><div class="governance"><strong>{icon('shield')} Govern every agent and action</strong><span>Identity</span><span>Policy</span><span>Audit</span><span>Retention</span><span>Data protection</span><span>Human approval</span></div>
-      </div>
-    </div></section>
 
     <section class="section" id="flow"><div class="shell">
       <div class="section-head"><h2>How work gets done.</h2><p>The experience hides system complexity without hiding evidence, decision rights, or accountability.</p></div>
@@ -244,17 +257,17 @@ def build() -> Path:
     </div></section>
 
     <section class="section outcomes" id="outcomes"><div class="shell">
-      <div class="section-head"><h2>What changes for the enterprise.</h2><p>The agent layer becomes the consistent front door while existing platforms keep their governance, data ownership, and specialized capabilities.</p></div>
-      <div class="outcome-grid"><article class="outcome"><span>{icon('understand')}</span><h3>One consistent experience</h3><p>Employees use a single, intuitive agent experience across contract systems and content.</p></article><article class="outcome"><span>{icon('execute')}</span><h3>Fewer handoffs</h3><p>Agents coordinate people and systems, reducing swivel-chair work and process latency.</p></article><article class="outcome"><span>{icon('shield')}</span><h3>Governed decisions at scale</h3><p>Policies, citations, approvals, and audit controls remain built into every action.</p></article></div>
+      <div class="section-head"><h2>What changes for the enterprise.</h2><p>A coordinated contract workflow connects people and platforms while each system retains its data, controls, and specialized capabilities.</p></div>
+      <div class="outcome-grid"><article class="outcome"><span>{icon('understand')}</span><h3>Coordinated contract work</h3><p>Agents bring the right content, business context, and expertise into each stage.</p></article><article class="outcome"><span>{icon('execute')}</span><h3>Fewer handoffs</h3><p>Agents coordinate people and systems, reducing swivel-chair work and process latency.</p></article><article class="outcome"><span>{icon('shield')}</span><h3>Decisions with accountability</h3><p>Policies, citations, approvals, and audit controls remain built into every action.</p></article></div>
     </div></section>
 
     <section class="section" id="proof"><div class="shell">
       <div class="section-head"><h2>Grounded in real demo experiences.</h2><p>These screens prove the content, workflow, engagement, and expert-review foundations that the AgentCore experience would orchestrate. No live AWS or Databricks console screenshot is claimed.</p></div><div class="proof-grid">{proof_cards()}</div>
     </div></section>
 
-    <section class="section"><div class="shell decision"><div><h2>Executive design questions.</h2><div class="checks"><span class="check">{icon('check')} What should become the primary employee experience?</span><span class="check">{icon('check')} Which systems remain authoritative?</span><span class="check">{icon('check')} Which actions require human approval?</span><span class="check">{icon('check')} What evidence must accompany recommendations?</span><span class="check">{icon('check')} Which analytical data products guide decisions?</span><span class="check">{icon('check')} How will agent actions be monitored and audited?</span></div></div><aside class="result"><h3>Hide complexity, not control.</h3><p>AgentCore provides one experience across the enterprise. Box, Salesforce Agentforce, and Databricks remain governed, authoritative, and independently valuable.</p><strong>Agents coordinate. Systems inform. Humans decide.</strong></aside></div></section>
+    <section class="section"><div class="shell decision"><div><h2>Executive design questions.</h2><div class="checks"><span class="check">{icon('check')} Where can coordinated agents remove handoffs?</span><span class="check">{icon('check')} Which systems remain authoritative?</span><span class="check">{icon('check')} Which actions require human approval?</span><span class="check">{icon('check')} What evidence must accompany recommendations?</span><span class="check">{icon('check')} Which analytical data products guide decisions?</span><span class="check">{icon('check')} How will agent actions be monitored and audited?</span></div></div><aside class="result"><h3>Make complexity manageable.</h3><p>Amazon Bedrock AgentCore coordinates the work while Box, Salesforce Agentforce, and Databricks remain authoritative for their content, business data, and analytics.</p><strong>Agents coordinate the work. Enterprise systems provide the context. People approve consequential decisions.</strong></aside></div></section>
   </main>
-  <footer><div class="shell"><span>Acme CLM · AgentCore-primary experience marketecture</span><span>Marketecture variation · managed deployment readiness remains explicit</span></div></footer>
+  <footer><div class="shell"><span>Acme CLM · coordinated contract work marketecture</span><span>Marketecture variation · managed deployment readiness remains explicit</span></div></footer>
   <dialog id="proof-dialog" aria-labelledby="dialog-title"><div class="dialog-head"><strong id="dialog-title">Demo experience</strong><button type="button" aria-label="Close">×</button></div><img alt=""></dialog>
   <script>
     const agents = {agent_json};

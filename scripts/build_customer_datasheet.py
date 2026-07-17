@@ -177,13 +177,13 @@ def build() -> Path:
   </style>
 </head>
 <body>
-  <header class="brand page"><img class="brand-logo" src="{box_logo}" alt="Box"><span>Solutions</span></header>
+  <header class="brand page"><img class="brand-logo" data-brand-logo="box" src="{box_logo}" alt="Box"><span>Solutions</span></header>
   <main class="page">
     <section class="hero" aria-labelledby="hero-title">
       <div>
         <h1 id="hero-title">Move work forward. Decide with confidence.</h1>
         <div class="rule" aria-hidden="true"></div>
-        <p class="lead">A guided, intelligent experience that brings content, business context, approvals, and insight together—so teams can act faster with confidence.</p>
+        <p class="lead">A guided workflow that brings content, business context, approvals, and insight together—so teams can act faster with confidence.</p>
       </div>
       <article class="workspace" aria-label="Guided contract approval experience">
         <div class="workspace-head">
@@ -200,7 +200,7 @@ def build() -> Path:
 
     <section class="outcomes" aria-label="Business outcomes">
       <article class="outcome"><span class="round-icon">{icon('fast')}</span><h2>Move faster</h2><p>Turn requests into coordinated action.</p></article>
-      <article class="outcome"><span class="round-icon">{icon('shield')}</span><h2>Reduce risk</h2><p>Apply trusted content, policy, and expertise.</p></article>
+      <article class="outcome"><span class="round-icon">{icon('shield')}</span><h2>Reduce risk</h2><p>Apply approved content, policy, and expertise.</p></article>
       <article class="outcome"><span class="round-icon">{icon('person')}</span><h2>Stay in control</h2><p>Keep people accountable for important decisions.</p></article>
     </section>
 
@@ -212,9 +212,9 @@ def build() -> Path:
     </section>
 
     <section class="systems" aria-labelledby="systems-title">
-      <h2 class="section-title" id="systems-title">One experience. Your trusted systems.</h2>
-      <p class="section-lead">The information and context you need—connected behind the experience.</p>
-      <div class="system-grid"><article class="system"><div class="system-logo"><img class="box-logo" src="{box_logo}" alt="Box"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo"><img class="salesforce-logo" src="{salesforce_logo}" alt="Salesforce"></div><div class="system-name">Salesforce Agentforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article><article class="system"><div class="system-logo"><img class="databricks-logo" src="{databricks_logo}" alt="Databricks"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Insights and outcomes</h3><p>Business intelligence from governed data.</p></article></div>
+      <h2 class="section-title" id="systems-title">The right context for every decision.</h2>
+      <p class="section-lead">Content, customer context, and analytics come together when the work requires them.</p>
+      <div class="system-grid"><article class="system"><div class="system-logo"><img class="box-logo" data-brand-logo="box" src="{box_logo}" alt="Box"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo"><img class="salesforce-logo" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></div><div class="system-name">Salesforce Agentforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article><article class="system"><div class="system-logo"><img class="databricks-logo" data-brand-logo="databricks" src="{databricks_logo}" alt="Databricks"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Insights and outcomes</h3><p>Business intelligence from governed data.</p></article></div>
     </section>
 
     <section class="example" aria-labelledby="example-title">

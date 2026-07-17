@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / "output" / "screenshots"
 OUTPUT = ROOT / "output" / "html"
+BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 BOX_EXPERIENCES = [
     {
@@ -105,6 +106,7 @@ SCENARIOS = [
         "description": "A workflow-directed orchestration of Apps, Forms, Automate, Extract, Box AI, Agentforce, human approvals, Hubs, Doc Gen, and execution controls.",
         "status": "Live Box surfaces. Automate is saved and inactive while its final OAuth smoke and activation remain gated.",
         "experiences": BOX_EXPERIENCES,
+        "brands": ("box", "salesforce"),
     },
     {
         "order": "04",
@@ -114,6 +116,7 @@ SCENARIOS = [
         "description": "The governed Box journey plus the Salesforce Agentforce experience in the Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
         "status": "Real Box and React screens. No live AWS AgentCore or Databricks screenshots are claimed.",
         "experiences": REACT_EXPERIENCES + BOX_EXPERIENCES,
+        "brands": ("box", "salesforce", "databricks"),
     },
 ]
 
@@ -122,8 +125,30 @@ def data_uri(path: Path) -> str:
     """Return an embedded image data URI for a screenshot path."""
 
     suffix = path.suffix.lower()
-    mime = "image/png" if suffix == ".png" else "image/jpeg"
+    mime = {
+        ".png": "image/png",
+        ".jpg": "image/jpeg",
+        ".jpeg": "image/jpeg",
+        ".svg": "image/svg+xml",
+    }.get(suffix)
+    if mime is None:
+        raise ValueError(f"Unsupported embedded image: {path}")
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
+
+
+def brand_logos(names: tuple[str, ...]) -> str:
+    """Render official embedded platform logos for the gallery scenario."""
+
+    assets = {
+        "box": ("box-logo-blue.svg", "Box"),
+        "salesforce": ("salesforce-logo.jpeg", "Salesforce"),
+        "databricks": ("databricks-primary-lockup-full-color.png", "Databricks"),
+    }
+    return "".join(
+        f'<img class="brand-logo brand-logo-{name}" data-brand-logo="{name}" '
+        f'src="{data_uri(BRAND_ASSETS / assets[name][0])}" alt="{assets[name][1]}">'
+        for name in names
+    )
 
 
 def render_card(item: dict[str, str], index: int) -> str:
@@ -190,6 +215,11 @@ def build_scenario(scenario: dict[str, object]) -> Path:
     .kicker, .eyebrow {{ color: var(--mint); font-size: .78rem; font-weight: 750; letter-spacing: .13em; text-transform: uppercase; }}
     h1 {{ margin: 10px 0 18px; max-width: 920px; font-size: clamp(2.8rem, 6vw, 6rem); line-height: .95; letter-spacing: -.055em; }}
     header p {{ margin: 0; color: var(--muted); font-size: 1.08rem; max-width: 700px; }}
+    .brand-logos {{ display: flex; flex-wrap: wrap; align-items: center; gap: 18px; min-height: 54px; margin-bottom: 28px; }}
+    .brand-logos img {{ display: block; width: auto; max-width: 150px; height: 42px; object-fit: contain; border: 0; border-radius: 0; background: transparent; }}
+    .brand-logos .brand-logo-box {{ width: 76px; }}
+    .brand-logos .brand-logo-salesforce {{ width: 128px; height: 46px; border-radius: 8px; }}
+    .brand-logos .brand-logo-databricks {{ width: 144px; }}
     .status {{ border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--panel); backdrop-filter: blur(14px); }}
     .status strong {{ display: block; margin-bottom: 8px; font-size: 1.15rem; }}
     .status span {{ color: var(--muted); }}
@@ -211,6 +241,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
     footer {{ padding: 0 0 64px; color: #7f8799; }}
     @media (max-width: 860px) {{
       header {{ grid-template-columns: 1fr; padding-top: 52px; }}
+      header > * {{ min-width: 0; }}
       .copy {{ grid-template-columns: 1fr; gap: 12px; padding: 24px; }}
       .copy .eyebrow {{ margin-bottom: 2px; }}
     }}
@@ -223,6 +254,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
 <body>
   <header>
     <div>
+      <div class="brand-logos" aria-label="Platforms in this scenario">{brand_logos(tuple(scenario['brands']))}</div>
       <p class="kicker">Acme Robotics · Visual Gallery · {html.escape(str(scenario['title']))}</p>
       <h1>{html.escape(str(scenario['headline']))}</h1>
       <p>{html.escape(str(scenario['description']))} Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>

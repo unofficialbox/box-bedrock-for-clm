@@ -19,9 +19,10 @@ Scenario presentation packages:
 - [Box Automate–Led Agentic Orchestration Markdown guide](docs/scenarios/box-automate-agentic-orchestration/README.md) · [01 portable guide](output/html/01-box-automate-agentic-orchestration-guide.html) · [02 visual gallery](output/html/02-box-automate-agentic-orchestration-gallery.html) · [manifest](config/demo/box-automate-agentic-orchestration-demo-manifest.json)
 - [Cross-Platform Agentic Orchestration Markdown guide](docs/scenarios/cross-platform-agentic-orchestration/README.md) · [03 portable guide](output/html/03-cross-platform-agentic-orchestration-guide.html) · [04 visual gallery](output/html/04-cross-platform-agentic-orchestration-gallery.html) · [manifest](config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 - [05 executive marketecture](output/html/05-executive-marketecture.html) — business value, governance, phased delivery, target architecture, and real-product proof for IT decision makers
-- [06 AgentCore agent-experience marketecture](output/html/06-agentcore-agent-experience-marketecture.html) — AgentCore Agents as the primary experience over governed Box, Salesforce Agentforce, and Databricks systems of record
+- [06 coordinated contract-work marketecture](output/html/06-agentcore-agent-experience-marketecture.html) — Amazon Bedrock AgentCore coordinates specialized agents across Box, Salesforce Agentforce, and Databricks with evidence, controls, and human approvals
 - [07 customer solution datasheet](output/html/07-customer-solution-datasheet.html) — nontechnical tell/show/tell overview for generalists, sales teams, customers, and IT decision makers
 - [Marketecture design concepts](docs/design/marketecture-concepts/README.md) — committed visual references, explicitly separated from real-demo screenshot evidence
+- [Agent orchestration messaging](docs/design/agent-orchestration-messaging.md) — researched messaging principles, approved headline system, and retired phrases for generated collateral
 
 Review the numbered HTML files in order. Each **guide** contains the complete narrative, architecture, flow, presenter script, screenshots, readiness, and setup. Each **visual gallery** is the shorter screenshot-only companion.
 - Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
@@ -122,7 +123,7 @@ Generated artifacts:
 | `output/html/03-cross-platform-agentic-orchestration-guide.html` | Complete, self-contained Cross-Platform Agentic Orchestration narrative |
 | `output/html/04-cross-platform-agentic-orchestration-gallery.html` | Visual-only Cross-Platform Agentic Orchestration gallery using real Box and React screens |
 | `output/html/05-executive-marketecture.html` | Executive, non-technical marketecture for IT and business decision makers |
-| `output/html/06-agentcore-agent-experience-marketecture.html` | Executive variation with AgentCore Agents as the primary employee experience |
+| `output/html/06-agentcore-agent-experience-marketecture.html` | Executive variation showing coordinated contract work across content, business data, analytics, and accountable teams |
 | `output/html/07-customer-solution-datasheet.html` | Customer-facing Box Solutions datasheet centered on experience, outcomes, and the CLM starting point |
 
 Config artifacts:

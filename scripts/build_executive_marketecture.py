@@ -11,6 +11,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / "output" / "screenshots"
 OUTPUT = ROOT / "output" / "html" / "05-executive-marketecture.html"
+BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 PROOF = (
     {
@@ -47,6 +48,13 @@ def data_uri(path: Path) -> str:
     return f"data:{mime};base64,{base64.b64encode(path.read_bytes()).decode('ascii')}"
 
 
+def asset_data_uri(filename: str, media_type: str) -> str:
+    """Return an official brand asset as an embedded data URI."""
+
+    encoded = base64.b64encode((BRAND_ASSETS / filename).read_bytes()).decode("ascii")
+    return f"data:{media_type};base64,{encoded}"
+
+
 def icon(name: str) -> str:
     paths = {
         "intake": '<path d="M12 3v12m0 0 4-4m-4 4-4-4"/><path d="M5 15v4h14v-4"/>',
@@ -78,6 +86,11 @@ def proof_cards() -> str:
 
 
 def build() -> Path:
+    box_logo = asset_data_uri("box-logo-blue.svg", "image/svg+xml")
+    salesforce_logo = asset_data_uri("salesforce-logo.jpeg", "image/jpeg")
+    databricks_logo = asset_data_uri(
+        "databricks-primary-lockup-full-color.png", "image/png"
+    )
     document = f'''<!doctype html>
 <html lang="en">
 <head>
@@ -110,7 +123,7 @@ def build() -> Path:
     .shell {{ width: min(1240px, calc(100% - 40px)); margin-inline: auto; }}
     .topbar {{ min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); }}
     .brand {{ display: flex; align-items: center; gap: 18px; font-weight: 720; letter-spacing: -.01em; }}
-    .box-mark {{ color: var(--blue); font-size: 2rem; font-weight: 850; letter-spacing: -.08em; }}
+    .box-mark {{ width: 68px; height: 38px; object-fit: contain; }}
     .brand span:last-child {{ border-left: 1px solid var(--line); padding-left: 18px; }}
     .audience {{ color: var(--muted); font-size: .82rem; }}
     .hero {{ padding: 76px 0 56px; }}
@@ -150,6 +163,11 @@ def build() -> Path:
     .platform.core {{ border-color: #6ca8ef; }} .platform.engage {{ border-color: #67babb; }} .platform.analytics {{ border-color: #e4a766; }}
     .platform + .platform::before {{ content: "+"; position: absolute; left: -44px; top: 130px; width: 30px; height: 30px; display: grid; place-items: center; color: var(--blue); font-weight: 800; background: #fff; border: 1px solid #9fc2ed; border-radius: 50%; }}
     .platform-name {{ margin: 0 0 28px; color: var(--blue); font-size: 1.45rem; font-weight: 800; letter-spacing: -.03em; }}
+    .platform-logo {{ display: flex; align-items: center; min-height: 64px; margin: 0 0 22px; }}
+    .platform-logo img {{ display: block; max-width: 100%; object-fit: contain; }}
+    .platform-logo .logo-box {{ width: 90px; height: 50px; }}
+    .platform-logo .logo-salesforce {{ width: 190px; height: 72px; border-radius: 10px; }}
+    .platform-logo .logo-databricks {{ width: 170px; height: auto; }}
     .platform.analytics .platform-name {{ color: #a35a08; }}
     .platform h3 {{ margin: 0 0 16px; font-size: 1.02rem; }}
     .platform ul {{ margin: 0; padding-left: 20px; color: var(--muted); }}
@@ -221,7 +239,7 @@ def build() -> Path:
 </head>
 <body>
   <header class="topbar shell">
-    <div class="brand"><span class="box-mark">box</span><span>Contract Lifecycle Management</span></div>
+    <div class="brand"><img class="box-mark" data-brand-logo="box" src="{box_logo}" alt="Box"><span>Contract Lifecycle Management</span></div>
     <div class="audience">Executive marketecture · IT and business decision makers</div>
   </header>
   <main>
@@ -254,9 +272,9 @@ def build() -> Path:
         <div class="section-head"><h2>Purpose-built platform roles.</h2><p>AgentCore directs work across the governed content, business context, and analytics platforms required for the target operating model.</p></div>
         <article class="orchestrator"><p class="platform-name">AWS Bedrock AgentCore</p><h3>Cross-platform traffic director</h3><p>Supervises specialist agents, selects the right tools, maintains negotiation context, applies guardrails, and coordinates work across every system.</p></article>
         <div class="platforms">
-          <article class="platform core"><p class="platform-name">box</p><h3>Governed content foundation</h3><ul><li>Single source of truth for contracts and related content</li><li>Security, classification, retention, legal hold, and audit</li><li>Apps, Forms, Automate, AI, Hubs, Doc Gen, Sign, and collaboration</li></ul></article>
-          <article class="platform engage"><p class="platform-name">Salesforce Agentforce</p><h3>Business context and engagement</h3><ul><li>Contract requests in the flow of work</li><li>Account, opportunity, quote, and approval context</li><li>Agents for routing, grounded insights, and next-best actions</li></ul></article>
-          <article class="platform analytics"><p class="platform-name">Databricks</p><h3>Intelligence and analytics foundation</h3><ul><li>Historical clause, outcome, spend, and revenue context</li><li>Governed enterprise data for specialist agents</li><li>Portfolio analytics, predictive insight, and performance measurement</li></ul></article>
+          <article class="platform core"><div class="platform-logo"><img class="logo-box" data-brand-logo="box" src="{box_logo}" alt="Box"></div><h3>Governed content foundation</h3><ul><li>Single source of truth for contracts and related content</li><li>Security, classification, retention, legal hold, and audit</li><li>Apps, Forms, Automate, AI, Hubs, Doc Gen, Sign, and collaboration</li></ul></article>
+          <article class="platform engage"><div class="platform-logo"><img class="logo-salesforce" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></div><h3>Business context and engagement</h3><ul><li>Contract requests in the flow of work</li><li>Account, opportunity, quote, and approval context</li><li>Agents for routing, grounded insights, and next-best actions</li></ul></article>
+          <article class="platform analytics"><div class="platform-logo"><img class="logo-databricks" data-brand-logo="databricks" src="{databricks_logo}" alt="Databricks"></div><h3>Intelligence and analytics foundation</h3><ul><li>Historical clause, outcome, spend, and revenue context</li><li>Governed enterprise data for specialist agents</li><li>Portfolio analytics, predictive insight, and performance measurement</li></ul></article>
         </div>
         <div class="foundation"><strong>{icon('shield')} Unified governance foundation</strong><span>Identity and access · Policy enforcement · Data protection · Monitoring and audit · Compliance and eDiscovery</span></div>
       </div>

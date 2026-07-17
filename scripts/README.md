@@ -10,7 +10,7 @@ Available scripts:
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
-| `build_agentcore_primary_marketecture.py` | Build the AgentCore-primary experience variation over governed Box, Salesforce Agentforce, and Databricks systems of record |
+| `build_agentcore_primary_marketecture.py` | Build the coordinated contract-work variation across Box, Salesforce Agentforce, Databricks, specialized agents, and accountable teams |
 | `build_customer_datasheet.py` | Build the nontechnical Box Solutions datasheet for generalists, sales teams, customers, and IT decision makers |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
 | `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
@@ -72,7 +72,7 @@ Rebuild the executive marketecture:
 python3 scripts/build_executive_marketecture.py
 ```
 
-Build the AgentCore-primary experience variation:
+Build the coordinated contract-work variation:
 
 ```bash
 python3 scripts/build_agentcore_primary_marketecture.py
@@ -92,7 +92,7 @@ Review outputs in this order:
 4. `output/html/03-cross-platform-agentic-orchestration-guide.html` — complete narrative.
 5. `output/html/04-cross-platform-agentic-orchestration-gallery.html` — visual-only companion.
 6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.
-7. `output/html/06-agentcore-agent-experience-marketecture.html` — AgentCore Agents as the primary employee experience.
+7. `output/html/06-agentcore-agent-experience-marketecture.html` — coordinated contract work across content, business data, analytics, and accountable teams.
 8. `output/html/07-customer-solution-datasheet.html` — high-level customer and sales datasheet focused on experience and outcomes.
 
 Guide diagrams and screenshots open in a full-size dialog. All eight files remain self-contained with no external assets.

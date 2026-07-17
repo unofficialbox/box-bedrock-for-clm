@@ -26,7 +26,11 @@ class ExecutiveMarketectureTests(unittest.TestCase):
         self.assertIn("Salesforce Agentforce", document)
         self.assertIn("Databricks", document)
         self.assertNotIn("Optional orchestration", document)
-        self.assertEqual(document.count("data:image/png;base64,"), 8)
+        self.assertEqual(document.count("data:image/png;base64,"), 9)
+        self.assertEqual(document.count("data:image/jpeg;base64,"), 1)
+        self.assertGreaterEqual(document.count("data:image/svg+xml;base64,"), 1)
+        for brand in ("box", "salesforce", "databricks"):
+            self.assertIn(f'data-brand-logo="{brand}"', document)
         self.assertIsNone(re.search(r'(?:src|href)=["\']https?://', document))
 
 
