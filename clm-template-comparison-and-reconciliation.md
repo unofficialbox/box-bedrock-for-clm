@@ -44,7 +44,7 @@ This is a repository-evidence assessment. A committed contract is not proof that
 | Fixtures and reset | Strong portable layer | Clauses, contracts, redlines, expected outputs, manifests, and operator reset planning | Promote manifest-driven fixtures and stable business keys |
 | Diagrams | Strong | Maintained Mermaid and SVG architecture, flow, operator, form-entry, and React integration views | Add drift validation consistently across demos |
 | Presenter output | Benchmark | Numbered operator/scenario HTML, marketecture, datasheet, lifecycle-responsibility view, and real screenshots | Keep CLM as the content-quality benchmark; the template now owns the reusable lifecycle generator |
-| Automated verification | Strong but fragmented | Python unit tests cover operator, mock orchestration, marketecture, datasheet, and branding | Add one top-level validation command and report |
+| Automated verification | Reconciled | `scripts/validate_clm.py` reports repository and fail-closed presenter-readiness matrices | Keep the command aligned with new artifacts and live receipt contracts |
 
 ## What the Git history teaches
 
@@ -71,7 +71,7 @@ The Git history begins with an imported implementation on 2026-07-14, so it does
 | 2. Box and environment bootstrap | Strong | Retain safe plan/apply/confirm behavior; strengthen machine-readable live evidence |
 | 3. Salesforce experience | Strong | Preserve profile choice, standard REST default, stable external IDs, and server-side credential boundaries |
 | 4. Fixtures and presenter assets | Complete at portable level | The template now has numbered HTML and a reusable lifecycle generator; continue promoting official brand assets, screenshot freshness checks, and deterministic generators |
-| 5. Verification and rehearsal | Partial | Consolidate tests, links, diagrams, generators, and browser evidence into one command |
+| 5. Verification and rehearsal | Reconciled at repository level | One command now covers tests, links, diagram drift, generators, manifests, screenshots, browser checks, and portable reset/idempotency contracts; live receipts remain environment-specific |
 | 6. Managed orchestration | Contract-ready, not fully proven live | Require deployed AgentCore and Databricks traces before presenter-ready live claims |
 
 ## Reconciliation actions
@@ -126,10 +126,10 @@ These belong in a CLM example pack or generated vertical, not in template defaul
 
 | Priority | Gap | Done when |
 |---|---|---|
-| P0 | No single top-level verification command | One command produces a concise pass/fail matrix for tests, links, diagrams, outputs, secrets, and runtime-ID isolation |
+| Complete | Single top-level verification command | `python3 scripts/validate_clm.py` produces the repository matrix; `--presenter-ready` additionally requires live receipts |
 | P0 | Managed AgentCore and Databricks remain readiness gates | Current deployed traces and bounded-query evidence exist, or all output remains explicitly labelled illustrative/local |
-| P1 | Screenshot freshness is implicit | A manifest maps every HTML screenshot to its source, capture date, crop rule, and readiness state |
-| P1 | Diagram synchronization is not one visible gate | Every maintained `.mmd`/`.svg` pair is drift-checked by the root validator |
+| Complete | Screenshot freshness is explicit | `config/demo/screenshot-manifest.json` maps every screenshot to its source, capture date, crop rule, scenario, and readiness state |
+| Complete | Diagram synchronization is visible | Every maintained `.mmd`/`.svg` pair is drift-checked by the root validator |
 | P1 | Versioned release state is weak | Add a small `VERSION`/`CHANGELOG` convention or an equivalent release manifest |
 | P2 | External-system reset evidence is mostly procedural | Repeated setup/run/reset produces idempotent receipts for owned demo objects |
 
@@ -157,4 +157,4 @@ The template and CLM are reconciled when:
 
 ## Recommended next step
 
-Add one top-level CLM validation command that reports placeholder and secret scans; JSON and schema validity; Markdown links; Mermaid/SVG drift; unit, lint, build, and browser tests; deterministic fixture and presenter generation; scenario- and screenshot-manifest completeness; branding; runtime-ID isolation; and clean-reset/idempotent-rerun evidence as a concise pass/fail matrix. The template now has this contract and the reusable lifecycle marketecture generator; bringing the mature CLM reference to the same one-command verification standard is the highest-value remaining reconciliation task.
+Execute the Cross-Platform Agentic Orchestration path in current managed environments and populate secret-free Box, Salesforce, AgentCore, and Databricks validation receipts. The repository contract is now reconciled; current bounded live evidence is the remaining requirement before the full scenario can pass `python3 scripts/validate_clm.py --presenter-ready`.

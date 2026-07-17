@@ -28,6 +28,27 @@ Scenario presentation packages:
 Review the numbered HTML files in order. Each **guide** contains the complete narrative, architecture, flow, presenter script, screenshots, readiness, and setup. Each **visual gallery** is the shorter screenshot-only companion.
 - Existing detailed Box + Agentforce + React scripts remain inside `docs/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/` as supporting deep dives.
 
+## Validate the repository
+
+Install the declared Python and React validation dependencies once, then run the complete matrix:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+npm install --global @mermaid-js/mermaid-cli@11.12.0
+npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/validate_clm.py
+```
+
+The command checks secrets and live-ID isolation, JSON and schemas, local links, Mermaid/SVG drift, Python and React tests, lint, build, Playwright, deterministic fixtures and presenter output, scenario and screenshot manifests, portability, and reset/idempotency contracts. Repository mode intentionally skips live-environment receipts.
+
+After completing the integrated live tests, copy `config/runtime/validation-receipts.example.json` to the gitignored `config/runtime/validation-receipts.json`, replace every example value with current evidence, and run:
+
+```bash
+python3 scripts/validate_clm.py --presenter-ready
+```
+
+This stricter mode fails closed unless Box, Salesforce, AgentCore, and Databricks have current passed receipts. It does not treat repository tests as proof of live deployment.
+
 The scenario is an enterprise commercial contract workflow for **Acme Robotics** negotiating a master services agreement (MSA), data processing addendum (DPA), statement of work (SOW), and order form with **Northstar Health**.
 
 ---

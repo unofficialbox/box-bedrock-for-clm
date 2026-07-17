@@ -26,7 +26,7 @@ New operators should build and rehearse **Box Automate–Led Agentic Orchestrati
 
 You need:
 
-- Python 3.10+, Node.js/npm, [Box CLI](https://developer.box.com/guides/tooling/cli/), and [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli).
+- Python 3.10+, Node.js/npm, Mermaid CLI (`mmdc`), [Box CLI](https://developer.box.com/guides/tooling/cli/), and [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli).
 - A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.
 - A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.
 - Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.
@@ -34,6 +34,14 @@ You need:
 Have the administrators complete the [product and permission checklist](04-entitlement-checklist.md). Do not infer entitlements from a successful CLI login.
 
 Do not place client secrets, access tokens, private keys, or passwords in this repository.
+
+Install the repository validation dependencies once:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+npm install --global @mermaid-js/mermaid-cli@11.12.0
+npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+```
 
 ## 3. Create local configuration
 
@@ -121,10 +129,12 @@ After recording the published App, Form, and Hub URLs in `demo-environment.json`
 ```bash
 python3 scripts/demo_operator.py resolve-config
 python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
-python3 -m unittest discover -s tests -v
+python3 scripts/validate_clm.py
 ```
 
 Then run the [integrated smoke test](02-smoke-test.md). Do not present the environment as ready until the selected scenario passes its checklist.
+
+After the full live smoke test, copy `config/runtime/validation-receipts.example.json` to `config/runtime/validation-receipts.json`, replace every example with current external run-log evidence, and run `python3 scripts/validate_clm.py --presenter-ready`. The receipt file is ignored by Git and must not contain credentials.
 
 ## 7. Present with tell/show/tell
 
