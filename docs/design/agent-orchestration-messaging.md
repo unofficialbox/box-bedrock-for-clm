@@ -30,6 +30,19 @@ Use this message system for executive marketecture, customer datasheets, generat
 4. Emphasize production operation, observability, controls, and measurable outcomes.
 5. Use platform names to clarify roles, not as a substitute for a customer outcome.
 
+## Lifecycle Contribution Pattern
+
+For lifecycle marketecture, lead with the business flow and show each platform's persistent responsibility across it:
+
+1. Contract Intake
+2. Classification & Enrichment
+3. Clause & Redline Analysis
+4. Cross-Source Commercial Validation
+5. Human Decision Gate
+6. Approved Execution & Lifecycle Management
+
+Use **“One end-to-end lifecycle. Persistent platform responsibilities.”** as the lifecycle-marketecture operating principle. Keep human authority inside the lifecycle, not in a detached governance footer. Describe AgentCore as the coordinator; describe Box, Salesforce Agentforce, and Databricks as authoritative for governed content, business context, and analytical intelligence respectively.
+
 ## Retired Phrases
 
 Do not reintroduce these phrases into generated collateral:
