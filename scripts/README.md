@@ -12,6 +12,7 @@ Available scripts:
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
 | `build_agentcore_primary_marketecture.py` | Build the coordinated contract-work variation across Box, Salesforce Agentforce, Databricks, specialized agents, and accountable teams |
 | `build_customer_datasheet.py` | Build the nontechnical Box Solutions datasheet for generalists, sales teams, customers, and IT decision makers |
+| `build_contract_lifecycle_readiness_marketecture.py` | Build the lifecycle swimlane marketecture showing persistent platform responsibilities and human decision authority |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
 | `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
 
@@ -84,6 +85,12 @@ Build the customer-facing Box Solutions datasheet:
 python3 scripts/build_customer_datasheet.py
 ```
 
+Build the contract lifecycle contribution marketecture:
+
+```bash
+python3 scripts/build_contract_lifecycle_readiness_marketecture.py
+```
+
 Review outputs in this order:
 
 1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
@@ -94,5 +101,6 @@ Review outputs in this order:
 6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.
 7. `output/html/06-agentcore-agent-experience-marketecture.html` — coordinated contract work across content, business data, analytics, and accountable teams.
 8. `output/html/07-customer-solution-datasheet.html` — high-level customer and sales datasheet focused on experience and outcomes.
+9. `output/html/08-contract-lifecycle-readiness-marketecture.html` — executive lifecycle view showing how each platform contributes from intake through lifecycle management.
 
-Guide diagrams and screenshots open in a full-size dialog. All eight files remain self-contained with no external assets.
+Guide diagrams and screenshots open in a full-size dialog. All nine files remain self-contained with no external assets.

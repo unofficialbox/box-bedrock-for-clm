@@ -21,6 +21,7 @@ Scenario presentation packages:
 - [05 executive marketecture](output/html/05-executive-marketecture.html) — business value, governance, phased delivery, target architecture, and real-product proof for IT decision makers
 - [06 coordinated contract-work marketecture](output/html/06-agentcore-agent-experience-marketecture.html) — Amazon Bedrock AgentCore coordinates specialized agents across Box, Salesforce Agentforce, and Databricks with evidence, controls, and human approvals
 - [07 customer solution datasheet](output/html/07-customer-solution-datasheet.html) — nontechnical tell/show/tell overview for generalists, sales teams, customers, and IT decision makers
+- [08 contract lifecycle readiness marketecture](output/html/08-contract-lifecycle-readiness-marketecture.html) — lifecycle swimlane view of persistent platform contributions, expert review, and approved execution
 - [Marketecture design concepts](docs/design/marketecture-concepts/README.md) — committed visual references, explicitly separated from real-demo screenshot evidence
 - [Agent orchestration messaging](docs/design/agent-orchestration-messaging.md) — researched messaging principles, approved headline system, and retired phrases for generated collateral
 
@@ -125,6 +126,7 @@ Generated artifacts:
 | `output/html/05-executive-marketecture.html` | Executive, non-technical marketecture for IT and business decision makers |
 | `output/html/06-agentcore-agent-experience-marketecture.html` | Executive variation showing coordinated contract work across content, business data, analytics, and accountable teams |
 | `output/html/07-customer-solution-datasheet.html` | Customer-facing Box Solutions datasheet centered on experience, outcomes, and the CLM starting point |
+| `output/html/08-contract-lifecycle-readiness-marketecture.html` | Executive lifecycle marketecture showing persistent platform responsibilities and human decision authority |
 
 Config artifacts:
 

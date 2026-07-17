@@ -6,6 +6,7 @@ These first-party assets are embedded into the self-contained generated HTML. Ke
 |---|---|---|
 | Box | `box-logo-blue.svg` | Box Corporate Logo shared folder linked from the Box branding guidelines |
 | Salesforce | `salesforce-logo.jpeg` | Official Salesforce logo supplied by the demo owner |
+| Salesforce | `salesforce-logo-cropped.png` | Presentation crop of the supplied official logo; whitespace removed without altering the mark |
 | Databricks | `databricks-primary-lockup-full-color.png` | Official Databricks Asset Library primary lockup supplied by the demo owner |
 | AWS | `aws-cloud-logo-dark.svg` | [AWS-approved Q2 2026 architecture icon package](https://aws.amazon.com/architecture/icons/) |
 | Amazon Bedrock AgentCore | `amazon-bedrock-agentcore.svg` | [AWS-approved Q2 2026 architecture icon package](https://aws.amazon.com/architecture/icons/) |
