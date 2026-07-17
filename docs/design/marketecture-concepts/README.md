@@ -5,7 +5,7 @@ These images are visual design references for the generated executive HTML artif
 | Concept | Generated artifact | Architecture emphasis |
 |---|---|---|
 | [Executive platform marketecture](05-executive-platform-marketecture-concept.png) | [05 executive marketecture](../../../output/html/05-executive-marketecture.html) | AgentCore directs Box, Salesforce Agentforce, and Databricks as purpose-built platform roles |
-| [AgentCore agent-experience marketecture](06-agentcore-agent-experience-concept.png) | [06 AgentCore agent-experience marketecture](../../../output/html/06-agentcore-agent-experience-marketecture.html) | AgentCore Agents are the primary employee experience over governed systems of record |
+| [Coordinated contract-work marketecture](06-agentcore-agent-experience-concept.png) | [06 coordinated contract-work marketecture](../../../output/html/06-agentcore-agent-experience-marketecture.html) | Amazon Bedrock AgentCore coordinates agents, enterprise content, business data, analytics, and accountable teams |
 | [Box Solutions SDK naming concept](07-box-solutions-sdk-concept.png) | Naming study only | Positions the framework as reusable solution-building capabilities, with CLM as one implementation |
 | [Box Solutions Harness naming concept](08-box-solutions-harness-concept.png) | Naming study only | Positions the framework as a governed assembly and orchestration foundation, with CLM as one implementation |
 | [Customer solution datasheet](09-customer-solution-datasheet-concept.png) | [07 customer solution datasheet](../../../output/html/07-customer-solution-datasheet.html) | Leads with the guided experience, customer outcomes, and CLM example while keeping platform mechanics secondary |

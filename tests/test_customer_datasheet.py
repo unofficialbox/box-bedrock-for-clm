@@ -27,6 +27,10 @@ class CustomerDatasheetTests(unittest.TestCase):
         self.assertIn("Reduce risk", document)
         self.assertIn("Stay in control", document)
         self.assertIn("Start with contract lifecycle management", document)
+        self.assertIn("The right context for every decision.", document)
+        self.assertNotIn("One experience. Your trusted systems.", document)
+        self.assertNotIn("guided, intelligent experience", document)
+        self.assertNotIn("trusted content", document)
         self.assertIn("Salesforce Agentforce", document)
         self.assertIn("AWS Bedrock AgentCore", document)
         self.assertNotIn("Powered by governed agent orchestration", document)
@@ -38,6 +42,8 @@ class CustomerDatasheetTests(unittest.TestCase):
         self.assertIn('alt="Box"', document)
         self.assertIn('alt="Salesforce"', document)
         self.assertIn('alt="Databricks"', document)
+        for brand in ("box", "salesforce", "databricks"):
+            self.assertIn(f'data-brand-logo="{brand}"', document)
         self.assertIsNone(re.search(r'(?:src|href)=["\']https?://', document))
 
     def test_official_brand_assets_are_available(self) -> None:

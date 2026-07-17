@@ -17,6 +17,7 @@ mimetypes.add_type("image/svg+xml", ".svg")
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "output" / "html"
+BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 
 SCENARIOS = (
@@ -34,6 +35,7 @@ SCENARIOS = (
         "accent": "#f4c86a",
         "accent_2": "#5a95ff",
         "label": "Fresh-environment setup for human and AI-assisted operators",
+        "brands": ("box", "salesforce", "databricks"),
     },
     {
         "order": "01",
@@ -42,6 +44,7 @@ SCENARIOS = (
         "accent": "#72e3bd",
         "accent_2": "#5a95ff",
         "label": "Workflow-directed agentic orchestration in Box Automate",
+        "brands": ("box", "salesforce"),
     },
     {
         "order": "03",
@@ -50,6 +53,7 @@ SCENARIOS = (
         "accent": "#a98bff",
         "accent_2": "#5aaeff",
         "label": "Supervisor-led, multi-platform orchestration",
+        "brands": ("box", "salesforce", "databricks"),
     },
 )
 
@@ -70,6 +74,21 @@ def data_uri(path: Path) -> str:
         raise ValueError(f"Unsupported embedded asset type: {path}")
     payload = base64.b64encode(path.read_bytes()).decode("ascii")
     return f"data:{mime};base64,{payload}"
+
+
+def brand_logos(names: tuple[str, ...]) -> str:
+    """Render official embedded platform logos for the active scenario."""
+
+    assets = {
+        "box": ("box-logo-blue.svg", "Box"),
+        "salesforce": ("salesforce-logo.jpeg", "Salesforce"),
+        "databricks": ("databricks-primary-lockup-full-color.png", "Databricks"),
+    }
+    return "".join(
+        f'<img class="brand-logo brand-logo-{name}" data-brand-logo="{name}" '
+        f'src="{data_uri(BRAND_ASSETS / assets[name][0])}" alt="{assets[name][1]}">'
+        for name in names
+    )
 
 
 @dataclass
@@ -394,7 +413,12 @@ def stylesheet(accent: str, accent_2: str) -> str:
       min-height: 64px;
     }}
     .brand {{ display: flex; align-items: center; gap: 12px; font-weight: 750; letter-spacing: -.015em; }}
-    .brand-mark {{ width: 30px; height: 30px; border-radius: 9px; background: linear-gradient(135deg, var(--accent-2), var(--accent)); box-shadow: 0 0 28px color-mix(in srgb, var(--accent) 32%, transparent); }}
+    .brand > img {{ width: 58px; height: 32px; object-fit: contain; }}
+    .platform-logos {{ position: relative; z-index: 1; display: flex; align-items: center; gap: 18px; min-height: 54px; margin-bottom: 28px; }}
+    .platform-logos img {{ display: block; max-width: 148px; height: 42px; object-fit: contain; border-radius: 0; background: transparent; }}
+    .platform-logos .brand-logo-box {{ width: 76px; }}
+    .platform-logos .brand-logo-salesforce {{ width: 128px; height: 46px; border-radius: 8px; }}
+    .platform-logos .brand-logo-databricks {{ width: 142px; }}
     .print-button {{
       border: 1px solid var(--line);
       border-radius: 999px;
@@ -546,7 +570,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
 <body>
   <header class="masthead">
     <div class="shell masthead-inner">
-      <div class="brand"><span class="brand-mark" aria-hidden="true"></span><span class="brand-label">Acme Robotics · CLM Demo Guide</span></div>
+      <div class="brand"><img data-brand-logo="box" src="{data_uri(BRAND_ASSETS / 'box-logo-blue.svg')}" alt="Box"><span class="brand-label">Acme Robotics · CLM Demo Guide</span></div>
       <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
     </div>
   </header>
@@ -558,6 +582,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
     <main>
       <section class="hero" id="top">
         <div class="hero-copy">
+          <div class="platform-logos" aria-label="Platforms in this scenario">{brand_logos(tuple(scenario['brands']))}</div>
           <div class="scenario-label">{html.escape(str(scenario['label']))}</div>
           <h1>{html.escape(rendered.title)}</h1>
           <p class="summary">{summary_html}</p>
@@ -621,6 +646,7 @@ class PortableHTMLValidator(HTMLParser):
         super().__init__()
         self.errors: list[str] = []
         self.images = 0
+        self.brand_images = 0
         self.zoom_triggers = 0
         self.dialogs = 0
         self.sections: set[str] = set()
@@ -631,6 +657,8 @@ class PortableHTMLValidator(HTMLParser):
             src = attributes.get("src")
             if src:
                 self.images += 1
+                if attributes.get("data-brand-logo"):
+                    self.brand_images += 1
                 if not src.startswith("data:image/"):
                     self.errors.append(f"non-embedded image: {src}")
         classes = (attributes.get("class") or "").split()
@@ -653,9 +681,10 @@ def validate_document(path: Path, rendered: RenderedMarkdown) -> None:
     parser.feed(path.read_text(encoding="utf-8"))
     expected_sections = {anchor for anchor, _ in rendered.sections}
     missing_sections = expected_sections - parser.sections
-    if parser.images != len(rendered.embedded_assets):
+    content_images = parser.images - parser.brand_images
+    if content_images != len(rendered.embedded_assets):
         parser.errors.append(
-            f"embedded image count {parser.images} != {len(rendered.embedded_assets)}"
+            f"embedded content image count {content_images} != {len(rendered.embedded_assets)}"
         )
     if parser.zoom_triggers != len(rendered.embedded_assets):
         parser.errors.append(
