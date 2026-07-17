@@ -20,8 +20,10 @@ SPEC.loader.exec_module(validation)
 
 class CLMValidationTests(unittest.TestCase):
     def test_json_schema_and_link_checks_cover_repository_sources(self) -> None:
-        self.assertRegex(validation.check_json_and_schemas(), r"\d+ JSON files")
-        self.assertRegex(validation.check_local_links(), r"\d+ Markdown files")
+        json_detail = validation.check_json_and_schemas()
+        link_detail = validation.check_local_links()
+        self.assertGreater(int(json_detail.split()[0]), 0)
+        self.assertGreater(int(link_detail.split()[0]), 0)
 
     def test_broken_local_link_is_reported(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -33,8 +35,8 @@ class CLMValidationTests(unittest.TestCase):
     def test_secret_and_live_environment_values_are_reported(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            (root / "unsafe.json").write_text(
-                '{"client' + 'Secret":"not-safe","url":"https://tenant' + '.ent.box.com/folder/1"}',
+            (root / "unsafe.toml").write_text(
+                'client' + 'Secret="not-safe"\nurl="https://tenant' + '.ent.box.com/folder/1"',
                 encoding="utf-8",
             )
             with self.assertRaisesRegex(validation.ValidationError, "Secrets or environment-bound values"):
@@ -65,7 +67,7 @@ class CLMValidationTests(unittest.TestCase):
                         "platform": platform,
                         "environment": "current-demo",
                         "validatedAt": datetime.now(UTC).isoformat(),
-                        "actionMode": "live-smoke-test",
+                        "actionMode": "live",
                         "businessKey": "CLM-2026-0017",
                         "status": "passed",
                         "evidence": "external-run-log-17",
@@ -75,12 +77,68 @@ class CLMValidationTests(unittest.TestCase):
                 ],
             }
             (runtime / "validation-receipts.json").write_text(json.dumps(receipts), encoding="utf-8")
-            self.assertIn("Box, Salesforce", validation.check_live_receipts(root, required=True))
+            detail = validation.check_live_receipts(root, required=True)
+            for platform in ("Box", "Salesforce", "AgentCore", "Databricks"):
+                self.assertIn(platform, detail)
+                receipt = next(item for item in receipts["receipts"] if item["platform"] == platform)
+                self.assertEqual("passed", receipt["status"])
+                self.assertEqual("live", receipt["actionMode"])
+                self.assertEqual("current-demo", receipt["environment"])
+
+    def test_presenter_ready_receipts_reject_non_live_action_modes(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / "config" / "runtime"
+            runtime.mkdir(parents=True)
+            receipts = {
+                "receipts": [
+                    {
+                        "platform": platform,
+                        "environment": "current-demo",
+                        "validatedAt": datetime.now(UTC).isoformat(),
+                        "actionMode": "mock" if platform == "AgentCore" else "live",
+                        "businessKey": "CLM-2026-0017",
+                        "status": "passed",
+                        "evidence": "external-run-log-17",
+                        "cleanupOwner": "demo-operator",
+                    }
+                    for platform in ("Box", "Salesforce", "AgentCore", "Databricks")
+                ]
+            }
+            (runtime / "validation-receipts.json").write_text(json.dumps(receipts), encoding="utf-8")
+            with self.assertRaisesRegex(validation.ValidationError, "coverage is incomplete"):
+                validation.check_live_receipts(root, required=True)
+
+    def test_presenter_ready_receipts_are_scanned_for_secrets(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            runtime = root / "config" / "runtime"
+            runtime.mkdir(parents=True)
+            (runtime / "validation-receipts.json").write_text(
+                '{"access' + 'Token":"not-safe","receipts":[]}',
+                encoding="utf-8",
+            )
+            with self.assertRaisesRegex(validation.ValidationError, "Secrets found in live receipts"):
+                validation.check_live_receipts(root, required=True)
+
+    def test_portable_resource_parser_catches_html_and_css_network_dependencies(self) -> None:
+        parser = validation.PortableResourceParser()
+        parser.feed(
+            '<img src = https://example.com/a.png srcset="data:image/png;base64,x 1x, //example.com/b.png 2x">'
+            '<style>.hero{background:url(https://example.com/c.png)}</style>'
+        )
+        self.assertEqual(3, len(parser.external_references))
 
     def test_execute_records_failure_without_stopping_matrix(self) -> None:
-        result = validation.execute("expected", lambda: (_ for _ in ()).throw(validation.ValidationError("boom")))
-        self.assertEqual("FAIL", result.status)
-        self.assertEqual("boom", result.detail)
+        ran: list[str] = []
+        results = [
+            validation.execute("expected", lambda: (_ for _ in ()).throw(validation.ValidationError("boom"))),
+            validation.execute("after failure", lambda: ran.append("ran") or "complete"),
+        ]
+        self.assertEqual("FAIL", results[0].status)
+        self.assertEqual("boom", results[0].detail)
+        self.assertEqual("PASS", results[1].status)
+        self.assertEqual(["ran"], ran)
 
 
 if __name__ == "__main__":

@@ -15,6 +15,7 @@ import time
 import zipfile
 from dataclasses import dataclass
 from datetime import UTC, date, datetime
+from html.parser import HTMLParser
 from pathlib import Path
 from typing import Callable
 
@@ -26,7 +27,8 @@ EXCLUDED_PARTS = {
     ".git", "node_modules", "dist", "build", "coverage", "playwright-report",
     "test-results", "__pycache__", ".pytest_cache",
 }
-TEXT_SUFFIXES = {".md", ".json", ".py", ".ts", ".tsx", ".js", ".xml", ".sh", ".yml", ".yaml"}
+MAX_TEXT_BYTES = 5_000_000
+RUNTIME_ID_SUFFIXES = {".md", ".json", ".py", ".ts", ".tsx", ".js", ".xml", ".sh", ".yml", ".yaml", ".toml", ".env", ".properties"}
 SECRET_ASSIGNMENT = re.compile(
     r'''(?ix)["']?(client[_-]?secret|access[_-]?token|refresh[_-]?token|api[_-]?key|password)["']?\s*[:=]\s*["']([^"'\n]+)'''
 )
@@ -66,32 +68,45 @@ def repository_files(root: Path = ROOT) -> list[Path]:
     return [path for path in root.rglob("*") if path.is_file() and not EXCLUDED_PARTS.intersection(path.parts)]
 
 
+def secret_findings(text: str, label: str) -> list[str]:
+    findings: list[str] = []
+    for match in SECRET_ASSIGNMENT.finditer(text):
+        value = match.group(2).strip().lower()
+        if not any(marker in value for marker in ("${", "example", "placeholder", "replace", "<", "your-", "none")):
+            findings.append(f"{label}: possible committed {match.group(1)}")
+    if PRIVATE_KEY.search(text):
+        findings.append(f"{label}: private key material")
+    return findings
+
+
 def check_secrets_and_runtime_ids(root: Path = ROOT) -> str:
     findings: list[str] = []
     scanned = 0
     placeholder_marker = "replace" + "-with-"
     for path in repository_files(root):
         relative = path.relative_to(root)
-        if EXCLUDED_PARTS.intersection(relative.parts) or path.name == "package-lock.json" or path.suffix.lower() not in TEXT_SUFFIXES:
+        if EXCLUDED_PARTS.intersection(relative.parts) or path.stat().st_size > MAX_TEXT_BYTES:
             continue
         try:
-            text = path.read_text(encoding="utf-8")
+            raw = path.read_bytes()
+            if b"\x00" in raw:
+                continue
+            text = raw.decode("utf-8")
         except UnicodeDecodeError:
             continue
         scanned += 1
-        for match in SECRET_ASSIGNMENT.finditer(text):
-            value = match.group(2).strip().lower()
-            if not any(marker in value for marker in ("${", "example", "placeholder", "replace", "<", "your-", "none")):
-                findings.append(f"{relative}: possible committed {match.group(1)}")
-        if PRIVATE_KEY.search(text):
-            findings.append(f"{relative}: private key material")
+        findings.extend(secret_findings(text, str(relative)))
         if LIVE_BOX_HOST.search(text):
             findings.append(f"{relative}: tenant-specific Box hostname")
         if LIVE_SALESFORCE_HOST.search(text):
             findings.append(f"{relative}: org-specific Salesforce hostname")
         if placeholder_marker in text.lower() and ".example." not in path.name:
             findings.append(f"{relative}: unresolved replace-with placeholder outside an example file")
-        if relative.parts and relative.parts[0] not in {"output", "sample-data"}:
+        if (
+            relative.parts
+            and relative.parts[0] not in {"output", "sample-data"}
+            and path.suffix.lower() in RUNTIME_ID_SUFFIXES
+        ):
             for line_number, line in enumerate(text.splitlines(), 1):
                 if LONG_NUMERIC_ID.search(line):
                     findings.append(f"{relative}:{line_number}: possible live numeric identifier")
@@ -192,9 +207,21 @@ def normalized_trace(path: Path) -> dict:
     return remove_timestamps(data)
 
 
-def docx_document_xml(path: Path) -> bytes:
+def docx_semantic_archive(path: Path) -> dict[str, bytes]:
     with zipfile.ZipFile(path) as archive:
-        return archive.read("word/document.xml")
+        members: dict[str, bytes] = {}
+        for name in sorted(archive.namelist()):
+            content = archive.read(name)
+            if name == "docProps/core.xml":
+                text = content.decode("utf-8")
+                text = re.sub(
+                    r"(<dcterms:(?:created|modified)[^>]*>).*?(</dcterms:(?:created|modified)>)",
+                    r"\1<TIMESTAMP>\2",
+                    text,
+                )
+                content = text.encode("utf-8")
+            members[name] = content
+        return members
 
 
 def check_generated_fixtures(root: Path = ROOT) -> str:
@@ -251,8 +278,8 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
         if {path.name for path in docgen_runs[0].glob("*.docx")} != expected_docx:
             raise ValidationError("Doc Gen output set is incomplete")
         for name in expected_docx:
-            first_xml = docx_document_xml(docgen_runs[0] / name)
-            if first_xml != docx_document_xml(docgen_runs[1] / name) or first_xml != docx_document_xml(root / "output" / "docgen" / name):
+            first_archive = docx_semantic_archive(docgen_runs[0] / name)
+            if first_archive != docx_semantic_archive(docgen_runs[1] / name) or first_archive != docx_semantic_archive(root / "output" / "docgen" / name):
                 raise ValidationError(f"Doc Gen template drift: {name}")
     return "6 PDFs, 3 deterministic data fixtures, 1 trace, 3 Doc Gen templates"
 
@@ -289,10 +316,58 @@ def check_generated_presenters(root: Path = ROOT) -> str:
     return "9 deterministic self-contained HTML files"
 
 
+class PortableResourceParser(HTMLParser):
+    """Collect network-backed HTML attributes and CSS URLs."""
+
+    CSS_EXTERNAL_URL = re.compile(r'''url\(\s*["']?(?:https?:)?//''', re.IGNORECASE)
+
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.external_references: list[str] = []
+        self._style_depth = 0
+
+    @staticmethod
+    def is_external(value: str) -> bool:
+        normalized = value.strip().lower()
+        return normalized.startswith(("http://", "https://", "//"))
+
+    def inspect_attributes(self, attrs: list[tuple[str, str | None]]) -> None:
+        for name, value in attrs:
+            if not value:
+                continue
+            lowered = name.lower()
+            if lowered in {"src", "href"} and self.is_external(value):
+                self.external_references.append(value)
+            elif lowered == "srcset":
+                for candidate in value.split(","):
+                    url = candidate.strip().split(maxsplit=1)[0]
+                    if self.is_external(url):
+                        self.external_references.append(url)
+            elif lowered == "style" and self.CSS_EXTERNAL_URL.search(value):
+                self.external_references.append(value)
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.inspect_attributes(attrs)
+        if tag.lower() == "style":
+            self._style_depth += 1
+
+    def handle_startendtag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        self.inspect_attributes(attrs)
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag.lower() == "style" and self._style_depth:
+            self._style_depth -= 1
+
+    def handle_data(self, data: str) -> None:
+        if self._style_depth and self.CSS_EXTERNAL_URL.search(data):
+            self.external_references.append(data)
+
+
 def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = None) -> str:
     today = today or datetime.now(UTC).date()
     failures: list[str] = []
     scenario_paths = sorted((root / "config" / "demo").glob("*-demo-manifest.json"))
+    scenario_ids = {path.name.removesuffix("-demo-manifest.json") for path in scenario_paths}
     if len(scenario_paths) != 2:
         failures.append(f"expected 2 scenario manifests, found {len(scenario_paths)}")
     for path in scenario_paths:
@@ -312,8 +387,14 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
         path.relative_to(root).as_posix()
         for path in (root / "output" / "screenshots").rglob("*.png")
     }
+    if not entries or not actual:
+        failures.append("screenshot inventory must not be empty")
     if declared != actual:
         failures.append(f"screenshot manifest mismatch; missing={sorted(actual - declared)} extra={sorted(declared - actual)}")
+    covered_scenarios = {entry.get("scenario") for entry in entries}
+    missing_scenarios = scenario_ids - covered_scenarios
+    if missing_scenarios:
+        failures.append(f"screenshot coverage missing scenarios: {sorted(missing_scenarios)}")
     freshness_days = int(manifest.get("freshnessDays", 0))
     for entry in entries:
         for key in ("path", "scenario", "sourceSurface", "capturedOn", "readiness"):
@@ -329,12 +410,13 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
         if entry.get("readiness") != "real-demo":
             failures.append(f"{entry.get('path')}: readiness must be real-demo")
 
-    external_asset = re.compile(r'''(?:src|href)=["']https?://''', re.IGNORECASE)
     html_paths = sorted((root / "output" / "html").glob("*.html"))
     if len(html_paths) != 9:
         failures.append(f"expected 9 HTML outputs, found {len(html_paths)}")
     for path in html_paths:
-        if external_asset.search(path.read_text(encoding="utf-8")):
+        parser = PortableResourceParser()
+        parser.feed(path.read_text(encoding="utf-8"))
+        if parser.external_references:
             failures.append(f"{path.relative_to(root)}: external asset reference")
     if failures:
         raise ValidationError("Manifest, screenshot, or portability failures:\n" + "\n".join(failures))
@@ -365,7 +447,11 @@ def check_live_receipts(root: Path = ROOT, *, required: bool) -> str:
         if required:
             raise ValidationError("Presenter-ready validation requires config/runtime/validation-receipts.json")
         return "SKIP:repository mode; live environment receipts are not required"
-    data = json.loads(path.read_text(encoding="utf-8"))
+    receipt_text = path.read_text(encoding="utf-8")
+    receipt_secrets = secret_findings(receipt_text, str(path.relative_to(root)))
+    if receipt_secrets:
+        raise ValidationError("Secrets found in live receipts:\n" + "\n".join(receipt_secrets))
+    data = json.loads(receipt_text)
     receipts = data.get("receipts", [])
     freshness_days = int(data.get("freshnessDays", 30))
     failures: list[str] = []
@@ -385,7 +471,11 @@ def check_live_receipts(root: Path = ROOT, *, required: bool) -> str:
             failures.append(f"{platform}: invalid validatedAt: {error}")
     if failures:
         raise ValidationError("Live receipt validation failed:\n" + "\n".join(failures))
-    platforms = {receipt.get("platform") for receipt in receipts if receipt.get("status") == "passed"}
+    platforms = {
+        receipt.get("platform")
+        for receipt in receipts
+        if receipt.get("status") == "passed" and receipt.get("actionMode") == "live"
+    }
     expected = {"Box", "Salesforce", "AgentCore", "Databricks"}
     if platforms != expected:
         raise ValidationError(f"Live receipt coverage is incomplete: expected={sorted(expected)} actual={sorted(platforms)}")
