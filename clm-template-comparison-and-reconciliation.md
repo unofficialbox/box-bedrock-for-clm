@@ -5,7 +5,7 @@
 **Reviewed:** 2026-07-17  
 **Demo:** `box-bedrock-for-clm/` at `04600d9`  
 **Template baseline reviewed read-only:** `../box-bedrock-template/` branch `codex/life-sciences-template-reconciliation` at `5e99aa2`  
-**Baseline document:** [`../box-bedrock-template/box-bedrock-template-clm-comparison-and-reconciliation.md`](../box-bedrock-template/box-bedrock-template-clm-comparison-and-reconciliation.md)
+**Baseline document:** [`box-bedrock-template-clm-comparison-and-reconciliation.md` at `5e99aa2`](https://github.com/unofficialbox/box-bedrock-template/blob/5e99aa2935567460133d542db1ccb244a537d9be/box-bedrock-template-clm-comparison-and-reconciliation.md)
 
 ## Executive decision
 
@@ -157,4 +157,4 @@ The template and CLM are reconciled when:
 
 ## Recommended next step
 
-Add one top-level CLM validation command that reports the existing tests, links, diagram drift, generated output, branding, secrets, and runtime-ID isolation as a concise pass/fail matrix. The template now has this contract and the reusable lifecycle marketecture generator; bringing the mature CLM reference to the same one-command verification standard is the highest-value remaining reconciliation task.
+Add one top-level CLM validation command that reports placeholder and secret scans; JSON and schema validity; Markdown links; Mermaid/SVG drift; unit, lint, build, and browser tests; deterministic fixture and presenter generation; scenario- and screenshot-manifest completeness; branding; runtime-ID isolation; and clean-reset/idempotent-rerun evidence as a concise pass/fail matrix. The template now has this contract and the reusable lifecycle marketecture generator; bringing the mature CLM reference to the same one-command verification standard is the highest-value remaining reconciliation task.
