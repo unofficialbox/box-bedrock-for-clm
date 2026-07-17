@@ -1,0 +1,46 @@
+{
+  "receiptVersion": "1.0.0",
+  "freshnessDays": 30,
+  "receipts": [
+    {
+      "platform": "Box",
+      "environment": "replace-with-enterprise-name",
+      "validatedAt": "2026-07-17T00:00:00Z",
+      "actionMode": "live-smoke-test",
+      "businessKey": "CLM-2026-0017",
+      "status": "passed",
+      "evidence": "replace-with-external-run-log-reference",
+      "cleanupOwner": "replace-with-owner"
+    },
+    {
+      "platform": "Salesforce",
+      "environment": "replace-with-org-alias",
+      "validatedAt": "2026-07-17T00:00:00Z",
+      "actionMode": "live-smoke-test",
+      "businessKey": "CLM-2026-0017",
+      "status": "passed",
+      "evidence": "replace-with-external-run-log-reference",
+      "cleanupOwner": "replace-with-owner"
+    },
+    {
+      "platform": "AgentCore",
+      "environment": "replace-with-account-and-region",
+      "validatedAt": "2026-07-17T00:00:00Z",
+      "actionMode": "bounded-live-trace",
+      "businessKey": "CLM-2026-0017",
+      "status": "passed",
+      "evidence": "replace-with-external-run-log-reference",
+      "cleanupOwner": "replace-with-owner"
+    },
+    {
+      "platform": "Databricks",
+      "environment": "replace-with-workspace-name",
+      "validatedAt": "2026-07-17T00:00:00Z",
+      "actionMode": "bounded-query-test",
+      "businessKey": "CLM-2026-0017",
+      "status": "passed",
+      "evidence": "replace-with-external-run-log-reference",
+      "cleanupOwner": "replace-with-owner"
+    }
+  ]
+}

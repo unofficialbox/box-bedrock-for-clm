@@ -88,6 +88,7 @@ web_modules/
 # Generated per-operator environment bindings (copy from the example)
 config/runtime/demo-environment.json
 config/runtime/bootstrap-state.json
+config/runtime/validation-receipts.json
 config/runtime/generated/
 
 # parcel-bundler cache (https://parceljs.org/)

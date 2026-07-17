@@ -227,9 +227,13 @@
 <section class="guide-section" id="2-confirm-prerequisites">
 <h2>2. Confirm prerequisites</h2>
 <p>You need:</p>
-<ul><li>Python 3.10+, Node.js/npm, <span class="source-ref">Box CLI<sup aria-label="reference 1">1</sup></span>, and <span class="source-ref">Salesforce CLI<sup aria-label="reference 2">2</sup></span>.</li><li>A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.</li><li>A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.</li><li>Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.</li></ul>
+<ul><li>Python 3.10+, Node.js/npm, Mermaid CLI (<code>mmdc</code>), <span class="source-ref">Box CLI<sup aria-label="reference 1">1</sup></span>, and <span class="source-ref">Salesforce CLI<sup aria-label="reference 2">2</sup></span>.</li><li>A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.</li><li>A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.</li><li>Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.</li></ul>
 <p>Have the administrators complete the <span class="source-ref">product and permission checklist<sup aria-label="reference 3">3</sup></span>. Do not infer entitlements from a successful CLI login.</p>
 <p>Do not place client secrets, access tokens, private keys, or passwords in this repository.</p>
+<p>Install the repository validation dependencies once:</p>
+<pre><code class="language-bash">python3 -m pip install -r requirements-dev.txt
+npm install --global @mermaid-js/mermaid-cli@11.12.0
+npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp</code></pre>
 </section>
 <section class="guide-section" id="3-create-local-configuration">
 <h2>3. Create local configuration</h2>
@@ -276,8 +280,9 @@ python3 scripts/demo_operator.py resolve-config --allow-unresolved</code></pre>
 <p>After recording the published App, Form, and Hub URLs in <code>demo-environment.json</code>:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py resolve-config
 python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
-python3 -m unittest discover -s tests -v</code></pre>
+python3 scripts/validate_clm.py</code></pre>
 <p>Then run the <span class="source-ref">integrated smoke test<sup aria-label="reference 5">5</sup></span>. Do not present the environment as ready until the selected scenario passes its checklist.</p>
+<p>After the full live smoke test, copy <code>config/runtime/validation-receipts.example.json</code> to <code>config/runtime/validation-receipts.json</code>, replace every example with current external run-log evidence, and run <code>python3 scripts/validate_clm.py --presenter-ready</code>. The receipt file is ignored by Git and must not contain credentials.</p>
 </section>
 <section class="guide-section" id="7-present-with-tell-show-tell">
 <h2>7. Present with tell/show/tell</h2>

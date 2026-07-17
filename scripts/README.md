@@ -6,6 +6,7 @@ Available scripts:
 
 | Script | Purpose |
 |--------|---------|
+| `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
@@ -22,6 +23,17 @@ For a fresh environment, start with:
 cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json
 python3 scripts/demo_operator.py doctor
 ```
+
+For repository verification, install dependencies and run:
+
+```bash
+python3 -m pip install -r requirements-dev.txt
+npm install --global @mermaid-js/mermaid-cli@11.12.0
+npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/validate_clm.py
+```
+
+Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.json` and run `python3 scripts/validate_clm.py --presenter-ready`.
 
 The operator command sequence is:
 
