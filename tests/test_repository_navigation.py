@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import shutil
 import subprocess
 import unittest
 from pathlib import Path
@@ -36,8 +37,10 @@ class RepositoryNavigationTests(unittest.TestCase):
 
     def test_local_markdown_links_resolve(self):
         failures: list[str] = []
+        git = shutil.which("git")
+        self.assertIsNotNone(git, "git executable is required for navigation tests")
         tracked = subprocess.run(
-            ["git", "ls-files", "*.md"],
+            [git, "ls-files", "*.md"],
             cwd=ROOT,
             check=True,
             capture_output=True,
@@ -50,7 +53,9 @@ class RepositoryNavigationTests(unittest.TestCase):
                     continue
                 path_text = target.split("#", 1)[0]
                 destination = (source.parent / path_text).resolve()
-                if not destination.exists():
+                if destination != ROOT and ROOT not in destination.parents:
+                    failures.append(f"{source.relative_to(ROOT)} -> {target}")
+                elif not destination.exists():
                     failures.append(f"{source.relative_to(ROOT)} -> {target}")
         self.assertEqual([], failures)
 
