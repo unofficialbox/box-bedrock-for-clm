@@ -83,15 +83,17 @@ Use customer finance assumptions for revenue acceleration rather than a generic 
 
 ## Executive Metrics
 
+The targets below are illustrative planning ranges. Replace them with customer baselines and customer-approved targets before using them as commitments.
+
 | Metric | Before | Target |
 |--------|--------|--------|
 | Request-to-workspace time | Hours or days | Minutes |
-| Contract cycle time | Customer baseline | 20-40% reduction for standard agreements |
-| Legal review hours | Customer baseline | 20-30% reduction for low/medium-risk work |
-| Approval SLA breaches | Customer baseline | 30-50% reduction |
-| Metadata completeness | Inconsistent | 95%+ for executed agreements |
-| Renewal notice visibility | Manual | 100% of executed agreements with renewal metadata |
-| Obligation owner assignment | Manual | 90%+ extracted and assigned |
+| Contract cycle time | Customer baseline | Illustrative: 20-40% reduction for standard agreements |
+| Legal review hours | Customer baseline | Illustrative: 20-30% reduction for low/medium-risk work |
+| Approval SLA breaches | Customer baseline | Illustrative: 30-50% reduction |
+| Metadata completeness | Inconsistent | Illustrative: 95%+ for executed agreements |
+| Renewal notice visibility | Manual | Illustrative: 100% of executed agreements with renewal metadata |
+| Obligation owner assignment | Manual | Illustrative: 90%+ extracted and assigned |
 
 ---
 

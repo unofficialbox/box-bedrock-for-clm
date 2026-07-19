@@ -8,7 +8,6 @@
 | Clause Risk Agent | Contract or redline uploaded to Box | Compare clauses to playbook and score risk | Non-standard language, high-risk fallback, low confidence |
 | Approval Routing Agent | Risk report complete | Determine required approvers and route tasks | Approval conflict, SLA breach, exception request |
 | Obligation Monitor Agent | Contract executed | Extract obligations and create renewal/notice tasks | Ambiguous obligation, owner not found |
-| Contract Insights Agent | User asks question or scheduled dashboard refresh | Summarize contract status and portfolio risk | Unsupported legal conclusion, source not available |
 
 ---
 

@@ -27,7 +27,7 @@
 - Submit or open the validated Box intake.
 - Show the Automate approval gate, then the approved HTTPS branch.
 - Show the newly created Salesforce CLM record and returned record ID.
-- Open the React workspace with the returned `recordId`, `contractId`, and `boxFolderId`.
+- Open React with `recordId`, `contractId`, and `folderId=<returned boxFolderId>`.
 
 **Land**
 

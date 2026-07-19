@@ -4,7 +4,7 @@
 
 | Item | Value |
 |---|---|
-| Duration | 20-25 minutes |
+| Duration | 30-35 minutes |
 | Audience | Legal Ops, commercial counsel, Sales Ops, Finance, Privacy, Security |
 | Objective | Demonstrate package review, clause analysis, approval routing, DocGen, and post-signature readiness |
 | Contract | `CLM-2026-0017` — Northstar Health MSA |

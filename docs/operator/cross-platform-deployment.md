@@ -40,4 +40,4 @@ Record the non-secret values in `config/runtime/demo-environment.json`, resolve 
 python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 ```
 
-Passing that command proves required bindings and core Box/Salesforce resources exist; it does not replace cloud-provider deployment tests. Keep the scenario labeled **local/specification-backed** until those tests are recorded.
+Passing that command proves required bindings and core Box/Salesforce resources exist; it does not replace cloud-provider deployment tests. Keep the scenario labeled **Local deterministic fixture** until those tests are recorded.

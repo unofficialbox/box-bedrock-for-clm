@@ -13,9 +13,11 @@ This page routes use-case creators to the canonical messaging, visual sources, a
 
 ## Generated deliverables
 
-- `output/html/05-executive-marketecture.html`
-- `output/html/06-agentcore-agent-experience-marketecture.html`
-- `output/html/07-customer-solution-datasheet.html`
-- `output/html/08-contract-lifecycle-readiness-marketecture.html`
+| Deliverable | Exact generator |
+|---|---|
+| `output/html/05-executive-marketecture.html` | `scripts/build_executive_marketecture.py` |
+| `output/html/06-agentcore-agent-experience-marketecture.html` | `scripts/build_agentcore_primary_marketecture.py` |
+| `output/html/07-customer-solution-datasheet.html` | `scripts/build_customer_datasheet.py` |
+| `output/html/08-contract-lifecycle-readiness-marketecture.html` | `scripts/build_contract_lifecycle_readiness_marketecture.py` |
 
-Generate these from their `scripts/build_*` sources. They must remain self-contained, use approved logos, distinguish real screenshots from illustrative diagrams, and preserve the readiness language in `README.md`.
+Update the exact generator and its Markdown/configuration inputs before regenerating a deliverable. The outputs must remain self-contained, use approved logos, distinguish real screenshots from illustrative diagrams, and preserve the readiness language in `README.md`.

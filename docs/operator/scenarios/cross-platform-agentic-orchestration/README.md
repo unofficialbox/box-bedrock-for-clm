@@ -40,7 +40,7 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 | CLM Supervisor Agent | Plans bounded work, selects specialists, records handoffs, and enforces guardrails |
 | Box Contract Package Agent | Validates governed files, metadata, tasks, and package completeness |
 | Clause Risk Agent | Compares contract language to approved positions and returns cited findings |
-| Salesforce Commercial Agent | Compares order forms with account, opportunity, quote, and contract truth |
+| Salesforce Commercial Agent | Compares order forms with Salesforce account, opportunity, quote, and contract records; Box remains authoritative for contract content |
 | Salesforce Approval Agent | Determines required human reviewers and reports approval state |
 | Databricks Analytics Agent | Returns read-only historical outcomes and cycle-time context |
 | Obligation Monitor Agent | Produces draft candidate obligations for human validation |
@@ -141,7 +141,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 4. Confirm Box content and the safe Salesforce Agentforce fallback render without browser secrets.
 5. Confirm the trace shows Box, Salesforce Agentforce, and Databricks specialist work plus a signature-block guardrail.
 6. Confirm every finding has a Box citation and every approval remains human-owned.
-7. Describe AgentCore and Databricks as local/specification-backed until managed deployment tests pass.
+7. Describe AgentCore and Databricks as **Local deterministic fixture** evidence until managed deployment tests pass.
 
 ### Expected local trace
 

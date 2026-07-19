@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -12,11 +13,15 @@ MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
 class RepositoryNavigationTests(unittest.TestCase):
     def test_persona_and_scenario_entry_points_are_linked_from_root(self):
         readme = (ROOT / "README.md").read_text()
-        self.assertIn("Box Automate Agentic Orchestration", readme)
-        self.assertIn("Cross-Platform Agentic Orchestration", readme)
-        self.assertIn("docs/operator/README.md", readme)
-        self.assertIn("docs/use-case-creator/README.md", readme)
-        self.assertIn("docs/maintainers/README.md", readme)
+        targets = {target.split("#", 1)[0] for target in MARKDOWN_LINK.findall(readme)}
+        expected = {
+            "docs/operator/README.md",
+            "docs/use-case-creator/README.md",
+            "docs/maintainers/README.md",
+            "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
+            "docs/operator/scenarios/cross-platform-agentic-orchestration/README.md",
+        }
+        self.assertTrue(expected.issubset(targets), expected - targets)
 
     def test_approved_redundant_paths_are_removed(self):
         removed = [
@@ -31,7 +36,14 @@ class RepositoryNavigationTests(unittest.TestCase):
 
     def test_local_markdown_links_resolve(self):
         failures: list[str] = []
-        markdown_files = sorted({*ROOT.glob("*.md"), *(ROOT / "docs").rglob("*.md")})
+        tracked = subprocess.run(
+            ["git", "ls-files", "*.md"],
+            cwd=ROOT,
+            check=True,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+        markdown_files = [ROOT / relative for relative in tracked]
         for source in markdown_files:
             for target in MARKDOWN_LINK.findall(source.read_text()):
                 if target.startswith(("#", "http://", "https://", "mailto:")):
