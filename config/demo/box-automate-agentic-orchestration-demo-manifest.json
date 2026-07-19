@@ -2,7 +2,7 @@
   "manifestVersion": "1.0.0",
   "scenario": {
     "id": "clm-box-automate-agentic-orchestration",
-    "name": "Northstar CLM - Box Automate–Led Agentic Orchestration",
+    "name": "Northstar CLM - Box Automate Agentic Orchestration",
     "orchestrationModel": "deterministic workflow with agentic enrichment",
     "contractId": "CLM-2026-0017"
   },
@@ -27,13 +27,15 @@
     "Strands"
   ],
   "readiness": {
+    "repositoryState": "Local deterministic fixture",
+    "targetState": "Presenter-ready live",
     "boxSurfaces": "build-and-validate-per-environment",
     "automate": "keep-inactive-until-oauth-and-idempotency-tests-pass",
     "salesforceRest": "validate-standard-upsert-and-lookup-per-environment",
     "sign": "human-confirmation-required"
   },
   "documentation": {
-    "guide": "docs/scenarios/box-automate-agentic-orchestration/README.md",
+    "guide": "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
     "architectureSource": "docs/diagrams/box-automate-agentic-orchestration-architecture.mmd",
     "architectureRendered": "docs/diagrams/box-automate-agentic-orchestration-architecture.svg",
     "flowSource": "docs/diagrams/box-automate-agentic-orchestration-flow.mmd",

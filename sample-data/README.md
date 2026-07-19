@@ -16,7 +16,7 @@ Recommended files:
 | `output/json/clause-playbook.json` | Approved standard and fallback positions |
 | `output/csv/historical-clause-outcomes.csv` | Mock analytics context for analytics agents |
 
-Use the PDFs, Box metadata, and structured records together in the primary Box + Agentforce + React demo. Analytics and AgentCore traces support only the optional architecture experiment.
+Use the PDFs, Box metadata, structured records, approved clause Markdown, analytics fixture, and AgentCore trace across the two scenario packages. The analytics dataset and AgentCore trace are **Local deterministic fixture** evidence for Cross-Platform Agentic Orchestration; they are not proof of a **Deployed integration**.
 
 Regenerate all sample assets from the CLM demo root:
 

@@ -57,7 +57,7 @@
     {
       "id": "browser-configuration",
       "owner": "Box and Salesforce administrators",
-      "guide": "docs/operator/01-browser-configuration.md",
+      "guide": "docs/operator/browser-configuration.md",
       "writesExternalState": true,
       "confirmationGates": ["Publish Form", "Publish Hub", "Publish App", "Activate workflow"],
       "completeWhen": "Published URLs are recorded locally and the workflow remains inactive until the integration test passes."
@@ -79,7 +79,7 @@
     {
       "id": "integrated-smoke-test",
       "owner": "operator plus named reviewers",
-      "guide": "docs/operator/02-smoke-test.md",
+      "guide": "docs/operator/smoke-test.md",
       "writesExternalState": true,
       "confirmationGates": ["Activate workflow", "Generate document", "Send signature request", "Delete reset data"],
       "completeWhen": "The labeled Northstar request creates one Salesforce record, duplicate retry updates that record, domain tasks route correctly, and the reset log is complete."
@@ -87,7 +87,7 @@
     {
       "id": "agentic-readiness",
       "owner": "AWS, Databricks, Agentforce, and demo operators",
-      "guide": "docs/operator/03-cross-platform-deployment.md",
+      "guide": "docs/operator/cross-platform-deployment.md",
       "command": "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration",
       "writesExternalState": false,
       "appliesWhen": "Presenting managed Cross-Platform Agentic Orchestration rather than local deterministic fixtures",
@@ -96,7 +96,7 @@
     {
       "id": "rehearsal",
       "owner": "presenter",
-      "guide": "docs/scenarios/README.md",
+      "guide": "docs/operator/scenarios/README.md",
       "writesExternalState": false,
       "completeWhen": "The presenter completes the selected tell/show/tell script within the allotted time and can identify every simulated or unavailable integration."
     }

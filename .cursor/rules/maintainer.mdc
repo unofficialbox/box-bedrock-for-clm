@@ -1,0 +1,7 @@
+---
+description: Maintain and release the CLM repository
+globs:
+alwaysApply: false
+---
+
+Read `docs/maintainers/README.md`. Confirm branch and worktree, follow source-to-derived ownership, preserve safety contracts, update sources before generated artifacts, run focused tests, then run `python3 scripts/validate_clm.py` without skip flags.

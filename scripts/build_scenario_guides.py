@@ -25,12 +25,12 @@ SCENARIOS = (
         "order": "00",
         "slug": "operator-setup",
         "sources": [
-            ROOT / "docs" / "operator" / "00-start-here.md",
-            ROOT / "docs" / "operator" / "04-entitlement-checklist.md",
-            ROOT / "docs" / "operator" / "01-browser-configuration.md",
-            ROOT / "docs" / "operator" / "02-smoke-test.md",
-            ROOT / "docs" / "operator" / "03-cross-platform-deployment.md",
-            ROOT / "docs" / "operator" / "AI-OPERATOR.md",
+            ROOT / "docs" / "operator" / "start-here.md",
+            ROOT / "docs" / "operator" / "entitlement-checklist.md",
+            ROOT / "docs" / "operator" / "browser-configuration.md",
+            ROOT / "docs" / "operator" / "cross-platform-deployment.md",
+            ROOT / "docs" / "operator" / "smoke-test.md",
+            ROOT / "docs" / "operator" / "ai-operator.md",
         ],
         "accent": "#f4c86a",
         "accent_2": "#5a95ff",
@@ -40,7 +40,7 @@ SCENARIOS = (
     {
         "order": "01",
         "slug": "box-automate-agentic-orchestration",
-        "source": ROOT / "docs" / "scenarios" / "box-automate-agentic-orchestration" / "README.md",
+        "source": ROOT / "docs" / "operator" / "scenarios" / "box-automate-agentic-orchestration" / "README.md",
         "accent": "#72e3bd",
         "accent_2": "#5a95ff",
         "label": "Workflow-directed agentic orchestration in Box Automate",
@@ -49,7 +49,7 @@ SCENARIOS = (
     {
         "order": "03",
         "slug": "cross-platform-agentic-orchestration",
-        "source": ROOT / "docs" / "scenarios" / "cross-platform-agentic-orchestration" / "README.md",
+        "source": ROOT / "docs" / "operator" / "scenarios" / "cross-platform-agentic-orchestration" / "README.md",
         "accent": "#a98bff",
         "accent_2": "#5aaeff",
         "label": "Supervisor-led, multi-platform orchestration",
@@ -111,7 +111,21 @@ INLINE_PATTERN = re.compile(
 )
 
 
-def render_inline(text: str, references: ReferenceIndex) -> str:
+def canonical_reference_target(target: str, source: Path) -> str:
+    """Convert local Markdown targets to durable repository-relative paths."""
+
+    if target.startswith(("#", "http://", "https://", "mailto:")):
+        return target
+    path_text, separator, fragment = target.partition("#")
+    destination = (source.parent / path_text).resolve()
+    try:
+        repository_path = destination.relative_to(ROOT).as_posix()
+    except ValueError:
+        return target
+    return repository_path + (f"#{fragment}" if separator else "")
+
+
+def render_inline(text: str, references: ReferenceIndex, source: Path) -> str:
     """Render the small inline Markdown subset used by the scenario guides."""
 
     output: list[str] = []
@@ -123,7 +137,7 @@ def render_inline(text: str, references: ReferenceIndex) -> str:
             output.append(f"<code>{html.escape(token[1:-1])}</code>")
         elif token.startswith("**"):
             output.append(
-                f"<strong>{render_inline(token[2:-2], references)}</strong>"
+                f"<strong>{render_inline(token[2:-2], references, source)}</strong>"
             )
         else:
             label, target = re.fullmatch(r"\[([^\]]+)\]\(([^)]+)\)", token).groups()
@@ -133,7 +147,7 @@ def render_inline(text: str, references: ReferenceIndex) -> str:
                     f"{html.escape(label)}</a>"
                 )
             else:
-                number = references.add(label, target)
+                number = references.add(label, canonical_reference_target(target, source))
                 output.append(
                     f'<span class="source-ref">{html.escape(label)}'
                     f'<sup aria-label="reference {number}">{number}</sup></span>'
@@ -154,6 +168,7 @@ def table_cells(line: str) -> list[str]:
 
 @dataclass
 class RenderedMarkdown:
+    source: Path
     title: str
     summary: str
     body: str
@@ -181,7 +196,7 @@ def render_markdown(path: Path, references: ReferenceIndex | None = None) -> Ren
         if not paragraph:
             return
         content = " ".join(part.strip() for part in paragraph)
-        blocks.append(f"<p>{render_inline(content, references)}</p>")
+        blocks.append(f"<p>{render_inline(content, references, path)}</p>")
         paragraph.clear()
 
     while index < len(lines):
@@ -242,7 +257,7 @@ def render_markdown(path: Path, references: ReferenceIndex | None = None) -> Ren
                 blocks.append(f'<section class="guide-section" id="{anchor}">')
                 section_open = True
             blocks.append(
-                f'<h{level}>{render_inline(text, references)}</h{level}>'
+                f'<h{level}>{render_inline(text, references, path)}</h{level}>'
             )
             index += 1
             continue
@@ -256,11 +271,11 @@ def render_markdown(path: Path, references: ReferenceIndex | None = None) -> Ren
                 rows.append(table_cells(lines[index]))
                 index += 1
             header_html = "".join(
-                f"<th>{render_inline(cell, references)}</th>" for cell in headers
+                f"<th>{render_inline(cell, references, path)}</th>" for cell in headers
             )
             rows_html = "".join(
                 "<tr>"
-                + "".join(f"<td>{render_inline(cell, references)}</td>" for cell in row)
+                + "".join(f"<td>{render_inline(cell, references, path)}</td>" for cell in row)
                 + "</tr>"
                 for row in rows
             )
@@ -282,7 +297,7 @@ def render_markdown(path: Path, references: ReferenceIndex | None = None) -> Ren
                 item_match = re.match(pattern, lines[index].strip())
                 if not item_match:
                     break
-                items.append(f"<li>{render_inline(item_match.group(1), references)}</li>")
+                items.append(f"<li>{render_inline(item_match.group(1), references, path)}</li>")
                 index += 1
             blocks.append(f"<{tag}>{''.join(items)}</{tag}>")
             continue
@@ -295,6 +310,7 @@ def render_markdown(path: Path, references: ReferenceIndex | None = None) -> Ren
     if section_open:
         body += "\n</section>"
     return RenderedMarkdown(
+        source=path,
         title=title,
         summary=summary,
         body=body,
@@ -321,13 +337,14 @@ def render_sources(paths: list[Path]) -> RenderedMarkdown:
         body.append(
             f'<section class="guide-section document-divider" id="{anchor}">'
             f"<h2>{html.escape(document.title)}</h2>"
-            f"<p>{render_inline(document.summary, references)}</p>"
+            f"<p>{render_inline(document.summary, references, document.source)}</p>"
             "</section>"
         )
         body.append(document.body)
         embedded_assets.extend(document.embedded_assets)
 
     return RenderedMarkdown(
+        source=primary.source,
         title=primary.title,
         summary=primary.summary,
         body="\n".join(body),
@@ -556,7 +573,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
         for anchor, label in rendered.sections
     )
     toc += '<a href="#offline-reference-index">Offline reference index</a>'
-    summary_html = render_inline(rendered.summary, rendered.references)
+    summary_html = render_inline(rendered.summary, rendered.references, rendered.source)
     reference_index = render_reference_index(rendered.references)
     document = f"""<!doctype html>
 <html lang="en">
