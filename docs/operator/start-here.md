@@ -17,10 +17,10 @@ The generated IDs are stored only in `config/runtime/bootstrap-state.json`. The 
 
 ## 1. Choose a scenario
 
-- **Box Automate–Led Agentic Orchestration:** Box-led, predictable Automate stages with agentic enrichment and human approval.
+- **Box Automate Agentic Orchestration:** Box-led, predictable Automate stages with agentic enrichment and human approval.
 - **Cross-Platform Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
 
-New operators should build and rehearse **Box Automate–Led Agentic Orchestration first**. It is the foundation for both scenarios.
+New operators should build and rehearse **Box Automate Agentic Orchestration first**. It is the foundation for both scenarios.
 
 ## 2. Confirm prerequisites
 
@@ -31,7 +31,7 @@ You need:
 - A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.
 - Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.
 
-Have the administrators complete the [product and permission checklist](04-entitlement-checklist.md). Do not infer entitlements from a successful CLI login.
+Have the administrators complete the [product and permission checklist](entitlement-checklist.md). Do not infer entitlements from a successful CLI login.
 
 Do not place client secrets, access tokens, private keys, or passwords in this repository.
 
@@ -118,7 +118,7 @@ The Salesforce phase deploys the portable CLM data model and UI. It intentionall
 
 ## 5. Complete the administrator surfaces
 
-Follow [Browser and administrator configuration](01-browser-configuration.md) in order. It uses logical names from the repository and the IDs generated in `bootstrap-state.json`; it never asks you to reuse another tenant's IDs.
+Follow [Browser and administrator configuration](browser-configuration.md) in order. It uses logical names from the repository and the IDs generated in `bootstrap-state.json`; it never asks you to reuse another tenant's IDs.
 
 Stop and obtain explicit owner approval immediately before any final **Publish**, **Share**, **Activate**, **Generate**, or **Send** action.
 
@@ -132,7 +132,7 @@ python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orches
 python3 scripts/validate_clm.py
 ```
 
-Then run the [integrated smoke test](02-smoke-test.md). Do not present the environment as ready until the selected scenario passes its checklist.
+Then run the [integrated smoke test](smoke-test.md). Do not present the environment as ready until the selected scenario passes its checklist.
 
 After the full live smoke test, copy `config/runtime/validation-receipts.example.json` to `config/runtime/validation-receipts.json`, replace every example with current external run-log evidence, and run `python3 scripts/validate_clm.py --presenter-ready`. The receipt file is ignored by Git and must not contain credentials.
 
@@ -140,8 +140,8 @@ After the full live smoke test, copy `config/runtime/validation-receipts.example
 
 Use the presenter script inside the selected scenario guide:
 
-1. [Box Automate–Led Agentic Orchestration](../scenarios/box-automate-agentic-orchestration/README.md#4-presenter-script)
-2. [Cross-Platform Agentic Orchestration](../scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
+1. [Box Automate Agentic Orchestration](scenarios/box-automate-agentic-orchestration/README.md#4-presenter-script)
+2. [Cross-Platform Agentic Orchestration](scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
 
 Each step tells the audience what matters, shows one visible proof, then explains the outcome. Avoid narrating every click.
 
@@ -150,6 +150,6 @@ Each step tells the audience what matters, shows one visible proof, then explain
 ![Fresh-environment setup flow](../diagrams/operator-setup-flow.svg)
 
 - [Diagram source](../diagrams/operator-setup-flow.mmd)
-- [Manual-task register](../manual-task-register.md)
+- [Manual-task register](manual-task-register.md)
 - [Machine-readable operator workflow](../../config/operator/operator-workflow.json)
 - [AI-assisted operator protocol](AI-OPERATOR.md)

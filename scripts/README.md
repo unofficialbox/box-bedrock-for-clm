@@ -8,7 +8,7 @@ Available scripts:
 |--------|---------|
 | `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
-| `build_clm_experience_gallery.py` | Build separate self-contained Box Automate–Led Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
+| `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
 | `build_agentcore_primary_marketecture.py` | Build the coordinated contract-work variation across Box, Salesforce Agentforce, Databricks, specialized agents, and accountable teams |

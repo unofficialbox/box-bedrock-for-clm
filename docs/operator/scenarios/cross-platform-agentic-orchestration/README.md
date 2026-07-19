@@ -26,18 +26,30 @@ Repository truth: the React experience and Box specifications are available; the
 
 ## 2. Architecture
 
-![Cross-Platform Agentic Orchestration architecture](../../diagrams/clm-agentcore-architecture.svg)
+![Cross-Platform Agentic Orchestration architecture](../../../diagrams/clm-agentcore-architecture.svg)
 
 AgentCore/Strands owns planning and specialist delegation. Box governs content, Salesforce Agentforce provides structured commercial context plus Salesforce-native assistance and actions, Databricks supplies analytical context, and React presents the joined workspace.
 
-- [Architecture source](../../diagrams/clm-agentcore-architecture.mmd)
-- [Shared architecture and control detail](../../01-architecture.md)
+- [Architecture source](../../../diagrams/clm-agentcore-architecture.mmd)
+- [Shared architecture and control detail](../../../use-case-creator/architecture.md)
+
+### Specialist responsibilities
+
+| Specialist | Responsibility |
+|---|---|
+| CLM Supervisor Agent | Plans bounded work, selects specialists, records handoffs, and enforces guardrails |
+| Box Contract Package Agent | Validates governed files, metadata, tasks, and package completeness |
+| Clause Risk Agent | Compares contract language to approved positions and returns cited findings |
+| Salesforce Commercial Agent | Compares order forms with account, opportunity, quote, and contract truth |
+| Salesforce Approval Agent | Determines required human reviewers and reports approval state |
+| Databricks Analytics Agent | Returns read-only historical outcomes and cycle-time context |
+| Obligation Monitor Agent | Produces draft candidate obligations for human validation |
 
 [Continue to flow](#3-flow)
 
 ## 3. Flow
 
-![Cross-Platform Agentic Orchestration flow](../../diagrams/cross-platform-agentic-orchestration-flow.svg)
+![Cross-Platform Agentic Orchestration flow](../../../diagrams/cross-platform-agentic-orchestration-flow.svg)
 
 1. A Box or Salesforce event starts an AgentCore session.
 2. The supervisor selects Box, Salesforce Agentforce, and Databricks specialists.
@@ -46,7 +58,7 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 5. A human gate blocks signature and routes missing approvals.
 6. Approved work proceeds to Doc Gen, Box Sign, obligations, and audit evidence.
 
-- [Flow source](../../diagrams/cross-platform-agentic-orchestration-flow.mmd)
+- [Flow source](../../../diagrams/cross-platform-agentic-orchestration-flow.mmd)
 
 [Continue to presenter script](#4-presenter-script)
 
@@ -75,25 +87,25 @@ Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies
 
 ## 5. Visual walkthrough
 
-The Box screenshots below reference the Box Automate–Led Agentic Orchestration source files. Only the React screenshots are scenario-specific.
+The Box screenshots below reference the Box Automate Agentic Orchestration source files. Only the React screenshots are scenario-specific.
 
 ### Unified React workspace
 
-![Northstar React workspace](../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png)
+![Northstar React workspace](../../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png)
 
-![React domain-expert review queue](../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-redline-reviews.png)
+![React domain-expert review queue](../../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-redline-reviews.png)
 
 ### Shared governed Box context
 
-![Box App portfolio dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
+![Box App portfolio dashboard](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
 
-![Box App Clause Library](../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
+![Box App Clause Library](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
 
-![Approved Clause Hub](../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
+![Approved Clause Hub](../../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
 
-![Human approval branch](../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
+![Human approval branch](../../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../output/html/04-cross-platform-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/03-cross-platform-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
+Optional offline presentation: [self-contained visual gallery](../../../../output/html/04-cross-platform-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../../output/html/03-cross-platform-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -101,19 +113,29 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 
 | Layer | Components | Status |
 |---|---|---|
-| Experience | Salesforce Multi-Framework React CLM workspace | Local tests/build verified; deploy per environment |
-| Salesforce Agentforce | `CLM_Contract__c`, Contract Copilot, approval context | Portable object/spec provided; configure per environment |
-| Box | Apps, Forms, content, metadata, tasks, Hub, Doc Gen, Sign | Foundation automation and browser specifications provided |
-| Orchestration | AWS Bedrock AgentCore supervisor and Strands specialists | Specification and deterministic local mock |
-| Analytics | Databricks historical outcomes and cycle-time benchmarks | Synthetic dataset/tool contract only |
-| Controls | Citations, deterministic expert directory, human approvals, signature block | Specified; Box tasks seeded |
-| Observability | Handoffs, tool calls, guardrail events, final trace | Local trace generated |
+| Experience | Salesforce Multi-Framework React CLM workspace | **Local deterministic fixture**; deploy and validate per environment |
+| Salesforce Agentforce | `CLM_Contract__c`, Contract Copilot, approval context | **Portable specification**; configure and validate per environment |
+| Box | Apps, Forms, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
+| Orchestration | Amazon Bedrock AgentCore supervisor and Strands specialists | **Local deterministic fixture** trace plus portable contracts |
+| Analytics | Databricks historical outcomes and cycle-time benchmarks | **Local deterministic fixture** dataset and tool contract |
+| Controls | Citations, deterministic expert directory, human approvals, signature block | **Portable specification** |
+| Observability | Handoffs, tool calls, guardrail events, final trace | **Local deterministic fixture** |
+
+### Component and authority contract
+
+- Box governs the contract package, versions, metadata, tasks, Doc Gen, Sign, and audit history.
+- Salesforce `CLM_Contract__c` governs structured commercial context and Box references.
+- Salesforce intake uses `Contract_ID__c` external-ID upsert followed by lookup; retries must not create duplicate records.
+- Agentforce may retrieve, summarize, compare, explain, recommend, draft, and route. It cannot approve a legal position or authorize signature.
+- Databricks supplies analytical context, never contract authority.
+- Low-confidence, unclassified, missing-owner, and inaccessible work routes to Legal Operations triage.
+- One open review task is reused per contract, redline file, and domain.
 
 [Continue to setup and validation](#7-setup-and-validation)
 
 ## 7. Setup and validation
 
-1. Complete [Operator Start Here](../../operator/00-start-here.md) and the Box Automate–Led Agentic Orchestration foundation first.
+1. Complete [Operator Start Here](../../start-here.md) and the Box Automate Agentic Orchestration foundation first.
 2. Run `python3 scripts/run_agentcore_mock.py` and validate `output/agentcore/northstar-agentcore-trace.json`.
 3. Start the React workspace with this environment's Salesforce record ID, contract ID, and generated Box workspace folder ID.
 4. Confirm Box content and the safe Salesforce Agentforce fallback render without browser secrets.
@@ -121,12 +143,26 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 6. Confirm every finding has a Box citation and every approval remains human-owned.
 7. Describe AgentCore and Databricks as local/specification-backed until managed deployment tests pass.
 
+### Expected local trace
+
+The deterministic trace must show package validation, the Net 90 versus Net 45 commercial mismatch, cited clause findings, Databricks benchmark context, named Finance/Privacy/Security/Legal review routing, a premature-signature block, and draft-only candidate obligations.
+
+### Guardrail checks
+
+| Attempt | Required result |
+|---|---|
+| Request signature before approvals | Block and route to the approval specialist |
+| Return a material legal position without a Box citation | Block and request source evidence |
+| Process PHI terms without Privacy and Security review | Require both human reviews |
+| Accept an order form that conflicts with Salesforce truth | Require Finance review |
+
 ### References
 
-- [Detailed AgentCore runbook](../../runbooks/03-agentcore-demo.md)
-- [Operator setup and activation](../../operator/00-start-here.md)
+- [Operator setup and activation](../../start-here.md)
+- [Cross-platform deployment](../../cross-platform-deployment.md)
 - [Manual-task register](../../manual-task-register.md)
-- [Machine-readable scenario manifest](../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
+- [Salesforce record contract](../../../use-case-creator/salesforce-record-contract.md)
+- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
 - [Supporting React scripts](supporting-react-scripts/README.md)
 
 [Back to the scenario selector](../README.md)

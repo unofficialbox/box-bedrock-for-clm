@@ -3,7 +3,7 @@
 ## Design Principles
 
 1. **One content foundation** - Box stores contract documents, signatures, metadata, versions, and audit trail for the demo.
-2. **Two explicit presenter paths** - Box Automate–Led Agentic Orchestration stays Box-centric; Cross-Platform Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands without blurring readiness.
+2. **Two explicit presenter paths** - Box Automate Agentic Orchestration stays Box-centric; Cross-Platform Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands without blurring readiness.
 3. **Human accountability** - AI drafts, summarizes, compares, extracts, and recommends. Humans approve legal positions, concessions, signatures, and obligations.
 4. **Composable integrations** - Box remains the system of record for unstructured contract content, Salesforce remains the system of record for structured deal data, and Databricks provides governed analytics context.
 5. **Reusable demo factory** - Domain-specific demos reuse the same abstraction layers, metadata conventions, agent patterns, and handoff workflow.
@@ -54,9 +54,9 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 This is the supervisor-directed, cross-platform scenario. Its architecture is intentional, but its current implementation status remains specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
 
-Rendered diagram: [CLM AgentCore Architecture](diagrams/clm-agentcore-architecture.svg)
+Rendered diagram: [CLM AgentCore Architecture](../diagrams/clm-agentcore-architecture.svg)
 
-Source: [Mermaid diagram](diagrams/clm-agentcore-architecture.mmd)
+Source: [Mermaid diagram](../diagrams/clm-agentcore-architecture.mmd)
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -146,15 +146,15 @@ Box Sign + Obligation Monitor
 
 ---
 
-## Scenario A: Box Automate–Led Agentic Orchestration
+## Scenario A: Box Automate Agentic Orchestration
 
 This is the workflow-directed, Box-centric presenter path. Automate owns the sequence, agents enrich individual steps, and humans own approvals. React is not part of this presenter path.
 
-Canonical guide: [Box Automate–Led Agentic Orchestration](scenarios/box-automate-agentic-orchestration/README.md)
+Canonical guide: [Box Automate Agentic Orchestration](../operator/scenarios/box-automate-agentic-orchestration/README.md)
 
-Architecture: [rendered](diagrams/box-automate-agentic-orchestration-architecture.svg) · [source](diagrams/box-automate-agentic-orchestration-architecture.mmd)
+Architecture: [rendered](../diagrams/box-automate-agentic-orchestration-architecture.svg) · [source](../diagrams/box-automate-agentic-orchestration-architecture.mmd)
 
-Flow: [rendered](diagrams/box-automate-agentic-orchestration-flow.svg) · [source](diagrams/box-automate-agentic-orchestration-flow.mmd)
+Flow: [rendered](../diagrams/box-automate-agentic-orchestration-flow.svg) · [source](../diagrams/box-automate-agentic-orchestration-flow.mmd)
 
 ### Variation rules
 
@@ -168,9 +168,9 @@ Flow: [rendered](diagrams/box-automate-agentic-orchestration-flow.svg) · [sourc
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
 | No external agent runtime | No request is sent to AgentCore, Strands, Databricks, or custom middleware. |
 
-Workflow contract: [`config/box/automate-workflows.json`](../config/box/automate-workflows.json)
+Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.json)
 
-Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../config/agentforce/clm-react-agentforce-spec.json)
+Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.json)
 
 ---
 

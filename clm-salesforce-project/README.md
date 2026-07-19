@@ -2,7 +2,7 @@
 
 This Salesforce DX project contains the portable `CLM_Contract__c` data model, layout, permission sets, tab, and Salesforce Multi-Framework React UI Bundle.
 
-Start with [CLM Demo Operator Start Here](../docs/operator/00-start-here.md). The root automation deploys the portable components and deliberately excludes tenant-specific OAuth metadata.
+Start with [CLM Demo Operator Start Here](../docs/operator/start-here.md). The root automation deploys the portable components and deliberately excludes tenant-specific OAuth metadata.
 
 ## Local UI development
 

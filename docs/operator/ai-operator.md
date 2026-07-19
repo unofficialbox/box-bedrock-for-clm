@@ -41,7 +41,7 @@ Stop and ask the human when:
 
 ## Browser execution
 
-Use `docs/operator/01-browser-configuration.md` and its canonical Form, App, Hub, workflow, agent, and connector specifications. Resolve IDs first:
+Use `docs/operator/browser-configuration.md` and its canonical Form, App, Hub, workflow, agent, and connector specifications. Resolve IDs first:
 
 ```bash
 python3 scripts/demo_operator.py resolve-config --allow-unresolved

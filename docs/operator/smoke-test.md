@@ -2,7 +2,7 @@
 
 Use a clearly labeled non-production request. Record new IDs in a run log, not in repository documentation.
 
-## Box Automate–Led Agentic Orchestration gate
+## Box Automate Agentic Orchestration gate
 
 1. Submit **New Contract Request** with contract ID `CLM-2026-0017`, the queue's Northstar values, and `northstar-msa-redline-v3.pdf`; confirm the file reaches `01 - Intake`.
 2. Confirm the extracted contract type is `MSA Package`, risk is reviewable as `Critical`, material deviations cite the redline, and no agent claims approval.

@@ -19,7 +19,7 @@ flowchart LR
     Context --> React["Open React CLM workspace"]
 ```
 
-Rendered version: [Box Form entry-point flow](../../../diagrams/clm-box-form-automate-entry.svg).
+Rendered version: [Box Form entry-point flow](../../../../diagrams/clm-box-form-automate-entry.svg).
 
 ## Live anchors
 
@@ -36,7 +36,7 @@ Treat the workflow as inactive until the target environment's Salesforce object,
 
 ## Pre-demo setup
 
-1. Complete [Operator Start Here](../../../operator/00-start-here.md) and the integrated smoke test.
+1. Complete [Operator Start Here](../../../start-here.md) and the integrated smoke test.
 2. Use a clearly labeled non-production request and a unique `contractId`.
 3. Confirm the workflow targets the published Form and generated intake folder.
 4. Confirm the HTTPS Connector points to the intended Salesforce test org and uses an administrator-managed OAuth 2.0 connection.

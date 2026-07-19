@@ -1,4 +1,4 @@
-# Box Automate–Led Agentic Orchestration
+# Box Automate Agentic Orchestration
 
 Deterministic CLM orchestration with agentic enrichment. Box is the operating surface, Box Automate controls the sequence, agents enrich evidence, and named people approve decisions.
 
@@ -23,18 +23,18 @@ Use this track when Box Apps, Forms, Automate, Hubs, metadata, tasks, Doc Gen, a
 
 ## 2. Architecture
 
-![Box Automate–Led Agentic Orchestration architecture](../../diagrams/box-automate-agentic-orchestration-architecture.svg)
+![Box Automate Agentic Orchestration architecture](../../../diagrams/box-automate-agentic-orchestration-architecture.svg)
 
 The Box layer owns content, workflow state, clauses, tasks, generation, signature, and audit evidence. The HTTPS Connector crosses into Salesforce only after the human validation gate.
 
-- [Architecture source](../../diagrams/box-automate-agentic-orchestration-architecture.mmd)
-- [Shared architecture and control detail](../../01-architecture.md)
+- [Architecture source](../../../diagrams/box-automate-agentic-orchestration-architecture.mmd)
+- [Shared architecture and control detail](../../../use-case-creator/architecture.md)
 
 [Continue to flow](#3-flow)
 
 ## 3. Flow
 
-![Box Automate–Led Agentic Orchestration flow](../../diagrams/box-automate-agentic-orchestration-flow.svg)
+![Box Automate Agentic Orchestration flow](../../../diagrams/box-automate-agentic-orchestration-flow.svg)
 
 1. Start from the Box App and open the single contract-intake Form.
 2. Automate runs Extract and source-grounded agent review in a fixed sequence.
@@ -42,7 +42,7 @@ The Box layer owns content, workflow state, clauses, tasks, generation, signatur
 4. Only the approved branch invokes Salesforce standard REST.
 5. Box tasks, metadata, Doc Gen, Sign, and the clause Hub carry the lifecycle forward.
 
-- [Flow source](../../diagrams/box-automate-agentic-orchestration-flow.mmd)
+- [Flow source](../../../diagrams/box-automate-agentic-orchestration-flow.mmd)
 
 [Continue to presenter script](#4-presenter-script)
 
@@ -73,29 +73,29 @@ These are the canonical Box screenshots. Cross-Platform Agentic Orchestration re
 
 ### Portfolio and actions
 
-![Box App portfolio dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
+![Box App portfolio dashboard](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
 
-![Box App actions and deal room](../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-actions-live.png)
+![Box App actions and deal room](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-actions-live.png)
 
 ### Intake and deterministic automation
 
-![New Contract Request Form](../../../output/screenshots/box-automate-agentic-orchestration/box-form-new-contract-request.png)
+![New Contract Request Form](../../../../output/screenshots/box-automate-agentic-orchestration/box-form-new-contract-request.png)
 
-![Automate Extract and agents](../../../output/screenshots/box-automate-agentic-orchestration/automate-intake-agents.png)
+![Automate Extract and agents](../../../../output/screenshots/box-automate-agentic-orchestration/automate-intake-agents.png)
 
-![Automate human approval branch](../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
+![Automate human approval branch](../../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-![Automate HTTPS Connector](../../../output/screenshots/box-automate-agentic-orchestration/automate-https-connector.png)
+![Automate HTTPS Connector](../../../../output/screenshots/box-automate-agentic-orchestration/automate-https-connector.png)
 
 ### Clauses and generation
 
-![Clause Library dashboard](../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
+![Clause Library dashboard](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
 
-![Approved Clause Hub](../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
+![Approved Clause Hub](../../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
 
-![Box Doc Gen templates](../../../output/screenshots/box-automate-agentic-orchestration/box-docgen-templates.png)
+![Box Doc Gen templates](../../../../output/screenshots/box-automate-agentic-orchestration/box-docgen-templates.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../output/html/02-box-automate-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../output/html/01-box-automate-agentic-orchestration-guide.html).
+Optional offline presentation: [self-contained visual gallery](../../../../output/html/02-box-automate-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../../output/html/01-box-automate-agentic-orchestration-guide.html).
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -105,7 +105,7 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 |---|---|---|
 | Box App and Form | Portfolio and single intake entry | Must be built and published per environment |
 | Box Automate | Form → Extract → agent review → approval → connector | Must pass inactive smoke test before activation |
-| Extract and Box/Agentforce agents | Structured evidence and source-grounded recommendations | Portable specifications provided |
+| Extract and Box/Agentforce agents | Structured evidence and source-grounded recommendations | **Portable specification** |
 | HTTPS Connector | Salesforce external-ID upsert and lookup | Must be configured and tested per environment |
 | Metadata, tasks, Clause Hub | Status, risk, named ownership, approved positions | Foundation automated; browser seeding remains |
 | Box Doc Gen | Approval memo, order summary, renewal notice | Templates generated/uploaded; mark in Box UI |
@@ -115,7 +115,7 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 
 ## 7. Setup and validation
 
-1. Complete [Operator Start Here](../../operator/00-start-here.md) for the target environment.
+1. Complete [Operator Start Here](../../start-here.md) for the target environment.
 2. Open the App, Form, and Hub URLs stored in the local runtime config.
 3. Confirm the App has one intake Form, the Clause Hub action, and Executed Agreements action.
 4. Confirm Automate remains inactive unless the owner explicitly authorizes activation.
@@ -125,10 +125,10 @@ Optional offline presentation: [self-contained visual gallery](../../../output/h
 
 ### References
 
-- [Operator setup and activation](../../operator/00-start-here.md)
+- [Operator setup and activation](../../start-here.md)
 - [Manual-task register](../../manual-task-register.md)
-- [Machine-readable scenario manifest](../../../config/demo/box-automate-agentic-orchestration-demo-manifest.json)
-- [Box Form blueprint](../../../config/box/form-blueprint.md)
-- [Box App blueprint](../../../config/box/box-app-blueprint.md)
+- [Machine-readable scenario manifest](../../../../config/demo/box-automate-agentic-orchestration-demo-manifest.json)
+- [Box Form blueprint](../../../../config/box/form-blueprint.md)
+- [Box App blueprint](../../../../config/box/box-app-blueprint.md)
 
 [Back to the scenario selector](../README.md)

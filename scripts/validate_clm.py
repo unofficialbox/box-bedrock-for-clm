@@ -428,7 +428,7 @@ def check_reset_and_idempotency_contract(root: Path = ROOT) -> str:
     connectors = json.loads((root / "config" / "box" / "https-connectors.json").read_text(encoding="utf-8"))
     operator_text = json.dumps(operator).lower()
     connector_text = json.dumps(connectors).lower()
-    manual_text = (root / "docs" / "manual-task-register.md").read_text(encoding="utf-8").lower()
+    manual_text = (root / "docs" / "operator" / "manual-task-register.md").read_text(encoding="utf-8").lower()
     required = {
         "operator duplicate check": "duplicate" in operator_text,
         "operator reset check": "reset" in operator_text,

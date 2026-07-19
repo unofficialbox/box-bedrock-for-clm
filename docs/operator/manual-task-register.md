@@ -63,6 +63,6 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-073 | Record test artifacts and restore demo state | Operator | Per run | Workflows/tasks are ready for the next session |
 | MT-074 | Delete data or remove collaborators | System owner | Confirmation required | Impact is reviewed and exact objects are approved |
 
-Use the run log in [Integrated Smoke Test](operator/02-smoke-test.md). Store environment-specific IDs and completion evidence only in the gitignored runtime files or the operator's external run log.
+Use the run log in [Integrated Smoke Test](smoke-test.md). Store environment-specific IDs and completion evidence only in the gitignored runtime files or the operator's external run log.
 
 For fail-closed readiness, copy `config/runtime/validation-receipts.example.json` to the gitignored `config/runtime/validation-receipts.json`, record only secret-free references to the current external run log, and run `python3 scripts/validate_clm.py --presenter-ready`.

@@ -1,0 +1,7 @@
+---
+description: Understand or tailor the CLM domain and value story
+globs:
+alwaysApply: false
+---
+
+Read `docs/use-case-creator/README.md`. Tailor this existing vertical in place. Preserve Box content authority, Salesforce structured authority, citations, human decision owners, distinct scenario coordination models, and the exact readiness vocabulary in `README.md`.
