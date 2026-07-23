@@ -1,18 +1,50 @@
 # CLM Scripts
 
-This directory is reserved for helper scripts.
+> **Status: transitional. A cleanup is planned.** Read the two sections below before adding to or depending on anything here.
 
-Available scripts:
+## The boundary this directory has not yet been sorted against
+
+This repository is a **golden copy** of the finished CLM scenario. Machinery that *creates* that copy belongs elsewhere — the Box surface authoring tooling already moved to `unofficialbox/box-capture`.
+
+`scripts/` predates that rule and still mixes both kinds. Roughly:
+
+| Kind | Scripts | Belongs |
+|---|---|---|
+| **Golden-copy verification** — proves the committed artifact is internally consistent | `validate_clm.py` | Here |
+| **Golden-copy generation** — builds committed presenter and diagram assets | the `build_*.py` family, `generate_*.py` | Here, arguably; they produce tracked output |
+| **Environment provisioning** — creates or mutates live Box and Salesforce state | `demo_operator.py`, `box_form_provisioner.py`, `prepare_box_form_browser_plan.py`, `setup_clm_dev.py` | Elsewhere, by the rule above |
+
+Nothing has been moved on this basis yet. Do not treat the current layout as a decision.
+
+## Known breakage: the BCL cutover is half-applied
+
+Config under `config/` is now `.bcl`; BCL is the only supported import format and every `.json` config was removed. Several scripts still expect the JSON paths and therefore fail:
+
+| Script | Stale references |
+|---|---|
+| `demo_operator.py` | 11 config paths |
+| `box_form_provisioner.py` | 4 |
+| `setup_clm_dev.py` | 1 |
+| `validate_clm.py` | 1 (`validation-receipts.json`) |
+
+Four tests error as a result, and `validate_clm.py` reports fewer passing rows than it did before the cutover. This is understood and accepted for now; it is not a regression to chase in isolation.
+
+A working Python BCL reader exists in `unofficialbox/box-capture/bcl.py` and parses the same inventory that `box-dispatch` reads in `internal/bcl`. It is deliberately **not** vendored back into this repository, because doing so would recreate the dependency the extraction just removed.
+
+Three ways out, in the order they should be considered:
+
+1. **Move the provisioning scripts out**, so the question disappears with them. Preferred if the boundary rule holds.
+2. **Let `box-dispatch` own config resolution** and delete the Python that duplicates it.
+3. **Vendor a shared BCL reader here** — cheapest, but keeps machinery in the golden copy.
+
+## Available scripts
 
 | Script | Purpose |
 |--------|---------|
 | `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
-| `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.json` |
+| `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.bcl` |
 | `prepare_box_form_browser_plan.py` | Validate the portable intake Form definition and prepare a guarded, gitignored Browser Use plan; makes no Box changes |
-| `box-capture/forms.py` | Build an explicitly acknowledged, non-destructive browser executor for the isolated CLM Forms private-API lab; never targets the production Form |
-| `box-capture/apps.py` | Build an explicitly acknowledged browser executor for the isolated Apps private-API lab; now includes section-aware reconciliation in addition to shell/description; never deletes, publishes, shares, or targets the production App |
-| `box-capture/automate.py` | Build an explicitly acknowledged executor for either the empty inactive Automate lab or the separate Manual Start-only graph lab; never deletes, publishes, activates, shares, or runs either lab. `--write-inspector` builds a read-only reader for an existing unpublished draft that issues no GraphQL operation and mutates nothing |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
@@ -26,7 +58,7 @@ Available scripts:
 For a fresh environment, start with:
 
 ```bash
-cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json
+cp config/runtime/demo-environment.example.bcl config/runtime/demo-environment.bcl
 python3 scripts/demo_operator.py doctor
 ```
 
@@ -49,7 +81,7 @@ Run a safe pre-flight check before full setup:
 python3 scripts/setup_clm_dev.py --smoke
 ```
 
-Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.json` and run `python3 scripts/validate_clm.py --presenter-ready`.
+Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.bcl` and run `python3 scripts/validate_clm.py --presenter-ready`.
 
 The operator command sequence is:
 
@@ -93,7 +125,7 @@ Generate the DocGen templates from the CLM demo root:
 python3 scripts/generate_docgen_templates.py
 ```
 
-The generated `.docx` files are written to `output/docgen/`. Sample merge data is in `config/box/docgen-template-data.json`.
+The generated `.docx` files are written to `output/docgen/`. Sample merge data is in `config/box/docgen-template-data.bcl`.
 
 Rebuild both screenshot galleries from the CLM demo root:
 

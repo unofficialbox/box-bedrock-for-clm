@@ -225,6 +225,16 @@ The created record carried all ten mapped fields correctly, confirmed on the Sal
 - **In the body editor, search variables by form element ID, not by label.** Several labels, `Counterparty` among them, match both a Form field and a metadata attribute, and picking the wrong one binds silently.
 - **A date variable has no `YYYY-MM-DD` preset.** Only a full ISO datetime or single components, which persist as a distinct `DATE_FORMAT` operand. A Salesforce Date field needs three of them joined by literal hyphens.
 
+## Repository boundary
+
+This repository is a **golden copy** of the finished CLM scenario. Anything needed to *create* that copy lives elsewhere.
+
+The Box surface authoring tooling has already moved to `unofficialbox/box-capture`: the guarded Forms, Apps and Automate executors, the Automate graph inspector, the `CLM Surface API Lab - *` specifications, and the lab operator guide. Nothing here depends on it at runtime. Reach for it when rebuilding a Box surface in a new environment or capturing a live workflow definition, not when running or presenting the demo.
+
+Live environment values did not move. `config/runtime/*` stays here and is passed to that tooling per run with `--config`, `--bootstrap`, and `--form-runtime`. No live identifier crosses the boundary in either direction.
+
+`scripts/` has **not** been sorted against this rule yet, and a cleanup is planned. See `scripts/README.md` for the current classification, the four scripts still holding stale `.json` config paths, and the three candidate resolutions. Treat its present layout as unsorted rather than decided.
+
 ## Still open
 
 1. **Duplicate safety.** A plain POST to the sobject collection creates a new record every submission. The `PATCH` upsert it replaced was idempotent against a `Contract_ID__c` external ID.
