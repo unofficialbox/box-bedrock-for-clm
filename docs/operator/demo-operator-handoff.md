@@ -129,9 +129,9 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 ### Auxiliary/browser/experimentation scripts
 
 11. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py)
-12. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/forms.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/forms.py)
-13. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/apps.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/apps.py)
-14. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/automate.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/automate.py)
+12. `forms.py` in the box-capture repository
+13. `apps.py` in the box-capture repository
+14. `automate.py` in the box-capture repository
 
 ## 4) Reference inventory of config/assets/docs for the new CLI
 

@@ -4,7 +4,7 @@ Assessment date: **2026-07-20**. “No public API” means no supported create/u
 
 ## Public API gaps
 
-All browser-agent and private-lab paths require the operator to be signed in to the intended Box web application first. The authenticated tab hostname must match the gitignored runtime environment. Generated executors do not log in, contain credentials, or make a Box Platform OAuth token equivalent to a Box web session. See [Box Private-API Labs](box-private-api-labs.md).
+All browser-agent and private-lab paths require the operator to be signed in to the intended Box web application first. The authenticated tab hostname must match the gitignored runtime environment. Generated executors do not log in, contain credentials, or make a Box Platform OAuth token equivalent to a Box web session. See Box Private-API Labs (see the box-capture repository).
 
 | Box component | CLM use case | Why it matters | Manual configuration needed | What would remove the manual work |
 |---|---|---|---|---|

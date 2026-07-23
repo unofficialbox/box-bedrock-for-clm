@@ -44,11 +44,11 @@ The provisioner does not call the private REST endpoints directly, export browse
 
 ## Unsupported private API lab
 
-The repository also contains separate, opt-in research executors documented in [Box Private-API Labs](box-private-api-labs.md). The Forms executor targets only the retained **CLM Forms API Lab - Contract Intake** Form. It is not the production provisioning path and cannot target **New Contract Request**.
+The repository also contains separate, opt-in research executors documented in Box Private-API Labs (see the box-capture repository). The Forms executor targets only the retained **CLM Forms API Lab - Contract Intake** Form. It is not the production provisioning path and cannot target **New Contract Request**.
 
 ```bash
-python3 tools/box-capture/forms.py --dry-run
-python3 tools/box-capture/forms.py \
+python3 ../../unofficialbox/box-capture/forms.py --dry-run
+python3 ../../unofficialbox/box-capture/forms.py \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
 ```

@@ -107,9 +107,9 @@ Capture this in `manual-task-register.md` as complete:
 If you use private-lab executors, keep them separate from production setup:
 
 ```bash
-python3 tools/box-capture/forms.py --dry-run
-python3 tools/box-capture/apps.py --dry-run
-python3 tools/box-capture/automate.py --dry-run
+python3 ../../unofficialbox/box-capture/forms.py --dry-run
+python3 ../../unofficialbox/box-capture/apps.py --dry-run
+python3 ../../unofficialbox/box-capture/automate.py --dry-run
 ```
 
 Then run each generated executor only in an authenticated Box web-app tab and never as production dependency.

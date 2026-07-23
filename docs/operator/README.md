@@ -28,10 +28,21 @@ Use [Manual Box Configuration and Automation Feasibility](manual-box-configurati
 
 Use the [Box Form Browser Plan](box-form-provisioner.md) only for the unsupported Forms-authoring gap. It prepares a guarded Browser Use task; it does not change Box by itself.
 
-Use [Box Private-API Labs](box-private-api-labs.md) for isolated research on Forms, Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
+Use Box Private-API Labs (see the box-capture repository) for isolated research on Forms, Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
 
 For assistant-driven execution, read [AI-Assisted Operator Protocol](ai-operator.md). Planning, generation, validation, and dry runs may proceed without external approval. Every external write requires the guide's explicit apply option, confirmation of the exact target, and any documented human decision gate.
 
 ## Live claim boundary
 
 Use the four readiness terms in `README.md`. Do not describe a **Portable specification** or **Local deterministic fixture** as a **Deployed integration**. Do not describe a scenario as **Presenter-ready live** until `python3 scripts/validate_clm.py --presenter-ready` passes with current receipts.
+
+## Box surface authoring tooling
+
+This repository is a **golden copy** of the finished CLM scenario. The tooling that authors Box
+surfaces without a supported API — the guarded Forms, Apps, and Automate executors, their lab
+specifications, and the Automate graph inspector — lives in a separate repository:
+
+    unofficialbox/box-capture
+
+Nothing here depends on it at runtime. Reach for it when you need to rebuild a Box surface in a new
+environment or capture a live workflow definition, not when running or presenting the demo.
