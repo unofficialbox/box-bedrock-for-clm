@@ -1,0 +1,380 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "automate-workflows"
+          "artifact_type" = "config"
+          "bindingModel" = "Resolve with python3 scripts/demo_operator.py resolve-config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "designPrinciples" = [
+            "Use resolved Box content IDs rather than display names in workflow bindings."
+            "Place a human validation or approval task after every generative or extractive AI result."
+            "Send only allowlisted structured fields through HTTPS connectors; never send contract bytes or secrets."
+            "Keep workflows inactive until trigger, permissions, OAuth, idempotency, and rollback tests pass."
+          ]
+          "enterprise_id" = ""
+          "provider" = "generic"
+          "provider_object_id" = "box/automate-workflows"
+          "schemaVersion" = "2.0"
+          "workflows" = [
+            {
+              "description" = "Extract request terms, run the CLM intake agent, route human validation, and emit an approved integration event."
+              "formFieldIds" = {
+                "businessOwner" = "<formField:businessOwner>"
+                "contractId" = "<formField:contractId>"
+                "contractPackage" = "<formField:contractPackage>"
+                "contractType" = "<formField:contractType>"
+                "counterparty" = "<formField:counterparty>"
+                "dataCategory" = "<formField:dataCategory>"
+                "dealValue" = "<formField:dealValue>"
+                "note" = "Form element IDs are environment-specific and change if the Form is rebuilt. Resolve each from the target Form before provisioning."
+                "region" = "<formField:region>"
+                "requesterEmail" = "<formField:requesterEmail>"
+                "requesterName" = "<formField:requesterName>"
+                "specialTermsRiskNotes" = "<formField:specialTermsRiskNotes>"
+                "targetSignatureDate" = "<formField:targetSignatureDate>"
+                "termMonths" = "<formField:termMonths>"
+              }
+              "initialStatus" = "inactive"
+              "key" = "contract-intake-enrichment"
+              "name" = "CLM - Contract Intake Enrichment"
+              "openIssues" = [
+                "No Extract Agent step exists in the live draft. Earlier revisions of this file specified one as step 1; decide whether to add it back or drop it from the packaged design."
+                "POST to the sobject collection has no duplicate safety. The PATCH upsert it replaced was idempotent against a Contract_ID__c external ID; this is not. Resubmitting the same contract would create a second Salesforce record. Decide on a duplicate strategy before activation."
+                "The connector step captures no output variable, so the created Salesforce record ID is not retained. The verified test outcome captured it as id from $.id."
+                "Risk_Level__c is no longer sent. It previously carried a fabricated literal, and the Box Agent emits unstructured text rather than a picklist value. Restore it once a structured Extract or Agent output supplies a real risk level."
+                "Box substitutes the literal string 'Variable unavailable' for an unresolved variable, not an empty string. A live run on 2026-07-22 failed because the Currency and Number fields received that text. Only bind values whose Form field is mandatory."
+                "The same substitution also produced a workspace folder named CLM-2026-Variable unavailable. Contract ID is required again, so the rename now resolves, but the rename step has not been re-run to confirm it."
+                "The connector failure surfaced only as errorCode UNKNOWN_ERROR with an empty payload. Box does not expose the Salesforce error body, so connector faults have to be diagnosed from the request payload in the run events."
+                "The connector must target the Salesforce org that actually holds CLM_Contract__c. Two similarly named connectors in this environment point at different orgs, and the wrong one fails with an opaque UNKNOWN_ERROR even when the payload is valid."
+                "This workflow is Active. Any further edit saves as a draft and does not take effect until the workflow is activated again, so always confirm the published version rather than the editor contents."
+                "The step uses the Agentforce Dev connector, while the verified POST was tested on Agentforce MyDomain Dev. Both resolve to the same development org host, but the POST contract has not been re-tested through this connector."
+                "No Salesforce lookup step exists in the live draft, so the workflow captures no created record ID."
+                "The Rejected branch has no outcome, so rejected submissions produce no notification or return-for-correction."
+                "The Box Agent instructions embed the approved-clause-library folder ID as literal text, which is not portable across environments."
+                "Every optional Form value can now arrive blank. The connector body must tolerate an empty string for each one before this workflow is activated."
+              ]
+              "optionalFormVariables" = [
+                "requesterName"
+                "dealValue"
+                "termMonths"
+                "region"
+                "dataCategory"
+                "targetSignatureDate"
+                "businessOwner"
+                "specialTermsRiskNotes"
+              ]
+              "placeholderConvention" = {
+                "${binding}" = "Resolved by python3 scripts/demo_operator.py resolve-config from runtime state."
+                "<name>" = "Resolved by hand at provisioning time. The operator tooling has no runtime binding for these yet, so they are deliberately not written as ${} bindings."
+                "note" = "Box Automate's own variable tokens also use ${}. To avoid collision with the resolver, Automate expressions are stored as a template plus a token map rather than as interpolated strings."
+              }
+              "required" = true
+              "requiredFormVariables" = [
+                "requesterEmail"
+                "contractPackage"
+                "contractId"
+                "contractType"
+                "counterparty"
+              ]
+              "requiredFormVariablesNote" = "Reconciled twice on 2026-07-22 and published each time. First reduced to two required fields, then raised to five after a live run failed. Salesforce marks Contract_ID__c, Contract_Type__c, Counterparty__c, and Requester_Email__c required on CLM_Contract__c, so their Form sources must be mandatory. contractPackage stays required because the Box Agent, the approval task, and two connector fields all read the uploaded file. The Form was edited in place both times, never rebuilt, so element IDs are unchanged and all bindings still resolve."
+              "steps" = [
+                {
+                  "destinationFolderId" = {
+                    "type" = "variable"
+                    "value" = "static.trigger.form.<formField:contractPackage>.folderId"
+                  }
+                  "eventSubType" = "copy"
+                  "name" = "Copy the CLM workspace template into the submission folder"
+                  "order" = 1
+                  "outputs" = [
+                    "folderId"
+                  ]
+                  "sourceFolderId" = "<workspaceTemplateFolderId>"
+                  "type" = "Folder Action"
+                }
+                {
+                  "eventSubType" = "rename"
+                  "folderId" = {
+                    "type" = "variable"
+                    "value" = "static.outcome_<step1>.folderId"
+                  }
+                  "name" = "Name the workspace from the workflow year and Contract ID"
+                  "newName" = {
+                    "note" = "Stored in the editor as one interpolated string. Each token appears wrapped in a dollar sign and braces."
+                    "template" = "CLM-{year}-{contractId}"
+                    "tokens" = {
+                      "contractId" = "static.trigger.form.<formField:contractId>"
+                      "year" = "static.workflow.createdAt__YYYY__"
+                    }
+                  }
+                  "order" = 2
+                  "type" = "Folder Action"
+                }
+                {
+                  "agentId" = "default_box_agent"
+                  "agentName" = "Box Agent"
+                  "agentRef" = "config/box/ai-agent-specs.bcl#contract-risk-triage"
+                  "contextItems" = [
+                    {
+                      "type" = "variable"
+                      "value" = "trigger.form.<formField:contractPackage>.fileIds"
+                    }
+                  ]
+                  "eventSubType" = "default"
+                  "expectedOutput" = [
+                    "riskLevel"
+                    "materialDeviations"
+                    "requiredReviewers"
+                    "evidenceItemIds"
+                  ]
+                  "instructions" = {
+                    "note" = "In the live draft the clause-library folder ID is typed as a literal rather than bound, which is the portability defect recorded in openIssues."
+                    "template" = "Review Box file ID {fileIds} against the approved clause library in folder ID {clauseLibraryFolderId}. Produce a concise approval brief covering risk, clause deviations, responsible reviewers, and recommended standard or approved fallback. Treat Extract output as draft and require human validation."
+                    "tokens" = {
+                      "clauseLibraryFolderId" = "${box.folders.clauses}"
+                      "fileIds" = "static.trigger.form.<formField:contractPackage>.fileIds"
+                    }
+                  }
+                  "name" = "CLM Contract Risk Triage"
+                  "order" = 3
+                  "outputFormat" = "textValue"
+                  "type" = "Box Agent"
+                }
+                {
+                  "assignees" = [
+                    "${box.reviewers.primary}"
+                  ]
+                  "dueDate" = null
+                  "eventSubType" = "approval"
+                  "fileId" = {
+                    "type" = "variable"
+                    "value" = "static.trigger.form.<formField:contractPackage>.fileIds"
+                  }
+                  "inviteAssigneesAsViewers" = true
+                  "managers" = [
+                    {
+                      "type" = "variable"
+                      "value" = "static.workflow.ownerId"
+                    }
+                  ]
+                  "message" = "Validate Extract values and the Box Agent approval brief. Confirm clause position, risk level, and reviewer routing before any downstream connector runs."
+                  "name" = "Validate extracted terms and approval brief"
+                  "order" = 4
+                  "outcomes" = [
+                    "Approved"
+                    "Rejected"
+                  ]
+                  "requireOnlyOneAssigneeToComplete" = false
+                  "required" = true
+                  "type" = "Approval Task"
+                }
+                {
+                  "branches" = [
+                    {
+                      "condition" = {
+                        "leftOperand" = "static.outcome_<step4>.taskStatus"
+                        "logicalConnector" = "EQUALS"
+                        "rightOperand" = "APPROVED"
+                        "type" = "task"
+                      }
+                      "label" = "Approved"
+                      "next" = [
+                        "salesforceContractCreate"
+                      ]
+                    }
+                    {
+                      "behavior" = "Branch terminates. The live draft attaches no outcome to this branch, so a rejected request is silently dropped."
+                      "condition" = {
+                        "leftOperand" = "static.outcome_<step4>.taskStatus"
+                        "logicalConnector" = "EQUALS"
+                        "rightOperand" = "REJECTED"
+                        "type" = "task"
+                      }
+                      "label" = "Rejected"
+                      "next" = []
+                    }
+                  ]
+                  "gatewaySubtype" = "exclusive"
+                  "gatewayType" = "split"
+                  "order" = 5
+                  "type" = "Conditional Split"
+                }
+                {
+                  "authType" = "OAUTH2_CLIENT_CREDENTIALS_GRANT"
+                  "bodyBinding" = "form-trigger variables, see config/box/https-connectors.bcl#salesforceContractCreate.bodyImplementation"
+                  "branch" = "Approved"
+                  "connectorId" = "<salesforceConnectorId>"
+                  "connectorName" = "the Salesforce connector whose base URL is the org holding CLM_Contract__c"
+                  "connectorRef" = "config/box/https-connectors.bcl#salesforce-clm-rest"
+                  "credentialId" = "<salesforceCredentialId>"
+                  "endpoint" = "services/data/v67.0/sobjects/CLM_Contract__c"
+                  "endpointNote" = "Stored without a leading slash. The connector switch normalised this to match the reference outcome."
+                  "eventSubType" = "call"
+                  "liveState" = "Proven end to end on 2026-07-22. A Form submission created a real CLM_Contract__c record and all ten mapped fields were verified on the Salesforce record. The published body is a CONCAT of 15 operands with 7 dynamic values, every dynamic value backed by a required Form field. Workflow status is Active."
+                  "method" = "POST"
+                  "operation" = "salesforceContractCreate"
+                  "order" = 6
+                  "type" = "HTTPS Request"
+                }
+              ]
+              "testGate" = {
+                "duplicateSubmission" = "Updates the same record"
+                "firstSubmission" = "Creates one Salesforce record"
+                "rejectedSubmission" = "Makes no Salesforce request"
+              }
+              "trigger" = {
+                "eventSubType" = "submitted"
+                "formId" = "<newContractRequestFormId>"
+                "formName" = "New Contract Request"
+                "formUrl" = "${box.formUrl}"
+                "type" = "form"
+              }
+              "variableSyntax" = {
+                "bindingIsByElementId" = "A form trigger addresses fields by form element ID, not by label. Rebuilding the Form breaks every binding below."
+                "formField" = "static.trigger.form.<formFieldId>"
+                "formUploadFileIds" = "static.trigger.form.<uploadFieldId>.fileIds"
+                "formUploadFolderId" = "static.trigger.form.<uploadFieldId>.folderId"
+                "freeTextField" = "Interpolates the token wrapped in a dollar sign and braces."
+                "note" = "Read verbatim from the live graph. Do not infer these tokens."
+                "priorOutcomeProperty" = "static.outcome_<outcomeId>.<property>"
+                "structuredField" = "Stores {\"type\":\"variable\",\"value\":\"<token>\"}."
+                "workflowCreatedYear" = "static.workflow.createdAt__YYYY__"
+                "workflowProperty" = "static.workflow.<property>"
+              }
+              "verification" = {
+                "everPublished" = false
+                "liveStatus" = "DRAFT"
+                "method" = "Read-only inspection of the authenticated Box Automate editor's loaded workflow graph."
+                "note" = "Step order, types, and variable bindings below reproduce the live draft. Environment-specific workflow, form, folder, connector, credential, and user IDs are bound at provisioning time and are deliberately not stored here."
+                "verifiedAgainstLiveDraft" = "2026-07-22"
+              }
+            }
+            {
+              "initialStatus" = "inactive"
+              "key" = "redline-domain-review-routing"
+              "name" = "CLM - Redline Domain Review Routing"
+              "required" = false
+              "steps" = [
+                {
+                  "agentRef" = "config/box/ai-agent-specs.bcl#redline-difference-router"
+                  "order" = 1
+                  "type" = "Box Agent"
+                }
+                {
+                  "condition" = "Unclassified or confidence below 0.85 routes to Legal Operations triage"
+                  "order" = 2
+                  "type" = "Conditional Split"
+                }
+                {
+                  "operation" = "routeRedlineFindings"
+                  "order" = 3
+                  "status" = "requires custom Apex implementation"
+                  "type" = "HTTPS Request"
+                }
+                {
+                  "order" = 4
+                  "templateKey" = "clmRedlineReview"
+                  "type" = "Apply Metadata"
+                }
+                {
+                  "assignee" = "${box.reviewers.primary}"
+                  "order" = 5
+                  "type" = "Create Task"
+                  "when" = "Needs Triage"
+                }
+              ]
+              "trigger" = {
+                "condition" = "versionStatus equals Redline"
+                "folderId" = "${box.folders.drafts}"
+                "templateKey" = "clmDocument"
+                "type" = "Metadata updated"
+              }
+            }
+            {
+              "initialStatus" = "inactive"
+              "key" = "approval-packet-readiness"
+              "name" = "CLM - Approval Packet Readiness"
+              "required" = false
+              "steps" = [
+                {
+                  "agentRef" = "config/box/ai-agent-specs.bcl#approval-brief"
+                  "order" = 1
+                  "type" = "Box Agent"
+                }
+                {
+                  "order" = 2
+                  "purpose" = "Approve Doc Gen creation"
+                  "type" = "Human Confirmation"
+                }
+                {
+                  "destinationFolderId" = "${box.folders.approvals}"
+                  "order" = 3
+                  "templateFileId" = "${box.files.docgenApprovalMemo}"
+                  "type" = "Generate Document"
+                }
+              ]
+              "trigger" = "All required human review tasks completed"
+            }
+            {
+              "initialStatus" = "inactive"
+              "key" = "executed-agreement-obligations"
+              "name" = "CLM - Executed Agreement Obligations"
+              "required" = false
+              "steps" = [
+                {
+                  "configurationRef" = "config/box/extract-field-prompts.bcl#executedObligations"
+                  "order" = 1
+                  "type" = "Extract Agent"
+                }
+                {
+                  "agentRef" = "config/box/ai-agent-specs.bcl#obligation-review"
+                  "order" = 2
+                  "type" = "Box Agent"
+                }
+                {
+                  "assignee" = "${box.reviewers.primary}"
+                  "order" = 3
+                  "type" = "Approval Task"
+                }
+                {
+                  "destinationFolderId" = "${box.folders.obligations}"
+                  "order" = 4
+                  "templateKey" = "clmObligation"
+                  "type" = "Apply Metadata"
+                }
+              ]
+              "trigger" = {
+                "folderId" = "${box.folders.executed}"
+                "type" = "File uploaded"
+              }
+            }
+          ]
+        }
+        "metadata" = {
+          "artifactName" = "automate-workflows"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/automate-workflows"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_automate-workflows"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

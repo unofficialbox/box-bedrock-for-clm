@@ -1,0 +1,63 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "private-api-lab-app-definition"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "description" = "Unsupported private API experiment. Do not use for production."
+          "enterprise_id" = ""
+          "initialPageName" = "Lab Overview"
+          "name" = "CLM Surface API Lab - Apps Workspace"
+          "pages" = [
+            {
+              "name" = "Lab Overview"
+              "sections" = [
+                {
+                  "layout" = {
+                  }
+                  "position" = 0
+                  "size" = 1
+                  "title" = "Overview"
+                }
+              ]
+            }
+          ]
+          "provider" = "generic"
+          "provider_object_id" = "box/private-api-lab-app-definition"
+          "provisioning" = {
+            "delete" = false
+            "existingAppPolicy" = "reconcile-exact-title"
+            "mode" = "experimental-private-rest"
+            "publish" = false
+            "share" = false
+          }
+          "schemaVersion" = 1
+        }
+        "metadata" = {
+          "artifactName" = "private-api-lab-app-definition"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/private-api-lab-app-definition"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_private-api-lab-app-definition"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

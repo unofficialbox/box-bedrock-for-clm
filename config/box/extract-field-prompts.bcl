@@ -1,0 +1,80 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "extract-field-prompts"
+          "artifact_type" = "config"
+          "contractIntake" = {
+            "fields" = [
+              {
+                "field" = "contractType"
+                "prompt" = "Classify as MSA Package, DPA, SOW, Order Form, or Procurement Agreement."
+              }
+              {
+                "field" = "riskLevel"
+                "prompt" = "Classify the agreement risk as Low, Medium, High, or Critical using only express contract terms and the approved clause library."
+              }
+              {
+                "field" = "keyIssues"
+                "prompt" = "Return a concise list of material clause deviations with section references. Do not provide final legal approval."
+              }
+            ]
+            "purpose" = "Create a reviewable contract record from an intake package."
+          }
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "executedObligations" = {
+            "fields" = [
+              {
+                "field" = "obligationType"
+                "prompt" = "Classify as Renewal Notice, SLA Report, Security Evidence, Data Deletion, Insurance, or Billing."
+              }
+              {
+                "field" = "owner"
+                "prompt" = "Return the named responsible party or team. If not explicit, return Unassigned."
+              }
+              {
+                "field" = "dueDate"
+                "prompt" = "Return the explicit due date in YYYY-MM-DD format. If only a relative period exists, quote the period and return null."
+              }
+              {
+                "field" = "sourceClause"
+                "prompt" = "Quote only the clause heading and section number; do not reproduce the full clause."
+              }
+              {
+                "field" = "reminderWindowDays"
+                "prompt" = "Return the explicit notice or reminder window in days. Otherwise return null."
+              }
+            ]
+            "purpose" = "Extract explicit post-signature duties for human validation."
+          }
+          "provider" = "generic"
+          "provider_object_id" = "box/extract-field-prompts"
+        }
+        "metadata" = {
+          "artifactName" = "extract-field-prompts"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/extract-field-prompts"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_extract-field-prompts"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

@@ -1,0 +1,146 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "agents" = [
+            {
+              "layer" = "unstructured-data"
+              "name" = "box-contract-package-agent"
+              "responsibilities" = [
+                "read_contract_files"
+                "apply_metadata"
+                "create_tasks"
+                "prepare_signature_packet"
+              ]
+              "systems" = [
+                "Box"
+              ]
+            }
+            {
+              "layer" = "unstructured-data"
+              "name" = "clause-risk-agent"
+              "responsibilities" = [
+                "compare_to_playbook"
+                "score_clause_risk"
+                "cite_sources"
+                "recommend_human_approvers"
+              ]
+              "systems" = [
+                "Box"
+                "Clause Playbook"
+              ]
+            }
+            {
+              "layer" = "structured-data"
+              "name" = "salesforce-commercial-agent"
+              "responsibilities" = [
+                "compare_order_form_to_quote"
+                "validate_account_status"
+                "flag_finance_exceptions"
+              ]
+              "systems" = [
+                "Salesforce"
+              ]
+            }
+            {
+              "layer" = "structured-data"
+              "name" = "salesforce-approval-agent"
+              "responsibilities" = [
+                "route_approvals"
+                "track_sla"
+                "block_signature_until_complete"
+              ]
+              "systems" = [
+                "Salesforce"
+              ]
+            }
+            {
+              "layer" = "analytics"
+              "name" = "databricks-analytics-agent"
+              "responsibilities" = [
+                "query_clause_outcomes"
+                "benchmark_cycle_time"
+                "enrich_risk_report"
+              ]
+              "systems" = [
+                "Databricks"
+              ]
+            }
+            {
+              "layer" = "follow-up"
+              "name" = "obligation-monitor-agent"
+              "responsibilities" = [
+                "extract_obligations"
+                "assign_owners"
+                "create_renewal_and_notice_tasks"
+              ]
+              "systems" = [
+                "Box"
+                "Salesforce"
+                "Databricks"
+              ]
+            }
+          ]
+          "artifact_name" = "agentcore-orchestration-spec"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "demo" = "CLM-2026-Northstar"
+          "enterprise_id" = ""
+          "guardrails" = [
+            "no_ai_final_legal_approval"
+            "source_citation_required"
+            "block_signature_until_required_approvals_complete"
+            "privacy_security_approval_required_for_phi"
+            "finance_approval_required_for_payment_term_mismatch"
+          ]
+          "localMock" = {
+            "output" = "output/agentcore/northstar-agentcore-trace.json"
+            "purpose" = "Produces a deterministic supervisor trace for demo rehearsal before deploying AgentCore infrastructure."
+            "script" = "scripts/run_agentcore_mock.py"
+          }
+          "orchestrator" = {
+            "finalizationPolicy" = "signature_blocked_until_required_human_approvals_complete"
+            "framework" = "Strands"
+            "name" = "clm-supervisor-agent"
+            "routingMode" = "supervisor"
+            "runtime" = "AWS Bedrock AgentCore"
+          }
+          "provider" = "generic"
+          "provider_object_id" = "agentcore/agentcore-orchestration-spec"
+          "sampleInputs" = {
+            "analytics" = "output/csv/historical-clause-outcomes.csv"
+            "bootstrapState" = "config/runtime/bootstrap-state.bcl"
+            "documents" = "output/pdf/"
+            "handoffPayloads" = "config/agentcore/agent-handoff-payloads.bcl"
+            "playbook" = "output/json/clause-playbook.json"
+            "runtimeBindings" = "config/runtime/demo-environment.bcl"
+            "structuredRecord" = "output/json/northstar-clm-records.json"
+          }
+        }
+        "metadata" = {
+          "artifactName" = "agentcore-orchestration-spec"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "agentcore/agentcore-orchestration-spec"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_agentcore_agentcore-orchestration-spec"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

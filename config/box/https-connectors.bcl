@@ -1,0 +1,271 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "https-connectors"
+          "artifact_type" = "config"
+          "connectors" = [
+            {
+              "apiVersion" = "67.0"
+              "authentication" = {
+                "runAsUser" = "${salesforce.integrationUsername}"
+                "scope" = "api"
+                "secretStorage" = "Box-managed connection only"
+                "tokenUrl" = "${salesforce.myDomainUrl}/services/oauth2/token"
+                "type" = "OAuth 2.0 client credentials"
+              }
+              "baseUrl" = "${salesforce.myDomainUrl}"
+              "initialStatus" = "unconfigured"
+              "key" = "salesforce-clm-rest"
+              "name" = "Salesforce CLM REST API"
+              "operations" = {
+                "routeRedlineFindings" = {
+                  "endpoint" = "/services/apexrest/clm/redline-routing"
+                  "method" = "POST"
+                  "requiredFor" = "Cross-Platform Agentic Orchestration live redline routing"
+                  "status" = "not implemented"
+                }
+                "salesforceContractCreate" = {
+                  "authType" = "OAUTH2_CLIENT_CREDENTIALS_GRANT"
+                  "blankSafety" = "Optional Form values must be resolved before this step or bound through a value that is valid when blank. A merge token that resolves to nothing inside a quoted JSON segment yields an empty string, not a null."
+                  "body" = {
+                    "Box_Intake_File_ID__c" = {
+                      "bind" = "form.contractPackage.fileIds"
+                    }
+                    "Box_Workspace_Folder_ID__c" = {
+                      "bind" = "form.contractPackage.folderId"
+                    }
+                    "Contract_ID__c" = {
+                      "bind" = "form.contractId"
+                      "salesforceRequired" = true
+                    }
+                    "Contract_Type__c" = {
+                      "bind" = "form.contractType"
+                      "note" = "Restricted picklist. Must come from a mandatory Form field."
+                      "salesforceRequired" = true
+                    }
+                    "Counterparty__c" = {
+                      "bind" = "form.counterparty"
+                      "salesforceRequired" = true
+                    }
+                    "Latest_Routing_Status__c" = "Not Started"
+                    "Name" = {
+                      "bind" = "form.counterparty"
+                      "literalPrefix" = "CLM Intake - "
+                    }
+                    "Open_Review_Task_Count__c" = 0
+                    "Record_Source__c" = "Box Form"
+                    "Requester_Email__c" = {
+                      "bind" = "form.requesterEmail"
+                      "salesforceRequired" = true
+                    }
+                  }
+                  "bodyEncoding" = {
+                    "blankSafetySupersedes" = "An earlier note in this file claimed an unresolved value yields an empty string and that quoting numeric fields made the body blank-safe. The live run disproved both. Quoting keeps the JSON syntactically valid but does not stop Salesforce rejecting the value."
+                    "fieldGuidPortability" = "The metadata field GUID is enterprise-specific and must be resolved from the target template at provisioning time. It is not portable."
+                    "note" = "Box Automate stores an HTTPS body as an ordered CONCAT of operands. Literal JSON segments are VALUE operands; each dynamic value is its own operand spliced between them. Merge tokens are not brace-delimited text inside the stored body."
+                    "operandTypes" = {
+                      "DATE_FORMAT" = "Renders one component of a date or datetime variable. The editor offers a full ISO string or single components; there is no YYYY-MM-DD preset, so a date-only value is built from three DATE_FORMAT operands joined by literal hyphens."
+                      "DYNAMIC_VARIABLE" = "Trigger-derived property, addressed by ref, for example ref trigger.fileParentFolderName."
+                      "GET_FILE_METADATA_FIELD" = "Reads one metadata field. Operands in order: VARIABLE(file path), VALUE(templateKey, METADATA_TEMPLATE_KEY), VALUE(fieldGuid, STRING), VALUE(scope, METADATA_TEMPLATE_SCOPE)."
+                      "VALUE" = "Literal string segment. dataType STRING."
+                      "VARIABLE" = "Graph variable addressed by path, for example path trigger.form.<formFieldId>."
+                    }
+                    "storedAs" = "CONCAT operand list, not a single string"
+                    "unresolvedVariableBehaviour" = "Observed in a live run on 2026-07-22. Box Automate substitutes the literal string 'Variable unavailable' for a variable that does not resolve. It does not substitute an empty string or a null. Any Salesforce field that cannot accept that text will reject the request, which covers every Number, Currency, Date, and restricted Picklist field. Only bind a value whose source is mandatory, or accept that the field may receive the phrase 'Variable unavailable'."
+                  }
+                  "bodyImplementation" = {
+                    "boundOn" = "2026-07-22"
+                    "designRule" = "Bind only values whose Form field is mandatory. Box substitutes the literal 'Variable unavailable' for anything unresolved, so an optional source can poison a typed Salesforce field."
+                    "history" = "A 19-field version bound every Form field, including optional ones. It failed in a live run because Deal_Value__c (Currency) and Term_Months__c (Number) received 'Variable unavailable'."
+                    "note" = "Implemented in the live CLM - Contract Intake Enrichment workflow. Every dynamic value is a Box Form field on the triggering submission, addressed as trigger.form.<formFieldId>. Form element IDs are environment-specific; resolve them from the target Form."
+                    "reducedOn" = "2026-07-22"
+                    "trigger" = "form"
+                    "verification" = "Reconstructed from the persisted CONCAT operands: 15 operands, 7 dynamic, 10 fields. The reconstruction parses as JSON. Every dynamic value is backed by a required Form field."
+                  }
+                  "bodyOmissions" = {
+                    "howToRestore" = "Make the source Form field required, then bind it. That is the only way to guarantee it resolves."
+                    "neverBound" = {
+                      "Box_Workspace_URL__c" = "Derivable from Box_Workspace_Folder_ID__c. Its literal slashes also open the editor's variable search mid-expression."
+                      "Intake_Workflow_Run_ID__c" = "No workflow-run identifier confirmed among available variables."
+                      "Last_Box_Sync__c" = "No current-timestamp variable confirmed."
+                      "Risk_Level__c" = "The Box Agent emits unstructured text, not a picklist value. Restore once a structured Extract or Agent output supplies it."
+                      "Status__c" = "Present only in the metadata-trigger test outcome."
+                    }
+                    "note" = "Deliberately absent. Each is sourced from an optional Form field, so binding it risks sending 'Variable unavailable' into a typed Salesforce field."
+                    "textAndOptional" = {
+                      "Box_Redline_File_ID__c" = "Duplicated the intake file ID; dropped until a distinct redline upload exists."
+                      "Business_Owner_Name__c" = "Text."
+                      "Requester_Name__c" = "Text. Would read 'Variable unavailable' rather than fail."
+                      "Special_Terms_Risk_Notes__c" = "Text."
+                    }
+                    "typeSensitiveAndOptional" = {
+                      "Data_Category__c" = "Restricted picklist."
+                      "Deal_Value__c" = "Currency. Caused the 2026-07-22 live failure."
+                      "Region__c" = "Restricted picklist."
+                      "Target_Signature_Date__c" = "Date, composed from three DATE_FORMAT operands. Would fail whenever the Form date is blank."
+                      "Term_Months__c" = "Number. Caused the 2026-07-22 live failure."
+                    }
+                  }
+                  "connectorTargeting" = {
+                    "observed2026-07-22" = {
+                      "correctOrgConnectorHost" = "kadams-agentforce-dev-ed.develop.my.salesforce.com"
+                      "note" = "Two similarly named connectors in this environment point at different orgs. Posting a valid payload to the org without the object fails with an opaque UNKNOWN_ERROR."
+                      "wrongOrgConnectorHost" = "kadams-dev-ed.develop.my.salesforce.com"
+                    }
+                    "rule" = "The connector determines which Salesforce org receives the request. Confirm the connector's base URL is the org that actually holds CLM_Contract__c before debugging anything else."
+                  }
+                  "endpoint" = "services/data/v67.0/sobjects/CLM_Contract__c"
+                  "endpointNote" = "Stored without a leading slash and resolved against the connector base URL. This is the plain sobject collection endpoint, not an external-ID upsert path."
+                  "expectedStatus" = null
+                  "expectedStatusNote" = "The HTTPS Request outcome exposes no expected-status configuration in the editor. Do not claim status gating that the surface cannot enforce."
+                  "headers" = {
+                  }
+                  "headersNote" = "The verified outcome enables no headers and no query parameters. Authorization is handled entirely by the Box-managed OAuth 2.0 connector."
+                  "idempotency" = {
+                    "reason" = "A plain POST to the sobject collection creates a new record on every run. Resubmitting the same contract duplicates it. Use the external-ID upsert path if duplicate safety is required."
+                    "safe" = false
+                  }
+                  "method" = "POST"
+                  "outputVariables" = {
+                    "id" = {
+                      "jsonPath" = "$.id"
+                      "key" = "id"
+                      "type" = "text"
+                    }
+                  }
+                  "restrictedPicklistValues" = {
+                    "Latest_Routing_Status__c" = [
+                      "Not Started"
+                      "Needs Triage"
+                      "Routed"
+                      "Complete"
+                      "Failed"
+                    ]
+                    "Record_Source__c" = [
+                      "Box Form"
+                      "Manual"
+                      "API"
+                    ]
+                    "note" = "Both literals below are valid members of their restricted picklists."
+                  }
+                  "salesforceRequiredFields" = {
+                    "fields" = [
+                      "Contract_ID__c"
+                      "Contract_Type__c"
+                      "Counterparty__c"
+                      "Requester_Email__c"
+                    ]
+                    "note" = "Read from clm-salesforce-project object metadata. Each must map to a mandatory Form field or the POST fails."
+                  }
+                  "verified" = {
+                    "evidence" = "A full Form submission created a real CLM_Contract__c record. All ten mapped fields were confirmed on the Salesforce record itself, not only from the Box run events. Three earlier runs failed: two on unresolved-variable substitution into typed fields, one on the connector pointing at the wrong Salesforce org."
+                    "fixtureRef" = "config/box/private-api-lab-automate-https-outcome-definition.bcl"
+                    "liveRunSucceeded" = true
+                    "provenOn" = "2026-07-22"
+                    "verifiedAgainstLiveDraft" = "2026-07-22"
+                  }
+                }
+                "salesforceContractLookup" = {
+                  "endpoint" = "/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c"
+                  "expectedStatus" = [
+                    200
+                  ]
+                  "method" = "GET"
+                  "outputVariables" = {
+                    "boxFolderId" = "$.Box_Workspace_Folder_ID__c"
+                    "contractId" = "$.Contract_ID__c"
+                    "recordId" = "$.Id"
+                  }
+                  "verified" = {
+                    "note" = "Neither live draft performs a lookup. Designed contract only."
+                    "status" = "not present in any live workflow"
+                    "verifiedAgainstLiveDraft" = "2026-07-22"
+                  }
+                }
+                "salesforceContractUpsert" = {
+                  "body" = {
+                    "Box_Intake_File_ID__c" = "submittedFileId"
+                    "Box_Redline_File_ID__c" = "submittedFileId"
+                    "Box_Workspace_Folder_ID__c" = "${box.folders.workspace}"
+                    "Box_Workspace_URL__c" = "https://${box.hostname}/folder/${box.folders.workspace}"
+                    "Business_Owner_Name__c" = "businessOwner"
+                    "Contract_Type__c" = "contractType"
+                    "Counterparty__c" = "counterparty"
+                    "Data_Category__c" = "dataCategory"
+                    "Deal_Value__c" = "dealValue"
+                    "Intake_Workflow_Run_ID__c" = "workflowRunId"
+                    "Last_Box_Sync__c" = "currentTimestamp"
+                    "Latest_Routing_Status__c" = "Not Started"
+                    "Name" = "<counterparty> <contractType>"
+                    "Open_Review_Task_Count__c" = 0
+                    "Record_Source__c" = "Box Form"
+                    "Region__c" = "region"
+                    "Requester_Email__c" = "requesterEmail"
+                    "Requester_Name__c" = "requesterName"
+                    "Risk_Level__c" = "riskLevel"
+                    "Special_Terms_Risk_Notes__c" = "specialTermsRiskNotes"
+                    "Target_Signature_Date__c" = "targetSignatureDate"
+                    "Term_Months__c" = "termMonths"
+                  }
+                  "endpoint" = "/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}"
+                  "expectedStatus" = [
+                    200
+                    201
+                    204
+                  ]
+                  "headers" = {
+                    "Content-Type" = "application/json"
+                  }
+                  "idempotencyKey" = "contractId"
+                  "method" = "PATCH"
+                  "verified" = {
+                    "liveState" = "The Approved branch of CLM - Contract Intake Enrichment calls PATCH against a hardcoded Contract_ID__c external ID with a fully literal body and no output variables. It carries no submission data and must not be treated as a working contract."
+                    "status" = "present in the live primary workflow only as a smoke test"
+                    "supersededForCreate" = "salesforceContractCreate"
+                    "verifiedAgainstLiveDraft" = "2026-07-22"
+                  }
+                }
+              }
+              "prohibitedPayload" = [
+                "contract bytes"
+                "Box access tokens"
+                "connector secrets"
+                "signer credentials"
+                "unreviewed AI output"
+              ]
+            }
+          ]
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "provider" = "generic"
+          "provider_object_id" = "box/https-connectors"
+          "schemaVersion" = "2.0"
+        }
+        "metadata" = {
+          "artifactName" = "https-connectors"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/https-connectors"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_https-connectors"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

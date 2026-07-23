@@ -1,0 +1,58 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "private-api-lab-automate-manual-start-definition"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "description" = "Unsupported private API graph experiment. Manual Start only. Do not use for production."
+          "enterprise_id" = ""
+          "graph" = {
+            "trigger" = {
+              "description" = ""
+              "includeSubfolders" = false
+              "scopeFolder" = "workspace"
+              "type" = "manualStart"
+            }
+          }
+          "name" = "CLM Surface API Lab - Automate Manual Start Graph"
+          "provider" = "generic"
+          "provider_object_id" = "box/private-api-lab-automate-manual-start-definition"
+          "provisioning" = {
+            "activate" = false
+            "delete" = false
+            "existingWorkflowPolicy" = "reconcile-exact-title-manual-start-only"
+            "mode" = "experimental-private-graphql"
+            "publish" = false
+            "run" = false
+            "share" = false
+          }
+          "schemaVersion" = 1
+        }
+        "metadata" = {
+          "artifactName" = "private-api-lab-automate-manual-start-definition"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/private-api-lab-automate-manual-start-definition"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_private-api-lab-automate-manual-start-definition"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

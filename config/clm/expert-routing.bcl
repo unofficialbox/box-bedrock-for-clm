@@ -1,0 +1,104 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "activationRules" = [
+            "Replace shared demo reviewer bindings with real domain experts when available."
+            "Verify each selected expert can access the redline before creating a task."
+            "Never infer a person or login from document text."
+            "Do not create more than one open task for the same contract, file, and domain."
+          ]
+          "artifact_name" = "expert-routing"
+          "artifact_type" = "config"
+          "confidenceThreshold" = 0.85
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "fallback" = {
+            "boxLogin" = "${box.reviewers.primary}"
+            "directoryKey" = "legal-operations-triage"
+            "displayName" = "Legal Operations Triage"
+            "rule" = "Use for unclassified findings, confidence below threshold, missing experts, or experts without file access."
+          }
+          "provider" = "generic"
+          "provider_object_id" = "clm/expert-routing"
+          "routes" = [
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "commercial-counsel"
+              "displayName" = "Jordan Lee"
+              "domain" = "Commercial Legal"
+              "title" = "Commercial Counsel"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "finance-director"
+              "displayName" = "Priya Shah"
+              "domain" = "Finance"
+              "title" = "Finance Director"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "privacy-counsel"
+              "displayName" = "Elena Torres"
+              "domain" = "Privacy"
+              "title" = "Privacy Counsel"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "security-lead"
+              "displayName" = "Marcus Reed"
+              "domain" = "Security"
+              "title" = "Security Assurance Lead"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "tax-counsel"
+              "displayName" = "Tax Counsel"
+              "domain" = "Tax"
+              "title" = "Tax Reviewer"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "service-owner"
+              "displayName" = "Service Owner"
+              "domain" = "Service and SLA"
+              "title" = "Service Delivery Owner"
+            }
+            {
+              "boxLogin" = "${box.reviewers.primary}"
+              "directoryKey" = "risk-manager"
+              "displayName" = "Risk Manager"
+              "domain" = "Insurance"
+              "title" = "Corporate Risk Manager"
+            }
+          ]
+          "schemaVersion" = "2.0"
+          "strategy" = "Group findings for the same contract, file, and domain into one human-owned Box task."
+        }
+        "metadata" = {
+          "artifactName" = "expert-routing"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "clm/expert-routing"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_clm_expert-routing"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}
