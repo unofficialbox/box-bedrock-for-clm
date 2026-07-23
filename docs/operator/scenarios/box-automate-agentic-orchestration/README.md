@@ -16,7 +16,7 @@ Use this track when Box Apps, Forms, Automate, Hubs, metadata, tasks, Doc Gen, a
 |---|---|
 | Presenter surface | Box App, Form, Automate, Hub, tasks, Doc Gen, Sign |
 | Agentic work | Extract plus Box and Agentforce agents for source-grounded enrichment |
-| Structured handoff | Salesforce standard REST external-ID upsert and lookup after human approval |
+| Structured handoff | Salesforce standard REST record creation after human approval |
 | Excluded | Salesforce React, Databricks, AWS Bedrock AgentCore, Strands |
 
 [Continue to architecture](#2-architecture)
@@ -56,14 +56,25 @@ The Box layer owns content, workflow state, clauses, tasks, generation, signatur
 |---|---|---|---|
 | 1. Portfolio | “Legal Operations needs one place to see work and act.” | Open the App; point to the three top actions and status/risk/type charts. | “The dashboard is driven by governed metadata, not a separate reporting copy.” |
 | 2. Intake | “A request should be easy for Sales and controlled for Legal.” | Open the sole **Start a New Contract** Form and submit the Northstar sample. | “The file and business context enter governed Box content together.” |
-| 3. Enrichment | “Automation handles the repeatable work; agents enrich evidence.” | Show Form → Extract → cited agent review in Automate. | “The sequence is designed, inspectable, and repeatable.” |
-| 4. Control | “Agent output is a draft, not an approval.” | Show the human task and approved/rejected branches. | “Rejected work returns for correction; Salesforce is unreachable until approval.” |
-| 5. Record | “Approved evidence can now update the commercial system safely.” | Show the HTTPS Connector upsert and lookup result. | “The external ID prevents duplicates, and a person—not an agent—authorized the write.” |
+| 3. Enrichment | “Automation handles the repeatable work; agents enrich evidence.” | Show Form → workspace creation → cited Box Agent review in Automate. | “The sequence is designed, inspectable, and repeatable.” |
+| 4. Control | “Agent output is a draft, not an approval.” | Show the human task and approved/rejected branches. | “Salesforce is unreachable until a named person approves.” |
+| 5. Record | “Approved evidence can now update the commercial system safely.” | Show the HTTPS Connector create the Salesforce record, then open the record. | “A person, not an agent, authorized the write, and every field came from the governed submission.” |
 | 6. Redlines | “Each clause issue belongs with the right domain expert.” | Open Clause Library, Hub, and domain-owned review work. | “Approved language is reusable; exceptions have a named owner and citation.” |
 | 7. Execution | “Generation and signature remain controlled lifecycle events.” | Show Doc Gen templates, approval evidence, and Executed Agreements. | “People authorize generation and signature; Box retains the audit trail.” |
 | 8. Close | “This is agentic orchestration directed by a governed workflow.” | Return to the portfolio view. | “Every mutation has a known stage, owner, and evidence trail.” |
 
-Required language: agents summarize, extract, compare, and recommend; people approve legal positions and signature. Describe Automate as live only after the target environment passes OAuth, idempotency, and activation checks.
+Required language: agents summarize, extract, compare, and recommend; people approve legal positions and signature. Describe Automate as live only after the target environment passes OAuth and activation checks.
+
+### What is proven, and what is not
+
+The Box path was run end to end on 2026-07-22 and created a real Salesforce record from a Form submission. Two claims that appear elsewhere in this repository are **not** true of the live workflow, so do not make them on stage:
+
+- **There is no Extract Agent step.** The live sequence is Form trigger, workspace copy, workspace rename, Box Agent review, approval task, conditional split, connector call. Say "agent review", not "Extract then agent review".
+- **There is no duplicate protection.** The connector performs a plain record create, not an external-ID upsert, and there is no follow-up lookup. Submitting the same contract twice creates two records. Do not claim the external ID prevents duplicates.
+
+The external-ID upsert remains the intended target design and is still described in the use-case and architecture documents. It is not what the demo currently does.
+
+A rejected submission also ends the run silently; the Rejected branch has no outcome attached. Frame step 4 as "Salesforce is unreachable until approval" rather than promising a return-for-correction path.
 
 [Continue to the visual walkthrough](#5-visual-walkthrough)
 
@@ -104,9 +115,9 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 | Component | Role | Status |
 |---|---|---|
 | Box App and Form | Portfolio and single intake entry | Must be built and published per environment |
-| Box Automate | Form → Extract → agent review → approval → connector | Must pass inactive smoke test before activation |
+| Box Automate | Form → workspace copy and rename → Box Agent review → approval → connector | Proven end to end on 2026-07-22 |
 | Extract and Box/Agentforce agents | Structured evidence and source-grounded recommendations | **Portable specification** |
-| HTTPS Connector | Salesforce external-ID upsert and lookup | Must be configured and tested per environment |
+| HTTPS Connector | Salesforce standard REST record creation | Configured and proven; connector must target the org holding `CLM_Contract__c` |
 | Metadata, tasks, Clause Hub | Status, risk, named ownership, approved positions | Foundation automated; browser seeding remains |
 | Box Doc Gen | Approval memo, order summary, renewal notice | Templates generated/uploaded; mark in Box UI |
 | Box Sign | Human-authorized execution | Configure only after approval controls pass |

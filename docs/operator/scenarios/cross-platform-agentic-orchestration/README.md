@@ -125,7 +125,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 - Box governs the contract package, versions, metadata, tasks, Doc Gen, Sign, and audit history.
 - Salesforce `CLM_Contract__c` governs structured commercial context and Box references.
-- Salesforce intake uses `Contract_ID__c` external-ID upsert followed by lookup; retries must not create duplicate records.
+- Salesforce intake is designed around a `Contract_ID__c` external-ID upsert followed by lookup so retries cannot create duplicate records. The live Box Automate workflow currently performs a plain record create instead, which is not idempotent; restore the upsert before making a duplicate-safety claim.
 - Agentforce may retrieve, summarize, compare, explain, recommend, draft, and route. It cannot approve a legal position or authorize signature.
 - Databricks supplies analytical context, never contract authority.
 - Low-confidence, unclassified, missing-owner, and inaccessible work routes to Legal Operations triage.

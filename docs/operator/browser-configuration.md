@@ -56,8 +56,8 @@ Build the workflows from `config/box/automate-workflows.json`. Start with **CLM 
 2. Extract: use the uploaded contract file and `config/box/extract-field-prompts.json`.
 3. Agent review: use `config/box/ai-agent-specs.json` and require citations.
 4. Human validation: assign a real reviewer in this environment.
-5. Approved branch: Salesforce standard REST external-ID upsert, then lookup, using `config/box/https-connectors.json`.
-6. Rejected branch: return for correction; do not invoke Salesforce.
+5. Approved branch: Salesforce standard REST record creation, using `config/box/https-connectors.bcl`. Point the connector at the org that holds `CLM_Contract__c`; two similarly named connectors can target different orgs, and the wrong one fails as an opaque `UNKNOWN_ERROR`.
+6. Rejected branch: return for correction; do not invoke Salesforce. The live workflow currently leaves this branch empty, so a rejected submission ends the run silently.
 
 Save and test the workflow while inactive. Obtain explicit approval immediately before activation.
 
@@ -91,5 +91,6 @@ Proceed only when:
 - The Form targets the generated intake folder.
 - The workflow is saved and remains inactive until approval.
 - OAuth succeeds as the dedicated integration user.
-- One external-ID upsert followed by a lookup succeeds in a labeled test.
-- A duplicate submission updates the same Salesforce record.
+- One record creation succeeds in a labeled test, and the created record is opened and checked field by field in Salesforce rather than trusted from the Box run events.
+- Every bound value is sourced from a **required** Form field. An unresolved variable is sent as the literal string `Variable unavailable`, not as an empty value, so an optional source corrupts any typed Salesforce field.
+- Duplicate behaviour is understood and accepted: the current create path is not idempotent, so a duplicate submission creates a second record. Restore the external-ID upsert if duplicate safety is required.
