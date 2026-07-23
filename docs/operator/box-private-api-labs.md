@@ -76,6 +76,40 @@ The executor accepts only an inactive exact-title lab with either no graph or on
 trigger, one dangling basic edge, and no outcomes or gateways. Run it a second time and require
 `"outcome": "unchanged"` before treating the lab as reconciled.
 
+## Automate graph inspector
+
+Writes remain limited to an empty or Manual Start lab graph. The GraphQL mutation shape for
+richer outcome types, such as a folder action, an agent, an approval task, or an HTTPS connector
+call, has not been observed and is deliberately not inferred.
+
+Reading an existing workflow is a separate, verified capability. Once the editor finishes loading,
+it holds the server-provided definition in client application state, so the graph can be captured
+without any mutation. GraphQL request and response bodies remain unreadable, which makes this the
+practical read path.
+
+```bash
+python3 scripts/experimental_box_automate_private_api.py \
+  --write-inspector \
+  --expect-title 'CLM - Contract Intake Enrichment' \
+  --acknowledge 'I understand this uses an unsupported Box private API'
+```
+
+The inspector issues no GraphQL operation at all. It reads already-loaded state, redacts GUIDs,
+long numeric IDs, and email addresses, and prints a structural summary. It enforces the configured
+hostname, requires an `/automate` page, optionally requires an exact title, and refuses any workflow
+that has ever been published.
+
+Two limitations are worth knowing before you rely on its output:
+
+- The loaded editor state exposes no status enum. The reported `status` is derived from the
+  publication timestamps and is reported alongside a `statusSource` note. Verified against the
+  editor's own header badge.
+- Redaction is a safety net, not a guarantee. Review the output before committing any capture.
+
+Open the target workflow first and let it finish loading, then apply the inspector in the page
+origin. `--expect-title` is optional but is the only protection against reading whichever workflow
+happens to be open.
+
 The Apps lab can also reconcile a portable `pages` section schema when provided in
 `config/box/private-api-lab-app-definition.json`. Keep sections to basic metadata only; `items` is still blocked until a stable block schema capture exists.
 

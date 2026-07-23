@@ -12,7 +12,7 @@ Available scripts:
 | `prepare_box_form_browser_plan.py` | Validate the portable intake Form definition and prepare a guarded, gitignored Browser Use plan; makes no Box changes |
 | `experimental_box_forms_private_api.py` | Build an explicitly acknowledged, non-destructive browser executor for the isolated CLM Forms private-API lab; never targets the production Form |
 | `experimental_box_apps_private_api.py` | Build an explicitly acknowledged browser executor for the isolated Apps private-API lab; now includes section-aware reconciliation in addition to shell/description; never deletes, publishes, shares, or targets the production App |
-| `experimental_box_automate_private_api.py` | Build an explicitly acknowledged executor for either the empty inactive Automate lab or the separate Manual Start-only graph lab; never deletes, publishes, activates, shares, or runs either lab |
+| `experimental_box_automate_private_api.py` | Build an explicitly acknowledged executor for either the empty inactive Automate lab or the separate Manual Start-only graph lab; never deletes, publishes, activates, shares, or runs either lab. `--write-inspector` builds a read-only reader for an existing unpublished draft that issues no GraphQL operation and mutates nothing |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |

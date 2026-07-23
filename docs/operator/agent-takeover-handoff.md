@@ -183,6 +183,58 @@ No repository fixture currently contains the HTTPS Connector outcome graph. Add 
 - The presenter script names the exact MSA file used for intake.
 - No workflow or App is published or activated without explicit confirmation.
 
+## Outcome, 2026-07-22 into 2026-07-23
+
+**The objective above is complete and the scenario is proven end to end.** A Form submission now runs trigger, workspace copy, workspace rename, Box Agent, human approval, and an HTTPS POST that creates a real Salesforce record.
+
+Config now lives in `.bcl`, not `.json`. BCL is the only supported import format; the paths in the table above should be read with a `.bcl` extension.
+
+### Capture method that worked
+
+The Automate editor holds the server-provided workflow definition in client application state once the page finishes loading. That is the definition before any local edit, and it is more reliable than reading the rendered editor. GraphQL request and response bodies stayed unreadable throughout, so this is the practical read path. `scripts/experimental_box_automate_private_api.py --write-inspector` packages it.
+
+### Live workflow, as reconciled
+
+Order is trigger, copy workspace folder, rename workspace folder, Box Agent, approval task, exclusive split, connector call on the Approved branch. There is no Extract Agent and no Salesforce lookup step. The Rejected branch has no outcome, so a rejected submission is silently dropped.
+
+### Three failures, three distinct causes
+
+Each one is worth keeping, because none was visible from Box's error reporting.
+
+1. **Unresolved variables become the literal string `Variable unavailable`.** Not empty, not null. `Deal_Value__c` (Currency) and `Term_Months__c` (Number) received that text and Salesforce could not parse it. The same substitution produced a folder named `CLM-2026-Variable unavailable`. Reconstructing the body with empty strings had "proved" blank-safety, but Box never emits empty, so the test measured the wrong thing. **Rule: only bind values whose Form field is mandatory.**
+2. **The Form and the Salesforce schema disagreed on what is mandatory.** `CLM_Contract__c` requires `Contract_ID__c`, `Contract_Type__c`, `Counterparty__c`, `Requester_Email__c`. Three had been made optional on the Form. `Contract_Type__c` is a restricted picklist, so the substituted text could not satisfy it either. The Form now requires five fields.
+3. **The connector pointed at the wrong Salesforce org.** Two similarly named connectors existed; only one org holds `CLM_Contract__c`. A valid payload sent to the other org fails as a bare `UNKNOWN_ERROR`. Switching the connector also normalised the endpoint to the leading-slash-free form.
+
+### Diagnosing connector faults on this surface
+
+Box never exposes the Salesforce error body. The run event carries `errorCode: UNKNOWN_ERROR` with an empty payload, Run Test says only "Something went wrong", and the underlying `/app-api/graphql` call returns HTTP 200 because the failure is inside Box's server-side connector call. The method that worked:
+
+1. Read the fully resolved request body from the `CALL_CONNECTOR` run event.
+2. Validate it field by field against the object metadata in `clm-salesforce-project`.
+3. Confirm the connector's base URL is the org that actually holds the object.
+4. If all three pass, replay the request from Workbench or curl, which returns the real error.
+
+### Verified result
+
+The created record carried all ten mapped fields correctly, confirmed on the Salesforce record itself rather than only from Box: contract name, contract ID, counterparty, contract type, requester email, intake file ID, workspace folder ID, record source, routing status, task count. `Deal Value`, `Term Months`, `Target Signature Date` and `Risk Level` are intentionally absent, because their Form fields are optional and would have carried `Variable unavailable` into typed Salesforce fields.
+
+### Editing cautions learned the hard way
+
+- **The workflow is Active.** Any further edit saves as a draft and does nothing until Activate is pressed again. The editor showing your change is not evidence that it runs. Confirm `lastPublishedAt` moved, or check the Status column on the Automate list.
+- **The endpoint control is a segmented editor, not a text input.** Text typed after a `/` is held as a pending variable lookup and is silently dropped from the model while still displayed. `Escape`, blur and `Enter` all discard it; a following `/` commits a segment. Select-all does not clear committed segments, so retyping appends. The reliable edit is cursor-to-end and delete backwards. Verify the model, not the rendered text.
+- **In the body editor, search variables by form element ID, not by label.** Several labels, `Counterparty` among them, match both a Form field and a metadata attribute, and picking the wrong one binds silently.
+- **A date variable has no `YYYY-MM-DD` preset.** Only a full ISO datetime or single components, which persist as a distinct `DATE_FORMAT` operand. A Salesforce Date field needs three of them joined by literal hyphens.
+
+## Still open
+
+1. **Duplicate safety.** A plain POST to the sobject collection creates a new record every submission. The `PATCH` upsert it replaced was idempotent against a `Contract_ID__c` external ID.
+2. **The created record ID is not captured.** The outcome defines no output variable; `$.id` is available.
+3. **The presenter script is wrong at step 5.** `docs/operator/scenarios/box-automate-agentic-orchestration/README.md` still says "upsert and lookup" and "the external ID prevents duplicates". Neither is true.
+4. **Rejected branch is terminal**, with no notification or return-for-correction.
+5. **No Extract Agent** in the live workflow, though the packaged design once specified one.
+6. **v3 versus v4 MSA** as the canonical intake sample is still undecided.
+7. **Repository Python tooling still expects `.json` config paths** after the BCL cutover, so `validate_clm.py` and several tests error. Tooling migration is owned by the box-dispatch effort.
+
 ## Immediate next action
 
-Start a browser-enabled task, open workflow `399436615012` read-only, and compare its graph with `config/box/automate-workflows.json`. Then use workflow `402235479966` to capture the HTTPS outcome and merge-variable payload before editing either JSON source of truth.
+Fix step 5 of the presenter script so it matches the live behaviour, then decide the duplicate-safety question before the scenario is presented.
