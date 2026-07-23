@@ -17,6 +17,7 @@ DEFAULT_SPEC = ROOT / "config/box/private-api-lab-automate-definition.json"
 DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
 DEFAULT_BOOTSTRAP = ROOT / "config/runtime/bootstrap-state.json"
 DEFAULT_OUTPUT = ROOT / "config/runtime/generated/box/private-api-lab-automate-provisioner.js"
+DEFAULT_INSPECTOR_OUTPUT = ROOT / "config/runtime/generated/box/private-api-automate-graph-inspector.js"
 LAB_TITLE_PREFIX = "CLM Surface API Lab - "
 FORBIDDEN_TITLES = {
     "CLM - Contract Intake Enrichment",
@@ -349,6 +350,121 @@ window.__clmPrivateAutomateLabPromise = (async () => {{
     return " ".join(line.strip() for line in script.splitlines() if line.strip()) + "\n"
 
 
+def inspector_script(hostname: str, expected_title: str | None = None) -> str:
+    """Build a read-only reader for an existing unpublished Automate draft.
+
+    The write executor above only ever reconciles a lab draft, because the GraphQL
+    mutation shape for outcome types beyond an empty or Manual Start graph has not
+    been observed. Reading an existing workflow is a separate, verified capability:
+    the editor exposes the server-provided definition in client application state
+    once the page has loaded, so the graph can be captured without any mutation.
+
+    This script issues no GraphQL operation at all. It reads already-loaded state,
+    redacts identifiers, and prints a structural summary.
+    """
+    hostname = validate_hostname(hostname)
+    title = json.dumps(expected_title) if expected_title else "null"
+    script = f'''/* Unsupported Box Automate private API reader. Read-only; issues no GraphQL operation and performs no mutation. */
+window.__clmPrivateAutomateInspectionPromise = (async () => {{
+  "use strict";
+  const expectedHostname = {json.dumps(hostname)};
+  const expectedTitle = {title};
+  if (location.hostname !== expectedHostname) throw new Error(`Target guard failed: expected ${{expectedHostname}}, received ${{location.hostname}}`);
+  if (!location.pathname.startsWith("/automate")) throw new Error("Surface guard failed: open Box Automate first");
+  const container = document.getElementById("app");
+  const fiberKey = container && Object.keys(container).find((key) => key.startsWith("__reactContainer"));
+  if (!fiberKey) throw new Error("Automate editor state is unavailable; let the workflow finish loading first");
+  const isGraph = (value) => {{
+    if (!value || typeof value !== "object") return false;
+    const keys = Object.keys(value);
+    return keys.includes("outcomes") && keys.includes("trigger") && keys.includes("edges") && keys.includes("configuration");
+  }};
+  const seen = new Set();
+  const found = [];
+  const scan = (value, depth) => {{
+    if (depth > 4 || !value || typeof value !== "object" || seen.has(value)) return;
+    seen.add(value);
+    if (isGraph(value)) {{ found.push(value); return; }}
+    for (const key of Object.keys(value).slice(0, 40)) {{ try {{ scan(value[key], depth + 1); }} catch (error) {{ void error; }} }}
+  }};
+  const queue = [container[fiberKey]];
+  let visited = 0;
+  while (queue.length && visited < 30000) {{
+    const fiber = queue.shift();
+    if (!fiber) continue;
+    visited += 1;
+    try {{ scan(fiber.memoizedState, 0); }} catch (error) {{ void error; }}
+    try {{ scan(fiber.memoizedProps, 0); }} catch (error) {{ void error; }}
+    if (fiber.child) queue.push(fiber.child);
+    if (fiber.sibling) queue.push(fiber.sibling);
+  }}
+  const size = (value) => (value && typeof value === "object" ? Object.keys(value).length : 0);
+  found.sort((left, right) => size(right.outcomes) - size(left.outcomes));
+  const workflow = found[0];
+  if (!workflow) throw new Error("No loaded workflow graph was found in the editor state");
+  const configuration = workflow.configuration || {{}};
+  if (expectedTitle !== null && configuration.name !== expectedTitle) throw new Error(`Title guard failed: expected ${{expectedTitle}}, received ${{configuration.name}}`);
+  const everPublished = Boolean(configuration.firstPublishedAt || configuration.lastPublishedAt);
+  if (everPublished) throw new Error("Publication guard failed: this reader only inspects a workflow that has never been published");
+  const guid = /[0-9a-f]{{8}}-[0-9a-f]{{4}}-[0-9a-f]{{4}}-[0-9a-f]{{4}}-[0-9a-f]{{12}}/gi;
+  const digits = /\\b\\d{{6,}}\\b/g;
+  const mail = /[^\\s"',]+@[^\\s"',]+\\.[a-z]{{2,}}/gi;
+  const redact = (value) => {{
+    if (typeof value === "string") return value.replace(guid, "<guid>").replace(mail, "<email>").replace(digits, "<id>");
+    if (Array.isArray(value)) return value.map(redact);
+    if (value && typeof value === "object") {{
+      const out = {{}};
+      for (const [key, child] of Object.entries(value)) out[redact(key)] = redact(child);
+      return out;
+    }}
+    return value;
+  }};
+  const result = {{
+    name: configuration.name,
+    description: redact(configuration.description || ""),
+    status: everPublished ? "PUBLISHED" : "DRAFT",
+    statusSource: "derived from publication timestamps; the loaded editor state exposes no status enum",
+    everPublished,
+    trigger: redact(workflow.trigger || null),
+    outcomes: Object.values(workflow.outcomes || {{}}).map(redact),
+    gateways: Object.values(workflow.gateways || {{}}).map(redact),
+    edges: (workflow.edges || []).map(redact),
+    graphqlOperationsIssued: 0,
+    mutated: false,
+    saved: false,
+    published: false,
+    activated: false,
+    shared: false,
+    run: false,
+    deleted: false,
+  }};
+  console.info("CLM_AUTOMATE_PRIVATE_API_INSPECTION", JSON.stringify(result));
+  return result;
+}})();
+'''
+    return " ".join(line.strip() for line in script.splitlines() if line.strip()) + "\n"
+
+
+def write_inspector(
+    config_path: Path,
+    output_path: Path,
+    acknowledgement: str,
+    expected_title: str | None,
+) -> None:
+    if acknowledgement != ACKNOWLEDGEMENT:
+        raise ExperimentalAutomateProvisionerError(
+            f"Refusing to build inspector without --acknowledge {ACKNOWLEDGEMENT!r}"
+        )
+    script = inspector_script(config_hostname(load_json(config_path)), expected_title)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+    output_path.write_text(script, encoding="utf-8")
+    display_path = output_path.relative_to(ROOT) if output_path.is_relative_to(ROOT) else output_path
+    print(f"Prepared read-only private API Automate graph inspector: {display_path}")
+    print("It requires an authenticated Box Automate editor page on the configured hostname.")
+    print("It issues no GraphQL operation, mutates nothing, and refuses a workflow that has ever been published.")
+    print("Review and sanitize its output before committing any capture.")
+
+
 def write_executor(
     spec_path: Path,
     config_path: Path,
@@ -388,9 +504,20 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     result.add_argument("--bootstrap", type=Path, default=DEFAULT_BOOTSTRAP)
     result.add_argument("--output", type=Path, default=DEFAULT_OUTPUT)
+    result.add_argument("--inspector-output", type=Path, default=DEFAULT_INSPECTOR_OUTPUT)
+    result.add_argument(
+        "--expect-title",
+        default="",
+        help="Refuse to inspect unless the loaded workflow carries this exact title.",
+    )
     modes = result.add_mutually_exclusive_group(required=True)
     modes.add_argument("--dry-run", action="store_true")
     modes.add_argument("--write-executor", action="store_true")
+    modes.add_argument(
+        "--write-inspector",
+        action="store_true",
+        help="Build a read-only reader for an existing unpublished draft. Issues no GraphQL operation.",
+    )
     result.add_argument("--acknowledge", default="")
     return result
 
@@ -400,6 +527,13 @@ def main() -> int:
     try:
         if args.dry_run:
             dry_run(args.spec, args.config, args.bootstrap)
+        elif args.write_inspector:
+            write_inspector(
+                args.config,
+                args.inspector_output,
+                args.acknowledge,
+                args.expect_title or None,
+            )
         else:
             write_executor(args.spec, args.config, args.bootstrap, args.output, args.acknowledge)
     except ExperimentalAutomateProvisionerError as error:

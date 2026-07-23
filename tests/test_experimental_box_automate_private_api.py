@@ -111,6 +111,61 @@ class ExperimentalBoxAutomatePrivateApiTests(unittest.TestCase):
                 provisioner.write_executor(spec_path, config_path, root / "bootstrap.json", output_path, "")
             self.assertFalse(output_path.exists())
 
+    def test_inspector_is_read_only(self):
+        script = provisioner.inspector_script("example.box.com")
+        self.assertEqual(len(script.splitlines()), 1)
+        for mutation in ("client.mutate", "CreateItemV2", "UpdateItemV2", "PublishWorkflow", "ActivateWorkflow", "DeleteItemV2"):
+            self.assertNotIn(mutation, script)
+        self.assertNotIn("client.query", script)
+        self.assertIn("__reactContainer", script)
+        self.assertIn("Publication guard failed", script)
+        self.assertIn("mutated: false", script)
+        self.assertIn("graphqlOperationsIssued: 0", script)
+
+    def test_inspector_enforces_hostname_and_surface(self):
+        script = provisioner.inspector_script("example.box.com")
+        self.assertIn("Target guard failed", script)
+        self.assertIn("Surface guard failed", script)
+        self.assertIn('"example.box.com"', script)
+        with self.assertRaisesRegex(provisioner.ExperimentalAutomateProvisionerError, "box.com"):
+            provisioner.inspector_script("example.invalid.com")
+
+    def test_inspector_title_guard_is_optional_but_exact(self):
+        without = provisioner.inspector_script("example.box.com")
+        self.assertIn("const expectedTitle = null", without)
+        with_title = provisioner.inspector_script("example.box.com", "CLM - Contract Intake Enrichment")
+        self.assertIn('const expectedTitle = "CLM - Contract Intake Enrichment"', with_title)
+        self.assertIn("Title guard failed", with_title)
+
+    def test_inspector_redacts_identifiers(self):
+        script = provisioner.inspector_script("example.box.com")
+        self.assertIn("<guid>", script)
+        self.assertIn("<email>", script)
+        self.assertIn("<id>", script)
+
+    def test_inspector_derives_status_from_publication_timestamps(self):
+        script = provisioner.inspector_script("example.box.com")
+        self.assertIn('everPublished ? "PUBLISHED" : "DRAFT"', script)
+        self.assertIn("statusSource", script)
+
+    def test_inspector_does_not_contain_credentials(self):
+        script = provisioner.inspector_script("example.box.com")
+        self.assertNotIn("cookie", script.lower())
+        self.assertNotIn("authorization", script.lower())
+        self.assertNotIn("x-csrf-token", script.lower())
+
+    def test_write_inspector_requires_exact_acknowledgement(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path = root / "config.json"
+            output_path = root / "inspector.js"
+            config_path.write_text(json.dumps({"box": {"hostname": "example.box.com"}}))
+            with self.assertRaisesRegex(provisioner.ExperimentalAutomateProvisionerError, "Refusing"):
+                provisioner.write_inspector(config_path, output_path, "", None)
+            self.assertFalse(output_path.exists())
+            provisioner.write_inspector(config_path, output_path, provisioner.ACKNOWLEDGEMENT, None)
+            self.assertTrue(output_path.exists())
+
     def test_executor_does_not_contain_credentials(self):
         script = provisioner.executor_script(self.valid_spec(), "example.box.com")
         self.assertNotIn("cookie", script.lower())
