@@ -5,8 +5,8 @@ import unittest
 from pathlib import Path
 
 
-MODULE_PATH = Path(__file__).parents[1] / "scripts/experimental_box_apps_private_api.py"
-SPEC = importlib.util.spec_from_file_location("experimental_box_apps_private_api", MODULE_PATH)
+MODULE_PATH = Path(__file__).parents[1] / "apps.py"
+SPEC = importlib.util.spec_from_file_location("box_capture_apps", MODULE_PATH)
 provisioner = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader
 SPEC.loader.exec_module(provisioner)

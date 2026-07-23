@@ -23,7 +23,7 @@ Sanitized request and response shapes are stored beside this file, including the
 
 ## 2026-07-22 follow-up: reading and writing an existing workflow
 
-Two existing drafts were read without mutation, and one connector outcome was then authored through the editor. The definitions were taken from the editor's loaded workflow graph in client application state, which is the server-provided definition before any local edit. GraphQL request and response bodies remained unreadable, so this is the practical read path for an existing workflow. `scripts/experimental_box_automate_private_api.py --write-inspector` packages the read path with hostname, surface, exact-title and never-published guards.
+Two existing drafts were read without mutation, and one connector outcome was then authored through the editor. The definitions were taken from the editor's loaded workflow graph in client application state, which is the server-provided definition before any local edit. GraphQL request and response bodies remained unreadable, so this is the practical read path for an existing workflow. `tools/box-capture/automate.py --write-inspector` packages the read path with hostname, surface, exact-title and never-published guards.
 
 Additional interpretation:
 

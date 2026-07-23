@@ -12,11 +12,14 @@ import sys
 from pathlib import Path
 from typing import Any
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bcl as bcl_reader  # noqa: E402  (sibling module, path set above)
 
-ROOT = Path(__file__).resolve().parents[1]
-DEFAULT_SPEC = ROOT / "config/box/private-api-lab-form-definition.json"
-DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
-DEFAULT_FORM_RUNTIME = ROOT / "config/runtime/generated/box/form-definition.json"
+
+ROOT = Path(__file__).resolve().parents[2]  # repository root
+DEFAULT_SPEC = ROOT / "config/box/private-api-lab-form-definition.bcl"
+DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.bcl"
+DEFAULT_FORM_RUNTIME = ROOT / "config/runtime/generated/box/form-definition.bcl"
 DEFAULT_OUTPUT = ROOT / "config/runtime/generated/box/private-api-lab-provisioner.js"
 LAB_TITLE_PREFIX = "CLM Forms API Lab - "
 FORBIDDEN_TITLES = {"New Contract Request", "Start new contract"}
@@ -37,8 +40,19 @@ class ExperimentalProvisionerError(RuntimeError):
 
 
 def load_json(path: Path) -> dict[str, Any]:
+    """Load a config payload.
+
+    BCL is the only supported config format, so `.bcl` inputs are unwrapped to
+    the artifact's `config` body. Plain JSON is still accepted for ad-hoc and
+    test fixtures.
+    """
     if not path.is_file():
         raise ExperimentalProvisionerError(f"Missing required file: {path}")
+    if path.suffix == ".bcl":
+        try:
+            return bcl_reader.load_config(path)
+        except bcl_reader.BCLError as error:
+            raise ExperimentalProvisionerError(str(error)) from error
     try:
         value = json.loads(path.read_text(encoding="utf-8"))
     except json.JSONDecodeError as error:

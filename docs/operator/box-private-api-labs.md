@@ -7,7 +7,7 @@ These labs investigate unsupported Box web APIs for surfaces that do not have co
 Before running any lab executor, the operator must:
 
 1. Sign in to the intended Box enterprise in a normal Box web-app tab.
-2. Confirm the tab hostname exactly matches `config/runtime/demo-environment.json`.
+2. Confirm the tab hostname exactly matches `config/runtime/demo-environment.bcl`.
 3. Use the intended builder account and confirm it has access to the target product.
 4. Keep that authenticated tab open while the browser agent runs the executor in the same page origin.
 
@@ -27,8 +27,8 @@ Use supported APIs for Hub creation/items/collaborators, AI Agents, Doc Gen temp
 ## Forms lab
 
 ```bash
-python3 scripts/experimental_box_forms_private_api.py --dry-run
-python3 scripts/experimental_box_forms_private_api.py \
+python3 tools/box-capture/forms.py --dry-run
+python3 tools/box-capture/forms.py \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
 ```
@@ -36,8 +36,8 @@ python3 scripts/experimental_box_forms_private_api.py \
 ## Apps lab
 
 ```bash
-python3 scripts/experimental_box_apps_private_api.py --dry-run
-python3 scripts/experimental_box_apps_private_api.py \
+python3 tools/box-capture/apps.py --dry-run
+python3 tools/box-capture/apps.py \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
 ```
@@ -47,8 +47,8 @@ python3 scripts/experimental_box_apps_private_api.py \
 Open Box Automate in the authenticated web-app tab before applying this executor.
 
 ```bash
-python3 scripts/experimental_box_automate_private_api.py --dry-run
-python3 scripts/experimental_box_automate_private_api.py \
+python3 tools/box-capture/automate.py --dry-run
+python3 tools/box-capture/automate.py \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
 ```
@@ -56,17 +56,17 @@ python3 scripts/experimental_box_automate_private_api.py \
 ## Automate Manual Start graph lab
 
 This separate lab resolves the `workspace` folder alias from the gitignored
-`config/runtime/bootstrap-state.json`. It never writes a live Box ID to the portable specification.
+`config/runtime/bootstrap-state.bcl`. It never writes a live Box ID to the portable specification.
 
 ```bash
-python3 scripts/experimental_box_automate_private_api.py \
-  --spec config/box/private-api-lab-automate-manual-start-definition.json \
-  --bootstrap config/runtime/bootstrap-state.json \
+python3 tools/box-capture/automate.py \
+  --spec config/box/private-api-lab-automate-manual-start-definition.bcl \
+  --bootstrap config/runtime/bootstrap-state.bcl \
   --dry-run
 
-python3 scripts/experimental_box_automate_private_api.py \
-  --spec config/box/private-api-lab-automate-manual-start-definition.json \
-  --bootstrap config/runtime/bootstrap-state.json \
+python3 tools/box-capture/automate.py \
+  --spec config/box/private-api-lab-automate-manual-start-definition.bcl \
+  --bootstrap config/runtime/bootstrap-state.bcl \
   --output config/runtime/generated/box/private-api-lab-automate-manual-start-provisioner.js \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
@@ -88,7 +88,7 @@ without any mutation. GraphQL request and response bodies remain unreadable, whi
 practical read path.
 
 ```bash
-python3 scripts/experimental_box_automate_private_api.py \
+python3 tools/box-capture/automate.py \
   --write-inspector \
   --expect-title 'CLM - Contract Intake Enrichment' \
   --acknowledge 'I understand this uses an unsupported Box private API'
@@ -111,7 +111,7 @@ origin. `--expect-title` is optional but is the only protection against reading 
 happens to be open.
 
 The Apps lab can also reconcile a portable `pages` section schema when provided in
-`config/box/private-api-lab-app-definition.json`. Keep sections to basic metadata only; `items` is still blocked until a stable block schema capture exists.
+`config/box/private-api-lab-app-definition.bcl`. Keep sections to basic metadata only; `items` is still blocked until a stable block schema capture exists.
 
 After generating an executor, give the authenticated browser agent this instruction:
 

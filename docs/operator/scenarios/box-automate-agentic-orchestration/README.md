@@ -138,7 +138,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 - [Operator setup and activation](../../start-here.md)
 - [Manual-task register](../../manual-task-register.md)
-- [Machine-readable scenario manifest](../../../../config/demo/box-automate-agentic-orchestration-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../../config/demo/box-automate-agentic-orchestration-demo-manifest.bcl)
 - [Box Form blueprint](../../../../config/box/form-blueprint.md)
 - [Box App blueprint](../../../../config/box/box-app-blueprint.md)
 

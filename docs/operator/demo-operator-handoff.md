@@ -129,24 +129,24 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 ### Auxiliary/browser/experimentation scripts
 
 11. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py)
-12. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_forms_private_api.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_forms_private_api.py)
-13. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_apps_private_api.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_apps_private_api.py)
-14. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_automate_private_api.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/experimental_box_automate_private_api.py)
+12. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/forms.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/forms.py)
+13. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/apps.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/apps.py)
+14. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/automate.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tools/box-capture/automate.py)
 
 ## 4) Reference inventory of config/assets/docs for the new CLI
 
 ### Runtime and generated state
 
-1. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.json)
-2. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.json)
-3. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.json)
-4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.json)
-5. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json)
-6. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json) (copy to `config/runtime/validation-receipts.json` for presenter-ready runs)
-7. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.json)
-8. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/box-automate-agentic-orchestration-demo-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/box-automate-agentic-orchestration-demo-manifest.json)
-9. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/cross-platform-agentic-orchestration-demo-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
-10. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/screenshot-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/screenshot-manifest.json)
+1. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.bcl)
+2. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.bcl)
+3. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.bcl)
+4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.bcl)
+5. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.bcl)
+6. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.bcl) (copy to `config/runtime/validation-receipts.json` for presenter-ready runs)
+7. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.bcl)
+8. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/box-automate-agentic-orchestration-demo-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/box-automate-agentic-orchestration-demo-manifest.bcl)
+9. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/cross-platform-agentic-orchestration-demo-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/cross-platform-agentic-orchestration-demo-manifest.bcl)
+10. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/screenshot-manifest.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/demo/screenshot-manifest.bcl)
 
 ### Operator/docs entry points
 

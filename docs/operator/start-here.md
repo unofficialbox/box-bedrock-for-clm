@@ -213,5 +213,5 @@ Each step tells the audience what matters, shows one visible proof, then explain
 - [Configuration workflow source](../diagrams/clm-configuration-workflow.mmd)
 - [Finalization checklist](final-phase.md)
 - [Manual-task register](manual-task-register.md)
-- [Machine-readable operator workflow](../../config/operator/operator-workflow.json)
+- [Machine-readable operator workflow](../../config/operator/operator-workflow.bcl)
 - [AI-assisted operator protocol](AI-OPERATOR.md)

@@ -168,9 +168,9 @@ Flow: [rendered](../diagrams/box-automate-agentic-orchestration-flow.svg) · [so
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
 | No external agent runtime | No request is sent to AgentCore, Strands, Databricks, or custom middleware. |
 
-Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.json)
+Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.bcl)
 
-Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.json)
+Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.bcl)
 
 ---
 

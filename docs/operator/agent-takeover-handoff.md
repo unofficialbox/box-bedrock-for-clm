@@ -24,7 +24,7 @@ Read these files before making changes:
 | Box App portable layout | `config/box/box-app-blueprint.md` |
 | Box private API operator notes | `docs/operator/box-private-api-labs.md` |
 | Box private API research index | `docs/research/box-web-private-api/README.md` |
-| Guarded Automate executor | `scripts/experimental_box_automate_private_api.py` |
+| Guarded Automate executor | `tools/box-capture/automate.py` |
 
 ## Live Box targets
 
@@ -156,7 +156,7 @@ No repository fixture currently contains the HTTPS Connector outcome graph. Add 
 6. Update `config/box/automate-workflows.json` to match the primary workflow's verified organization.
 7. Update `config/box/https-connectors.json` with the verified POST endpoint, headers, merge-variable body, expected statuses, and response outputs.
 8. Add a versioned HTTPS outcome fixture under `config/box/` and matching redacted evidence under `docs/research/box-web-private-api/`.
-9. Extend `scripts/experimental_box_automate_private_api.py` only after the graph shape is known. Preserve exact-title, inactive-status, and no-publish guards.
+9. Extend `tools/box-capture/automate.py` only after the graph shape is known. Preserve exact-title, inactive-status, and no-publish guards.
 10. Inspect the live Box App Home and Clause Library, then update `config/box/box-app-blueprint.md` to match the revised layout and names.
 11. Reconcile the Form's two required fields and decide whether v4 becomes the canonical presenter upload.
 12. Run the repository's narrow configuration validation only after the package changes are complete.
@@ -191,7 +191,7 @@ Config now lives in `.bcl`, not `.json`. BCL is the only supported import format
 
 ### Capture method that worked
 
-The Automate editor holds the server-provided workflow definition in client application state once the page finishes loading. That is the definition before any local edit, and it is more reliable than reading the rendered editor. GraphQL request and response bodies stayed unreadable throughout, so this is the practical read path. `scripts/experimental_box_automate_private_api.py --write-inspector` packages it.
+The Automate editor holds the server-provided workflow definition in client application state once the page finishes loading. That is the definition before any local edit, and it is more reliable than reading the rendered editor. GraphQL request and response bodies stayed unreadable throughout, so this is the practical read path. `tools/box-capture/automate.py --write-inspector` packages it.
 
 ### Live workflow, as reconciled
 

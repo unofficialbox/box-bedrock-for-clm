@@ -5,8 +5,8 @@ import unittest
 from pathlib import Path
 
 
-MODULE_PATH = Path(__file__).parents[1] / "scripts/experimental_box_automate_private_api.py"
-SPEC = importlib.util.spec_from_file_location("experimental_box_automate_private_api", MODULE_PATH)
+MODULE_PATH = Path(__file__).parents[1] / "automate.py"
+SPEC = importlib.util.spec_from_file_location("box_capture_automate", MODULE_PATH)
 provisioner = importlib.util.module_from_spec(SPEC)
 assert SPEC.loader
 SPEC.loader.exec_module(provisioner)
@@ -49,7 +49,7 @@ class ExperimentalBoxAutomatePrivateApiTests(unittest.TestCase):
         provisioner.validate_spec(provisioner.load_json(provisioner.DEFAULT_SPEC))
 
     def test_repository_manual_start_definition_is_valid(self):
-        path = provisioner.ROOT / "config/box/private-api-lab-automate-manual-start-definition.json"
+        path = provisioner.ROOT / "config/box/private-api-lab-automate-manual-start-definition.bcl"
         provisioner.validate_spec(provisioner.load_json(path))
 
     def test_rejects_production_title(self):

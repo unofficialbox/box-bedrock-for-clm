@@ -1,6 +1,6 @@
 # Box Form Browser Plan
 
-Box Forms has no supported public authoring API. This is the controlled Browser Use fallback; it is not API provisioning. The tracked [Form definition](../../config/box/form-definition.json) is the source of truth.
+Box Forms has no supported public authoring API. This is the controlled Browser Use fallback; it is not API provisioning. The tracked [Form definition](../../config/box/form-definition.bcl) is the source of truth.
 
 ## Prepare
 
@@ -47,8 +47,8 @@ The provisioner does not call the private REST endpoints directly, export browse
 The repository also contains separate, opt-in research executors documented in [Box Private-API Labs](box-private-api-labs.md). The Forms executor targets only the retained **CLM Forms API Lab - Contract Intake** Form. It is not the production provisioning path and cannot target **New Contract Request**.
 
 ```bash
-python3 scripts/experimental_box_forms_private_api.py --dry-run
-python3 scripts/experimental_box_forms_private_api.py \
+python3 tools/box-capture/forms.py --dry-run
+python3 tools/box-capture/forms.py \
   --write-executor \
   --acknowledge 'I understand this uses an unsupported Box private API'
 ```

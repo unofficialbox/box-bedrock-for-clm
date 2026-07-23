@@ -13,8 +13,8 @@ Supporting artifacts:
 
 - [Demo flow diagram](../../../../diagrams/clm-box-agentforce-react-demo-flow.svg)
 - [Box Form entry-point diagram](../../../../diagrams/clm-box-form-automate-entry.svg)
-- [Machine-readable scenario manifest](../../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
-- [Agentforce action contract](../../../../../config/agentforce/clm-react-agentforce-spec.json)
+- [Machine-readable scenario manifest](../../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.bcl)
+- [Agentforce action contract](../../../../../config/agentforce/clm-react-agentforce-spec.bcl)
 
 ## Experience boundary
 

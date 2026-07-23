@@ -162,7 +162,7 @@ The deterministic trace must show package validation, the Net 90 versus Net 45 c
 - [Cross-platform deployment](../../cross-platform-deployment.md)
 - [Manual-task register](../../manual-task-register.md)
 - [Salesforce record contract](../../../use-case-creator/salesforce-record-contract.md)
-- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.bcl)
 - [Supporting React scripts](supporting-react-scripts/README.md)
 
 [Back to the scenario selector](../README.md)

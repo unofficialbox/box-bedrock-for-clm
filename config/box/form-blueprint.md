@@ -2,7 +2,7 @@
 
 Build this Form after `python3 scripts/demo_operator.py box-foundation`. Bind its destination to the generated `CLM-2026-Northstar / 01 - Intake` folder from `config/runtime/bootstrap-state.json`.
 
-The machine-readable [Form definition](form-definition.json) is the sole source for the title, ordered fields, options, required states, rehearsal values, destination binding, default confirmation behavior, and automation safety policy. Do not maintain a second field list here.
+The machine-readable [Form definition](form-definition.bcl) is the sole source for the title, ordered fields, options, required states, rehearsal values, destination binding, default confirmation behavior, and automation safety policy. Do not maintain a second field list here.
 
 Prepare and apply it through the [Box Form Browser Plan](../../docs/operator/box-form-provisioner.md).
 
