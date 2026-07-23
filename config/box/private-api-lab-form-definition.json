@@ -1,0 +1,58 @@
+{
+  "schemaVersion": 1,
+  "name": "CLM Forms API Lab - Contract Intake",
+  "description": "Unsupported private API experiment. Do not use for production.",
+  "provisioning": {
+    "mode": "experimental-private-rest",
+    "existingFormPolicy": "reconcile-exact-title",
+    "delete": false,
+    "publishLink": false,
+    "share": false,
+    "submitTestResponse": false
+  },
+  "fields": [
+    {
+      "key": "labRequester",
+      "label": "Lab requester",
+      "type": "shortText",
+      "required": true
+    },
+    {
+      "key": "labEmail",
+      "label": "Lab email",
+      "type": "email",
+      "required": true
+    },
+    {
+      "key": "labCategory",
+      "label": "Lab request category",
+      "type": "dropdown",
+      "options": ["Standard", "Expedited", "Research only"],
+      "required": true
+    },
+    {
+      "key": "labAmount",
+      "label": "Lab amount",
+      "type": "number",
+      "required": false
+    },
+    {
+      "key": "labTargetDate",
+      "label": "Lab target date",
+      "type": "date",
+      "required": false
+    },
+    {
+      "key": "labAttachment",
+      "label": "Lab attachment",
+      "type": "fileUpload",
+      "required": false
+    },
+    {
+      "key": "labNotes",
+      "label": "Lab notes",
+      "type": "longText",
+      "required": false
+    }
+  ]
+}

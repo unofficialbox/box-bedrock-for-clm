@@ -2,6 +2,8 @@
 
 Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs from the local, gitignored `config/runtime/bootstrap-state.json`.
 
+Before any browser-agent step, sign in to the intended Box web application with the intended builder account and keep that tab open. Confirm its hostname exactly matches `config/runtime/demo-environment.json`. Browser plans and private-lab executors use that existing web session; they do not perform login or contain credentials.
+
 ## 1. Box content and metadata
 
 1. Open the generated `CLM-2026-Northstar` workspace.
@@ -12,9 +14,9 @@ Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs fr
 
 ## 2. Box Form
 
-Build one Form named **New Contract Request** from [the Form blueprint](../../config/box/form-blueprint.md). Set its destination to generated folder `01 - Intake`.
+Prepare the guarded [Box Form Browser Plan](box-form-provisioner.md), then have an authenticated browser agent apply it. It builds one Form named **New Contract Request** from the portable definition and binds its destination to generated folder `01 - Intake`.
 
-Before publishing, verify the title, fields, required states, defaults, destination, and confirmation message. Obtain approval before the final publish click, then record the published URL in `demo-environment.json`.
+Verify the title, fields, required states, defaults, destination, and Box-default confirmation behavior. Box lists a saved Form as **Active**; obtain approval before copying, enabling, or distributing its link, then record the approved URL in `demo-environment.json`.
 
 ## 3. Box App
 

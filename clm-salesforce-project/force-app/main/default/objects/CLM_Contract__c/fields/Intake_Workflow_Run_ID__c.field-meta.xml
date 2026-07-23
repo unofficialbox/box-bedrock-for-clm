@@ -3,7 +3,7 @@
     <fullName>Intake_Workflow_Run_ID__c</fullName>
     <label>Intake Workflow Run ID</label>
     <length>128</length>
-    <required>true</required>
+    <required>false</required>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

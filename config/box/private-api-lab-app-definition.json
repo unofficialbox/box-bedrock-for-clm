@@ -1,0 +1,26 @@
+{
+  "schemaVersion": 1,
+  "name": "CLM Surface API Lab - Apps Workspace",
+  "description": "Unsupported private API experiment. Do not use for production.",
+  "initialPageName": "Lab Overview",
+  "pages": [
+    {
+      "name": "Lab Overview",
+      "sections": [
+        {
+          "title": "Overview",
+          "position": 0,
+          "size": 1,
+          "layout": {}
+        }
+      ]
+    }
+  ],
+  "provisioning": {
+    "mode": "experimental-private-rest",
+    "existingAppPolicy": "reconcile-exact-title",
+    "delete": false,
+    "publish": false,
+    "share": false
+  }
+}

@@ -36,15 +36,35 @@ Never promote a capability based only on configuration files or local fixtures.
 
 ## Validate
 
-Install dependencies once:
+Before running validation commands, complete operator prerequisites:
+
+- Authenticate the CLIs used by demo setup:
+  - `box login -d` (or your standard Box auth flow)
+  - `sf org login web` (or org auth flow you already use)
+- Confirm you are in the CLM repo root.
+
+Run the onboarding smoke check first. It only probes CLI sessions and prints a safe, simulated install plan:
 
 ```bash
-python3 -m pip install -r requirements-dev.txt
-npm install --global @mermaid-js/mermaid-cli@11.12.0
-npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/setup_clm_dev.py --smoke
 ```
 
-Run the complete repository gate:
+Install dependencies and create the runtime config in one command:
+
+```bash
+python3 scripts/setup_clm_dev.py
+```
+
+What setup command variants do:
+
+- `--automated`: runs without prompts for CI or scripted setup.
+- `--from-current-clis`: preloads Box/Salesforce IDs and login values from the authenticated CLIs into `config/runtime/demo-environment.json`.
+
+```bash
+python3 scripts/setup_clm_dev.py --automated --from-current-clis
+```
+
+Run the full non-live validation gate (unit/lint/tests/build/schema checks, local presenter artifacts, and safety contracts):
 
 ```bash
 python3 scripts/validate_clm.py
@@ -52,7 +72,7 @@ python3 scripts/validate_clm.py
 
 It checks secrets and runtime-ID isolation, JSON schemas, Markdown links, Mermaid/SVG drift, Python and React tests, lint, build, Playwright, deterministic fixtures, presenter output, screenshot manifests, reset behavior, and idempotency contracts. Repository mode intentionally skips live receipts.
 
-After integrated testing, create the gitignored `config/runtime/validation-receipts.json` from its example and run:
+After integrated testing and smoke verification, create the gitignored `config/runtime/validation-receipts.json` from its example and run presenter-readiness validation:
 
 ```bash
 python3 scripts/validate_clm.py --presenter-ready
@@ -62,7 +82,9 @@ This fails closed unless Box, Salesforce, AgentCore, and Databricks have current
 
 ## Portable presenter output
 
-Review these self-contained files in order:
+Start with the [presenter library](output/html/index.html). It routes to each standalone file and to the [complete self-contained edition](output/html/09-complete-presenter-edition.html).
+
+Review the standalone files in order:
 
 1. [Operator setup guide](output/html/00-operator-setup-guide.html)
 2. [Box Automate scenario guide](output/html/01-box-automate-agentic-orchestration-guide.html)
@@ -74,7 +96,7 @@ Review these self-contained files in order:
 8. [Customer solution datasheet](output/html/07-customer-solution-datasheet.html)
 9. [Contract lifecycle readiness marketecture](output/html/08-contract-lifecycle-readiness-marketecture.html)
 
-The Markdown source remains authoritative. Generated HTML is the portable sharing layer.
+The combined edition embeds all nine chapters and requires no sibling files or network access. The Markdown source remains authoritative. Generated HTML is the portable sharing layer.
 
 ## Safety contract
 

@@ -1,0 +1,14 @@
+{
+  "captureDate": "2026-07-20",
+  "source": "authenticated read-only browser request to an existing Form",
+  "identifiers": "removed",
+  "componentSchemas": {
+    "shortText": {"type": "textField", "textType": "text", "required": "boolean", "label": "string"},
+    "longText": {"type": "textField", "textType": "text", "multiline": true, "required": "boolean", "label": "string"},
+    "email": {"type": "textField", "textType": "email", "visible": true, "required": "boolean", "label": "string"},
+    "number": {"type": "numberField", "required": "boolean", "label": "string"},
+    "dropdown": {"type": "selectField", "maximumSelections": 0, "options": ["string"], "required": "boolean", "label": "string"},
+    "date": {"type": "dateTimeField", "dateTimeMode": "date", "dateLabel": "", "timeLabel": "", "required": "boolean", "label": "string"},
+    "fileUpload": {"type": "uploadField", "folderId": "<runtime-folder-id>", "showFileDescription": false, "required": "boolean", "label": "string"}
+  }
+}

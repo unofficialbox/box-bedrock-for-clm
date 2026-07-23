@@ -1,0 +1,35 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "formType": "form",
+    "id": "${FORM_OBJECT_ID}",
+    "versionId": "${NEW_FORM_VERSION_ID}",
+    "type": "form",
+    "createdBy": "${REDACTED_USER}",
+    "ownedBy": "${REDACTED_USER}",
+    "createdAt": "${TIMESTAMP}",
+    "status": "ACTIVE",
+    "enterpriseId": "${ENTERPRISE_ID}",
+    "modifiedBy": "${REDACTED_USER}",
+    "modifiedAt": "${TIMESTAMP}",
+    "title": "Codex Private API Probe",
+    "formScope": "USER",
+    "versionLabel": "${VERSION_LABEL}",
+    "versionNumber": "${VERSION_NUMBER}",
+    "latestFlag": "true",
+    "currentForFormId": "${FORM_OBJECT_ID}",
+    "content": {
+      "type": "form",
+      "root": "group-0",
+      "components": {
+        "element-${FIELD_ID}": {
+          "type": "textField",
+          "textType": "text",
+          "required": true,
+          "label": "Probe Field Updated",
+          "id": "element-${FIELD_ID}"
+        }
+      }
+    }
+  }
+}

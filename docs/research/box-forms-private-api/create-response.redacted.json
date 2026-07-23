@@ -1,0 +1,40 @@
+{
+  "httpStatus": 200,
+  "body": {
+    "id": "${FORM_ID}",
+    "type": "form",
+    "folder": {
+      "id": "${DESTINATION_FOLDER_ID}",
+      "type": "folder"
+    },
+    "status": "ACTIVE",
+    "visibility": "OPEN",
+    "urlId": "${FORM_URL_ID}",
+    "url": "/f/${FORM_URL_ID}",
+    "enterprise": {
+      "type": "enterprise",
+      "id": "${ENTERPRISE_ID}"
+    },
+    "createdAt": "${TIMESTAMP}",
+    "modifiedAt": "${TIMESTAMP}",
+    "createdBy": {
+      "type": "user",
+      "id": "${USER_ID}"
+    },
+    "modifiedBy": {
+      "type": "user",
+      "id": "${USER_ID}"
+    },
+    "formVersion": {
+      "id": "${FORM_VERSION_ID}",
+      "type": "form_version"
+    },
+    "submitterEmailRequired": false,
+    "allowDescription": false,
+    "formsBrandingUserEnabled": true,
+    "formsAllowEditorsEnabled": true,
+    "formRequiresLogin": false,
+    "isSameEnterprise": true,
+    "users": "${REDACTED_USER_MAP}"
+  }
+}

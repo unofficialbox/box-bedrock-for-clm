@@ -1,0 +1,6 @@
+{
+  "method": "DELETE",
+  "url": "https://${BOX_WEB_HOST}/app-api/file-request-web/file-request/${FORM_ID}",
+  "body": null,
+  "authentication": "${REDACTED_BROWSER_SESSION_AND_ANTIFORGERY_CONTEXT}"
+}

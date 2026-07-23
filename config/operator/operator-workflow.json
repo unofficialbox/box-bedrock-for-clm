@@ -85,6 +85,15 @@
       "completeWhen": "The labeled Northstar request creates one Salesforce record, duplicate retry updates that record, domain tasks route correctly, and the reset log is complete."
     },
     {
+      "id": "finalization",
+      "owner": "operator",
+      "command": "python3 scripts/validate_clm.py --presenter-ready",
+      "dryRun": "cp config/runtime/validation-receipts.example.json config/runtime/validation-receipts.json",
+      "writesExternalState": false,
+      "appliesWhen": "All selected scenarios and integrations are represented in validation receipts",
+      "completeWhen": "No unresolved mandatory tokens remain, scenario smoke validation passed, presenter-ready receipts are current, and manual finalization tasks are complete."
+    },
+    {
       "id": "agentic-readiness",
       "owner": "AWS, Databricks, Agentforce, and demo operators",
       "guide": "docs/operator/cross-platform-deployment.md",

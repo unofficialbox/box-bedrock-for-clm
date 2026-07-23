@@ -1,0 +1,30 @@
+{
+  "experiment": "CLM Forms API Lab - Contract Intake",
+  "method": "POST",
+  "url": "https://${BOX_WEB_HOST}/app-api/file-request-web/form-version/${FORM_VERSION_ID}",
+  "contentType": "multipart/form-data",
+  "multipartFields": {
+    "fileRequestId": "${FORM_ID}",
+    "content": {
+      "root": "group-0",
+      "fieldCount": 7,
+      "orderedFieldTypes": [
+        "shortText",
+        "email",
+        "dropdown",
+        "number",
+        "date",
+        "fileUpload",
+        "longText"
+      ],
+      "uploadDestination": "${RUNTIME_FOLDER_ID}",
+      "componentIdentifiers": "element-${DETERMINISTIC_FIELD_ID}"
+    }
+  },
+  "authentication": "${REDACTED_BROWSER_SESSION_AND_ANTIFORGERY_CONTEXT}",
+  "productionFormTargeted": false,
+  "deleteAttempted": false,
+  "publishAttempted": false,
+  "shareAttempted": false,
+  "submissionAttempted": false
+}

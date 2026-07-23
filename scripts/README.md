@@ -8,9 +8,15 @@ Available scripts:
 |--------|---------|
 | `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
+| `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.json` |
+| `prepare_box_form_browser_plan.py` | Validate the portable intake Form definition and prepare a guarded, gitignored Browser Use plan; makes no Box changes |
+| `experimental_box_forms_private_api.py` | Build an explicitly acknowledged, non-destructive browser executor for the isolated CLM Forms private-API lab; never targets the production Form |
+| `experimental_box_apps_private_api.py` | Build an explicitly acknowledged browser executor for the isolated Apps private-API lab; now includes section-aware reconciliation in addition to shell/description; never deletes, publishes, shares, or targets the production App |
+| `experimental_box_automate_private_api.py` | Build an explicitly acknowledged executor for either the empty inactive Automate lab or the separate Manual Start-only graph lab; never deletes, publishes, activates, shares, or runs either lab |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
+| `build_presenter_portal.py` | Build the presenter landing page plus a single self-contained edition that embeds all nine standalone chapters |
 | `build_agentcore_primary_marketecture.py` | Build the coordinated contract-work variation across Box, Salesforce Agentforce, Databricks, specialized agents, and accountable teams |
 | `build_customer_datasheet.py` | Build the nontechnical Box Solutions datasheet for generalists, sales teams, customers, and IT decision makers |
 | `build_contract_lifecycle_readiness_marketecture.py` | Build the lifecycle swimlane marketecture showing persistent platform responsibilities and human decision authority |
@@ -24,13 +30,23 @@ cp config/runtime/demo-environment.example.json config/runtime/demo-environment.
 python3 scripts/demo_operator.py doctor
 ```
 
-For repository verification, install dependencies and run:
+For repository verification, run the setup script (it also installs all dependency prerequisites):
 
 ```bash
-python3 -m pip install -r requirements-dev.txt
-npm install --global @mermaid-js/mermaid-cli@11.12.0
-npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/setup_clm_dev.py
 python3 scripts/validate_clm.py
+```
+
+You can enable CLI context capture in setup:
+
+```bash
+python3 scripts/setup_clm_dev.py --automated --from-current-clis --pet off
+```
+
+Run a safe pre-flight check before full setup:
+
+```bash
+python3 scripts/setup_clm_dev.py --smoke
 ```
 
 Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.json` and run `python3 scripts/validate_clm.py --presenter-ready`.
@@ -41,6 +57,8 @@ The operator command sequence is:
 python3 scripts/demo_operator.py generate-assets
 python3 scripts/demo_operator.py box-foundation --dry-run
 python3 scripts/demo_operator.py box-foundation
+python3 scripts/prepare_box_form_browser_plan.py --dry-run
+python3 scripts/prepare_box_form_browser_plan.py
 python3 scripts/demo_operator.py seed-metadata --dry-run
 python3 scripts/demo_operator.py seed-metadata
 python3 scripts/demo_operator.py salesforce-deploy --dry-run
@@ -50,6 +68,16 @@ python3 scripts/demo_operator.py resolve-config --allow-unresolved
 python3 scripts/demo_operator.py resolve-config
 python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
 ```
+
+For a clean single-shot operator flow that checks and creates what is missing:
+
+```bash
+python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run
+python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes
+python3 scripts/demo_operator.py status --scenario box-automate-agentic-orchestration
+```
+
+`provision` remains as a legacy alias for backward compatibility.
 
 Use `--offline` with `doctor` or `validate` only for repository/CI checks. Normal operator runs perform read-only verification against the configured Box enterprise and Salesforce org.
 
@@ -103,7 +131,15 @@ Build the contract lifecycle contribution marketecture:
 python3 scripts/build_contract_lifecycle_readiness_marketecture.py
 ```
 
+Build the presenter landing page and complete embedded edition after the nine standalone chapters exist:
+
+```bash
+python3 scripts/build_presenter_portal.py
+```
+
 Review outputs in this order:
+
+- `output/html/index.html` — landing page and table of contents for the presenter library.
 
 1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
 2. `output/html/01-box-automate-agentic-orchestration-guide.html` — complete narrative.
@@ -115,4 +151,6 @@ Review outputs in this order:
 8. `output/html/07-customer-solution-datasheet.html` — high-level customer and sales datasheet focused on experience and outcomes.
 9. `output/html/08-contract-lifecycle-readiness-marketecture.html` — executive lifecycle view showing how each platform contributes from intake through lifecycle management.
 
-Guide diagrams and screenshots open in a full-size dialog. All nine files remain self-contained with no external assets.
+For one-file sharing, use `output/html/09-complete-presenter-edition.html`. It embeds all nine chapters and supports desktop navigation, a mobile chapter picker, previous/next controls, and `Alt` + arrow-key navigation.
+
+Guide diagrams and screenshots open in a full-size dialog. All eleven files remain portable with no external assets; the combined edition has no sibling-file dependency.

@@ -1,0 +1,14 @@
+{
+  "transport": "authenticated-browser-automation",
+  "hostname": "${BOX_WEB_HOST}",
+  "result": {
+    "outcome": "unchanged",
+    "title": "CLM Forms API Lab - Contract Intake",
+    "status": "ACTIVE",
+    "visibility": "OPEN",
+    "fieldCount": 7
+  },
+  "credentialExported": false,
+  "devToolsConsoleUsed": false,
+  "deleteAttempted": false
+}

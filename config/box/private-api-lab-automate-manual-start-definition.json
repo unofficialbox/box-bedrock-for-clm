@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "name": "CLM Surface API Lab - Automate Manual Start Graph",
+  "description": "Unsupported private API graph experiment. Manual Start only. Do not use for production.",
+  "graph": {
+    "trigger": {
+      "type": "manualStart",
+      "scopeFolder": "workspace",
+      "includeSubfolders": false,
+      "description": ""
+    }
+  },
+  "provisioning": {
+    "mode": "experimental-private-graphql",
+    "existingWorkflowPolicy": "reconcile-exact-title-manual-start-only",
+    "delete": false,
+    "publish": false,
+    "activate": false,
+    "share": false,
+    "run": false
+  }
+}

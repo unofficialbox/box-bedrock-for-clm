@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
+    <description>Contract Lifecycle Management demo workspace for contract intake, review, routing, and Box-backed content coordination.</description>
+    <formFactors>Large</formFactors>
+    <label>Contract Lifecycle Management</label>
+    <navType>Standard</navType>
+    <tabs>standard-home</tabs>
+    <tabs>CLM_Contract__c</tabs>
+    <uiType>Lightning</uiType>
+</CustomApplication>

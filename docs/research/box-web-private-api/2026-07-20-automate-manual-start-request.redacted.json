@@ -1,0 +1,52 @@
+{
+  "captureDate": "2026-07-20",
+  "surface": "Box Automate",
+  "transport": "private GraphQL through the authenticated in-page Apollo client",
+  "operation": "UpdateItemV2",
+  "authentication": {
+    "requiredState": "operator already authenticated in the intended Box web-app session",
+    "hostname": "${BOX_WEB_HOST}",
+    "credentialsExported": false,
+    "antiForgeryValueReadOrStored": false
+  },
+  "guards": {
+    "exactTitle": "CLM Surface API Lab - Automate Manual Start Graph",
+    "requiredStatus": "INACTIVE",
+    "allowedExistingShape": "empty or one Manual Start trigger plus one dangling basic edge",
+    "forbiddenOperations": [
+      "delete",
+      "publish",
+      "activate",
+      "share",
+      "run"
+    ]
+  },
+  "workflow": {
+    "id": "${LAB_WORKFLOW_ID}",
+    "name": "CLM Surface API Lab - Automate Manual Start Graph",
+    "description": "Unsupported private API graph experiment. Manual Start only. Do not use for production.",
+    "trigger": {
+      "id": "trigger_${DETERMINISTIC_UUID}",
+      "triggerType": "MANUAL",
+      "triggerSubtype": "START",
+      "description": "",
+      "parameters": {
+        "parentFolderId": "${RUNTIME_FOLDER_ID}",
+        "includeSubfolders": "false"
+      },
+      "condition": null
+    },
+    "outcomes": [],
+    "gateways": [],
+    "edges": [
+      {
+        "id": "edge_${DETERMINISTIC_UUID}",
+        "source": "trigger_${DETERMINISTIC_UUID}",
+        "target": null,
+        "edgeType": "BASIC",
+        "condition": null,
+        "label": null
+      }
+    ]
+  }
+}
