@@ -91,7 +91,15 @@ Inspect the proposed values and citations. Correct or reject unsupported values.
 
 ### 4. Show the HTTPS Connector handoff
 
-On the approved branch, show `salesforceContractUpsert` calling Salesforce's standard external-ID resource:
+> **Match this to the workflow you actually run.** The proven live connector is `salesforceContractCreate`, a plain **POST** to `services/data/{apiVersion}/sobjects/CLM_Contract__c` (`config/box/https-connectors.bcl`, `liveRunSucceeded = true`). It is **not idempotent** — resubmitting the same contract creates a second record. Do not claim duplicate-safe upsert on stage unless the org you are demoing actually runs the `salesforceContractUpsert` PATCH path below, which remains the duplicate-safe design target rather than the proven path.
+
+On the approved branch, show the connector calling Salesforce. The proven path posts a new record:
+
+```text
+POST services/data/{apiVersion}/sobjects/CLM_Contract__c
+```
+
+The duplicate-safe design target instead upserts against the external-ID resource:
 
 ```text
 PATCH /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}
@@ -99,7 +107,7 @@ PATCH /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEn
 
 The request contains only the allowlisted structured fields. It must not contain contract bytes, Box access tokens, connector secrets, signer identity details, or unreviewed AI output.
 
-Salesforce upserts by `Contract_ID__c`. A retry with the same `contractId` updates the existing record instead of creating a duplicate.
+The POST create returns the new record `id`. With the PATCH upsert design, a retry with the same `contractId` would update the existing record instead of creating a duplicate.
 
 Because an update can return no response body, the next step, `salesforceContractLookup`, retrieves stable launch context:
 

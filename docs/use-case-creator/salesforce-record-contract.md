@@ -50,6 +50,10 @@ Deployable metadata: `clm-salesforce-project/force-app/main/default/objects/CLM_
 
 ## Intake integration
 
+> **Proven live path vs. design target.** The workflow that has been proven end to end uses a plain **POST** create to the sobject collection (`services/data/{apiVersion}/sobjects/CLM_Contract__c`), captured in `config/box/https-connectors.bcl` as `salesforceContractCreate` (`liveRunSucceeded = true`). That POST is **not idempotent**: a resubmission creates a second record. The external-ID **PATCH upsert** described below is the duplicate-safe *design target*; it is not currently the live path. Restore it — and re-verify against a live run — only if duplicate safety is required. See the duplicate-safety note in `docs/operator/agent-takeover-handoff.md`.
+
+The duplicate-safe design is an upsert by external ID:
+
 ```text
 PATCH /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}
 ```
