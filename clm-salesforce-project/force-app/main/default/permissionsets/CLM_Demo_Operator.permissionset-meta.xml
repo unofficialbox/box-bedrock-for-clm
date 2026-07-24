@@ -6,27 +6,17 @@
     </applicationVisibilities>
     <fieldPermissions>
         <editable>true</editable>
-        <field>CLM_Contract__c.Box_Redline_File_ID__c</field>
+        <field>CLM_Contract__c.Counterparty_Account__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>true</editable>
+        <field>CLM_Contract__c.Opportunity__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>true</editable>
         <field>CLM_Contract__c.Business_Owner__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>CLM_Contract__c.Last_Box_Sync__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>CLM_Contract__c.Latest_Routing_Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>true</editable>
-        <field>CLM_Contract__c.Open_Review_Task_Count__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>

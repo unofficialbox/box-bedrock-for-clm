@@ -9,9 +9,10 @@
             <layoutItems><behavior>Required</behavior><field>Name</field></layoutItems>
             <layoutItems><behavior>Required</behavior><field>Contract_ID__c</field></layoutItems>
             <layoutItems><behavior>Required</behavior><field>Counterparty__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Counterparty_Account__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Opportunity__c</field></layoutItems>
             <layoutItems><behavior>Required</behavior><field>Contract_Type__c</field></layoutItems>
             <layoutItems><behavior>Required</behavior><field>Status__c</field></layoutItems>
-            <layoutItems><behavior>Edit</behavior><field>Risk_Level__c</field></layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems><behavior>Required</behavior><field>Deal_Value__c</field></layoutItems>
@@ -35,10 +36,6 @@
             <layoutItems><behavior>Edit</behavior><field>Business_Owner__c</field></layoutItems>
         </layoutColumns>
         <layoutColumns>
-            <layoutItems><behavior>Edit</behavior><field>Special_Terms_Risk_Notes__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Intake_Workflow_Run_ID__c</field></layoutItems>
-            <layoutItems><behavior>Edit</behavior><field>Latest_Routing_Status__c</field></layoutItems>
-            <layoutItems><behavior>Edit</behavior><field>Open_Review_Task_Count__c</field></layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
@@ -46,17 +43,12 @@
         <customLabel>true</customLabel>
         <detailHeading>true</detailHeading>
         <editHeading>true</editHeading>
-        <label>Box References</label>
+        <label>Risk and Governance</label>
         <layoutColumns>
-            <layoutItems><behavior>Required</behavior><field>Box_Workspace_Folder_ID__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Box_Workspace_URL__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Box_Intake_File_ID__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Risk_Level__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Special_Terms_Risk_Notes__c</field></layoutItems>
         </layoutColumns>
-        <layoutColumns>
-            <layoutItems><behavior>Edit</behavior><field>Box_Redline_File_ID__c</field></layoutItems>
-            <layoutItems><behavior>Edit</behavior><field>Last_Box_Sync__c</field></layoutItems>
-        </layoutColumns>
-        <style>TwoColumnsTopToBottom</style>
+        <style>OneColumn</style>
     </layoutSections>
     <layoutSections>
         <customLabel>false</customLabel>
