@@ -11,13 +11,6 @@ locals {
         "config" = {
           "artifact_name" = "clm-contract-record"
           "artifact_type" = "config"
-          "boxReferences" = {
-            "intakeFileId" = "Box_Intake_File_ID__c"
-            "redlineFileId" = "Box_Redline_File_ID__c"
-            "workflowRunId" = "Intake_Workflow_Run_ID__c"
-            "workspaceFolderId" = "Box_Workspace_Folder_ID__c"
-            "workspaceUrl" = "Box_Workspace_URL__c"
-          }
           "created_at" = "2026-07-23T11:55:20Z"
           "enterprise_id" = ""
           "fieldMappings" = [
@@ -95,56 +88,10 @@ locals {
               "target" = "Special_Terms_Risk_Notes__c"
             }
             {
-              "required" = true
-              "source" = "boxFolderId"
-              "target" = "Box_Workspace_Folder_ID__c"
-              "validation" = "digits only and allowlisted workspace"
-            }
-            {
-              "required" = true
-              "source" = "boxFolderUrl"
-              "target" = "Box_Workspace_URL__c"
-              "validation" = "${box.hostname} URL"
-            }
-            {
-              "required" = true
-              "source" = "boxIntakeFileId"
-              "target" = "Box_Intake_File_ID__c"
-              "validation" = "digits only"
-            }
-            {
-              "required" = false
-              "source" = "boxRedlineFileId"
-              "target" = "Box_Redline_File_ID__c"
-              "validation" = "digits only"
-            }
-            {
-              "required" = true
-              "source" = "workflowRunId"
-              "target" = "Intake_Workflow_Run_ID__c"
-            }
-            {
               "default" = "Box Form"
               "required" = true
               "source" = "recordSource"
               "target" = "Record_Source__c"
-            }
-            {
-              "default" = "Not Started"
-              "required" = false
-              "source" = "routingStatus"
-              "target" = "Latest_Routing_Status__c"
-            }
-            {
-              "default" = 0
-              "required" = false
-              "source" = "openReviewTaskCount"
-              "target" = "Open_Review_Task_Count__c"
-            }
-            {
-              "required" = false
-              "source" = "lastBoxSync"
-              "target" = "Last_Box_Sync__c"
             }
           ]
           "idempotency" = {
@@ -166,11 +113,10 @@ locals {
               {
                 "method" = "GET"
                 "name" = "salesforceContractLookup"
-                "pathTemplate" = "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c"
+                "pathTemplate" = "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c"
               }
             ]
             "responseMapping" = {
-              "boxFolderId" = "Box_Workspace_Folder_ID__c"
               "contractId" = "Contract_ID__c"
               "recordId" = "Id"
             }

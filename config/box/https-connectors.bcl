@@ -36,12 +36,6 @@ locals {
                   "authType" = "OAUTH2_CLIENT_CREDENTIALS_GRANT"
                   "blankSafety" = "Optional Form values must be resolved before this step or bound through a value that is valid when blank. A merge token that resolves to nothing inside a quoted JSON segment yields an empty string, not a null."
                   "body" = {
-                    "Box_Intake_File_ID__c" = {
-                      "bind" = "form.contractPackage.fileIds"
-                    }
-                    "Box_Workspace_Folder_ID__c" = {
-                      "bind" = "form.contractPackage.folderId"
-                    }
                     "Contract_ID__c" = {
                       "bind" = "form.contractId"
                       "salesforceRequired" = true
@@ -55,12 +49,10 @@ locals {
                       "bind" = "form.counterparty"
                       "salesforceRequired" = true
                     }
-                    "Latest_Routing_Status__c" = "Not Started"
                     "Name" = {
                       "bind" = "form.counterparty"
                       "literalPrefix" = "CLM Intake - "
                     }
-                    "Open_Review_Task_Count__c" = 0
                     "Record_Source__c" = "Box Form"
                     "Requester_Email__c" = {
                       "bind" = "form.requesterEmail"
@@ -93,15 +85,11 @@ locals {
                   "bodyOmissions" = {
                     "howToRestore" = "Make the source Form field required, then bind it. That is the only way to guarantee it resolves."
                     "neverBound" = {
-                      "Box_Workspace_URL__c" = "Derivable from Box_Workspace_Folder_ID__c. Its literal slashes also open the editor's variable search mid-expression."
-                      "Intake_Workflow_Run_ID__c" = "No workflow-run identifier confirmed among available variables."
-                      "Last_Box_Sync__c" = "No current-timestamp variable confirmed."
                       "Risk_Level__c" = "The Box Agent emits unstructured text, not a picklist value. Restore once a structured Extract or Agent output supplies it."
                       "Status__c" = "Present only in the metadata-trigger test outcome."
                     }
                     "note" = "Deliberately absent. Each is sourced from an optional Form field, so binding it risks sending 'Variable unavailable' into a typed Salesforce field."
                     "textAndOptional" = {
-                      "Box_Redline_File_ID__c" = "Duplicated the intake file ID; dropped until a distinct redline upload exists."
                       "Business_Owner_Name__c" = "Text."
                       "Requester_Name__c" = "Text. Would read 'Variable unavailable' rather than fail."
                       "Special_Terms_Risk_Notes__c" = "Text."
@@ -142,13 +130,6 @@ locals {
                     }
                   }
                   "restrictedPicklistValues" = {
-                    "Latest_Routing_Status__c" = [
-                      "Not Started"
-                      "Needs Triage"
-                      "Routed"
-                      "Complete"
-                      "Failed"
-                    ]
                     "Record_Source__c" = [
                       "Box Form"
                       "Manual"
@@ -174,13 +155,12 @@ locals {
                   }
                 }
                 "salesforceContractLookup" = {
-                  "endpoint" = "/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c"
+                  "endpoint" = "/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c"
                   "expectedStatus" = [
                     200
                   ]
                   "method" = "GET"
                   "outputVariables" = {
-                    "boxFolderId" = "$.Box_Workspace_Folder_ID__c"
                     "contractId" = "$.Contract_ID__c"
                     "recordId" = "$.Id"
                   }
@@ -192,20 +172,12 @@ locals {
                 }
                 "salesforceContractUpsert" = {
                   "body" = {
-                    "Box_Intake_File_ID__c" = "submittedFileId"
-                    "Box_Redline_File_ID__c" = "submittedFileId"
-                    "Box_Workspace_Folder_ID__c" = "${box.folders.workspace}"
-                    "Box_Workspace_URL__c" = "https://${box.hostname}/folder/${box.folders.workspace}"
                     "Business_Owner_Name__c" = "businessOwner"
                     "Contract_Type__c" = "contractType"
                     "Counterparty__c" = "counterparty"
                     "Data_Category__c" = "dataCategory"
                     "Deal_Value__c" = "dealValue"
-                    "Intake_Workflow_Run_ID__c" = "workflowRunId"
-                    "Last_Box_Sync__c" = "currentTimestamp"
-                    "Latest_Routing_Status__c" = "Not Started"
                     "Name" = "<counterparty> <contractType>"
-                    "Open_Review_Task_Count__c" = 0
                     "Record_Source__c" = "Box Form"
                     "Region__c" = "region"
                     "Requester_Email__c" = "requesterEmail"
