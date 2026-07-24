@@ -91,15 +91,9 @@ The current connector contract contains these fields. Keep only fields supported
 | `Business_Owner_Name__c` | Form business owner |
 | `Risk_Level__c` | Box Agent risk level |
 | `Special_Terms_Risk_Notes__c` | Form notes or reviewed agent summary |
-| `Box_Workspace_Folder_ID__c` | Resolved Box workspace folder ID |
-| `Box_Workspace_URL__c` | Resolved Box workspace URL |
-| `Box_Intake_File_ID__c` | Submitted Form file ID |
-| `Box_Redline_File_ID__c` | Submitted Form file ID |
-| `Intake_Workflow_Run_ID__c` | Current Automate workflow run ID |
 | `Record_Source__c` | Literal `Box Form` |
-| `Latest_Routing_Status__c` | Initial routing status |
-| `Open_Review_Task_Count__c` | Initial task count |
-| `Last_Box_Sync__c` | Current workflow timestamp |
+| `Counterparty_Account__c` | Resolved counterparty Account |
+| `Opportunity__c` | Resolved opportunity |
 
 The new Form has only two required inputs. Any optional value must be safe when blank or must be sourced from the Extract or Box Agent outcome before the HTTPS step.
 

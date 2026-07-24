@@ -104,10 +104,10 @@ Salesforce upserts by `Contract_ID__c`. A retry with the same `contractId` updat
 Because an update can return no response body, the next step, `salesforceContractLookup`, retrieves stable launch context:
 
 ```text
-GET /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c
+GET /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c
 ```
 
-No custom Apex intake service or SOQL query is required.
+No custom Apex intake service or SOQL query is required. `Counterparty_Account__c` and `Opportunity__c` are not read here: the Box intake path never supplies them, so `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
 
 ### 5. Open the resulting workspace
 
@@ -116,12 +116,11 @@ Confirm the successful response includes:
 ```json
 {
   "recordId": "<salesforce-record-id>",
-  "contractId": "<contract-id>",
-  "boxFolderId": "<generated-workspace-folder-id>"
+  "contractId": "<contract-id>"
 }
 ```
 
-Open React with:
+Open React with the Salesforce record context plus the Box folder ID gathered from the upstream workflow:
 
 ```text
 recordId=<salesforce-record-id>&contractId=<contract-id>&folderId=<generated-workspace-folder-id>

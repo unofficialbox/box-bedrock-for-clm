@@ -1,14 +1,14 @@
 # Browser and Administrator Configuration
 
-Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs from the local, gitignored `config/runtime/bootstrap-state.json`.
+Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs from the local, gitignored `config/runtime/bootstrap-state.bcl`.
 
-Before any browser-agent step, sign in to the intended Box web application with the intended builder account and keep that tab open. Confirm its hostname exactly matches `config/runtime/demo-environment.json`. Browser plans and private-lab executors use that existing web session; they do not perform login or contain credentials.
+Before any browser-agent step, sign in to the intended Box web application with the intended builder account and keep that tab open. Confirm its hostname exactly matches `config/runtime/demo-environment.bcl`. Browser plans and private-lab executors use that existing web session; they do not perform login or contain credentials.
 
 ## 1. Box content and metadata
 
 1. Open the generated `CLM-2026-Northstar` workspace.
 2. Mark the three Word files in `08 - DocGen Templates` as Box Doc Gen templates.
-3. Confirm `seed-metadata` applied the `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` values recorded in `bootstrap-state.json`.
+3. Confirm `seed-metadata` applied the `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` values recorded in `bootstrap-state.bcl`.
 4. Confirm the generated **Approved Clauses** folder contains the README plus eight standard/fallback Markdown clauses.
 5. Assign real owners and collaborators from this environment; do not copy demo usernames.
 
@@ -16,7 +16,7 @@ Before any browser-agent step, sign in to the intended Box web application with 
 
 Prepare the guarded [Box Form Browser Plan](box-form-provisioner.md), then have an authenticated browser agent apply it. It builds one Form named **New Contract Request** from the portable definition and binds its destination to generated folder `01 - Intake`.
 
-Verify the title, fields, required states, defaults, destination, and Box-default confirmation behavior. Box lists a saved Form as **Active**; obtain approval before copying, enabling, or distributing its link, then record the approved URL in `demo-environment.json`.
+Verify the title, fields, required states, defaults, destination, and Box-default confirmation behavior. Box lists a saved Form as **Active**; obtain approval before copying, enabling, or distributing its link, then record the approved URL in `demo-environment.bcl`.
 
 ## 3. Box App
 
@@ -24,7 +24,7 @@ Build **Contract Lifecycle Management** from `config/box/box-app-blueprint.md`.
 
 Use the generated folder/template IDs only when the builder asks for a binding. Put the high-frequency actions first: **Start a New Contract**, **Approved Clause Hub**, and **Executed Agreements**. Add charts by status, risk, contract type, region, and clause family so the dashboard appears operational rather than empty.
 
-Obtain approval before publishing. Record the published URL in `demo-environment.json`.
+Obtain approval before publishing. Record the published URL in `demo-environment.bcl`.
 
 ## 4. Clause Library Hub
 
@@ -50,11 +50,11 @@ The repository intentionally contains no tenant-specific External Client App met
 
 ## 6. Box Automate
 
-Build the workflows from `config/box/automate-workflows.json`. Start with **CLM - Contract Intake Enrichment**:
+Build the workflows from `config/box/automate-workflows.bcl`. Start with **CLM - Contract Intake Enrichment**:
 
 1. Trigger: **New Contract Request** submitted.
-2. Extract: use the uploaded contract file and `config/box/extract-field-prompts.json`.
-3. Agent review: use `config/box/ai-agent-specs.json` and require citations.
+2. Extract: use the uploaded contract file and `config/box/extract-field-prompts.bcl`.
+3. Agent review: use `config/box/ai-agent-specs.bcl` and require citations.
 4. Human validation: assign a real reviewer in this environment.
 5. Approved branch: Salesforce standard REST record creation, using `config/box/https-connectors.bcl`. Point the connector at the org that holds `CLM_Contract__c`; two similarly named connectors can target different orgs, and the wrong one fails as an opaque `UNKNOWN_ERROR`.
 6. Rejected branch: return for correction; do not invoke Salesforce. The live workflow currently leaves this branch empty, so a rejected submission ends the run silently.
@@ -63,25 +63,27 @@ Save and test the workflow while inactive. Obtain explicit approval immediately 
 
 ### HTTPS Request settings
 
-Use the resolved file `config/runtime/generated/box/https-connectors.json`.
+Use the resolved file `config/runtime/generated/box/https-connectors.bcl`.
+
+The proven live path is a plain **POST** record create, not an upsert. This is the configuration that created a real `CLM_Contract__c` record end to end (`salesforceContractCreate.liveRunSucceeded = true`, proven 2026-07-22).
 
 | Request | Setting | Value |
 |---|---|---|
-| Upsert | Method | `PATCH` |
-| Upsert | Endpoint | `/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}` |
-| Upsert | Header | `Content-Type: application/json` |
-| Upsert | Body | Copy the allowlisted field mapping from `salesforceContractUpsert.body` |
-| Lookup | Method | `GET` |
-| Lookup | Endpoint | `/services/data/v67.0/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c` |
-| Lookup | Output | `recordId=$.Id`, `contractId=$.Contract_ID__c`, `boxFolderId=$.Box_Workspace_Folder_ID__c` |
+| Create | Method | `POST` |
+| Create | Endpoint | `services/data/v67.0/sobjects/CLM_Contract__c` (no leading slash; resolved against the connector base URL. Plain sobject collection, not an external-ID upsert path.) |
+| Create | Headers | None. The verified outcome enables no headers and no query parameters; authorization is handled entirely by the Box-managed OAuth connection. |
+| Create | Body | Copy the field mapping from `salesforceContractCreate.body`. Every bound value must be sourced from a **required** Form field, or Box sends the literal `Variable unavailable`. |
+| Create | Output | `id=$.id` |
 
-Do not place the OAuth token in a header manually; select the Box-managed OAuth connection. If a Box variable picker uses different display labels, bind by the logical field named in the resolved JSON and verify the test preview before saving.
+Do not place the OAuth token in a header manually; select the Box-managed OAuth connection. If a Box variable picker uses different display labels, bind by the logical field named in the resolved BCL and verify the test preview before saving.
+
+This POST is **not idempotent** (`idempotency.safe = false`): resubmitting the same contract creates a second record. The connector also carries `salesforceContractUpsert` (a `PATCH` on `Contract_ID__c`) and `salesforceContractLookup` (a `GET`) as the duplicate-safe alternative, but that upsert path is not the proven live path — `salesforceContractUpsert` is marked `supersededForCreate = "salesforceContractCreate"`. Restore it only if duplicate safety is required, and re-verify against a live run before relying on it.
 
 ## 7. Agentforce and optional orchestration
 
 For Box Automate Agentic Orchestration, configure only the Agentforce actions used by the Box-led path. For Cross-Platform Agentic Orchestration, follow [Cross-Platform Agentic Orchestration deployment boundary](cross-platform-deployment.md). The repository provides a local deterministic trace; it does not yet automate managed AgentCore or Databricks provisioning.
 
-Record the new environment's IDs in `demo-environment.json`; never write secrets there.
+Record the new environment's IDs in `demo-environment.bcl`; never write secrets there.
 
 ## 8. Completion gate
 
