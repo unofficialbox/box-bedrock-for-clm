@@ -18,7 +18,7 @@ private class EmailIntakeHandlerTest {
     }
 
     @isTest
-    static void capturesEmailAndAttachmentOntoOpportunity() {
+    static void logsEmailActivityOntoOpportunity() {
         Account acct = new Account(Name = 'Northstar Health', Website = 'https://www.northstar.example');
         insert acct;
         insert new Contact(
@@ -41,20 +41,11 @@ private class EmailIntakeHandlerTest {
         Test.stopTest();
 
         System.assert(res.success, 'handler should report success');
-
-        List<ContentDocumentLink> links = [
-            SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :opp.Id
-        ];
-        System.assertEquals(1, links.size(), 'attachment should be linked to the Opportunity');
-
-        List<ContentVersion> cvs = [
-            SELECT Id FROM ContentVersion WHERE Title = 'northstar-msa-redline-v3.pdf'
-        ];
-        System.assertEquals(1, cvs.size(), 'attachment should be saved as a File');
-
         Integer emails = [SELECT COUNT() FROM EmailMessage WHERE RelatedToId = :opp.Id];
         Integer tasks = [SELECT COUNT() FROM Task WHERE WhatId = :opp.Id];
         System.assert(emails + tasks >= 1, 'an email or task activity should be logged on the Opportunity');
+        // The attachment is uploaded to Box (async, skipped in tests); nothing is stored in Salesforce.
+        System.assertEquals(0, [SELECT COUNT() FROM ContentVersion], 'no Salesforce File should be created');
     }
 
     @isTest
@@ -68,7 +59,6 @@ private class EmailIntakeHandlerTest {
         );
         insert opp;
 
-        // No Contact for this sender; domain must match the Account website.
         Messaging.InboundEmail email = buildEmail('newperson@acmecloudworks.example', 'Expansion redline', true);
         Messaging.InboundEnvelope env = new Messaging.InboundEnvelope();
 
@@ -76,10 +66,9 @@ private class EmailIntakeHandlerTest {
         new EmailIntakeHandler().handleInboundEmail(email, env);
         Test.stopTest();
 
-        List<ContentDocumentLink> links = [
-            SELECT Id FROM ContentDocumentLink WHERE LinkedEntityId = :opp.Id
-        ];
-        System.assertEquals(1, links.size(), 'domain fallback should link the file to the Opportunity');
+        Integer emails = [SELECT COUNT() FROM EmailMessage WHERE RelatedToId = :opp.Id];
+        Integer tasks = [SELECT COUNT() FROM Task WHERE WhatId = :opp.Id];
+        System.assert(emails + tasks >= 1, 'domain fallback should log an activity on the Opportunity');
     }
 
     @isTest
@@ -92,6 +81,7 @@ private class EmailIntakeHandlerTest {
         Test.stopTest();
 
         System.assert(res.success, 'unmatched sender should still succeed (no bounce)');
-        System.assertEquals(0, [SELECT COUNT() FROM ContentVersion], 'nothing captured for an unmatched sender');
+        System.assertEquals(0, [SELECT COUNT() FROM EmailMessage], 'nothing logged for an unmatched sender');
+        System.assertEquals(0, [SELECT COUNT() FROM Task], 'nothing logged for an unmatched sender');
     }
 }

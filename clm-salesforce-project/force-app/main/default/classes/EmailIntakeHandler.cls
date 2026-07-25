@@ -2,17 +2,18 @@
  * Inbound email service handler for CLM contract intake.
  *
  * Captures an inbound email (for example, a counterparty sending an MSA or redline)
- * onto the matching Opportunity's activity timeline and saves its attachments as
- * Salesforce Files linked to that Opportunity.
+ * onto the matching Opportunity's activity timeline, and uploads its attachments
+ * straight into that Opportunity's Box folder (via BoxEmailAttachmentUploader).
  *
  * Matching: sender address -> Contact.Email -> Contact.Account -> an open Opportunity
  * on that Account (subject may name a specific Opportunity to override the default).
  *
+ * Storage: the attachment bytes are NOT persisted in Salesforce as a ContentVersion.
+ * The file lives once, in Box, and surfaces on the Opportunity through the Box for
+ * Salesforce managed package's record -> folder mapping.
+ *
  * Boundary: this handler intentionally does NOT create or update CLM_Contract__c.
- * Contract-record creation stays in the governed, human-gated Box intake path. This
- * handler only captures the inbound content onto the Opportunity; a follow-on step
- * (BoxFileUploader, Phase 2) pushes the file into the Box "01 - Intake" folder, where
- * the existing clmContract metadata trigger takes over.
+ * Contract-record creation stays in the governed, human-gated Box intake path.
  */
 global without sharing class EmailIntakeHandler implements Messaging.InboundEmailHandler {
 
@@ -45,11 +46,7 @@ global without sharing class EmailIntakeHandler implements Messaging.InboundEmai
         }
 
         logEmailActivity(email, opp.Id, sender);
-        saveAttachments(email, opp.Id);
-        // Phase 2 hook (enabled once the Box Named Credential exists):
-        // if (!versionIds.isEmpty()) {
-        //     System.enqueueJob(new BoxFileUploader(versionIds, opp.Id));
-        // }
+        enqueueBoxUpload(email, opp.Id);
     }
 
     /** sender -> Contact -> Account -> open Opportunity (subject token overrides default). */
@@ -146,45 +143,28 @@ global without sharing class EmailIntakeHandler implements Messaging.InboundEmai
         }
     }
 
-    /** Save each binary attachment as a Salesforce File linked to the Opportunity. */
-    private List<Id> saveAttachments(Messaging.InboundEmail email, Id oppId) {
-        List<Id> versionIds = new List<Id>();
+    /**
+     * Hand the attachments to a Queueable that uploads them straight to the Opportunity's
+     * Box folder. The bytes are never persisted in Salesforce as a ContentVersion — the file
+     * lives once, in Box, and surfaces on the Opportunity via the managed package's Box widget.
+     */
+    private void enqueueBoxUpload(Messaging.InboundEmail email, Id oppId) {
         if (email.binaryAttachments == null || email.binaryAttachments.isEmpty()) {
-            return versionIds;
+            return;
         }
-
-        List<ContentVersion> versions = new List<ContentVersion>();
+        List<BoxEmailAttachmentUploader.Attachment> atts = new List<BoxEmailAttachmentUploader.Attachment>();
         for (Messaging.InboundEmail.BinaryAttachment att : email.binaryAttachments) {
             if (att == null || att.body == null) {
                 continue;
             }
-            ContentVersion cv = new ContentVersion();
-            cv.Title = String.isBlank(att.fileName) ? 'attachment' : att.fileName;
-            cv.PathOnClient = cv.Title;
-            cv.VersionData = att.body;
-            versions.add(cv);
-        }
-        if (versions.isEmpty()) {
-            return versionIds;
-        }
-        insert versions;
-
-        Set<Id> cvIds = new Set<Id>();
-        for (ContentVersion cv : versions) {
-            cvIds.add(cv.Id);
-        }
-        List<ContentDocumentLink> links = new List<ContentDocumentLink>();
-        for (ContentVersion cv : [SELECT Id, ContentDocumentId FROM ContentVersion WHERE Id IN :cvIds]) {
-            versionIds.add(cv.Id);
-            links.add(new ContentDocumentLink(
-                ContentDocumentId = cv.ContentDocumentId,
-                LinkedEntityId = oppId,
-                ShareType = 'V',
-                Visibility = 'AllUsers'
+            atts.add(new BoxEmailAttachmentUploader.Attachment(
+                String.isBlank(att.fileName) ? 'attachment' : att.fileName,
+                EncodingUtil.base64Encode(att.body)
             ));
         }
-        insert links;
-        return versionIds;
+        if (!atts.isEmpty() && !Test.isRunningTest()) {
+            System.enqueueJob(new BoxEmailAttachmentUploader(oppId, atts));
+        }
     }
 
     private String senderDomain(String sender) {

@@ -1,21 +1,31 @@
 # Inbound Email Intake Service
 
-Captures a contract that arrives **by email** (the realistic first hop — a counterparty emails an internal rep an MSA or redline) onto the matching Salesforce Opportunity, and stages the attachment for Box.
+Captures a contract that arrives **by email** (the realistic first hop — a counterparty emails an internal rep an MSA or redline) onto the matching Salesforce Opportunity, and uploads the attachment straight into that Opportunity's Box folder.
 
 ## What it does
 
-`EmailIntakeHandler` (Apex `Messaging.InboundEmailHandler`, in `clm-salesforce-project/force-app/main/default/classes/`):
+`EmailIntakeHandler` (Apex `Messaging.InboundEmailHandler`) + `BoxEmailAttachmentUploader` (Queueable), in `clm-salesforce-project/force-app/main/default/classes/`:
 
 1. Resolves the sender: `Contact.Email = fromAddress` → `Contact.Account`. Falls back to matching the sender's email domain against an `Account` website.
 2. Picks the open Opportunity on that Account (the email subject may name a specific Opportunity to override the default).
 3. Logs the email on the Opportunity's **activity timeline** — an `EmailMessage` where Enhanced Email is enabled, otherwise a `Task`.
-4. Saves each attachment as a Salesforce **File** (`ContentVersion` + `ContentDocumentLink`) on the Opportunity.
+4. Uploads each attachment **directly into the Opportunity's Box folder** — the bytes come straight from the inbound email and are **never persisted in Salesforce** as a ContentVersion. The file lives once, in Box, and surfaces on the Opportunity through the Box for Salesforce managed package's record → folder mapping.
 
-It **never bounces** the sender (always returns success), and it **does not create `CLM_Contract__c`** — contract-record creation stays in the governed, human-gated Box intake path. This handler only captures the inbound content.
+It **never bounces** the sender (always returns success), and it **does not create `CLM_Contract__c`** — contract-record creation stays in the governed, human-gated Box intake path.
+
+## How the Box upload works (no credentials, no double storage)
+
+`BoxEmailAttachmentUploader` uses the **Box for Salesforce managed package** (`box.Toolkit`), so there is **no Named Credential and no separate Box app** to configure — the package's service account handles auth:
+
+- `box.Toolkit.getFolderIdByRecordId(oppId)` resolves the Opportunity's Box folder (`createObjectFolderForRecordId` creates it if missing).
+- The attachment `Blob` is hand-assembled into a `multipart/form-data` body and POSTed to `https://upload.box.com/api/2.0/files/content` via `box.Toolkit.sendRequest(...)`, which attaches the service-account token.
+- Because creating the folder mapping is a callout **plus** DML, the first upload for an unmapped record creates + commits the mapping, then chains a second job that does the upload-only callouts (Salesforce forbids callouts after DML).
+
+Prerequisite: the Box for Salesforce integration's **service account must be authorized** in the org (it is, since the package already maps records to Box folders), and **Opportunity** must be a Box-mapped object.
 
 ## Boundary
 
-Content (the attachment) belongs in Box; Salesforce keeps the email **activity** plus a File reference. The authoritative `CLM_Contract__c` record is still created only by the Box metadata-trigger intake workflow after human review. No file bytes are written into the structured record.
+Content (the attachment) lives only in Box; Salesforce keeps the email **activity** and reaches the file through the managed package's Box widget. The authoritative `CLM_Contract__c` record is still created only by the Box metadata-trigger intake workflow after human review. No file bytes are written into the structured record.
 
 ## Per-org setup (Email Service)
 
@@ -26,18 +36,12 @@ The Apex deploys with the metadata; the inbound **address** and its **Run As** u
    - Accept Attachments: **All** (binary + text)
    - Active: checked
 2. **New Email Address** under that service:
-   - Run As: a licensed user with access to `Contact`/`Account`/`Opportunity` and create on `EmailMessage`/`Task`/`ContentVersion` (e.g. the CLM integration user with `CLM_Box_Automate_Integration`).
+   - Run As: a licensed user with access to `Contact`/`Account`/`Opportunity`, create on `EmailMessage`/`Task`, and access to `box.Toolkit` (e.g. the CLM integration user with `CLM_Box_Automate_Integration`).
    - Active: checked. Optionally restrict **Accept Email From** to the counterparty domains.
 3. Salesforce generates the inbound address (`<localpart>@<...>.apex.salesforce.com`). Route counterparty mail to it — forward a shared mailbox, or add it as a BCC/recipient on the counterparty thread.
 
-Verify: send a test email (with a PDF) from a known counterparty Contact address; confirm the email appears on that Contact's Account Opportunity timeline and the PDF shows in the Opportunity's Files.
+Verify: send a test email (with a PDF) from a known counterparty Contact address; confirm the email appears on that Contact's Account Opportunity timeline and the PDF appears in the Opportunity's Box folder.
 
-## Phase 2 — push the attachment into Box (not yet wired)
+## Connecting to the intake workflow (follow-up)
 
-Getting the captured file into Box `01 - Intake` (where the `clmContract` metadata trigger fires) requires a Salesforce → Box callout:
-
-- An **External Credential + Named Credential** for a Box custom app (OAuth 2.0). *These credentials must be created in Box and the org — they are not committed.*
-- A `BoxFileUploader` Queueable that uploads the `ContentVersion` to the intake folder (folder id held in a `CLM_Integration_Setting__mdt` record, set per-org).
-- The handler enqueues that job after capture (the hook is present but commented out in `EmailIntakeHandler`).
-
-Until the Box credentials exist, the service delivers the Salesforce half: email + attachment captured on the Opportunity.
+The file now lands in the **Opportunity's** Box folder, not the shared `01 - Intake` folder that the `clmContract` metadata trigger watches. To fire the governed intake workflow off it, re-point that Automate trigger at the record folders (or apply `clmContract` metadata to the file in the Opportunity folder). Tracked as a follow-up; it does not block the email-capture flow.
