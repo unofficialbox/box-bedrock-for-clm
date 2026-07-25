@@ -71,7 +71,7 @@ Behavior:
 Wraps `scripts/demo_operator.py status`.
 
 - Must show: bootstrap state, required folders/files/templates, generated specs presence, unresolved tokens, and remaining manual fields.
-- Includes expected blocker list (form/app/hub/workflow URLs if missing).
+- Includes expected blocker list (app/hub/workflow URLs if missing).
 
 ### `clm-cli validate`
 
@@ -115,10 +115,9 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 1. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/setup_clm_dev.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/setup_clm_dev.py)
 2. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/demo_operator.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/demo_operator.py)
 3. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/validate_clm.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/validate_clm.py)
-4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/prepare_box_form_browser_plan.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/prepare_box_form_browser_plan.py)
-5. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_sample_contract_assets.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_sample_contract_assets.py)
-6. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_docgen_templates.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_docgen_templates.py)
-7. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/run_agentcore_mock.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/run_agentcore_mock.py)
+4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_sample_contract_assets.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_sample_contract_assets.py)
+5. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_docgen_templates.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/generate_docgen_templates.py)
+6. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/run_agentcore_mock.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/run_agentcore_mock.py)
 
 ### Presenter/build scripts
 
@@ -128,10 +127,8 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 
 ### Auxiliary/browser/experimentation scripts
 
-11. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/scripts/box_form_provisioner.py)
-12. `forms.py` in the box-capture repository
-13. `apps.py` in the box-capture repository
-14. `automate.py` in the box-capture repository
+11. `apps.py` in the box-capture repository
+12. `automate.py` in the box-capture repository
 
 ## 4) Reference inventory of config/assets/docs for the new CLI
 
@@ -140,7 +137,7 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 1. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.example.bcl)
 2. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/demo-environment.bcl)
 3. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/bootstrap-state.bcl)
-4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/form-definition.bcl)
+4. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/automate-workflows.bcl](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/generated/box/automate-workflows.bcl)
 5. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.bcl)
 6. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/runtime/validation-receipts.example.bcl) (copy to `config/runtime/validation-receipts.json` for presenter-ready runs)
 7. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.json](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/config/operator/operator-workflow.bcl)
@@ -164,7 +161,6 @@ Pre-flight confirmation command for manual gates (publish/share/activate/send).
 
 20. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_demo_operator.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_demo_operator.py)
 21. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_setup_clm_dev.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_setup_clm_dev.py)
-22. [/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_box_form_provisioner.py](/Users/massnerder/Developer/Code/box-bedrock-agentcore-demos/box-bedrock-for-clm/tests/test_box_form_provisioner.py)
 
 ## 5) CLI implementation constraints
 
@@ -217,8 +213,8 @@ At each run, the CLI should emit:
     }
   ],
   "manual": [
-    "box.formUrl",
-    "box.appUrl"
+    "box.appUrl",
+    "box.hubUrl"
   ],
   "validation": {
     "demo_operator_status": "blocked",

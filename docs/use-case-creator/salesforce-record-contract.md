@@ -18,7 +18,7 @@ Do not overload Salesforce `Contract` or org-specific managed CLM objects. The d
 |---|---|
 | Record owner | Standard `OwnerId`; authenticated integration user owns new records unless an approved assignment rule changes ownership |
 | Business owner | Optional `Business_Owner__c` lookup to an active Salesforce User |
-| Unresolved business owner | Preserve the validated Form value in `Business_Owner_Name__c`; do not create or guess a User |
+| Unresolved business owner | Preserve the validated metadata value in `Business_Owner_Name__c`; do not create or guess a User |
 | Internal sharing | Private |
 | External sharing | Private |
 | Access grant | Permission set plus the intended Lightning/Experience sharing configuration |
@@ -50,7 +50,7 @@ Deployable metadata: `clm-salesforce-project/force-app/main/default/objects/CLM_
 
 ## Intake integration
 
-> **Proven live path vs. design target.** The workflow that has been proven end to end uses a plain **POST** create to the sobject collection (`services/data/{apiVersion}/sobjects/CLM_Contract__c`), captured in `config/box/https-connectors.bcl` as `salesforceContractCreate` (`liveRunSucceeded = true`). That POST is **not idempotent**: a resubmission creates a second record. The external-ID **PATCH upsert** described below is the duplicate-safe *design target*; it is not currently the live path. Restore it — and re-verify against a live run — only if duplicate safety is required. See the duplicate-safety note in `docs/operator/agent-takeover-handoff.md`.
+> **Proven live path vs. design target.** The workflow uses a plain **POST** create to the sobject collection (`services/data/{apiVersion}/sobjects/CLM_Contract__c`), captured in `config/box/https-connectors.bcl` as `salesforceContractCreate`. This POST was proven end to end on 2026-07-22 — but via the now-removed Box Form trigger. Intake is now sourced from the `clmContract` metadata trigger (`static.trigger.metadata.<key>`), and that metadata-triggered variant has not been re-verified live. The POST is **not idempotent**: a resubmission creates a second record. The external-ID **PATCH upsert** described below is the duplicate-safe *design target*; it is not currently the live path. Restore it — and re-verify against a live run — only if duplicate safety is required. See the duplicate-safety note in `docs/operator/agent-takeover-handoff.md`.
 
 The duplicate-safe design is an upsert by external ID:
 
@@ -75,7 +75,7 @@ Response mapping:
 }
 ```
 
-`Counterparty_Account__c` and `Opportunity__c` are not part of the intake path: the Box Form supplies no Account or Opportunity ID, so the connector neither writes nor reads them. They are populated on the record by the packaged sample data or by manual entry, and the connector's `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
+`Counterparty_Account__c` and `Opportunity__c` are not part of the intake path: the intake metadata supplies no Account or Opportunity ID, so the connector neither writes nor reads them. They are populated on the record by the packaged sample data or by manual entry, and the connector's `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
 
 The Box Automate integration must:
 
@@ -89,11 +89,11 @@ The Box Automate integration must:
 
 SOQL is not required for this path. If the Box Automate builder cannot retrieve by external ID, a second standard REST query operation may select `Id` and `Contract_ID__c` by the generated contract ID.
 
-## Form and Extract mapping
+## Metadata and Extract mapping
 
 The authoritative mapping is the `fieldMappings` array in `config/salesforce/clm-contract-record.bcl`. Key rules:
 
-- Form values are written only after the Box human-validation gate.
+- Metadata values are written only after the Box human-validation gate.
 - `riskLevel` is written only when a human validated the Extract/AI result.
 - `boxFolderId` must be the allowlisted workspace associated with the intake.
 - `boxFolderUrl` must use the hostname recorded for the target Box enterprise.

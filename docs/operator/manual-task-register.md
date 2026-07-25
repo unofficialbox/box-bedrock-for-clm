@@ -14,7 +14,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-002 | Confirm required Box and Salesforce licenses/features | Administrators | Required | Every selected product surface opens for its operator |
 | MT-003 | Name workflow, legal, privacy, security, finance, publishing, and signing owners | Demo owner | Required | Owners and escalation path are recorded |
 | MT-004 | Store credentials outside source control | Administrators | Required | Secrets exist only in managed connections or protected secret stores |
-| MT-005 | Sign in to the intended Box web application before browser-agent configuration | Box operator | Required for Forms, Apps, Automate, and Hub composition | An authenticated tab is open on the exact configured hostname under the intended builder account; no browser credentials are exported |
+| MT-005 | Sign in to the intended Box web application before browser-agent configuration | Box operator | Required for Apps, Automate, and Hub composition | An authenticated tab is open on the exact configured hostname under the intended builder account; no browser credentials are exported |
 
 ## Box browser work
 
@@ -22,11 +22,11 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 |---|---|---|---|---|
 | MT-010 | Review deterministic metadata applied by `seed-metadata` | Content owner | Required | Values are appropriate and App views/charts contain useful data |
 | MT-011 | Mark the three Word files as Doc Gen templates | Doc Gen admin | Required | Templates appear in the Doc Gen catalog |
-| MT-012 | Have an authenticated browser agent apply and verify **New Contract Request** from the generated Browser Use plan | Forms builder | Required; no supported public authoring API | One saved **Active** Form matches `config/box/form-definition.json`, targets generated `01 - Intake`, and its link is not distributed until approval |
+| MT-012 | Verify the `clmContract` metadata trigger entry point for intake | Content owner | Required | The generated `01 - Intake` folder and the `clmContract` metadata template exist, and applying `clmContract` metadata to a test file uploaded there starts **CLM - Contract Intake Enrichment** |
 | MT-013 | Build **Contract Lifecycle Management** | Apps builder | Required | Actions are first; status, risk, type, region, and clause charts are useful |
 | MT-014 | Build **Approved Contract Clause Library** | Hub owner | Required | Approved clauses, fallbacks, ownership, and review cadence are visible |
 | MT-015 | Build and save the Automate workflows | Workflow builder | Required | Bindings use only this environment's generated IDs |
-| MT-016 | Publish or republish an App or Hub; enable or distribute a Form link | Surface owner | Confirmation required | Owner approves immediately before the consequential action |
+| MT-016 | Publish or republish an App or Hub | Surface owner | Confirmation required | Owner approves immediately before the consequential action |
 | MT-017 | Activate an Automate workflow | Workflow owner | Confirmation required | Trigger, scope, destination, idempotency, rollback, and test plan are reviewed |
 | MT-018 | Generate a Doc Gen output | Authorized reviewer | Confirmation required | One intended file is created after approval |
 | MT-019 | Send a Box Sign request | Signatory coordinator | Confirmation required | Required approvals are complete and send is separately approved |

@@ -25,7 +25,7 @@ Use this path to understand or intentionally tailor the existing Contract Lifecy
 | Content authority | Box |
 | Structured authority | Salesforce |
 | Human authority | Legal, Finance, Privacy, Security, and designated business owners |
-| Entry points | Box Form or prepared Salesforce record, depending on the scenario |
+| Entry points | Box metadata trigger on an uploaded contract, or a prepared Salesforce record, depending on the scenario |
 | Failure path | Triage missing evidence, low confidence, unresolved owners, partial writes, and blocked approvals before retry |
 | Reset path | Remove or archive only resources owned by the confirmed demo run and retain reset evidence |
 

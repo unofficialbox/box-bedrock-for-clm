@@ -26,9 +26,7 @@ Use [Demo Operator Handoff](./demo-operator-handoff.md) as the single consolidat
 
 Use [Manual Box Configuration and Automation Feasibility](manual-box-configuration.md) to distinguish supported API automation from browser-only product setup and private-API research.
 
-Use the [Box Form Browser Plan](box-form-provisioner.md) only for the unsupported Forms-authoring gap. It prepares a guarded Browser Use task; it does not change Box by itself.
-
-Use Box Private-API Labs (see the box-capture repository) for isolated research on Forms, Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
+Use Box Private-API Labs (see the box-capture repository) for isolated research on Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
 
 For assistant-driven execution, read [AI-Assisted Operator Protocol](ai-operator.md). Planning, generation, validation, and dry runs may proceed without external approval. Every external write requires the guide's explicit apply option, confirmation of the exact target, and any documented human decision gate.
 

@@ -6,9 +6,8 @@ Have administrators complete this before external writes. Product names and avai
 |---|---|---|---|
 | Box folders/files | Both scenarios | Box admin | Operator can open the approved parent folder and upload/delete a disposable test file |
 | Enterprise metadata templates | Both | Box metadata admin | Operator can open metadata-template administration and create templates |
-| Box Forms | Box Automate Agentic Orchestration | Forms builder | Forms surface opens and allows an unpublished draft |
 | Box Apps | Box Automate Agentic Orchestration | Apps builder | Apps builder opens and supports metadata views/charts |
-| Box Automate | Box Automate Agentic Orchestration | Workflow admin | Automate builder exposes Form trigger, Extract Agent, Box Agent, approval, conditional split, and HTTPS Request |
+| Box Automate | Box Automate Agentic Orchestration | Workflow admin | Automate builder exposes a metadata trigger, Extract Agent, Box Agent, approval, conditional split, and HTTPS Request |
 | Box AI/Extract | Both | Box AI admin | Selected agents can access only the intended demo content |
 | Box Hubs | Both | Hub owner | Operator can create an unpublished Hub draft |
 | Box Doc Gen | Both | Doc Gen admin | A generated Word file can be marked as a template |

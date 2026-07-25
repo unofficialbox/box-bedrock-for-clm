@@ -12,11 +12,11 @@ Before any browser-agent step, sign in to the intended Box web application with 
 4. Confirm the generated **Approved Clauses** folder contains the README plus eight standard/fallback Markdown clauses.
 5. Assign real owners and collaborators from this environment; do not copy demo usernames.
 
-## 2. Box Form
+## 2. Box intake entry point
 
-Prepare the guarded [Box Form Browser Plan](box-form-provisioner.md), then have an authenticated browser agent apply it. It builds one Form named **New Contract Request** from the portable definition and binds its destination to generated folder `01 - Intake`.
+Intake no longer uses a Box Form. A contract enters the pipeline when it is uploaded into generated folder `01 - Intake` and the `clmContract` metadata template is applied to it, with `contractId`, `contractType`, `counterparty`, and `requesterEmail` populated. Applying that metadata is the trigger for the **CLM - Contract Intake Enrichment** workflow.
 
-Verify the title, fields, required states, defaults, destination, and Box-default confirmation behavior. Box lists a saved Form as **Active**; obtain approval before copying, enabling, or distributing its link, then record the approved URL in `demo-environment.bcl`.
+Confirm the `01 - Intake` folder exists and that the `clmContract` template is available in this environment (section 1). No Form is built, enabled, or distributed.
 
 ## 3. Box App
 
@@ -52,7 +52,7 @@ The repository intentionally contains no tenant-specific External Client App met
 
 Build the workflows from `config/box/automate-workflows.bcl`. Start with **CLM - Contract Intake Enrichment**:
 
-1. Trigger: **New Contract Request** submitted.
+1. Trigger: `clmContract` metadata applied to a file in generated `01 - Intake`. The trigger yields `static.trigger.fileId` and `static.trigger.metadata.<key>`.
 2. Extract: use the uploaded contract file and `config/box/extract-field-prompts.bcl`.
 3. Agent review: use `config/box/ai-agent-specs.bcl` and require citations.
 4. Human validation: assign a real reviewer in this environment.
@@ -65,14 +65,14 @@ Save and test the workflow while inactive. Obtain explicit approval immediately 
 
 Use the resolved file `config/runtime/generated/box/https-connectors.bcl`.
 
-The proven live path is a plain **POST** record create, not an upsert. This is the configuration that created a real `CLM_Contract__c` record end to end (`salesforceContractCreate.liveRunSucceeded = true`, proven 2026-07-22).
+The intended live path is a plain **POST** record create, not an upsert. This is the configuration that created a real `CLM_Contract__c` record end to end on 2026-07-22, when intake was triggered by the now-removed Box Form. The connector endpoint and body are unchanged, but the trigger is now the `clmContract` metadata event and every dynamic value is re-sourced from `static.trigger.metadata.<key>`. That metadata-triggered path has not been re-verified live and must be re-tested before activation.
 
 | Request | Setting | Value |
 |---|---|---|
 | Create | Method | `POST` |
 | Create | Endpoint | `services/data/v67.0/sobjects/CLM_Contract__c` (no leading slash; resolved against the connector base URL. Plain sobject collection, not an external-ID upsert path.) |
 | Create | Headers | None. The verified outcome enables no headers and no query parameters; authorization is handled entirely by the Box-managed OAuth connection. |
-| Create | Body | Copy the field mapping from `salesforceContractCreate.body`. Every bound value must be sourced from a **required** Form field, or Box sends the literal `Variable unavailable`. |
+| Create | Body | Copy the field mapping from `salesforceContractCreate.body`. Every bound value must be sourced from a populated `clmContract` metadata key (`static.trigger.metadata.<key>`) or another mandatory source, or Box sends the literal `Variable unavailable`. |
 | Create | Output | `id=$.id` |
 
 Do not place the OAuth token in a header manually; select the Box-managed OAuth connection. If a Box variable picker uses different display labels, bind by the logical field named in the resolved BCL and verify the test preview before saving.
@@ -89,10 +89,10 @@ Record the new environment's IDs in `demo-environment.bcl`; never write secrets 
 
 Proceed only when:
 
-- The App, Form, and Hub open for the intended operator.
-- The Form targets the generated intake folder.
+- The App and Hub open for the intended operator.
+- The `01 - Intake` folder accepts uploads and the `clmContract` metadata trigger starts the workflow.
 - The workflow is saved and remains inactive until approval.
 - OAuth succeeds as the dedicated integration user.
 - One record creation succeeds in a labeled test, and the created record is opened and checked field by field in Salesforce rather than trusted from the Box run events.
-- Every bound value is sourced from a **required** Form field. An unresolved variable is sent as the literal string `Variable unavailable`, not as an empty value, so an optional source corrupts any typed Salesforce field.
+- Every bound value is sourced from a populated `clmContract` metadata key (`static.trigger.metadata.<key>`) or another mandatory source. An unresolved variable is sent as the literal string `Variable unavailable`, not as an empty value, so an optional source corrupts any typed Salesforce field.
 - Duplicate behaviour is understood and accepted: the current create path is not idempotent, so a duplicate submission creates a second record. Restore the external-ID upsert if duplicate safety is required.

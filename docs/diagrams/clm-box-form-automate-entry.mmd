@@ -1,12 +1,11 @@
 flowchart LR
-    Form["Box Form<br/>New Contract Request"] --> Automate["Box Automate<br/>Contract Intake Enrichment"]
+    Intake["Box Intake folder<br/>upload + clmContract metadata"] --> Automate["Box Automate<br/>Contract Intake Enrichment"]
     Automate --> Extract["Extract + Box AI Agent<br/>candidate structured values"]
     Extract --> Gate{"Human validates<br/>the enrichment?"}
-    Gate -- "Reject" --> Rework["Correct request or package"]
-    Rework --> Form
-    Gate -- "Approve" --> Upsert["HTTPS Connector<br/>standard REST upsert"]
-    Upsert --> Lookup["HTTPS Connector<br/>external-ID lookup"]
-    Lookup --> Context["Map recordId,<br/>contractId, boxFolderId"]
+    Gate -- "Reject" --> Rework["Correct metadata or package"]
+    Rework --> Intake
+    Gate -- "Approve" --> Create["HTTPS Connector<br/>standard REST create (POST)"]
+    Create --> Context["Map recordId and<br/>contractId from the response"]
     Context --> React["Open React CLM workspace"]
 
     classDef box fill:#f8fafc,stroke:#1166e8,color:#071b33,stroke-width:2px
@@ -14,7 +13,7 @@ flowchart LR
     classDef salesforce fill:#e9f1ff,stroke:#1166e8,color:#071b33,stroke-width:2px
     classDef blocked fill:#ffe8eb,stroke:#c63846,color:#7c1621,stroke-width:2px
 
-    class Form,Automate,Extract,Upsert,Lookup box
+    class Intake,Automate,Extract,Create box
     class Gate decision
     class Context,React salesforce
     class Rework blocked

@@ -20,7 +20,7 @@ Read these files before making changes:
 | Scenario presenter source | `docs/operator/scenarios/box-automate-agentic-orchestration/README.md` |
 | Automate workflow source of truth | `config/box/automate-workflows.json` |
 | HTTPS connector contract | `config/box/https-connectors.json` |
-| Box Form source of truth | `config/box/form-definition.json` |
+| `clmContract` metadata template source of truth | `config/box/metadata-templates.bcl` |
 | Box App portable layout | `config/box/box-app-blueprint.md` |
 | Box private API operator notes | `docs/box-private-api-labs.md` in the box-capture repository |
 | Box private API research index | `docs/research/box-web-private-api/README.md` |
@@ -50,7 +50,7 @@ Use the authenticated page's existing Apollo client for Automate GraphQL inspect
 
 | Order | Step |
 |---:|---|
-| Trigger | Box Forms submission from **New Contract Request** |
+| Trigger | `clmContract` metadata applied to a file in generated `01 - Intake` |
 | 1 | Extract Agent: Contract Intake Extract |
 | 2 | Box Agent: CLM Contract Risk Triage |
 | 3 | Approval Task: validate extracted terms and approval brief |
@@ -79,36 +79,33 @@ The current connector contract contains these fields. Keep only fields supported
 | Salesforce field | Intended source |
 |---|---|
 | `Name` | Counterparty plus contract type |
-| `Requester_Name__c` | Form requester name |
-| `Requester_Email__c` | Form requester email |
-| `Counterparty__c` | Form or Extract counterparty |
-| `Contract_Type__c` | Form or Extract contract type |
-| `Deal_Value__c` | Form deal value |
-| `Term_Months__c` | Form or Extract term |
-| `Region__c` | Form region |
-| `Data_Category__c` | Form or Extract data category |
-| `Target_Signature_Date__c` | Form target signature date |
-| `Business_Owner_Name__c` | Form business owner |
+| `Requester_Name__c` | Metadata requester name |
+| `Requester_Email__c` | Metadata `requesterEmail` |
+| `Counterparty__c` | Metadata `counterparty` or Extract counterparty |
+| `Contract_Type__c` | Metadata `contractType` or Extract contract type |
+| `Deal_Value__c` | Metadata or Extract deal value |
+| `Term_Months__c` | Metadata or Extract term |
+| `Region__c` | Metadata region |
+| `Data_Category__c` | Metadata or Extract data category |
+| `Target_Signature_Date__c` | Metadata target signature date |
+| `Business_Owner_Name__c` | Metadata business owner |
 | `Risk_Level__c` | Box Agent risk level |
-| `Special_Terms_Risk_Notes__c` | Form notes or reviewed agent summary |
-| `Record_Source__c` | Literal `Box Form` |
+| `Special_Terms_Risk_Notes__c` | Metadata notes or reviewed agent summary |
+| `Record_Source__c` | Literal `Box Automate` |
 | `Counterparty_Account__c` | Resolved counterparty Account |
 | `Opportunity__c` | Resolved opportunity |
 
-The new Form has only two required inputs. Any optional value must be safe when blank or must be sourced from the Extract or Box Agent outcome before the HTTPS step.
+The `clmContract` metadata template supplies the required inputs (`contractId`, `contractType`, `counterparty`, `requesterEmail`). Any optional value must be safe when blank or must be sourced from the Extract or Box Agent outcome before the HTTPS step.
 
 ## Recent local changes
 
-### Form simplification
+### Metadata trigger replaces the Form
 
-`config/box/form-definition.json` now requires only:
+The Box Form ("New Contract Request") has been removed entirely. Intake now fires from a `clmContract` metadata trigger: the workflow starts when `clmContract` metadata is applied to a file uploaded into generated `01 - Intake`. The trigger yields `static.trigger.fileId` and `static.trigger.metadata.<key>`.
 
-- `requesterEmail`
-- `contractPackage`
+`config/box/metadata-templates.bcl` defines the `clmContract` template. `requesterEmail` was added so the Salesforce-required `Requester_Email__c` can be sourced from metadata alongside `contractId`, `contractType`, and `counterparty`.
 
-All other Form fields remain available but optional. The live Box Form still needs reconciliation before its required states change.
-
-`config/box/automate-workflows.json` still lists all Form variables under `requiredFormVariables`. This is inconsistent with the new Form definition and must be corrected after reviewing the live primary workflow.
+The live Box Automate workflow must be rebound from the removed form-trigger tokens to the metadata-trigger tokens before it can run. This metadata-triggered variant is designed but has not been re-verified live.
 
 ### Realistic MSA fixture
 
@@ -120,7 +117,7 @@ A new seven-page realistic agreement was added without replacing v3:
 
 The v4 agreement includes realistic commercial, privacy, security, IP, indemnity, liability, termination, and signature provisions plus negotiated Northstar redlines and an issue register. It was rendered and visually reviewed across all seven pages.
 
-The Form definition and presenter README still refer to `northstar-msa-redline-v3.pdf`. Switch them to v4 if the user confirms v4 should become the canonical intake sample.
+The `clmContract` metadata sample and presenter README still refer to `northstar-msa-redline-v3.pdf`. Switch them to v4 if the user confirms v4 should become the canonical intake sample.
 
 ## Existing private API evidence
 
@@ -152,7 +149,7 @@ No repository fixture currently contains the HTTPS Connector outcome graph. Add 
 8. Add a versioned HTTPS outcome fixture under `config/box/` and matching redacted evidence under `docs/research/box-web-private-api/`.
 9. Extend `box-capture/automate.py` only after the graph shape is known. Preserve exact-title, inactive-status, and no-publish guards.
 10. Inspect the live Box App Home and Clause Library, then update `config/box/box-app-blueprint.md` to match the revised layout and names.
-11. Reconcile the Form's two required fields and decide whether v4 becomes the canonical presenter upload.
+11. Rebind the workflow trigger to the `clmContract` metadata template and decide whether v4 becomes the canonical presenter upload.
 12. Run the repository's narrow configuration validation only after the package changes are complete.
 
 ## Safety boundaries
@@ -170,7 +167,7 @@ No repository fixture currently contains the HTTPS Connector outcome graph. Add 
 - The primary packaged Automate workflow matches the verified organization of workflow `399436615012`.
 - The HTTPS outcome fixture reproduces the verified structure from workflow `402235479966`.
 - The Salesforce POST body contains valid Box Automate merge variables for all included dynamic values.
-- Optional Form values cannot break the POST when omitted.
+- Optional metadata values cannot break the POST when omitted.
 - The response captures the Salesforce record ID when the tested outcome exposes it.
 - The package does not store credentials or browser anti-forgery state.
 - The App blueprint matches the live Home and Clause Library structure and shortened names.
@@ -179,7 +176,7 @@ No repository fixture currently contains the HTTPS Connector outcome graph. Add 
 
 ## Outcome, 2026-07-22 into 2026-07-23
 
-**The objective above is complete and the scenario is proven end to end.** A Form submission now runs trigger, workspace copy, workspace rename, Box Agent, human approval, and an HTTPS POST that creates a real Salesforce record.
+**The objective above was completed and the form-triggered scenario was proven end to end on 2026-07-22.** At that time a Form submission ran trigger, workspace copy, workspace rename, Box Agent, human approval, and an HTTPS POST that created a real Salesforce record. This section is history: the Box Form has since been removed, and intake is now designed to fire from a `clmContract` metadata trigger on the `01 - Intake` folder. That metadata-triggered variant has not been re-verified live and must be re-tested before activation.
 
 Config now lives in `.bcl`, not `.json`. BCL is the only supported import format; the paths in the table above should be read with a `.bcl` extension.
 

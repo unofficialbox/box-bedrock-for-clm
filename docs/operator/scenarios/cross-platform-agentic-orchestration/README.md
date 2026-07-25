@@ -115,7 +115,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 |---|---|---|
 | Experience | Salesforce Multi-Framework React CLM workspace | **Local deterministic fixture**; deploy and validate per environment |
 | Salesforce Agentforce | `CLM_Contract__c`, Contract Copilot, approval context | **Portable specification**; configure and validate per environment |
-| Box | Apps, Forms, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
+| Box | Apps, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
 | Orchestration | Amazon Bedrock AgentCore supervisor and Strands specialists | **Local deterministic fixture** trace plus portable contracts |
 | Analytics | Databricks historical outcomes and cycle-time benchmarks | **Local deterministic fixture** dataset and tool contract |
 | Controls | Citations, deterministic expert directory, human approvals, signature block | **Portable specification** |

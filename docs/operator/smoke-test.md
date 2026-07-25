@@ -4,11 +4,11 @@ Use a clearly labeled non-production request. Record new IDs in a run log, not i
 
 ## Box Automate Agentic Orchestration gate
 
-1. Submit **New Contract Request** with contract ID `CLM-2026-0017`, the queue's Northstar values, and `northstar-msa-redline-v3.pdf`; confirm the file reaches `01 - Intake`.
+1. Upload `northstar-msa-redline-v3.pdf` into `01 - Intake` and apply the `clmContract` metadata with contract ID `CLM-2026-0017`, the queue's Northstar values (`contractType`, `counterparty`), and `requesterEmail`; confirm applying the metadata starts the intake workflow.
 2. Confirm the extracted contract type is `MSA Package`, risk is reviewable as `Critical`, material deviations cite the redline, and no agent claims approval.
 3. Correct unsupported values, then approve the human validation task.
 4. Confirm Salesforce creates exactly one `CLM_Contract__c` record.
-5. Submit the same `CLM-2026-0017` contract ID again and confirm the same Salesforce record is updated rather than duplicated.
+5. Apply the same `CLM-2026-0017` metadata to a second intake upload and confirm the same Salesforce record is updated rather than duplicated.
 6. Confirm redline findings route one task per domain to real experts or the documented triage owner.
 7. Confirm the App charts and views reflect the seeded metadata.
 8. Confirm signature remains blocked while a required review is incomplete.
@@ -39,7 +39,7 @@ Operator:
 Scenario:
 Box hostname:
 Salesforce org alias:
-Form submission / workflow run:
+Metadata trigger / workflow run:
 Salesforce record:
 Created or reused task IDs:
 Corrections made during validation:

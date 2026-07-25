@@ -7,7 +7,7 @@ Use this guide to build the demo in a **new Box enterprise and Salesforce org**.
 | Automated | Administrator or browser work |
 |---|---|
 | Generate synthetic contracts and Doc Gen templates | Confirm product licenses and administrator access |
-| Create the Box workspace folders | Build Box Form, App, Hub, and Automate workflows |
+| Create the Box workspace folders | Build Box App, Hub, and Automate workflows |
 | Create Box metadata templates and apply deterministic dashboard seed data | Select real reviewers and verify seeded values |
 | Upload the contract package and Doc Gen templates | Configure protected OAuth credentials |
 | Deploy the Salesforce object, fields, layout, permissions, tab, and UI Bundle | Create/configure Agentforce and optional cloud services |

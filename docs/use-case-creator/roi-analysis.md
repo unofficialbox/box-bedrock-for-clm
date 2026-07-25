@@ -10,7 +10,7 @@ CLM value comes from compressing cycle time, reducing legal review burden, impro
 
 | Driver | Mechanism | Demo Evidence |
 |--------|-----------|---------------|
-| Faster intake | Standard Box Form and metadata reduce back-and-forth | Request-to-workspace in minutes |
+| Faster intake | Standard Box metadata and Automate reduce back-and-forth | Request-to-workspace in minutes |
 | Faster legal review | Clause summary and risk findings focus reviewer time | Redline risk brief with source citations |
 | Fewer approval delays | Policy-based routing and SLA tracking | Approval dashboard and escalations |
 | Less revenue leakage | Quote/order form comparison catches mismatches | Salesforce-to-contract value comparison |

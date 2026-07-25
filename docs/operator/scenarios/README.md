@@ -6,7 +6,7 @@ Building this in a new environment? Complete [Operator Start Here](../start-here
 
 | Track | Short name | Orchestration model | Presenter surface | Readiness |
 |---|---|---|---|---|
-| [Box Automate Agentic Orchestration](box-automate-agentic-orchestration/README.md) | Box Automate | A designed Box Automate sequence directs Extract, Box AI, and Agentforce work through explicit conditions and human gates | Box Form, Apps, Automate, Hub, tasks, Doc Gen, Sign | **Local deterministic fixture**; target activation and OAuth smoke remain gated |
+| [Box Automate Agentic Orchestration](box-automate-agentic-orchestration/README.md) | Box Automate | A designed Box Automate sequence directs Extract, Box AI, and Agentforce work through explicit conditions and human gates | Box metadata, Apps, Automate, Hub, tasks, Doc Gen, Sign | **Local deterministic fixture**; target activation and OAuth smoke remain gated |
 | [Cross-Platform Agentic Orchestration](cross-platform-agentic-orchestration/README.md) | Cross-Platform | An AgentCore/Strands supervisor dynamically delegates to Box, Salesforce Agentforce, and Databricks specialists | Salesforce Multi-Framework React workspace plus connected platforms | **Local deterministic fixture**; managed AgentCore and Databricks require deployment evidence |
 
 ## Naming rule
