@@ -66,7 +66,6 @@ FILE_BINDINGS = {
     "docgenRenewalNotice": "clm-renewal-notice-template.docx",
 }
 PORTABLE_SPECS = [
-    "config/box/form-definition.json",
     "config/box/automate-workflows.json",
     "config/box/https-connectors.json",
     "config/box/ai-agent-specs.json",

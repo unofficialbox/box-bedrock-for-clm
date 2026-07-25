@@ -12,7 +12,7 @@ This repository is a **golden copy** of the finished CLM scenario. Machinery tha
 |---|---|---|
 | **Golden-copy verification** — proves the committed artifact is internally consistent | `validate_clm.py` | Here |
 | **Golden-copy generation** — builds committed presenter and diagram assets | the `build_*.py` family, `generate_*.py` | Here, arguably; they produce tracked output |
-| **Environment provisioning** — creates or mutates live Box and Salesforce state | `demo_operator.py`, `box_form_provisioner.py`, `prepare_box_form_browser_plan.py`, `setup_clm_dev.py` | Elsewhere, by the rule above |
+| **Environment provisioning** — creates or mutates live Box and Salesforce state | `demo_operator.py`, `setup_clm_dev.py` | Elsewhere, by the rule above |
 
 Nothing has been moved on this basis yet. Do not treat the current layout as a decision.
 
@@ -22,12 +22,11 @@ Config under `config/` is now `.bcl`; BCL is the only supported import format an
 
 | Script | Stale references |
 |---|---|
-| `demo_operator.py` | 11 config paths |
-| `box_form_provisioner.py` | 4 |
+| `demo_operator.py` | 10 config paths |
 | `setup_clm_dev.py` | 1 |
 | `validate_clm.py` | 1 (`validation-receipts.json`) |
 
-Four tests error as a result, and `validate_clm.py` reports fewer passing rows than it did before the cutover. This is understood and accepted for now; it is not a regression to chase in isolation.
+Some tests error as a result, and `validate_clm.py` reports fewer passing rows than it did before the cutover. This is understood and accepted for now; it is not a regression to chase in isolation.
 
 A working Python BCL reader exists in `unofficialbox/box-capture/bcl.py` and parses the same inventory that `box-dispatch` reads in `internal/bcl`. It is deliberately **not** vendored back into this repository, because doing so would recreate the dependency the extraction just removed.
 
@@ -44,7 +43,6 @@ Three ways out, in the order they should be considered:
 | `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
 | `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.bcl` |
-| `prepare_box_form_browser_plan.py` | Validate the portable intake Form definition and prepare a guarded, gitignored Browser Use plan; makes no Box changes |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
@@ -89,8 +87,6 @@ The operator command sequence is:
 python3 scripts/demo_operator.py generate-assets
 python3 scripts/demo_operator.py box-foundation --dry-run
 python3 scripts/demo_operator.py box-foundation
-python3 scripts/prepare_box_form_browser_plan.py --dry-run
-python3 scripts/prepare_box_form_browser_plan.py
 python3 scripts/demo_operator.py seed-metadata --dry-run
 python3 scripts/demo_operator.py seed-metadata
 python3 scripts/demo_operator.py salesforce-deploy --dry-run

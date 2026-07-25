@@ -24,7 +24,7 @@ BOX_EXPERIENCES = [
         "file": "box-app-dashboard-actions-live.png",
         "eyebrow": "Box Apps actions",
         "title": "Intake, clauses, and deal room",
-        "description": "The published dashboard action row keeps one governed intake Form alongside approved-clause and executed-agreement shortcuts, followed by live Northstar workspace and contract-document cards.",
+        "description": "The published dashboard action row keeps one governed intake action alongside approved-clause and executed-agreement shortcuts, followed by live Northstar workspace and contract-document cards.",
     },
     {
         "file": "box-app-clause-library-live.png",
@@ -37,12 +37,6 @@ BOX_EXPERIENCES = [
         "eyebrow": "Box Apps view",
         "title": "Approved clause standards",
         "description": "The live metadata-backed Box Apps view over individual Markdown clause files in the CLM clause library.",
-    },
-    {
-        "file": "box-form-new-contract-request.png",
-        "eyebrow": "Box Forms",
-        "title": "New Contract Request",
-        "description": "The published intake form used to capture requester, counterparty, commercial terms, target date, and the contract package.",
     },
     {
         "file": "box-hub-clause-library-live.png",
