@@ -30,7 +30,6 @@ locals {
           ]
           "included" = [
             "Box Apps"
-            "Box Forms"
             "Box Automate"
             "Box Extract"
             "Box AI and Agentforce agents"

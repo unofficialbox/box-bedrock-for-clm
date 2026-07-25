@@ -28,6 +28,10 @@ locals {
                   "type" = "string"
                 }
                 {
+                  "key" = "requesterEmail"
+                  "type" = "string"
+                }
+                {
                   "key" = "contractType"
                   "options" = [
                     "MSA Package"

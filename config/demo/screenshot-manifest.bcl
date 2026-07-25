@@ -77,13 +77,6 @@ locals {
             }
             {
               "capturedOn" = "2026-07-14"
-              "path" = "output/screenshots/box-automate-agentic-orchestration/box-form-new-contract-request.png"
-              "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
-              "sourceSurface" = "Box Forms contract request"
-            }
-            {
-              "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png"
               "readiness" = "real-demo"
               "scenario" = "box-automate-agentic-orchestration"

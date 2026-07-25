@@ -1,6 +1,6 @@
 # Box App Blueprint: Contract Lifecycle Management
 
-This is a portable layout specification. Bind it to the folders, files, metadata templates, Form, and Hub created in the target environment. Do not record target-environment App, page, folder, or file identifiers here; keep those in runtime state or audit receipts.
+This is a portable layout specification. Bind it to the folders, files, metadata templates, and Hub created in the target environment. Do not record target-environment App, page, folder, or file identifiers here; keep those in runtime state or audit receipts.
 
 **Structure verified:** 2026-07-22, by read-only browser inspection of the live Home and Clause Library pages.
 
@@ -14,7 +14,7 @@ Section header: `Quick Actions & Portfolio`. Place the action row above the char
 
 | Order | Block | Type | Subtitle | Source |
 |---:|---|---|---|---|
-| 1 | Start a New Contract | Form action | Submit a governed intake request and contract package | Published `New Contract Request` Form |
+| 1 | Start a New Contract | Folder action | Upload a contract package to the intake folder and apply CLM contract metadata to begin the governed intake workflow | Generated `01 - Intake` folder |
 | 2 | Clause Hub | Link | Standards, approved fallbacks, owners, and review cadence | Target environment's published Clause Hub |
 | 3 | Executed Agreements | Link | Signed contracts, obligations, and renewal-ready records | Generated `06 - Executed Agreement` folder |
 | 4 | Document Approval Status | Donut | - | `clmDocument.approvalStatus` |
@@ -22,7 +22,7 @@ Section header: `Quick Actions & Portfolio`. Place the action row above the char
 | 6 | Documents by Type | Bar | - | `clmDocument.documentType` |
 | 7 | Contract Package Status | Bar | - | `clmDocument.versionStatus` |
 
-Use three action cards in one row, then two equal chart columns. Do not add a second Form block.
+Use three action cards in one row, then two equal chart columns. Do not add a second intake action block.
 
 The action block is named `Clause Hub`, not `Approved Clause Hub`. The Clause Library page uses the longer `Open Approved Clause Hub` for the equivalent link.
 
@@ -110,6 +110,6 @@ Make the App feel operational: representative metadata, clear ownership, visible
 3. Use two equal chart columns; drag and resize blocks instead of building a long single column.
 4. Set the description to `Operational CLM cockpit for governed intake, document risk, approvals, approved clauses, execution, and renewal readiness.`
 5. Preview at desktop width, save, and obtain owner approval immediately before publishing.
-6. Verify exactly one Form action, working Hub and folder links, non-empty charts, generated deal-room items, filtered pending work, and all Clause Library blocks.
+6. Verify exactly one intake action (the `01 - Intake` folder card), working Hub and folder links, non-empty charts, generated deal-room items, filtered pending work, and all Clause Library blocks.
 7. Verify the chart consistency invariants above and confirm no chart renders a single category or all-equal bars.
 8. Confirm the deal-room and review tables reference the intended MSA sample file version.

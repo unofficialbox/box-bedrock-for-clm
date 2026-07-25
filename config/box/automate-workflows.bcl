@@ -25,51 +25,32 @@ locals {
           "schemaVersion" = "2.0"
           "workflows" = [
             {
-              "description" = "Extract request terms, run the CLM intake agent, route human validation, and emit an approved integration event."
-              "formFieldIds" = {
-                "businessOwner" = "<formField:businessOwner>"
-                "contractId" = "<formField:contractId>"
-                "contractPackage" = "<formField:contractPackage>"
-                "contractType" = "<formField:contractType>"
-                "counterparty" = "<formField:counterparty>"
-                "dataCategory" = "<formField:dataCategory>"
-                "dealValue" = "<formField:dealValue>"
-                "note" = "Form element IDs are environment-specific and change if the Form is rebuilt. Resolve each from the target Form before provisioning."
-                "region" = "<formField:region>"
-                "requesterEmail" = "<formField:requesterEmail>"
-                "requesterName" = "<formField:requesterName>"
-                "specialTermsRiskNotes" = "<formField:specialTermsRiskNotes>"
-                "targetSignatureDate" = "<formField:targetSignatureDate>"
-                "termMonths" = "<formField:termMonths>"
-              }
+              "description" = "Trigger on applied CLM contract metadata, run the CLM intake agent, route human validation, and emit an approved integration event."
               "initialStatus" = "inactive"
               "key" = "contract-intake-enrichment"
               "name" = "CLM - Contract Intake Enrichment"
               "openIssues" = [
-                "No Extract Agent step exists in the live draft. Earlier revisions of this file specified one as step 1; decide whether to add it back or drop it from the packaged design."
-                "POST to the sobject collection has no duplicate safety. The PATCH upsert it replaced was idempotent against a Contract_ID__c external ID; this is not. Resubmitting the same contract would create a second Salesforce record. Decide on a duplicate strategy before activation."
+                "This workflow was redesigned from a Form trigger to a clmContract metadata trigger. The form-triggered variant was the one proven live on 2026-07-22; this metadata-triggered variant has not been re-verified and must be rebuilt and re-tested before activation."
+                "The metadata trigger assumes the clmContract structured fields are already applied to the file. If the demo should derive them from the document, add an Extract Agent plus Apply Metadata pre-step so the connector reads populated metadata rather than blank fields."
+                "POST to the sobject collection has no duplicate safety. The PATCH upsert it replaced was idempotent against a Contract_ID__c external ID; this is not. Re-triggering on the same contract would create a second Salesforce record. Decide on a duplicate strategy before activation."
                 "The connector step captures no output variable, so the created Salesforce record ID is not retained. The verified test outcome captured it as id from $.id."
                 "Risk_Level__c is no longer sent. It previously carried a fabricated literal, and the Box Agent emits unstructured text rather than a picklist value. Restore it once a structured Extract or Agent output supplies a real risk level."
-                "Box substitutes the literal string 'Variable unavailable' for an unresolved variable, not an empty string. A live run on 2026-07-22 failed because the Currency and Number fields received that text. Only bind values whose Form field is mandatory."
-                "The same substitution also produced a workspace folder named CLM-2026-Variable unavailable. Contract ID is required again, so the rename now resolves, but the rename step has not been re-run to confirm it."
+                "Box substitutes the literal string 'Variable unavailable' for an unresolved variable, not an empty string. A live run on 2026-07-22 failed because the Currency and Number fields received that text. Only bind values whose clmContract metadata field is guaranteed populated before the trigger fires."
                 "The connector failure surfaced only as errorCode UNKNOWN_ERROR with an empty payload. Box does not expose the Salesforce error body, so connector faults have to be diagnosed from the request payload in the run events."
                 "The connector must target the Salesforce org that actually holds CLM_Contract__c. Two similarly named connectors in this environment point at different orgs, and the wrong one fails with an opaque UNKNOWN_ERROR even when the payload is valid."
-                "This workflow is Active. Any further edit saves as a draft and does not take effect until the workflow is activated again, so always confirm the published version rather than the editor contents."
+                "The live Active workflow is still the form-triggered version. Rebuilding it around the metadata trigger requires deactivating and re-activating, so always confirm the published version rather than the editor contents."
                 "The step uses the Agentforce Dev connector, while the verified POST was tested on Agentforce MyDomain Dev. Both resolve to the same development org host, but the POST contract has not been re-tested through this connector."
-                "No Salesforce lookup step exists in the live draft, so the workflow captures no created record ID."
-                "The Rejected branch has no outcome, so rejected submissions produce no notification or return-for-correction."
+                "No Salesforce lookup step exists, so the workflow captures no created record ID."
+                "The Rejected branch has no outcome, so rejected requests produce no notification or return-for-correction."
                 "The Box Agent instructions embed the approved-clause-library folder ID as literal text, which is not portable across environments."
-                "Every optional Form value can now arrive blank. The connector body must tolerate an empty string for each one before this workflow is activated."
               ]
-              "optionalFormVariables" = [
-                "requesterName"
+              "optionalMetadataFields" = [
                 "dealValue"
                 "termMonths"
                 "region"
                 "dataCategory"
                 "targetSignatureDate"
-                "businessOwner"
-                "specialTermsRiskNotes"
+                "owner"
               ]
               "placeholderConvention" = {
                 "${binding}" = "Resolved by python3 scripts/demo_operator.py resolve-config from runtime state."
@@ -77,22 +58,18 @@ locals {
                 "note" = "Box Automate's own variable tokens also use ${}. To avoid collision with the resolver, Automate expressions are stored as a template plus a token map rather than as interpolated strings."
               }
               "required" = true
-              "requiredFormVariables" = [
-                "requesterEmail"
-                "contractPackage"
+              "requiredMetadataFields" = [
                 "contractId"
                 "contractType"
                 "counterparty"
+                "requesterEmail"
               ]
-              "requiredFormVariablesNote" = "Reconciled twice on 2026-07-22 and published each time. First reduced to two required fields, then raised to five after a live run failed. Salesforce marks Contract_ID__c, Contract_Type__c, Counterparty__c, and Requester_Email__c required on CLM_Contract__c, so their Form sources must be mandatory. contractPackage stays required because the Box Agent, the approval task, and two connector fields all read the uploaded file. The Form was edited in place both times, never rebuilt, so element IDs are unchanged and all bindings still resolve."
+              "requiredMetadataFieldsNote" = "Salesforce marks Contract_ID__c, Contract_Type__c, Counterparty__c, and Requester_Email__c required on CLM_Contract__c, so their clmContract metadata sources must be populated before the trigger fires. Box substitutes the literal string 'Variable unavailable' for an unresolved metadata variable, not an empty string, so an unpopulated field corrupts a typed Salesforce field rather than arriving blank. requesterEmail was added to the clmContract template for this purpose. The triggering file must also be present because the Box Agent and approval task read it."
               "steps" = [
                 {
-                  "destinationFolderId" = {
-                    "type" = "variable"
-                    "value" = "static.trigger.form.<formField:contractPackage>.folderId"
-                  }
+                  "destinationFolderId" = "${box.folders.intake}"
                   "eventSubType" = "copy"
-                  "name" = "Copy the CLM workspace template into the submission folder"
+                  "name" = "Copy the CLM workspace template into the intake folder"
                   "order" = 1
                   "outputs" = [
                     "folderId"
@@ -111,7 +88,7 @@ locals {
                     "note" = "Stored in the editor as one interpolated string. Each token appears wrapped in a dollar sign and braces."
                     "template" = "CLM-{year}-{contractId}"
                     "tokens" = {
-                      "contractId" = "static.trigger.form.<formField:contractId>"
+                      "contractId" = "static.trigger.metadata.contractId"
                       "year" = "static.workflow.createdAt__YYYY__"
                     }
                   }
@@ -125,7 +102,7 @@ locals {
                   "contextItems" = [
                     {
                       "type" = "variable"
-                      "value" = "trigger.form.<formField:contractPackage>.fileIds"
+                      "value" = "static.trigger.fileId"
                     }
                   ]
                   "eventSubType" = "default"
@@ -140,7 +117,7 @@ locals {
                     "template" = "Review Box file ID {fileIds} against the approved clause library in folder ID {clauseLibraryFolderId}. Produce a concise approval brief covering risk, clause deviations, responsible reviewers, and recommended standard or approved fallback. Treat Extract output as draft and require human validation."
                     "tokens" = {
                       "clauseLibraryFolderId" = "${box.folders.clauses}"
-                      "fileIds" = "static.trigger.form.<formField:contractPackage>.fileIds"
+                      "fileIds" = "static.trigger.fileId"
                     }
                   }
                   "name" = "CLM Contract Risk Triage"
@@ -156,7 +133,7 @@ locals {
                   "eventSubType" = "approval"
                   "fileId" = {
                     "type" = "variable"
-                    "value" = "static.trigger.form.<formField:contractPackage>.fileIds"
+                    "value" = "static.trigger.fileId"
                   }
                   "inviteAssigneesAsViewers" = true
                   "managers" = [
@@ -209,7 +186,7 @@ locals {
                 }
                 {
                   "authType" = "OAUTH2_CLIENT_CREDENTIALS_GRANT"
-                  "bodyBinding" = "form-trigger variables, see config/box/https-connectors.bcl#salesforceContractCreate.bodyImplementation"
+                  "bodyBinding" = "metadata-trigger variables, see config/box/https-connectors.bcl#salesforceContractCreate.bodyImplementation"
                   "branch" = "Approved"
                   "connectorId" = "<salesforceConnectorId>"
                   "connectorName" = "the Salesforce connector whose base URL is the org holding CLM_Contract__c"
@@ -218,7 +195,7 @@ locals {
                   "endpoint" = "services/data/v67.0/sobjects/CLM_Contract__c"
                   "endpointNote" = "Stored without a leading slash. The connector switch normalised this to match the reference outcome."
                   "eventSubType" = "call"
-                  "liveState" = "Proven end to end on 2026-07-22. A Form submission created a real CLM_Contract__c record and all ten mapped fields were verified on the Salesforce record. The published body is a CONCAT of 15 operands with 7 dynamic values, every dynamic value backed by a required Form field. Workflow status is Active."
+                  "liveState" = "The form-triggered variant of this POST was proven end to end on 2026-07-22: a Form submission created a real CLM_Contract__c record with all mapped fields verified on the Salesforce record. This packaged design replaces the Form trigger with a clmContract metadata trigger and re-sources every dynamic value from static.trigger.metadata.<field>. That metadata-triggered variant has not been re-verified live and must be re-tested before activation."
                   "method" = "POST"
                   "operation" = "salesforceContractCreate"
                   "order" = 6
@@ -226,35 +203,32 @@ locals {
                 }
               ]
               "testGate" = {
-                "duplicateSubmission" = "Updates the same record"
-                "firstSubmission" = "Creates one Salesforce record"
-                "rejectedSubmission" = "Makes no Salesforce request"
+                "firstTrigger" = "Creates one Salesforce record"
+                "rejectedValidation" = "Makes no Salesforce request"
+                "repeatTrigger" = "Creates a second record (POST is not idempotent); restore the external-ID upsert if dedup is required"
               }
               "trigger" = {
-                "eventSubType" = "submitted"
-                "formId" = "<newContractRequestFormId>"
-                "formName" = "New Contract Request"
-                "formUrl" = "${box.formUrl}"
-                "type" = "form"
+                "condition" = "clmContract metadata applied on a file with the Salesforce-required fields (contractId, contractType, counterparty, requesterEmail) populated"
+                "folderId" = "${box.folders.intake}"
+                "templateKey" = "clmContract"
+                "type" = "Metadata updated"
               }
               "variableSyntax" = {
-                "bindingIsByElementId" = "A form trigger addresses fields by form element ID, not by label. Rebuilding the Form breaks every binding below."
-                "formField" = "static.trigger.form.<formFieldId>"
-                "formUploadFileIds" = "static.trigger.form.<uploadFieldId>.fileIds"
-                "formUploadFolderId" = "static.trigger.form.<uploadFieldId>.folderId"
                 "freeTextField" = "Interpolates the token wrapped in a dollar sign and braces."
-                "note" = "Read verbatim from the live graph. Do not infer these tokens."
+                "metadataField" = "static.trigger.metadata.<key>"
+                "note" = "Metadata-trigger tokens. A metadata trigger yields the triggering file as static.trigger.fileId and each template value as static.trigger.metadata.<key>. The former form-trigger tokens were removed with the Form; these bindings replace them but have not been re-verified against a live metadata-triggered graph."
                 "priorOutcomeProperty" = "static.outcome_<outcomeId>.<property>"
                 "structuredField" = "Stores {\"type\":\"variable\",\"value\":\"<token>\"}."
+                "triggerFileId" = "static.trigger.fileId"
                 "workflowCreatedYear" = "static.workflow.createdAt__YYYY__"
                 "workflowProperty" = "static.workflow.<property>"
               }
               "verification" = {
                 "everPublished" = false
                 "liveStatus" = "DRAFT"
-                "method" = "Read-only inspection of the authenticated Box Automate editor's loaded workflow graph."
-                "note" = "Step order, types, and variable bindings below reproduce the live draft. Environment-specific workflow, form, folder, connector, credential, and user IDs are bound at provisioning time and are deliberately not stored here."
-                "verifiedAgainstLiveDraft" = "2026-07-22"
+                "method" = "Designed from the proven form-triggered live draft, then converted to a clmContract metadata trigger."
+                "note" = "The form-triggered variant was verified against the live draft on 2026-07-22 and proven end to end. This metadata-triggered variant is a redesign that has NOT been rebuilt or re-verified live. Trigger, file, and metadata bindings must be confirmed against a live metadata-triggered graph before activation. Environment-specific workflow, folder, connector, credential, and user IDs are bound at provisioning time and are deliberately not stored here."
+                "supersedesFormTrigger" = "2026-07-22 form-triggered live draft"
               }
             }
             {

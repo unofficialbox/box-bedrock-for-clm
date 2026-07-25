@@ -8,7 +8,7 @@
         <restricted>true</restricted>
         <valueSetDefinition>
             <sorted>false</sorted>
-            <value><fullName>Box Form</fullName><default>true</default><label>Box Form</label></value>
+            <value><fullName>Box Automate</fullName><default>true</default><label>Box Automate</label></value>
             <value><fullName>Manual</fullName><default>false</default><label>Manual</label></value>
             <value><fullName>API</fullName><default>false</default><label>API</label></value>
         </valueSetDefinition>

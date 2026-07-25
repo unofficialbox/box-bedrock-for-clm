@@ -88,7 +88,7 @@ locals {
               "target" = "Special_Terms_Risk_Notes__c"
             }
             {
-              "default" = "Box Form"
+              "default" = "Box Automate"
               "required" = true
               "source" = "recordSource"
               "target" = "Record_Source__c"
