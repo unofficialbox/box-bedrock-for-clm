@@ -1,0 +1,82 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "box-automate-agentic-orchestration-demo-manifest"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "documentation" = {
+            "architectureRendered" = "docs/diagrams/box-automate-agentic-orchestration-architecture.svg"
+            "architectureSource" = "docs/diagrams/box-automate-agentic-orchestration-architecture.mmd"
+            "flowRendered" = "docs/diagrams/box-automate-agentic-orchestration-flow.svg"
+            "flowSource" = "docs/diagrams/box-automate-agentic-orchestration-flow.mmd"
+            "gallery" = "output/html/02-box-automate-agentic-orchestration-gallery.html"
+            "guide" = "docs/operator/scenarios/box-automate-agentic-orchestration/README.md"
+            "portableGuide" = "output/html/01-box-automate-agentic-orchestration-guide.html"
+          }
+          "enterprise_id" = ""
+          "excludedFromPresenterPath" = [
+            "Salesforce Multi-Framework React"
+            "Databricks"
+            "AWS Bedrock AgentCore"
+            "Strands"
+          ]
+          "included" = [
+            "Box Apps"
+            "Box Automate"
+            "Box Extract"
+            "Box AI and Agentforce agents"
+            "Box metadata and tasks"
+            "Box Hubs"
+            "Box Doc Gen"
+            "Box Sign"
+            "Salesforce standard REST record upsert and lookup"
+            "human approval gates"
+          ]
+          "manifestVersion" = "1.0.0"
+          "presenterSurface" = "Box"
+          "provider" = "generic"
+          "provider_object_id" = "demo/box-automate-agentic-orchestration-demo-manifest"
+          "readiness" = {
+            "automate" = "keep-inactive-until-oauth-and-idempotency-tests-pass"
+            "boxSurfaces" = "build-and-validate-per-environment"
+            "repositoryState" = "Local deterministic fixture"
+            "salesforceRest" = "validate-standard-upsert-and-lookup-per-environment"
+            "sign" = "human-confirmation-required"
+            "targetState" = "Presenter-ready live"
+          }
+          "scenario" = {
+            "contractId" = "CLM-2026-0017"
+            "id" = "clm-box-automate-agentic-orchestration"
+            "name" = "Northstar CLM - Box Automate Agentic Orchestration"
+            "orchestrationModel" = "deterministic workflow with agentic enrichment"
+          }
+          "screenshots" = "output/screenshots/box-automate-agentic-orchestration/"
+        }
+        "metadata" = {
+          "artifactName" = "box-automate-agentic-orchestration-demo-manifest"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "demo/box-automate-agentic-orchestration-demo-manifest"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_demo_box-automate-agentic-orchestration-demo-manifest"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

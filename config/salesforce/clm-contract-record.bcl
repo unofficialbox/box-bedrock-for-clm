@@ -1,0 +1,176 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "clm-contract-record"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "fieldMappings" = [
+            {
+              "required" = true
+              "source" = "contractId"
+              "target" = "Contract_ID__c"
+              "validation" = "non-blank"
+            }
+            {
+              "required" = true
+              "source" = "requesterName"
+              "target" = "Requester_Name__c"
+            }
+            {
+              "required" = true
+              "source" = "requesterEmail"
+              "target" = "Requester_Email__c"
+            }
+            {
+              "required" = true
+              "source" = "counterparty"
+              "target" = "Counterparty__c"
+            }
+            {
+              "required" = true
+              "source" = "contractType"
+              "target" = "Contract_Type__c"
+            }
+            {
+              "required" = true
+              "source" = "dealValue"
+              "target" = "Deal_Value__c"
+            }
+            {
+              "required" = false
+              "source" = "termMonths"
+              "target" = "Term_Months__c"
+            }
+            {
+              "required" = true
+              "source" = "region"
+              "target" = "Region__c"
+            }
+            {
+              "required" = true
+              "source" = "dataCategory"
+              "target" = "Data_Category__c"
+            }
+            {
+              "required" = true
+              "source" = "targetSignatureDate"
+              "target" = "Target_Signature_Date__c"
+            }
+            {
+              "required" = true
+              "source" = "businessOwner"
+              "target" = "Business_Owner_Name__c"
+            }
+            {
+              "required" = false
+              "source" = "resolvedBusinessOwnerUserId"
+              "target" = "Business_Owner__c"
+              "validation" = "existing active Salesforce User"
+            }
+            {
+              "humanValidated" = true
+              "required" = false
+              "source" = "riskLevel"
+              "target" = "Risk_Level__c"
+            }
+            {
+              "required" = false
+              "source" = "specialTermsRiskNotes"
+              "target" = "Special_Terms_Risk_Notes__c"
+            }
+            {
+              "default" = "Box Automate"
+              "required" = true
+              "source" = "recordSource"
+              "target" = "Record_Source__c"
+            }
+          ]
+          "idempotency" = {
+            "externalId" = true
+            "field" = "Contract_ID__c"
+            "operation" = "upsert"
+            "rule" = "The Box workflow supplies contractId. Retries must return the existing record instead of creating a duplicate."
+            "unique" = true
+          }
+          "intakeIntegration" = {
+            "authentication" = "OAuth 2.0 through a Box Automate managed HTTPS connection"
+            "customApexRequired" = false
+            "operations" = [
+              {
+                "method" = "PATCH"
+                "name" = "salesforceContractUpsert"
+                "pathTemplate" = "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}"
+              }
+              {
+                "method" = "GET"
+                "name" = "salesforceContractLookup"
+                "pathTemplate" = "/services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c"
+              }
+            ]
+            "responseMapping" = {
+              "contractId" = "Contract_ID__c"
+              "recordId" = "Id"
+            }
+            "status" = "specified-pending-org-configuration"
+            "type" = "Salesforce standard REST API"
+          }
+          "label" = "CLM Contract"
+          "nameField" = {
+            "apiName" = "Name"
+            "type" = "Text"
+            "value" = "<counterparty> <contractType>"
+          }
+          "objectApiName" = "CLM_Contract__c"
+          "ownership" = {
+            "businessOwnerField" = "Business_Owner__c"
+            "defaultOwner" = "Authenticated integration user"
+            "externalSharingModel" = "Private"
+            "model" = "Standard OwnerId"
+            "sharingModel" = "Private"
+            "unresolvedBusinessOwnerField" = "Business_Owner_Name__c"
+          }
+          "pluralLabel" = "CLM Contracts"
+          "provider" = "generic"
+          "provider_object_id" = "salesforce/clm-contract-record"
+          "schemaVersion" = "1.0"
+          "security" = {
+            "browserWritableFields" = []
+            "documentsRemainIn" = "Box"
+            "integrationWritableFields" = "Only targets in fieldMappings"
+            "prohibited" = [
+              "contract file bytes"
+              "Box access tokens"
+              "connector secrets"
+              "unreviewed AI output"
+            ]
+          }
+        }
+        "metadata" = {
+          "artifactName" = "clm-contract-record"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "salesforce/clm-contract-record"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_salesforce_clm-contract-record"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

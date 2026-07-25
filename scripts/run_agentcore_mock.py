@@ -22,11 +22,11 @@ def read_clause_outcomes(path: Path) -> dict[str, dict[str, str]]:
         return {row["clauseArea"]: row for row in rows}
 
 
-def box_context() -> dict:
+def box_context(*, use_runtime: bool = True) -> dict:
     """Use this operator's bootstrap state when present, otherwise local fixtures."""
 
     state_path = ROOT / "config" / "runtime" / "bootstrap-state.json"
-    if state_path.exists():
+    if use_runtime and state_path.exists():
         box = read_json(state_path).get("box", {})
         return {
             "workspaceId": box.get("folders", {}).get("workspace", "runtime-workspace"),
@@ -60,11 +60,11 @@ def event(agent: str, action: str, status: str, details: dict) -> dict:
     }
 
 
-def main() -> None:
+def main(*, use_runtime: bool = True) -> None:
     records = read_json(ROOT / "output" / "json" / "northstar-clm-records.json")
     playbook = read_json(ROOT / "output" / "json" / "clause-playbook.json")
     outcomes = read_clause_outcomes(ROOT / "output" / "csv" / "historical-clause-outcomes.csv")
-    box = box_context()
+    box = box_context(use_runtime=use_runtime)
 
     contract = records["contract"]
     opportunity = records["salesforceOpportunity"]

@@ -4,7 +4,7 @@
 
 | Agent | Trigger | Primary Function | Human Escalation Points |
 |-------|---------|------------------|-------------------------|
-| Contract Intake Agent | Box Form or Salesforce opportunity reaches contract stage | Create workspace, validate package, apply metadata | Missing request details, conflicting deal data |
+| Contract Intake Agent | Box contract metadata applied, or Salesforce opportunity reaches contract stage | Create workspace, validate package, apply metadata | Missing request details, conflicting deal data |
 | Clause Risk Agent | Contract or redline uploaded to Box | Compare clauses to playbook and score risk | Non-standard language, high-risk fallback, low confidence |
 | Approval Routing Agent | Risk report complete | Determine required approvers and route tasks | Approval conflict, SLA breach, exception request |
 | Obligation Monitor Agent | Contract executed | Extract obligations and create renewal/notice tasks | Ambiguous obligation, owner not found |

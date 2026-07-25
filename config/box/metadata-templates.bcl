@@ -1,0 +1,364 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "metadata-templates"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "provider" = "generic"
+          "provider_object_id" = "box/metadata-templates"
+          "templates" = [
+            {
+              "displayName" = "CLM Contract"
+              "fields" = [
+                {
+                  "key" = "contractId"
+                  "type" = "string"
+                }
+                {
+                  "key" = "counterparty"
+                  "type" = "string"
+                }
+                {
+                  "key" = "requesterEmail"
+                  "type" = "string"
+                }
+                {
+                  "key" = "contractType"
+                  "options" = [
+                    "MSA Package"
+                    "DPA"
+                    "SOW"
+                    "Order Form"
+                    "Procurement Agreement"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "status"
+                  "options" = [
+                    "Intake"
+                    "Legal Review"
+                    "Business Review"
+                    "Approved"
+                    "Signature"
+                    "Executed"
+                    "Obligations Active"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "dealValue"
+                  "type" = "float"
+                }
+                {
+                  "key" = "termMonths"
+                  "type" = "float"
+                }
+                {
+                  "key" = "region"
+                  "options" = [
+                    "US"
+                    "EU"
+                    "APAC"
+                    "Global"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "dataCategory"
+                  "options" = [
+                    "None"
+                    "Personal Data"
+                    "PHI"
+                    "Financial Data"
+                    "Confidential"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "owner"
+                  "type" = "string"
+                }
+                {
+                  "key" = "legalReviewer"
+                  "type" = "string"
+                }
+                {
+                  "key" = "riskLevel"
+                  "options" = [
+                    "Low"
+                    "Medium"
+                    "High"
+                    "Critical"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "targetSignatureDate"
+                  "type" = "date"
+                }
+                {
+                  "key" = "renewalDate"
+                  "type" = "date"
+                }
+                {
+                  "key" = "noticeDeadline"
+                  "type" = "date"
+                }
+              ]
+              "templateKey" = "clmContract"
+            }
+            {
+              "displayName" = "CLM Document"
+              "fields" = [
+                {
+                  "key" = "documentType"
+                  "options" = [
+                    "MSA"
+                    "DPA"
+                    "SOW"
+                    "Order Form"
+                    "Security Exhibit"
+                    "Insurance"
+                    "Approval Memo"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "versionStatus"
+                  "options" = [
+                    "Draft"
+                    "Redline"
+                    "Approved"
+                    "Executed"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "clauseRisk"
+                  "options" = [
+                    "Low"
+                    "Medium"
+                    "High"
+                    "Critical"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "aiSummaryStatus"
+                  "options" = [
+                    "Not Started"
+                    "Complete"
+                    "Needs Review"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "approvalStatus"
+                  "options" = [
+                    "Not Required"
+                    "Pending"
+                    "Approved"
+                    "Rejected"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "signatureStatus"
+                  "options" = [
+                    "Not Required"
+                    "Pending"
+                    "Signed"
+                  ]
+                  "type" = "enum"
+                }
+              ]
+              "templateKey" = "clmDocument"
+            }
+            {
+              "displayName" = "CLM Obligation"
+              "fields" = [
+                {
+                  "key" = "obligationType"
+                  "options" = [
+                    "Renewal Notice"
+                    "SLA Report"
+                    "Security Evidence"
+                    "Data Deletion"
+                    "Insurance"
+                    "Billing"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "owner"
+                  "type" = "string"
+                }
+                {
+                  "key" = "dueDate"
+                  "type" = "date"
+                }
+                {
+                  "key" = "sourceClause"
+                  "type" = "string"
+                }
+                {
+                  "key" = "status"
+                  "options" = [
+                    "Open"
+                    "In Progress"
+                    "Complete"
+                    "Escalated"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "reminderWindowDays"
+                  "type" = "float"
+                }
+              ]
+              "templateKey" = "clmObligation"
+            }
+            {
+              "displayName" = "CLM Clause"
+              "fields" = [
+                {
+                  "key" = "clauseId"
+                  "type" = "string"
+                }
+                {
+                  "key" = "clauseFamily"
+                  "options" = [
+                    "Limitation of Liability"
+                    "Payment Terms"
+                    "Data Processing"
+                    "SLA Credits"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "position"
+                  "options" = [
+                    "Standard"
+                    "Approved Fallback"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "approvalStatus"
+                  "options" = [
+                    "Approved"
+                    "Under Review"
+                    "Retired"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "owner"
+                  "type" = "string"
+                }
+                {
+                  "key" = "jurisdiction"
+                  "options" = [
+                    "Global"
+                    "US"
+                    "EU"
+                    "APAC"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "lastReviewed"
+                  "type" = "date"
+                }
+                {
+                  "key" = "nextReview"
+                  "type" = "date"
+                }
+                {
+                  "key" = "usageCount"
+                  "type" = "float"
+                }
+              ]
+              "templateKey" = "clmClause"
+            }
+            {
+              "displayName" = "CLM Redline Review"
+              "fields" = [
+                {
+                  "key" = "baselineItemId"
+                  "type" = "string"
+                }
+                {
+                  "key" = "comparisonStatus"
+                  "options" = [
+                    "Not Started"
+                    "Processing"
+                    "Needs Triage"
+                    "Routed"
+                    "Complete"
+                    "Failed"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "findingCount"
+                  "type" = "float"
+                }
+                {
+                  "key" = "highestRisk"
+                  "options" = [
+                    "Low"
+                    "Medium"
+                    "High"
+                    "Critical"
+                  ]
+                  "type" = "enum"
+                }
+                {
+                  "key" = "reviewDomains"
+                  "type" = "string"
+                }
+                {
+                  "key" = "openTaskCount"
+                  "type" = "float"
+                }
+                {
+                  "key" = "lastCompared"
+                  "type" = "date"
+                }
+              ]
+              "status" = "specified-not-live"
+              "templateKey" = "clmRedlineReview"
+            }
+          ]
+        }
+        "metadata" = {
+          "artifactName" = "metadata-templates"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/metadata-templates"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_metadata-templates"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

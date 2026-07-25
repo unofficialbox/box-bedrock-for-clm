@@ -39,8 +39,18 @@ From the repository root:
 python3 scripts/demo_operator.py salesforce-deploy --dry-run
 python3 scripts/demo_operator.py salesforce-deploy
 ```
-
 This deploys the object, fields, layout, operator and integration permission sets, tab, and UI Bundle. It then assigns `CLM_Demo_Operator` to the authenticated operator. Environment-specific OAuth metadata is intentionally not included.
+
+## Salesforce sample data (packageable)
+
+The `sample-data/` folder captures a deterministic CLM dataset (Accounts, Contacts, Opportunities, Contracts) plus an idempotent Apex seed and a BCL manifest.
+
+- Idempotent Apex seed (source of truth):
+  - `./scripts/seed-clm-sample-data.sh <orgAlias>`
+- BCL manifest (descriptive; not read at seed time):
+  - `sample-data/clm-sample-records.bcl`
+
+This lets each environment load the same contract relationships and record shape before demo setup.
 
 ## Integration user
 

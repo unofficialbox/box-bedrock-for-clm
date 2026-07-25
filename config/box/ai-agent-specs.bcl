@@ -1,0 +1,100 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "agents" = [
+            {
+              "humanGate" = "Review Needs Triage findings and expert routing before task creation"
+              "instructions" = "Compare the counterparty redline with the approved baseline and clause library. Return only findings supported by citations to both the changed document and approved position. Use allowed domain and risk values. Never invent a reviewer, login, clause, or approval. Mark low-confidence and unclassified findings Needs Triage."
+              "key" = "redline-difference-router"
+              "name" = "CLM Redline Difference Router"
+              "outputSchema" = "config/clm/redline-finding.schema.bcl"
+              "sources" = [
+                "file:${box.files.msaRedline}"
+                "folder:${box.folders.clauses}"
+              ]
+            }
+            {
+              "humanGate" = "Validate extracted contract record"
+              "instructions" = "Review the submitted package against approved clause files and extracted metadata. Return a concise risk level, three material deviations, required review teams, and evidence item IDs. Never approve language or infer missing commercial terms."
+              "key" = "contract-risk-triage"
+              "name" = "CLM Contract Risk Triage"
+              "output" = [
+                "riskLevel"
+                "materialDeviations"
+                "requiredReviewers"
+                "evidenceItemIds"
+              ]
+              "sources" = [
+                "folder:${box.folders.workspace}"
+                "folder:${box.folders.clauses}"
+              ]
+            }
+            {
+              "humanGate" = "Confirm approval brief and remaining deviations"
+              "instructions" = "Summarize resolved and unresolved deviations, completed human review tasks, business impact, and recommended next human action. Cite Box file and clause IDs. Never state that a contract is approved."
+              "key" = "approval-brief"
+              "name" = "CLM Approval Brief"
+              "output" = [
+                "executiveSummary"
+                "resolvedItems"
+                "openItems"
+                "recommendedAction"
+                "evidenceItemIds"
+              ]
+              "sources" = [
+                "folder:${box.folders.workspace}"
+                "folder:${box.folders.clauses}"
+              ]
+            }
+            {
+              "humanGate" = "Validate extracted obligations"
+              "instructions" = "Review extracted obligations from the executed package. Deduplicate equivalent duties, flag missing owners or dates, and return structured records for human validation. Do not create calendar commitments or contact external parties."
+              "key" = "obligation-review"
+              "name" = "CLM Obligation Review"
+              "output" = [
+                "obligations"
+                "missingOwners"
+                "missingDates"
+                "sourceEvidence"
+              ]
+              "sources" = [
+                "folder:${box.folders.executed}"
+              ]
+            }
+          ]
+          "artifact_name" = "ai-agent-specs"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "provider" = "generic"
+          "provider_object_id" = "box/ai-agent-specs"
+          "schemaVersion" = "2.0"
+        }
+        "metadata" = {
+          "artifactName" = "ai-agent-specs"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "box/ai-agent-specs"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_box_ai-agent-specs"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

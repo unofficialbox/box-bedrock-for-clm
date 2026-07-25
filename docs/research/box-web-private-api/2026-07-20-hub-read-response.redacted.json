@@ -1,0 +1,8 @@
+{
+  "status": 200,
+  "hubShape": ["id", "document", "documentVersionId", "documentVersionNumber", "permissions", "bannerImage", "iconImage", "publishedAt", "publishedBy"],
+  "documentEncoding": "base64-encoded binary",
+  "documentIsPlainJson": false,
+  "mutationAttempted": false,
+  "credentialExported": false
+}

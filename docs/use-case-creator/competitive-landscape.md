@@ -24,7 +24,7 @@ This demo should position Box + AWS as a composable CLM intelligence layer, not 
 |------------|-----------|
 | Content system of record | Stores drafts, redlines, exhibits, executed agreements, and supporting evidence |
 | Box Apps | Creates dashboard-like CLM experience without custom app build |
-| Box Forms | Standardizes contract intake |
+| Box Automate | Standardizes contract intake via metadata-triggered workflows |
 | Box Metadata | Makes contract packages queryable and automatable |
 | Box AI | Summarizes, compares, and extracts from contract content |
 | Box Sign | Keeps execution in the same content package |

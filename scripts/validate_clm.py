@@ -258,7 +258,7 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             module = load_script("run_agentcore_mock", root)
             module.OUT = temporary / f"trace-{index}"
             module.OUT.mkdir(parents=True, exist_ok=True)
-            module.main()
+            module.main(use_runtime=False)
             trace_runs.append(module.OUT / "northstar-agentcore-trace.json")
         committed_trace = root / "output" / "agentcore" / "northstar-agentcore-trace.json"
         if normalized_trace(trace_runs[0]) != normalized_trace(trace_runs[1]) or normalized_trace(trace_runs[0]) != normalized_trace(committed_trace):
@@ -303,17 +303,32 @@ def check_generated_presenters(root: Path = ROOT) -> str:
             module = load_script(name, root)
             module.OUTPUT = output / filename
             module.build()
-        expected = {f"{index:02d}" for index in range(9)}
-        generated = {path.name[:2] for path in output.glob("*.html")}
+        module = load_script("build_presenter_portal", root)
+        module.OUTPUT = output
+        module.build()
+        expected = {
+            "index.html",
+            "00-operator-setup-guide.html",
+            "01-box-automate-agentic-orchestration-guide.html",
+            "02-box-automate-agentic-orchestration-gallery.html",
+            "03-cross-platform-agentic-orchestration-guide.html",
+            "04-cross-platform-agentic-orchestration-gallery.html",
+            "05-executive-marketecture.html",
+            "06-agentcore-agent-experience-marketecture.html",
+            "07-customer-solution-datasheet.html",
+            "08-contract-lifecycle-readiness-marketecture.html",
+            "09-complete-presenter-edition.html",
+        }
+        generated = {path.name for path in output.glob("*.html")}
         if generated != expected:
-            raise ValidationError(f"Presenter output order is incomplete: {sorted(generated)}")
+            raise ValidationError(f"Presenter output set is incomplete: {sorted(generated)}")
         drift = [
             path.name for path in sorted(output.glob("*.html"))
             if path.read_bytes() != (root / "output" / "html" / path.name).read_bytes()
         ]
         if drift:
             raise ValidationError("Generated presenter drift:\n" + "\n".join(drift))
-    return "9 deterministic self-contained HTML files"
+    return "9 standalone chapters, 1 landing page, and 1 self-contained combined edition"
 
 
 class PortableResourceParser(HTMLParser):
@@ -411,8 +426,8 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
             failures.append(f"{entry.get('path')}: readiness must be real-demo")
 
     html_paths = sorted((root / "output" / "html").glob("*.html"))
-    if len(html_paths) != 9:
-        failures.append(f"expected 9 HTML outputs, found {len(html_paths)}")
+    if len(html_paths) != 11:
+        failures.append(f"expected 11 HTML outputs, found {len(html_paths)}")
     for path in html_paths:
         parser = PortableResourceParser()
         parser.feed(path.read_text(encoding="utf-8"))
@@ -420,7 +435,7 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
             failures.append(f"{path.relative_to(root)}: external asset reference")
     if failures:
         raise ValidationError("Manifest, screenshot, or portability failures:\n" + "\n".join(failures))
-    return f"2 scenarios, {len(entries)} current real screenshots, 9 portable HTML files"
+    return f"2 scenarios, {len(entries)} current real screenshots, 11 portable HTML files"
 
 
 def check_reset_and_idempotency_contract(root: Path = ROOT) -> str:

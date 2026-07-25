@@ -13,7 +13,7 @@ OUTPUT = ROOT / "output" / "html" / "08-contract-lifecycle-readiness-marketectur
 BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 STAGES = (
-    ("01", "Contract Intake", "Capture the request, establish ownership, and create the governed contract workspace.", "Intake may begin in Box Forms or the contract workspace; Box Automate starts the governed process."),
+    ("01", "Contract Intake", "Capture the request, establish ownership, and create the governed contract workspace.", "Intake begins when contract metadata is applied in Box; Box Automate starts the governed process."),
     ("02", "Classification & Enrichment", "Extract terms, apply metadata, and connect commercial context.", "Extracted values are validated before governed metadata and commercial records are updated."),
     ("03", "Clause & Redline Analysis", "Compare approved language, explain deviations, and route domain exceptions.", "Cited differences are mapped to Legal, Finance, Privacy, Security, or another named domain expert."),
     ("04", "Cross-Source Commercial Validation", "Reconcile contract terms with governed business and analytical context.", "Box content, Salesforce context, and Databricks signals are compared without changing system authority."),
@@ -57,7 +57,7 @@ LANES = (
         "name": "Box",
         "class": "box",
         "summary": "Governed contract content: requests, drafts, clauses, redlines, executed agreements, tasks, and audit history.",
-        "technical": "Box Forms and Automate trigger Extract and Box Agent steps; metadata, tasks, versions, Hubs, Apps, and retention remain native.",
+        "technical": "Box metadata and Automate trigger Extract and Box Agent steps; metadata, tasks, versions, Hubs, Apps, and retention remain native.",
         "cells": (
             ("Governed intake", "Form request, files, metadata, ownership, and access."),
             ("Content organization", "Classification, extracted terms, and contract workspace."),

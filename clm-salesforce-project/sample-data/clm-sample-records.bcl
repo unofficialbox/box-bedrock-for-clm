@@ -1,0 +1,127 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+# Descriptive spec for the CLM Salesforce sample records. The executable source
+# of truth is ../scripts/seed-clm-salesforce-sample-data.apex; this file mirrors
+# those values for packaging and is not read at seed time.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-24T18:16:00Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "accounts" = [
+            {
+              "industry" = "Healthcare"
+              "name" = "Northstar Health"
+              "phone" = "(212) 555-0101"
+              "website" = "https://www.northstar.example"
+            }
+            {
+              "industry" = "Technology"
+              "name" = "Acme Cloudworks"
+              "phone" = "(213) 555-0102"
+              "website" = "https://www.acmecloudworks.example"
+            }
+          ]
+          "artifact_name" = "clm-sample-records"
+          "artifact_type" = "config"
+          "contacts" = [
+            {
+              "account" = "Northstar Health"
+              "email" = "alex.mendoza@northstar.example"
+              "firstName" = "Alex"
+              "lastName" = "Mendoza"
+            }
+            {
+              "account" = "Acme Cloudworks"
+              "email" = "sarah.kim@acmecloudworks.example"
+              "firstName" = "Sarah"
+              "lastName" = "Kim"
+            }
+          ]
+          "contracts" = [
+            {
+              "businessOwner" = "Northstar Master Contract Owner"
+              "contractId" = "CLM-SAMPLE-NST-001"
+              "contractType" = "MSA Package"
+              "counterparty" = "Northstar Health"
+              "counterpartyAccount" = "Northstar Health"
+              "dataCategory" = "None"
+              "dealValue" = 250000
+              "name" = "Northstar Health Master Service Agreement 2026"
+              "opportunity" = "Northstar Master Service Agreement 2026"
+              "recordSource" = "Manual"
+              "region" = "US"
+              "requesterEmail" = "alex.mendoza@northstar.example"
+              "requesterName" = "Alex Mendoza"
+              "riskLevel" = "Medium"
+              "riskNotes" = "Sample contract record for demo use only."
+              "status" = "Intake"
+              "targetSignatureDateOffsetMonths" = 5
+              "termMonths" = 36
+            }
+            {
+              "businessOwner" = "Acme Cloud Contract Owner"
+              "contractId" = "CLM-SAMPLE-ACM-001"
+              "contractType" = "SOW"
+              "counterparty" = "Acme Cloudworks"
+              "counterpartyAccount" = "Acme Cloudworks"
+              "dataCategory" = "Confidential"
+              "dealValue" = 120000
+              "name" = "Acme Cloudworks Cloud Security Expansion 2026"
+              "opportunity" = "Acme Cloudworks Cloud Security Expansion 2026"
+              "recordSource" = "Manual"
+              "region" = "Global"
+              "requesterEmail" = "sarah.kim@acmecloudworks.example"
+              "requesterName" = "Sarah Kim"
+              "riskLevel" = "Medium"
+              "riskNotes" = "Sample contract record for demo use only."
+              "status" = "Intake"
+              "targetSignatureDateOffsetMonths" = 6
+              "termMonths" = 24
+            }
+          ]
+          "created_at" = "2026-07-24T18:16:00Z"
+          "enterprise_id" = ""
+          "opportunities" = [
+            {
+              "account" = "Northstar Health"
+              "amount" = 250000
+              "closeDateOffsetMonths" = 5
+              "name" = "Northstar Master Service Agreement 2026"
+              "stage" = "Prospecting"
+            }
+            {
+              "account" = "Acme Cloudworks"
+              "amount" = 120000
+              "closeDateOffsetMonths" = 6
+              "name" = "Acme Cloudworks Cloud Security Expansion 2026"
+              "stage" = "Qualification"
+            }
+          ]
+          "provider" = "generic"
+          "provider_object_id" = "salesforce/clm-sample-records"
+        }
+        "metadata" = {
+          "artifactName" = "clm-sample-records"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-24T18:16:00Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "salesforce/clm-sample-records"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_salesforce_clm-sample-records"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

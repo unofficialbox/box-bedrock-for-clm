@@ -10,7 +10,7 @@ Use a dedicated custom object:
 CLM_Contract__c
 ```
 
-Do not overload Salesforce `Contract`, Opportunity, or an org-specific managed CLM object. The demo needs a portable structured record without introducing an Account, Opportunity, quote, or managed-package dependency.
+Do not overload Salesforce `Contract` or org-specific managed CLM objects. The demo keeps `CLM_Contract__c` as the authoritative structured record and links to existing standard Account and Opportunity records for business context.
 
 ## Ownership and sharing
 
@@ -18,7 +18,7 @@ Do not overload Salesforce `Contract`, Opportunity, or an org-specific managed C
 |---|---|
 | Record owner | Standard `OwnerId`; authenticated integration user owns new records unless an approved assignment rule changes ownership |
 | Business owner | Optional `Business_Owner__c` lookup to an active Salesforce User |
-| Unresolved business owner | Preserve the validated Form value in `Business_Owner_Name__c`; do not create or guess a User |
+| Unresolved business owner | Preserve the validated metadata value in `Business_Owner_Name__c`; do not create or guess a User |
 | Internal sharing | Private |
 | External sharing | Private |
 | Access grant | Permission set plus the intended Lightning/Experience sharing configuration |
@@ -33,23 +33,26 @@ Do not overload Salesforce `Contract`, Opportunity, or an org-specific managed C
 
 ## System-of-record boundary
 
-Salesforce stores validated structured context and Box references. Contract files, clauses, versions, review evidence, generated documents, signatures, and content audit history remain in Box.
+Salesforce stores validated structured context and ownership metadata. Contract files, clauses, versions, review evidence, generated documents, signatures, and content audit history remain in Box.
 
 ## Field groups
 
 | Group | Fields |
 |---|---|
 | Identity | `Contract_ID__c`, `Name`, `Record_Source__c` |
-| Intake | `Requester_Name__c`, `Requester_Email__c`, `Counterparty__c`, `Contract_Type__c`, `Deal_Value__c`, `Term_Months__c`, `Region__c`, `Data_Category__c`, `Target_Signature_Date__c`, `Special_Terms_Risk_Notes__c` |
+| Intake | `Requester_Name__c`, `Requester_Email__c`, `Counterparty__c`, `Counterparty_Account__c`, `Opportunity__c`, `Contract_Type__c`, `Deal_Value__c`, `Term_Months__c`, `Region__c`, `Data_Category__c`, `Target_Signature_Date__c`, `Special_Terms_Risk_Notes__c` |
 | Ownership | `OwnerId`, `Business_Owner__c`, `Business_Owner_Name__c` |
-| Lifecycle | `Status__c`, `Risk_Level__c`, `Latest_Routing_Status__c`, `Open_Review_Task_Count__c`, `Last_Box_Sync__c` |
-| Box references | `Box_Workspace_Folder_ID__c`, `Box_Workspace_URL__c`, `Box_Intake_File_ID__c`, `Box_Redline_File_ID__c`, `Intake_Workflow_Run_ID__c` |
+| Lifecycle | `Status__c`, `Risk_Level__c` |
 
-Machine-readable mapping: `config/salesforce/clm-contract-record.json`.
+Machine-readable mapping: `config/salesforce/clm-contract-record.bcl`.
 
 Deployable metadata: `clm-salesforce-project/force-app/main/default/objects/CLM_Contract__c/`.
 
 ## Intake integration
+
+> **Proven live path vs. design target.** The workflow uses a plain **POST** create to the sobject collection (`services/data/{apiVersion}/sobjects/CLM_Contract__c`), captured in `config/box/https-connectors.bcl` as `salesforceContractCreate`. This POST was proven end to end on 2026-07-22 — but via the now-removed Box Form trigger. Intake is now sourced from the `clmContract` metadata trigger (`static.trigger.metadata.<key>`), and that metadata-triggered variant has not been re-verified live. The POST is **not idempotent**: a resubmission creates a second record. The external-ID **PATCH upsert** described below is the duplicate-safe *design target*; it is not currently the live path. Restore it — and re-verify against a live run — only if duplicate safety is required. See the duplicate-safety note in `docs/operator/agent-takeover-handoff.md`.
+
+The duplicate-safe design is an upsert by external ID:
 
 ```text
 PATCH /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}
@@ -60,7 +63,7 @@ No custom Apex REST service is required for intake. The approved Box Automate br
 An insert can return a record ID, while a successful update can return `204 No Content`. Therefore, the next workflow step retrieves the record through the same external-ID resource:
 
 ```text
-GET /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c,Box_Workspace_Folder_ID__c
+GET /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c
 ```
 
 Response mapping:
@@ -68,10 +71,11 @@ Response mapping:
 ```json
 {
   "recordId": "Id",
-  "contractId": "Contract_ID__c",
-  "boxFolderId": "Box_Workspace_Folder_ID__c"
+  "contractId": "Contract_ID__c"
 }
 ```
+
+`Counterparty_Account__c` and `Opportunity__c` are not part of the intake path: the intake metadata supplies no Account or Opportunity ID, so the connector neither writes nor reads them. They are populated on the record by the packaged sample data or by manual entry, and the connector's `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
 
 The Box Automate integration must:
 
@@ -83,13 +87,13 @@ The Box Automate integration must:
 6. Look up and return the same record on retry.
 7. Never accept contract bytes, access tokens, connector secrets, or unreviewed AI output.
 
-SOQL is not required for this path. If the Box Automate builder cannot retrieve by external ID, a second standard REST query operation may select `Id`, `Contract_ID__c`, and `Box_Workspace_Folder_ID__c` by the generated contract ID.
+SOQL is not required for this path. If the Box Automate builder cannot retrieve by external ID, a second standard REST query operation may select `Id` and `Contract_ID__c` by the generated contract ID.
 
-## Form and Extract mapping
+## Metadata and Extract mapping
 
-The authoritative mapping is the `fieldMappings` array in `config/salesforce/clm-contract-record.json`. Key rules:
+The authoritative mapping is the `fieldMappings` array in `config/salesforce/clm-contract-record.bcl`. Key rules:
 
-- Form values are written only after the Box human-validation gate.
+- Metadata values are written only after the Box human-validation gate.
 - `riskLevel` is written only when a human validated the Extract/AI result.
 - `boxFolderId` must be the allowlisted workspace associated with the intake.
 - `boxFolderUrl` must use the hostname recorded for the target Box enterprise.

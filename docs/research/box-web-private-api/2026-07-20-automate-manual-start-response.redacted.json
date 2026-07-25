@@ -1,0 +1,36 @@
+{
+  "captureDate": "2026-07-20",
+  "surface": "Box Automate",
+  "labTitle": "CLM Surface API Lab - Automate Manual Start Graph",
+  "firstExecutorResult": {
+    "outcome": "updated",
+    "status": "INACTIVE",
+    "triggerCount": 1,
+    "outcomeCount": 0,
+    "gatewayCount": 0,
+    "edgeCount": 1
+  },
+  "secondExecutorResult": {
+    "outcome": "unchanged",
+    "status": "INACTIVE",
+    "triggerCount": 1,
+    "outcomeCount": 0,
+    "gatewayCount": 0,
+    "edgeCount": 1
+  },
+  "browserReadBack": {
+    "titleVisible": true,
+    "draftVisible": true,
+    "manualStartVisible": true,
+    "runtimeFolderNameVisible": true
+  },
+  "consequentialActions": {
+    "published": false,
+    "activated": false,
+    "shared": false,
+    "run": false,
+    "deleted": false
+  },
+  "identifiersRedacted": true,
+  "credentialsExported": false
+}

@@ -7,7 +7,7 @@ Use this guide to build the demo in a **new Box enterprise and Salesforce org**.
 | Automated | Administrator or browser work |
 |---|---|
 | Generate synthetic contracts and Doc Gen templates | Confirm product licenses and administrator access |
-| Create the Box workspace folders | Build Box Form, App, Hub, and Automate workflows |
+| Create the Box workspace folders | Build Box App, Hub, and Automate workflows |
 | Create Box metadata templates and apply deterministic dashboard seed data | Select real reviewers and verify seeded values |
 | Upload the contract package and Doc Gen templates | Configure protected OAuth credentials |
 | Deploy the Salesforce object, fields, layout, permissions, tab, and UI Bundle | Create/configure Agentforce and optional cloud services |
@@ -35,12 +35,28 @@ Have the administrators complete the [product and permission checklist](entitlem
 
 Do not place client secrets, access tokens, private keys, or passwords in this repository.
 
-Install the repository validation dependencies once:
+Install repository dependencies and seed runtime config in one step:
 
 ```bash
-python3 -m pip install -r requirements-dev.txt
-npm install --global @mermaid-js/mermaid-cli@11.12.0
-npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/setup_clm_dev.py
+```
+
+For non-interactive runs:
+
+```bash
+python3 scripts/setup_clm_dev.py --automated
+```
+
+To pull Box and Salesforce values from your logged-in CLIs:
+
+```bash
+python3 scripts/setup_clm_dev.py --automated --from-current-clis
+```
+
+For a quick non-invasive onboarding check, run:
+
+```bash
+python3 scripts/setup_clm_dev.py --smoke
 ```
 
 ## 3. Create local configuration
@@ -51,7 +67,13 @@ From the repository root:
 cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json
 ```
 
-Fill only the values you know initially:
+Fill only the values you know initially. If you are already authenticated to Box and Salesforce, you can skip most of this and auto-fill from CLIs:
+
+```bash
+python3 scripts/setup_clm_dev.py --automated --from-current-clis --pet off
+```
+
+If you prefer, fill only initial values first:
 
 - `box.parentFolderId`: the Box folder under which the demo may be created; use `0` only when the operator's root is appropriate.
 - `box.enterpriseId`: copy the authenticated enterprise ID from the Box administrator.
@@ -77,6 +99,29 @@ sf org display --target-org <your-clm-org-alias>
 If your organization requires a Box JWT or client-credentials application, have the Box administrator configure it from a secret file stored **outside** this repository, then select that CLI environment. Confirm the authenticated Box user can create folders and enterprise metadata templates.
 
 Then run:
+
+```bash
+python3 scripts/demo_operator.py doctor
+```
+
+For the most common operator path after config seeding, use:
+
+```bash
+python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run
+```
+
+and when approvals are confirmed:
+
+```bash
+python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes
+```
+
+The one-shot `bootstrap` command always checks pre-requisites, avoids duplicates, and only creates missing resources.
+
+Expected result from `bootstrap` preview: no external writes.
+Expected result from confirmed apply: phase-by-phase status lines and a completion summary.
+
+You can still run:
 
 ```bash
 python3 scripts/demo_operator.py doctor
@@ -122,19 +167,33 @@ Follow [Browser and administrator configuration](browser-configuration.md) in or
 
 Stop and obtain explicit owner approval immediately before any final **Publish**, **Share**, **Activate**, **Generate**, or **Send** action.
 
-## 6. Validate and rehearse
+## 6. Validate, finalize, and rehearse
 
-After recording the published App, Form, and Hub URLs in `demo-environment.json`:
+Run the final lock-down phase after browser/admin handoff:
 
 ```bash
-python3 scripts/demo_operator.py resolve-config
+python3 scripts/demo_operator.py resolve-config --allow-unresolved
 python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
 python3 scripts/validate_clm.py
 ```
 
-Then run the [integrated smoke test](smoke-test.md). Do not present the environment as ready until the selected scenario passes its checklist.
+If you are running Cross-Platform Agentic Orchestration, also run:
 
-After the full live smoke test, copy `config/runtime/validation-receipts.example.json` to `config/runtime/validation-receipts.json`, replace every example with current external run-log evidence, and run `python3 scripts/validate_clm.py --presenter-ready`. The receipt file is ignored by Git and must not contain credentials.
+```bash
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
+```
+
+Then run the [integrated smoke test](smoke-test.md). Do not present as ready until that smoke test passes.
+
+After smoke test, capture receipts and complete [Finalization](final-phase.md):
+
+```bash
+cp config/runtime/validation-receipts.example.json config/runtime/validation-receipts.json
+```
+
+Do not present the environment as ready until [Finalization](final-phase.md) documents passing `python3 scripts/validate_clm.py --presenter-ready`.
+
+The receipt file is ignored by Git and must not contain credentials.
 
 ## 7. Present with tell/show/tell
 
@@ -149,7 +208,10 @@ Each step tells the audience what matters, shows one visible proof, then explain
 
 ![Fresh-environment setup flow](../diagrams/operator-setup-flow.svg)
 
+- [CLM configuration workflow (manual steps in red)](../diagrams/clm-configuration-workflow.svg)
 - [Diagram source](../diagrams/operator-setup-flow.mmd)
+- [Configuration workflow source](../diagrams/clm-configuration-workflow.mmd)
+- [Finalization checklist](final-phase.md)
 - [Manual-task register](manual-task-register.md)
-- [Machine-readable operator workflow](../../config/operator/operator-workflow.json)
+- [Machine-readable operator workflow](../../config/operator/operator-workflow.bcl)
 - [AI-assisted operator protocol](AI-OPERATOR.md)

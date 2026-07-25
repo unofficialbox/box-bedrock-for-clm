@@ -4,7 +4,7 @@
 
 | Control Area | Box | Agentforce | React UI Bundle | Human Owner |
 |---|---|---|---|---|
-| Intake | Form, files, metadata, Automate | Explain extracted values and package gaps | Show request and contract context | Validate Extract and AI output |
+| Intake | Files, `clmContract` metadata, Automate | Explain extracted values and package gaps | Show request and contract context | Validate Extract and AI output |
 | Clause review | Versioned contracts and approved clause Hub | Compare redlines with source citations and emit structured findings | Present before/after language and fallback position | Select or approve legal position |
 | Expert routing | Review tasks and collaborator permissions | Classify domains; resolve experts only from the maintained directory | Group findings into one review queue item per domain | Legal Operations owns exceptions; named experts own decisions |
 | Approvals | Tasks, due dates, decision history | Explain blockers and prepare drafts | Show expert, task, risk, and approval readiness | Complete assigned review tasks |
@@ -16,7 +16,7 @@
 
 | Requirement | Implementation | System |
 |---|---|---|
-| Capture required fields | Published New Contract Request form | Box Forms |
+| Capture required fields | Apply the `clmContract` metadata template (contractId, contractType, counterparty, requesterEmail) when uploading to `01 - Intake` | Box metadata / Automate |
 | Preserve source files | Upload into intake folder without overwriting | Box |
 | Extract candidate values | Enhanced Extract Agent fields: contract type, risk level, key issues | Box Automate |
 | Review AI output | Approval task before the HTTPS branch | Box Automate / Human reviewer |
@@ -61,6 +61,6 @@
 |---|---|
 | React | Workspace and approval views load with the live Box identifiers |
 | Agentforce | Responses cite Box sources and cannot approve or sign |
-| Box | App, Form, Hub, metadata, tasks, clauses, and Doc Gen templates resolve |
+| Box | App, Hub, metadata, tasks, clauses, and Doc Gen templates resolve |
 | Automate | Saved inactive workflow contains Extract, Box Agent, approval gate, and HTTPS stage |
 | End to end | Signature remains blocked until named human tasks are complete |

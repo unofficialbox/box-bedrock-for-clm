@@ -1,0 +1,97 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "bootstrap-state"
+          "artifact_type" = "config"
+          "box" = {
+            "files" = {
+              "CLM-DATA-001-standard.md" = "2344316824098"
+              "CLM-DATA-002-fallback.md" = "2344289869704"
+              "CLM-LIAB-001-standard.md" = "2344312866990"
+              "CLM-LIAB-002-fallback.md" = "2344282491830"
+              "CLM-PAY-001-standard.md" = "2344303263817"
+              "CLM-PAY-002-fallback.md" = "2344329796519"
+              "CLM-SLA-001-standard.md" = "2344314507811"
+              "CLM-SLA-002-fallback.md" = "2344314138659"
+              "README.md" = "2344321741416"
+              "clm-approval-memo-template.docx" = "2344242775119"
+              "clm-order-summary-template.docx" = "2344233767713"
+              "clm-renewal-notice-template.docx" = "2344244747613"
+              "northstar-dpa.pdf" = "2342633156726"
+              "northstar-insurance-certificate.pdf" = "2342619758153"
+              "northstar-msa-redline-v3.pdf" = "2342633195167"
+              "northstar-order-form.pdf" = "2342633259967"
+              "northstar-security-exhibit.pdf" = "2342636075017"
+              "northstar-sow-implementation.pdf" = "2342622013520"
+            }
+            "folders" = {
+              "01 - Intake" = "399082115646"
+              "02 - Drafts and Redlines" = "399080778184"
+              "03 - Review Packets" = "399082148957"
+              "04 - Approvals" = "399082072259"
+              "05 - Signature" = "399081939679"
+              "06 - Executed Agreement" = "399080706253"
+              "07 - Obligations" = "399081567921"
+              "08 - DocGen Templates" = "399363530207"
+              "Approved Clauses" = "399419341582"
+              "workspace" = "399081692991"
+            }
+            "metadataSeeds" = {
+              "file:CLM-DATA-001-standard.md:clmClause" = "existing"
+              "file:CLM-DATA-002-fallback.md:clmClause" = "existing"
+              "file:CLM-LIAB-001-standard.md:clmClause" = "existing"
+              "file:CLM-LIAB-002-fallback.md:clmClause" = "existing"
+              "file:CLM-PAY-001-standard.md:clmClause" = "existing"
+              "file:CLM-PAY-002-fallback.md:clmClause" = "existing"
+              "file:CLM-SLA-001-standard.md:clmClause" = "existing"
+              "file:CLM-SLA-002-fallback.md:clmClause" = "existing"
+              "file:northstar-dpa.pdf:clmDocument" = "existing"
+              "file:northstar-insurance-certificate.pdf:clmDocument" = "existing"
+              "file:northstar-msa-redline-v3.pdf:clmDocument" = "existing"
+              "file:northstar-order-form.pdf:clmDocument" = "existing"
+              "file:northstar-security-exhibit.pdf:clmDocument" = "existing"
+              "file:northstar-sow-implementation.pdf:clmDocument" = "existing"
+              "folder:07 - Obligations:clmObligation" = "existing"
+              "folder:workspace:clmContract" = "existing"
+            }
+            "metadataTemplates" = {
+              "clmClause" = "9ca0de81-5f96-4158-82f7-1251b28a9c6e"
+              "clmContract" = "fe4e6fdb-659f-4931-9718-d03b624affdb"
+              "clmDocument" = "8a6cc4c2-8425-48fa-b4f0-01711b777d4a"
+              "clmObligation" = "964802ab-7da2-444e-9422-1b52fd4f5489"
+              "clmRedlineReview" = "59810aba-bcad-4406-b324-763b849712e7"
+            }
+          }
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "provider" = "generic"
+          "provider_object_id" = "runtime/bootstrap-state"
+        }
+        "metadata" = {
+          "artifactName" = "bootstrap-state"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "runtime/bootstrap-state"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_runtime_bootstrap-state"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

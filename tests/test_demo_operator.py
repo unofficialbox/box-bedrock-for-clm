@@ -53,6 +53,15 @@ class DemoOperatorTests(unittest.TestCase):
         self.assertEqual(demo_operator.parse_id('{"templateKey":"clmContract"}'), "clmContract")
         self.assertEqual(demo_operator.parse_id(""), "DRY_RUN")
 
+    def test_box_identity_requests_enterprise_guard_fields(self):
+        with patch.object(demo_operator, "run_json", return_value={"id": "user", "login": "operator@example.com", "enterprise": {"id": "enterprise"}}) as run_json:
+            identity = demo_operator.box_identity()
+        self.assertEqual(identity["enterprise"]["id"], "enterprise")
+        self.assertEqual(
+            run_json.call_args.args[0],
+            ["box", "users:get", "me", "--fields", "id,login,enterprise", "--json"],
+        )
+
     def test_doctor_reports_blank_org(self):
         with tempfile.TemporaryDirectory() as directory:
             path = self.write_config(directory, salesforce={"orgAlias": ""})
@@ -78,7 +87,44 @@ class DemoOperatorTests(unittest.TestCase):
                     demo_operator.salesforce_deploy(path, dry_run=True)
             commands = [call.args[0] for call in run.call_args_list]
             self.assertIn("demo", commands[0])
+            deploy_commands = [cmd for cmd in commands if "project deploy start" in " ".join(cmd)]
+            self.assertGreaterEqual(len(deploy_commands), 2)
+            self.assertIn(
+                "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
+                " ".join(" ".join(cmd) for cmd in deploy_commands),
+            )
             self.assertTrue(any("CLM_Demo_Operator" in command for command in commands))
+
+    def test_salesforce_deploy_duplicate_permission_set_assignment_is_tolerated(self):
+        with tempfile.TemporaryDirectory() as directory:
+            path = self.write_config(directory, salesforce={"orgAlias": "agentforce", "orgId": "00D123"})
+            with patch.object(demo_operator, "doctor"), \
+                patch.object(demo_operator, "run"), \
+                patch.object(demo_operator, "deploy_uibundle"), \
+                patch.object(demo_operator, "salesforce_identity", return_value={"id": "00D123"}), \
+                patch.object(demo_operator, "run_json_allow_fail", return_value=(1, {
+                    "result": {
+                        "failures": [
+                            {
+                                "name": "user@example.com",
+                                "message": "Duplicate PermissionSetAssignment. Assignee: 005ABC, Permission Set: 0PSABC",
+                            }
+                        ]
+                    }
+                })) as run_json_allow_fail:
+                    with redirect_stdout(io.StringIO()):
+                        demo_operator.salesforce_deploy(path, dry_run=False)
+            self.assertTrue(run_json_allow_fail.called)
+
+    def test_parser_includes_bootstrap_with_yes_alias(self):
+        args = demo_operator.parser().parse_args([
+            "bootstrap",
+            "--yes",
+            "--scenario", "box-automate-agentic-orchestration",
+            "--dry-run",
+        ])
+        self.assertEqual(args.command, "bootstrap")
+        self.assertTrue(args.confirm)
 
     def test_box_foundation_skips_resources_recorded_in_state(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -146,6 +192,45 @@ class DemoOperatorTests(unittest.TestCase):
                 with redirect_stdout(io.StringIO()):
                     demo_operator.seed_metadata(config_path, dry_run=True)
             self.assertEqual(run.call_count, 16)
+
+    def test_provision_requires_confirm_for_mutating_run(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = self.write_config(directory)
+            with patch.object(demo_operator, "doctor"):
+                with self.assertRaisesRegex(demo_operator.OperatorError, "Add --yes"):
+                    demo_operator.provision(
+                        config_path,
+                        scenario="box-automate-agentic-orchestration",
+                        dry_run=False,
+                        allow_unresolved=True,
+                        skip_validate=True,
+                        confirm=False,
+                    )
+
+    def test_provision_dry_run_executes_planned_sequence(self):
+        with tempfile.TemporaryDirectory() as directory:
+            config_path = self.write_config(directory)
+            with patch.object(demo_operator, "doctor") as doctor, \
+                patch.object(demo_operator, "generate_assets") as generate_assets, \
+                patch.object(demo_operator, "box_foundation") as box_foundation, \
+                patch.object(demo_operator, "seed_metadata") as seed_metadata, \
+                patch.object(demo_operator, "salesforce_deploy") as salesforce_deploy, \
+                patch.object(demo_operator, "resolve_config") as resolve_config:
+                with redirect_stdout(io.StringIO()):
+                    demo_operator.provision(
+                        config_path,
+                        scenario="box-automate-agentic-orchestration",
+                        dry_run=True,
+                        allow_unresolved=True,
+                        skip_validate=True,
+                        confirm=False,
+                    )
+            doctor.assert_called_once()
+            generate_assets.assert_called_once_with(True)
+            box_foundation.assert_called_once_with(config_path, dry_run=True)
+            seed_metadata.assert_called_once_with(config_path, dry_run=True)
+            salesforce_deploy.assert_called_once_with(config_path, dry_run=True)
+            resolve_config.assert_called_once_with(config_path, allow_unresolved=True)
 
     def test_validate_urls_rejects_cross_tenant_box_url(self):
         config = {"box": {"hostname": "a.box.com", "appUrl": "https://b.box.com/app/1"}, "salesforce": {"myDomainUrl": "https://example.my.salesforce.com"}}

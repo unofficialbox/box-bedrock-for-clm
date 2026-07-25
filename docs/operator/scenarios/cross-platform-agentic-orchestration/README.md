@@ -115,7 +115,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 |---|---|---|
 | Experience | Salesforce Multi-Framework React CLM workspace | **Local deterministic fixture**; deploy and validate per environment |
 | Salesforce Agentforce | `CLM_Contract__c`, Contract Copilot, approval context | **Portable specification**; configure and validate per environment |
-| Box | Apps, Forms, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
+| Box | Apps, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
 | Orchestration | Amazon Bedrock AgentCore supervisor and Strands specialists | **Local deterministic fixture** trace plus portable contracts |
 | Analytics | Databricks historical outcomes and cycle-time benchmarks | **Local deterministic fixture** dataset and tool contract |
 | Controls | Citations, deterministic expert directory, human approvals, signature block | **Portable specification** |
@@ -125,7 +125,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 - Box governs the contract package, versions, metadata, tasks, Doc Gen, Sign, and audit history.
 - Salesforce `CLM_Contract__c` governs structured commercial context and Box references.
-- Salesforce intake uses `Contract_ID__c` external-ID upsert followed by lookup; retries must not create duplicate records.
+- Salesforce intake is designed around a `Contract_ID__c` external-ID upsert followed by lookup so retries cannot create duplicate records. The live Box Automate workflow currently performs a plain record create instead, which is not idempotent; restore the upsert before making a duplicate-safety claim.
 - Agentforce may retrieve, summarize, compare, explain, recommend, draft, and route. It cannot approve a legal position or authorize signature.
 - Databricks supplies analytical context, never contract authority.
 - Low-confidence, unclassified, missing-owner, and inaccessible work routes to Legal Operations triage.
@@ -162,7 +162,7 @@ The deterministic trace must show package validation, the Net 90 versus Net 45 c
 - [Cross-platform deployment](../../cross-platform-deployment.md)
 - [Manual-task register](../../manual-task-register.md)
 - [Salesforce record contract](../../../use-case-creator/salesforce-record-contract.md)
-- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.json)
+- [Machine-readable scenario manifest](../../../../config/demo/cross-platform-agentic-orchestration-demo-manifest.bcl)
 - [Supporting React scripts](supporting-react-scripts/README.md)
 
 [Back to the scenario selector](../README.md)

@@ -54,6 +54,20 @@ class AgentCoreMockTests(unittest.TestCase):
             self.assertEqual(context["source"], "operator-bootstrap-state")
             self.assertEqual(context["files"]["northstar-dpa.pdf"], "new-file")
 
+    def test_box_context_can_ignore_operator_state_for_deterministic_validation(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            state = root / "config/runtime/bootstrap-state.json"
+            state.parent.mkdir(parents=True)
+            state.write_text(json.dumps({"box": {"folders": {"workspace": "live"}, "files": {}}}))
+            pdf = root / "output/pdf"
+            pdf.mkdir(parents=True)
+            (pdf / "northstar-msa-redline-v3.pdf").write_bytes(b"fixture")
+            with patch.object(run_agentcore_mock, "ROOT", root):
+                context = run_agentcore_mock.box_context(use_runtime=False)
+            self.assertEqual(context["source"], "generated-local-assets")
+            self.assertEqual(context["workspaceId"], "local-fixture")
+
 
 if __name__ == "__main__":
     unittest.main()

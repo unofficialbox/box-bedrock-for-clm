@@ -12,7 +12,7 @@
 
 The runtime path is:
 
-1. Box Forms and Automate capture and enrich the contract request.
+1. Box metadata and Automate capture and enrich the contract request: applying the `clmContract` metadata to a file in `01 - Intake` triggers the workflow.
 2. A human validates Extract and Box Agent output.
 3. The approved HTTPS branch uses Salesforce standard REST to upsert one CLM record by external ID, then looks it up for a stable record ID.
 4. Salesforce hosts the Multi-Framework React UI Bundle.

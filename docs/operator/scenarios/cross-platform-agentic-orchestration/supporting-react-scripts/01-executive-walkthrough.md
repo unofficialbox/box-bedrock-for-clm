@@ -12,7 +12,7 @@
 
 ## Pre-demo state
 
-- Prepare a validated New Contract Request and the Salesforce standard REST OAuth 2.0 connection.
+- Prepare a validated intake: a contract uploaded to `01 - Intake` with `clmContract` metadata applied, plus the Salesforce standard REST OAuth 2.0 connection.
 - Open the React workspace with the test contract and generated Box workspace folder.
 - Keep the **Workspace** view selected.
 - Confirm the Northstar banner shows **Critical** risk and **Approval blocked** status.
@@ -24,7 +24,7 @@
 
 **Show**
 
-- Submit or open the validated Box intake.
+- Open the validated Box intake (a contract in `01 - Intake` with `clmContract` metadata applied).
 - Show the Automate approval gate, then the approved HTTPS branch.
 - Show the newly created Salesforce CLM record and returned record ID.
 - Open React with `recordId`, `contractId`, and `folderId=<returned boxFolderId>`.

@@ -3,7 +3,7 @@
     <fullName>Requester_Name__c</fullName>
     <label>Requester Name</label>
     <length>255</length>
-    <required>true</required>
+    <required>false</required>
     <type>Text</type>
     <unique>false</unique>
 </CustomField>

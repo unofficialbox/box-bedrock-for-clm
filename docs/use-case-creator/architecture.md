@@ -16,7 +16,7 @@
 
 | Object | Purpose |
 |--------|---------|
-| `Contract Requests` folder | Intake packages from Box Forms |
+| `Contract Requests` folder | Intake packages entering via the `clmContract` metadata trigger |
 | `Active Negotiations` folder | Live CLM workspaces by counterparty |
 | `Executed Agreements` folder | Signed agreements with retention and renewal metadata |
 | `Clause Library` folder | Approved standard clauses and fallback positions |
@@ -36,7 +36,7 @@
 
 ```mermaid
 flowchart LR
-    Form["New Contract Request"] --> Extract["Enhanced Extract Agent"]
+    Trigger["clmContract metadata applied in 01 - Intake"] --> Extract["Enhanced Extract Agent"]
     Extract --> Agent["Box AI Agent review"]
     Agent --> Gate["Human approval task"]
     Gate -->|Approved| Connector["HTTPS connector"]
@@ -90,7 +90,7 @@ Source: [Mermaid diagram](../diagrams/clm-agentcore-architecture.mmd)
 ## Event-Driven Flow
 
 ```text
-Box Form / Salesforce Opportunity Event
+Box metadata trigger / Salesforce Opportunity Event
         │
         ▼
 AgentCore Strands Intake Agent
@@ -128,7 +128,7 @@ Box Sign + Obligation Monitor
 | Agent roles | Intake, classify, risk, approve, monitor | Contract intake, clause risk, approval, obligations | Rename to domain-specific roles |
 | System connectors | Content, CRM, Databricks analytics | Box, Salesforce, Databricks | Box plus domain system and Databricks analytics |
 | Sample data | Synthetic PDFs + JSON records | MSA/DPA/SOW/order form | Domain-specific records and files |
-| Runtime state | Gitignored environment and bootstrap bindings | Box App, metadata, Forms, agents | Same portable binding contract |
+| Runtime state | Gitignored environment and bootstrap bindings | Box App, metadata, agents | Same portable binding contract |
 
 ---
 
@@ -168,9 +168,9 @@ Flow: [rendered](../diagrams/box-automate-agentic-orchestration-flow.svg) · [so
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
 | No external agent runtime | No request is sent to AgentCore, Strands, Databricks, or custom middleware. |
 
-Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.json)
+Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.bcl)
 
-Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.json)
+Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.bcl)
 
 ---
 

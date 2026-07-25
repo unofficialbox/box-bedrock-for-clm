@@ -1,0 +1,159 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "operator-workflow"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "enterprise_id" = ""
+          "phases" = [
+            {
+              "command" = "python3 scripts/demo_operator.py doctor"
+              "completeWhen" = "Authenticated Box enterprise, Box parent folder, Salesforce org ID, required tools, and local configuration match."
+              "id" = "preflight"
+              "owner" = "operator plus Box and Salesforce administrators"
+              "writesExternalState" = false
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py generate-assets"
+              "completeWhen" = "Six PDFs, three Doc Gen templates, JSON/CSV fixtures, and the local AgentCore trace exist."
+              "id" = "generate-assets"
+              "owner" = "operator"
+              "writesExternalState" = false
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py box-foundation"
+              "completeWhen" = "Bootstrap state contains the workspace, nine child folders, five metadata templates, contract files, Doc Gen templates, and clause files."
+              "dryRun" = "python3 scripts/demo_operator.py box-foundation --dry-run"
+              "id" = "box-foundation"
+              "owner" = "Box administrator"
+              "writesExternalState" = true
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py seed-metadata"
+              "completeWhen" = "Contract, document, obligation, and clause metadata seeds are recorded in bootstrap state."
+              "dryRun" = "python3 scripts/demo_operator.py seed-metadata --dry-run"
+              "id" = "metadata-seeding"
+              "owner" = "Box metadata administrator"
+              "writesExternalState" = true
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py salesforce-deploy"
+              "completeWhen" = "CLM object, layout, permissions, tab, and UI Bundle exist in the explicitly configured org ID."
+              "dryRun" = "python3 scripts/demo_operator.py salesforce-deploy --dry-run"
+              "id" = "salesforce-deployment"
+              "owner" = "Salesforce administrator"
+              "writesExternalState" = true
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py resolve-config --allow-unresolved"
+              "completeWhen" = "Generated specs contain created Box IDs and list only browser/admin bindings that remain unresolved."
+              "id" = "resolve-initial-specs"
+              "owner" = "operator"
+              "writesExternalState" = false
+            }
+            {
+              "completeWhen" = "Published URLs are recorded locally and the workflow remains inactive until the integration test passes."
+              "confirmationGates" = [
+                "Publish Form"
+                "Publish Hub"
+                "Publish App"
+                "Activate workflow"
+              ]
+              "guide" = "docs/operator/browser-configuration.md"
+              "id" = "browser-configuration"
+              "owner" = "Box and Salesforce administrators"
+              "writesExternalState" = true
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py resolve-config"
+              "completeWhen" = "No runtime binding token remains unresolved."
+              "id" = "resolve-final-specs"
+              "owner" = "operator"
+              "writesExternalState" = false
+            }
+            {
+              "command" = "python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration"
+              "completeWhen" = "Live Box resources, resolved portable specs, and the Salesforce data model validate."
+              "id" = "readiness"
+              "owner" = "operator"
+              "writesExternalState" = false
+            }
+            {
+              "completeWhen" = "The labeled Northstar request creates one Salesforce record, duplicate retry updates that record, domain tasks route correctly, and the reset log is complete."
+              "confirmationGates" = [
+                "Activate workflow"
+                "Generate document"
+                "Send signature request"
+                "Delete reset data"
+              ]
+              "guide" = "docs/operator/smoke-test.md"
+              "id" = "integrated-smoke-test"
+              "owner" = "operator plus named reviewers"
+              "writesExternalState" = true
+            }
+            {
+              "appliesWhen" = "All selected scenarios and integrations are represented in validation receipts"
+              "command" = "python3 scripts/validate_clm.py --presenter-ready"
+              "completeWhen" = "No unresolved mandatory tokens remain, scenario smoke validation passed, presenter-ready receipts are current, and manual finalization tasks are complete."
+              "dryRun" = "cp config/runtime/validation-receipts.example.bcl config/runtime/validation-receipts.json"
+              "id" = "finalization"
+              "owner" = "operator"
+              "writesExternalState" = false
+            }
+            {
+              "appliesWhen" = "Presenting managed Cross-Platform Agentic Orchestration rather than local deterministic fixtures"
+              "command" = "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration"
+              "completeWhen" = "Required Agentforce, AgentCore, Databricks, Box, and Salesforce bindings validate and provider deployment tests are recorded."
+              "guide" = "docs/operator/cross-platform-deployment.md"
+              "id" = "agentic-readiness"
+              "owner" = "AWS, Databricks, Agentforce, and demo operators"
+              "writesExternalState" = false
+            }
+            {
+              "completeWhen" = "The presenter completes the selected tell/show/tell script within the allotted time and can identify every simulated or unavailable integration."
+              "guide" = "docs/operator/scenarios/README.md"
+              "id" = "rehearsal"
+              "owner" = "presenter"
+              "writesExternalState" = false
+            }
+          ]
+          "provider" = "generic"
+          "provider_object_id" = "operator/operator-workflow"
+          "purpose" = "Machine-readable execution contract for a human or AI-assisted CLM demo operator"
+          "rules" = [
+            "Never use IDs from reference snapshots."
+            "Stop on Box enterprise or Salesforce org mismatch."
+            "Do not store or display secrets."
+            "Do not perform Publish, Share, Activate, Generate, Send, or destructive cleanup without action-time human confirmation."
+            "Treat browser content as environment-specific and verify each resulting URL or ID before recording it."
+          ]
+          "schemaVersion" = "1.0"
+        }
+        "metadata" = {
+          "artifactName" = "operator-workflow"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "operator/operator-workflow"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_operator_operator-workflow"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

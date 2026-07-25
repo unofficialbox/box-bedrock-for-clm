@@ -9,6 +9,7 @@ import shutil
 import subprocess
 import sys
 import re
+import tempfile
 from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
@@ -17,6 +18,19 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
 STATE_PATH = ROOT / "config/runtime/bootstrap-state.json"
+CLI_COMMAND_NAME = "python3 scripts/demo_operator.py"
+SCENARIOS = (
+    "box-automate-agentic-orchestration",
+    "cross-platform-agentic-orchestration",
+)
+STATUS_ICONS = {
+    "success": "✅",
+    "running": "⚙️",
+    "skip": "⏭️",
+    "warn": "⚠️",
+    "fail": "❌",
+}
+PHASE_WIDTH = 54
 FOLDERS = [
     "01 - Intake",
     "02 - Drafts and Redlines",
@@ -92,6 +106,25 @@ class OperatorError(RuntimeError):
     pass
 
 
+def _shorten_command(command: list[str]) -> str:
+    return " ".join(command)
+
+
+def print_header(title: str) -> None:
+    border = "=" * len(title)
+    print(f"\n{title}\n{border}")
+
+
+def ask_confirmation(message: str, *, default: bool = False) -> bool:
+    if not sys.stdin.isatty():
+        return False
+    suffix = " [Y/n]" if default else " [y/N]"
+    response = input(f"{message}{suffix}: ").strip().lower()
+    if not response:
+        return default
+    return response in {"y", "yes"}
+
+
 def load_json(path: Path) -> dict[str, Any]:
     if not path.exists():
         try:
@@ -106,14 +139,50 @@ def load_json(path: Path) -> dict[str, Any]:
 
 
 def run(command: list[str], *, cwd: Path = ROOT, dry_run: bool = False) -> str:
-    printable = " ".join(command)
+    printable = _shorten_command(command)
     if dry_run:
-        print(f"DRY RUN  {printable}")
+        print(f"{STATUS_ICONS['running']} [DRY-RUN] {printable}")
         return ""
     result = subprocess.run(command, cwd=cwd, check=False, text=True, capture_output=True)
     if result.returncode:
         raise OperatorError(f"Command failed ({result.returncode}): {printable}\n{result.stderr.strip()}")
     return result.stdout.strip()
+
+
+def deploy_uibundle(project: Path, *, alias: str, dry_run: bool) -> None:
+    if dry_run:
+        command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
+        ui_bundle_sources = [
+            "force-app/main/default/uiBundles/clmreactapp/ui-bundle.json",
+            "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
+            "force-app/main/default/uiBundles/clmreactapp/index.html",
+            "force-app/main/default/uiBundles/clmreactapp/dist",
+        ]
+        for source in ui_bundle_sources:
+            command.extend(["--source-dir", source])
+        run(command, cwd=project, dry_run=dry_run)
+        return
+
+    source_root = project / "force-app/main/default/uiBundles/clmreactapp"
+    with tempfile.TemporaryDirectory(prefix="clmreactapp-uibundle-deploy-") as staging_root:
+        stage = Path(staging_root) / "force-app/main/default/uiBundles/clmreactapp"
+        stage.mkdir(parents=True, exist_ok=True)
+        for source_name in ["ui-bundle.json", "clmreactapp.uibundle-meta.xml", "index.html"]:
+            shutil.copy2(source_root / source_name, stage / source_name)
+        shutil.copytree(source_root / "dist", stage / "dist")
+        command = [
+            "sf",
+            "project",
+            "deploy",
+            "start",
+            "--target-org",
+            alias,
+            "--wait",
+            "20",
+            "--source-dir",
+            str(stage),
+        ]
+        run(command, cwd=project, dry_run=dry_run)
 
 
 def run_json(command: list[str], *, cwd: Path = ROOT) -> Any:
@@ -122,6 +191,24 @@ def run_json(command: list[str], *, cwd: Path = ROOT) -> Any:
         return json.loads(output)
     except json.JSONDecodeError as error:
         raise OperatorError(f"Command returned invalid JSON: {' '.join(command)}") from error
+
+
+def run_json_allow_fail(command: list[str], *, cwd: Path = ROOT) -> tuple[int, Any]:
+    result = subprocess.run(command, cwd=cwd, check=False, text=True, capture_output=True)
+    payload: Any = None
+    if result.stdout:
+        try:
+            payload = json.loads(result.stdout)
+        except json.JSONDecodeError:
+            payload = None
+    return result.returncode, payload
+
+
+def run_phase(name: str, index: int, total: int, fn, *args, **kwargs) -> None:
+    label = f"{index:>2}/{total} {name}"
+    print(f"{STATUS_ICONS['running']} {label:<{PHASE_WIDTH}}")
+    fn(*args, **kwargs)
+    print(f"{STATUS_ICONS['success']} {label}")
 
 
 def try_run_json(command: list[str], *, cwd: Path = ROOT) -> Any | None:
@@ -148,8 +235,12 @@ def require_tools(names: list[str]) -> list[str]:
     return [name for name in names if shutil.which(name) is None]
 
 
+def _status(icon: str, message: str) -> None:
+    print(f"{icon} {message}")
+
+
 def box_identity() -> dict[str, Any]:
-    payload = run_json(["box", "users:get", "me", "--json"])
+    payload = run_json(["box", "users:get", "me", "--fields", "id,login,enterprise", "--json"])
     if isinstance(payload, list):
         payload = payload[0]
     return payload
@@ -161,6 +252,7 @@ def salesforce_identity(alias: str) -> dict[str, Any]:
 
 
 def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -> None:
+    print_header("Doctor")
     config = load_json(config_path)
     tools = ["python3"]
     if platform in ("all", "box"):
@@ -209,14 +301,15 @@ def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -
         if str(sf_org.get("id") or "") != str(config["salesforce"]["orgId"]):
             raise OperatorError(f"Salesforce org mismatch: authenticated {sf_org.get('id') or 'unknown'}, configured {config['salesforce']['orgId']}.")
     scope = "local prerequisites" if offline else "authenticated identity, target scope, and local prerequisites"
-    print(f"Doctor passed for {platform}: {scope} are valid.")
+    _status(STATUS_ICONS["success"], f"Doctor passed for {platform}: {scope} are valid.")
 
 
 def generate_assets(dry_run: bool) -> None:
+    print_header("Generate sample and helper artifacts")
     for script in ["generate_sample_contract_assets.py", "generate_docgen_templates.py", "run_agentcore_mock.py"]:
         run([sys.executable, str(ROOT / "scripts" / script)], dry_run=dry_run)
     action = "Would generate" if dry_run else "Generated"
-    print(f"{action} sample contracts, Doc Gen templates, and the local AgentCore trace.")
+    _status(STATUS_ICONS["success"], f"{action} sample contracts, Doc Gen templates, and the local AgentCore trace.")
 
 
 def box_template_command(template: dict[str, Any]) -> list[str]:
@@ -510,6 +603,146 @@ def resolve_config(config_path: Path, *, allow_unresolved: bool) -> None:
         print("Unresolved until browser/admin setup: " + ", ".join(sorted(unresolved)))
 
 
+def unresolved_bindings_in_generated_specs() -> set[str]:
+    generated_root = ROOT / "config/runtime/generated"
+    unresolved: set[str] = set()
+    for relative in PORTABLE_SPECS:
+        path = generated_root / Path(relative).relative_to("config")
+        if not path.exists():
+            continue
+        text = path.read_text(encoding="utf-8")
+        unresolved.update(TOKEN_PATTERN.findall(text))
+    return unresolved
+
+
+def provision_status(config_path: Path, scenario: str) -> None:
+    print_header("Provision status")
+    config = load_json(config_path)
+    doctor(config_path, offline=True, platform="all")
+
+    state_exists = STATE_PATH.exists()
+    state: dict[str, Any] = load_json(STATE_PATH) if state_exists else {"box": {"folders": {}, "files": {}, "metadataTemplates": {}, "metadataSeeds": {}}}
+    box_state = state.get("box", {})
+    folders = box_state.get("folders", {})
+    files = box_state.get("files", {})
+    templates = box_state.get("metadataTemplates", {})
+    seeds = box_state.get("metadataSeeds", {})
+
+    required_folders = ["workspace", *FOLDERS]
+    required_files = [Path(path).name for paths in UPLOADS.values() for path in paths]
+    required_templates = [item["templateKey"] for item in load_json(ROOT / "config/box/metadata-templates.json")["templates"]]
+
+    missing_folders = [name for name in required_folders if not folders.get(name)]
+    missing_files = [filename for filename in required_files if not files.get(filename)]
+    missing_templates = [item for item in required_templates if not templates.get(item)]
+
+    generated_root = ROOT / "config/runtime/generated"
+    missing_specs = [str((generated_root / Path(relative).relative_to("config")).relative_to(ROOT)) for relative in PORTABLE_SPECS if not (generated_root / Path(relative).relative_to("config")).exists()]
+    unresolved = unresolved_bindings_in_generated_specs()
+
+    print(f"{STATUS_ICONS['success'] if state_exists else STATUS_ICONS['warn']} Bootstrap state file: {'present' if state_exists else 'missing'}")
+    folder_ok = not missing_folders
+    file_ok = not missing_files
+    template_ok = not missing_templates
+    seeds_ok = len(seeds) >= 16
+    specs_ok = not missing_specs
+    unresolved_ok = not unresolved
+    print(f"{STATUS_ICONS['success'] if folder_ok else STATUS_ICONS['warn']} Box folders complete: {len(folders)}/{len(required_folders)}")
+    print(f"{STATUS_ICONS['success'] if file_ok else STATUS_ICONS['warn']} Box files complete: {len(files)}/{len(required_files)}")
+    print(f"{STATUS_ICONS['success'] if template_ok else STATUS_ICONS['warn']} Metadata templates complete: {len(templates)}/{len(required_templates)}")
+    print(f"{STATUS_ICONS['success'] if seeds_ok else STATUS_ICONS['warn']} Metadata seeds complete: {len(seeds)} / 16")
+    print(f"{STATUS_ICONS['success'] if specs_ok else STATUS_ICONS['warn']} Resolved runtime specs present: {len(PORTABLE_SPECS)}/{len(PORTABLE_SPECS)}")
+    print(f"{STATUS_ICONS['success'] if unresolved_ok else STATUS_ICONS['warn']} Runtime unresolved tokens: {'none' if unresolved_ok else ', '.join(sorted(unresolved))}")
+
+    if missing_folders or missing_files or missing_templates or missing_specs:
+        print("Missing automation scope:")
+        if missing_folders:
+            print("  folders: " + ", ".join(missing_folders))
+        if missing_files:
+            print("  files: " + ", ".join(missing_files))
+        if missing_templates:
+            print("  metadata templates: " + ", ".join(missing_templates))
+        if missing_specs:
+            print("  generated specs: " + ", ".join(missing_specs))
+
+    required_manual = ["box.appUrl", "box.formUrl", "box.hubUrl", "box.workflowUrl"]
+    missing_manual = [
+        key for key in required_manual
+        if not config.get("box", {}).get(key.split(".")[1])
+    ]
+    if unresolved:
+        print("Browser-only and environment-integration bindings still unresolved; complete operator browser/admin steps:")
+        for token in sorted(unresolved):
+            print(f"  - {token}")
+    if missing_manual:
+        print("Manual integration fields still missing in runtime config:")
+        for key in missing_manual:
+            print(f"  - {key}")
+
+    if not missing_manual and not unresolved:
+        try:
+            validate(config_path, scenario=scenario, offline=True)
+            _status(STATUS_ICONS["success"], "Automated/manual config appears aligned with scenario requirements.")
+        except OperatorError as error:
+            print(f"{STATUS_ICONS['warn']} Validate status: {error}")
+    else:
+        print(f"{STATUS_ICONS['warn']} Run finalize steps (resolve-config allow-unresolved and manual setup) before running validate.")
+
+
+def provision(
+    config_path: Path,
+    *,
+    scenario: str,
+    dry_run: bool,
+    allow_unresolved: bool,
+    skip_validate: bool,
+    confirm: bool,
+    interactive: bool = False,
+) -> None:
+    print_header("Bootstrap")
+    doctor(config_path, offline=dry_run, platform="all")
+    if dry_run:
+        _status(STATUS_ICONS["running"], "Dry-run mode enabled; no external writes will execute.")
+        print("Use --yes/--confirm to run the same workflow for real.")
+    elif not confirm:
+        raise OperatorError("Provisioning performs external writes. Add --yes (or --confirm) to run mutations, or --dry-run to inspect the plan.")
+
+    phases = (
+        ("Generate local artifacts", lambda: generate_assets(dry_run)),
+        ("Create Box foundation", lambda: box_foundation(config_path, dry_run=dry_run)),
+        ("Seed representative metadata", lambda: seed_metadata(config_path, dry_run=dry_run)),
+        ("Deploy Salesforce components", lambda: salesforce_deploy(config_path, dry_run=dry_run)),
+        ("Resolve generated specs", lambda: resolve_config(config_path, allow_unresolved=True)),
+    )
+    for index, (name, action) in enumerate(phases, start=1):
+        if interactive and not dry_run and not confirm:
+            if not ask_confirmation(f"Run phase {index}/{len(phases)}: {name}"):
+                _status(STATUS_ICONS["skip"], f"{index}/{len(phases)} {name}: skipped by operator")
+                continue
+        run_phase(name, index, len(phases), action)
+
+    unresolved = unresolved_bindings_in_generated_specs()
+    if unresolved and not allow_unresolved:
+        message = ", ".join(sorted(unresolved))
+        if dry_run:
+            print(f"{STATUS_ICONS['warn']} Resolution preview still has unresolved tokens: {message}")
+        else:
+            print(f"{STATUS_ICONS['warn']} Resolution requires manual steps (unresolved tokens): {message}")
+
+    if not dry_run and not skip_validate:
+        try:
+            validate(config_path, scenario=scenario, offline=False)
+            _status(STATUS_ICONS["success"], "Validation passed for automated and configured assets.")
+        except OperatorError as error:
+            print(f"{STATUS_ICONS['warn']} Automated provision complete; finalize check not fully passed because: {error}")
+
+    _status(STATUS_ICONS["success"], "Provision attempt finished.")
+    if not dry_run:
+        print("Run: python3 scripts/demo_operator.py status --scenario <scenario> for a full readiness summary.")
+    else:
+        print("Run again with --yes (or --confirm) to apply the remaining items.")
+
+
 def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
     config = load_json(config_path)
     doctor(config_path, offline=dry_run, platform="salesforce")
@@ -526,19 +759,51 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         actual_org = salesforce_identity(alias)
         if str(actual_org.get("id") or "") != str(expected_org_id):
             raise OperatorError(f"Refusing deployment: authenticated Salesforce org {actual_org.get('id') or 'unknown'} does not match configured {expected_org_id}.")
-    sources = [
+    core_sources = [
         "force-app/main/default/objects/CLM_Contract__c",
         "force-app/main/default/layouts/CLM_Contract__c-CLM Contract Layout.layout-meta.xml",
         "force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",
         "force-app/main/default/permissionsets/CLM_Demo_Operator.permissionset-meta.xml",
         "force-app/main/default/tabs/CLM_Contract__c.tab-meta.xml",
-        "force-app/main/default/uiBundles",
     ]
-    command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
-    for source in sources:
-        command.extend(["--source-dir", source])
-    run(command, cwd=project, dry_run=dry_run)
-    run(["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias], cwd=project, dry_run=dry_run)
+    ui_bundle_sources = [
+        "force-app/main/default/uiBundles/clmreactapp/ui-bundle.json",
+        "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
+        "force-app/main/default/uiBundles/clmreactapp/index.html",
+        "force-app/main/default/uiBundles/clmreactapp/dist",
+    ]
+    for name, sources in [
+        ("Salesforce core metadata", core_sources),
+    ]:
+        command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
+        for source in sources:
+            command.extend(["--source-dir", source])
+        run(command, cwd=project, dry_run=dry_run)
+    if not dry_run:
+        deploy_uibundle(project, alias=alias, dry_run=dry_run)
+    else:
+        deploy_uibundle(project, alias=alias, dry_run=dry_run)
+    if dry_run:
+        run(["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias, "--json"], cwd=project, dry_run=True)
+    else:
+        return_code, payload = run_json_allow_fail(
+            ["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias, "--json"],
+            cwd=project,
+        )
+        if return_code and payload and isinstance(payload, dict):
+            failures = (payload.get("result") or {}).get("failures") or []
+            duplicate = any(
+                isinstance(item, dict) and "Duplicate PermissionSetAssignment" in str(item.get("message", ""))
+                for item in failures
+            )
+            if duplicate:
+                _status(STATUS_ICONS["warn"], "PermissionSet assignment already exists; continuing.")
+            else:
+                raise OperatorError(
+                    f"Failed to assign CLM_Demo_Operator. return_code={return_code} result={payload}"
+                )
+        elif return_code:
+            raise OperatorError("sf org assign permset failed without machine-readable failure details.")
     action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, tab, layout, and UI Bundle deployed"
     print(f"{action}.")
 
@@ -633,27 +898,52 @@ def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None
 
 
 def parser() -> argparse.ArgumentParser:
-    result = argparse.ArgumentParser(description=__doc__)
+    result = argparse.ArgumentParser(
+        description=__doc__,
+        epilog=(
+            "Examples:\n"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-automate-agentic-orchestration --dry-run\n"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-automate-agentic-orchestration --yes\n"
+            f"  {CLI_COMMAND_NAME} status --scenario cross-platform-agentic-orchestration\n"
+            f"  {CLI_COMMAND_NAME} validate --scenario cross-platform-agentic-orchestration --offline"
+        ),
+    )
     result.add_argument("--config", type=Path, default=DEFAULT_CONFIG)
     sub = result.add_subparsers(dest="command", required=True)
-    doctor_parser = sub.add_parser("doctor")
-    doctor_parser.add_argument("--offline", action="store_true", help="Check local prerequisites without calling Box or Salesforce")
+
+    doctor_parser = sub.add_parser("doctor", help="Check CLI/tooling prerequisites before changing anything.")
+    doctor_parser.add_argument("--offline", action="store_true", help="Skip Box/Salesforce API checks.")
     doctor_parser.add_argument("--platform", choices=["all", "box", "salesforce"], default="all")
+
     for name in ["generate-assets", "box-foundation", "seed-metadata", "salesforce-deploy"]:
-        command = sub.add_parser(name)
+        command = sub.add_parser(name, help=f"Run the {name} task only.")
         command.add_argument("--dry-run", action="store_true")
-    resolve_parser = sub.add_parser("resolve-config")
-    resolve_parser.add_argument("--allow-unresolved", action="store_true")
-    validate_parser = sub.add_parser("validate")
-    validate_parser.add_argument(
-        "--scenario",
-        choices=[
-            "box-automate-agentic-orchestration",
-            "cross-platform-agentic-orchestration",
-        ],
-        default="box-automate-agentic-orchestration",
-    )
-    validate_parser.add_argument("--offline", action="store_true", help="Validate local bindings without calling Box or Salesforce")
+
+    resolve_parser = sub.add_parser("resolve-config", help="Render portable specs from template + runtime state.")
+    resolve_parser.add_argument("--allow-unresolved", action="store_true", help="Allow unresolved runtime placeholders.")
+
+    status_parser = sub.add_parser("status", help="Show completeness and what remains.")
+    status_parser.add_argument("--scenario", choices=SCENARIOS, default=SCENARIOS[0])
+
+    bootstrap_parser = sub.add_parser("bootstrap", help="Run the full non-destructive workflow end-to-end.")
+    bootstrap_parser.add_argument("--scenario", choices=SCENARIOS, default=SCENARIOS[0])
+    bootstrap_parser.add_argument("--dry-run", action="store_true", help="Plan without creating anything.")
+    bootstrap_parser.add_argument("--allow-unresolved", action="store_true", help="Allow unresolved placeholders during spec rendering.")
+    bootstrap_parser.add_argument("--skip-validate", action="store_true", help="Skip full post-bootstrap validation.")
+    bootstrap_parser.add_argument("--yes", "--confirm", dest="confirm", action="store_true", help="Apply and confirm writes.")
+    bootstrap_parser.add_argument("--interactive", action="store_true", help="Prompt before each phase.")
+
+    provision_parser = sub.add_parser("provision", help="Legacy alias for bootstrap.")
+    provision_parser.add_argument("--scenario", choices=SCENARIOS, default=SCENARIOS[0])
+    provision_parser.add_argument("--dry-run", action="store_true")
+    provision_parser.add_argument("--allow-unresolved", action="store_true")
+    provision_parser.add_argument("--skip-validate", action="store_true")
+    provision_parser.add_argument("--yes", "--confirm", dest="confirm", action="store_true", help="Apply writes to Box and Salesforce.")
+    provision_parser.add_argument("--interactive", action="store_true", help="Prompt before each phase.")
+
+    validate_parser = sub.add_parser("validate", help="Validate readiness and readiness gates.")
+    validate_parser.add_argument("--scenario", choices=SCENARIOS, default=SCENARIOS[0])
+    validate_parser.add_argument("--offline", action="store_true", help="Validate local bindings without live calls.")
     return result
 
 
@@ -672,6 +962,34 @@ def main() -> int:
             salesforce_deploy(args.config, dry_run=args.dry_run)
         elif args.command == "resolve-config":
             resolve_config(args.config, allow_unresolved=args.allow_unresolved)
+        elif args.command == "status":
+            if not args.config.exists():
+                raise OperatorError("Demo configuration missing. Run setup_clm_dev.py first.")
+            provision_status(args.config, scenario=args.scenario)
+        elif args.command == "provision":
+            if not args.config.exists():
+                raise OperatorError("Demo configuration missing. Run setup_clm_dev.py first.")
+            provision(
+                args.config,
+                scenario=args.scenario,
+                dry_run=args.dry_run,
+                allow_unresolved=args.allow_unresolved,
+                skip_validate=args.skip_validate,
+                confirm=args.confirm,
+                interactive=args.interactive,
+            )
+        elif args.command == "bootstrap":
+            if not args.config.exists():
+                raise OperatorError("Demo configuration missing. Run setup_clm_dev.py first.")
+            provision(
+                args.config,
+                scenario=args.scenario,
+                dry_run=args.dry_run,
+                allow_unresolved=args.allow_unresolved,
+                skip_validate=args.skip_validate,
+                confirm=args.confirm,
+                interactive=args.interactive,
+            )
         elif args.command == "validate":
             validate(args.config, scenario=args.scenario, offline=args.offline)
     except (OperatorError, json.JSONDecodeError) as error:

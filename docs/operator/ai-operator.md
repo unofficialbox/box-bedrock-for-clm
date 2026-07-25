@@ -36,7 +36,7 @@ Stop and ask the human when:
 - Create the explicitly scoped Box foundation after enterprise and parent-folder verification.
 - Apply the deterministic metadata seed after the dry run.
 - Deploy portable Salesforce metadata after exact org-ID verification.
-- Assemble unpublished Box Form/App/Hub/Automate drafts from resolved specifications.
+- Assemble unpublished Box App/Hub/Automate drafts from resolved specifications.
 - Test inactive workflows with labeled non-production data when credentials are already configured and the human authorized the test scope.
 
 ## Browser execution
