@@ -4,6 +4,10 @@
         <application>CLM_Demo</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <classAccesses>
+        <apexClass>EmailIntakeHandler</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <editable>true</editable>
         <field>CLM_Contract__c.Counterparty_Account__c</field>
