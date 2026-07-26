@@ -42,6 +42,24 @@ The Apex deploys with the metadata; the inbound **address** and its **Run As** u
 
 Verify: send a test email (with a PDF) from a known counterparty Contact address; confirm the email appears on that Contact's Account Opportunity timeline and the PDF appears in the Opportunity's Box folder.
 
+## Running the demo
+
+**Mode A — simulated (reliable, no external mail).** Best for a controlled demo; runs the exact handler the inbound service calls.
+
+1. Confirm the sample data is seeded (a Northstar Contact + the "Northstar Master Service Agreement 2026" Opportunity, Box-mapped).
+2. Run:
+   ```bash
+   sf apex run --target-org <alias> --file clm-salesforce-project/scripts/demo-email-intake.apex
+   ```
+3. Open the matched Opportunity → the email is on the **activity timeline**; the attachment appears in the Opportunity's **Box folder** (via the Box section on the record; uploads asynchronously — allow a few seconds).
+
+**Mode B — live email (most realistic).** Shows a real inbound message.
+
+1. One-time: complete the *Per-org setup* above to create the Email Service and copy its generated inbound address.
+2. One-time: point a Northstar Contact's `Email` at a mailbox you control — the sample uses non-deliverable `.example` addresses, and the sender must match a `Contact.Email` for routing to work.
+3. From that mailbox, send an email with a contract PDF attached to the generated inbound address.
+4. Show the email on the Opportunity timeline and the PDF in the Opportunity's Box folder — then the folder-wide Box Extract job picks it up for downstream intake.
+
 ## Connecting to the intake workflow (follow-up)
 
 The file now lands in the **Opportunity's** Box folder, not the shared `01 - Intake` folder that the `clmContract` metadata trigger watches. To fire the governed intake workflow off it, re-point that Automate trigger at the record folders (or apply `clmContract` metadata to the file in the Opportunity folder). Tracked as a follow-up; it does not block the email-capture flow.
