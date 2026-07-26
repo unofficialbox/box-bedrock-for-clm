@@ -761,6 +761,7 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
             raise OperatorError(f"Refusing deployment: authenticated Salesforce org {actual_org.get('id') or 'unknown'} does not match configured {expected_org_id}.")
     core_sources = [
         "force-app/main/default/classes",
+        "force-app/main/default/staticresources",
         "force-app/main/default/objects/CLM_Contract__c",
         "force-app/main/default/layouts/CLM_Contract__c-CLM Contract Layout.layout-meta.xml",
         "force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",

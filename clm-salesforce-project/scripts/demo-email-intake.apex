@@ -7,11 +7,13 @@
  * and uploads the attachment into that Opportunity's Box folder (stored once, in Box).
  *
  * Change SENDER to a Contact.Email that exists in the org, and SUBJECT/FILE_NAME as desired.
+ * The attachment bytes come from the Clm_Sample_Msa_Redline static resource (the repo's
+ * sample Northstar MSA redline PDF), so the demo sends a real contract document.
  */
 String SENDER    = 'alex.mendoza@northstar.example';           // must match a Contact.Email
 String SUBJECT   = 'Northstar MSA redline (demo)';
-String FILE_NAME = 'northstar-msa-redline-demo.pdf';
-Blob   FILE_BODY = Blob.valueOf('%PDF-1.7 demo contract payload — replace with a real PDF in a live send');
+String FILE_NAME = 'northstar-msa-redline-v3.pdf';
+Blob   FILE_BODY = [SELECT Body FROM StaticResource WHERE Name = 'Clm_Sample_Msa_Redline' LIMIT 1].Body;
 
 Messaging.InboundEmail email = new Messaging.InboundEmail();
 email.fromAddress = SENDER;
