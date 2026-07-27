@@ -50,6 +50,8 @@ Deployable metadata: `clm-salesforce-project/force-app/main/default/objects/CLM_
 
 ## Intake integration
 
+> **Inbound email is the realistic first hop.** Before a contract reaches the Box intake, it usually arrives by email. The `EmailIntakeHandler` inbound email service (see [Inbound Email Intake Service](../operator/email-intake-service.md)) captures a counterparty's email onto the matching Opportunity's activity timeline and uploads the attachment **straight into that Opportunity's Box folder** via the Box for Salesforce managed package — the file is stored once, in Box, not duplicated as a Salesforce File. That handler does **not** create `CLM_Contract__c` — record creation stays in the governed path described here.
+
 > **Proven live path vs. design target.** The workflow uses a plain **POST** create to the sobject collection (`services/data/{apiVersion}/sobjects/CLM_Contract__c`), captured in `config/box/https-connectors.bcl` as `salesforceContractCreate`. This POST was proven end to end on 2026-07-22 — but via the now-removed Box Form trigger. Intake is now sourced from the `clmContract` metadata trigger (`static.trigger.metadata.<key>`), and that metadata-triggered variant has not been re-verified live. The POST is **not idempotent**: a resubmission creates a second record. The external-ID **PATCH upsert** described below is the duplicate-safe *design target*; it is not currently the live path. Restore it — and re-verify against a live run — only if duplicate safety is required. See the duplicate-safety note in `docs/operator/agent-takeover-handoff.md`.
 
 The duplicate-safe design is an upsert by external ID:
