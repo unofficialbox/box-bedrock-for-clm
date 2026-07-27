@@ -1,16 +1,16 @@
 # Box Automate Agentic Orchestration
 
-Deterministic CLM orchestration with agentic enrichment. Box is the operating surface, Box Automate controls the sequence, agents enrich evidence, and named people approve decisions.
+Deterministic CLM orchestration with agentic enrichment. Box is the operating surface, Box Automate controls the sequence, agents enrich evidence, named people approve decisions.
 
 ## Read this guide in order
 
 [1. Orientation](#1-orientation) → [2. Architecture](#2-architecture) → [3. Flow](#3-flow) → [4. Presenter script](#4-presenter-script) → [5. Visual walkthrough](#5-visual-walkthrough) → [6. Components and readiness](#6-components-and-readiness) → [7. Setup and validation](#7-setup-and-validation)
 
-Everything required for the main presentation is on this page. Links in **References** are optional operator or technical detail.
+Links in **References** are optional operator or technical detail.
 
 ## 1. Orientation
 
-Use this track when Box Apps, Automate, Hubs, metadata, tasks, Doc Gen, and Sign should lead; predictable routing and auditability matter more than autonomous planning; and Salesforce record creation is an integration outcome rather than the presenter workspace.
+Use this track when Box Apps, Automate, Hubs, metadata, tasks, Doc Gen, and Sign lead; predictable routing and auditability matter more than autonomous planning; and Salesforce record creation is an integration outcome, not the presenter workspace.
 
 | Boundary | Included |
 |---|---|
@@ -80,7 +80,7 @@ A rejected item also ends the run silently; the Rejected branch has no outcome a
 
 ## 5. Visual walkthrough
 
-These are the canonical Box screenshots. Cross-Platform Agentic Orchestration references the same files rather than copying them.
+Canonical Box screenshots; Cross-Platform Agentic Orchestration references these same files.
 
 ### Portfolio and actions
 

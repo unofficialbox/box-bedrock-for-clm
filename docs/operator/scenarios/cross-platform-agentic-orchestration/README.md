@@ -6,7 +6,7 @@ Supervisor-led CLM execution across a multi-platform stack. AWS Bedrock AgentCor
 
 [1. Orientation](#1-orientation) → [2. Architecture](#2-architecture) → [3. Flow](#3-flow) → [4. Presenter script](#4-presenter-script) → [5. Visual walkthrough](#5-visual-walkthrough) → [6. Components and readiness](#6-components-and-readiness) → [7. Setup and validation](#7-setup-and-validation)
 
-Everything required for the main presentation is on this page. Links in **References** and the supporting React scripts are optional technical depth.
+Links in **References** and the supporting React scripts are optional technical depth.
 
 ## 1. Orientation
 
@@ -20,7 +20,7 @@ Use this track when dynamic planning, specialist delegation, memory, traces, and
 | Shared asset | Box Automate intake exists but remains inactive and is not executed in this presenter path |
 | Human authority | Legal positions, approvals, concessions, signature, final obligations |
 
-Repository truth: the React experience and Box specifications are available; the AgentCore flow includes a deterministic local trace. Each operator must validate their own Box surfaces, Salesforce Agentforce configuration, and managed integrations. Do not present AWS or Databricks as live until that environment passes deployment tests.
+The React experience and Box specifications are available; the AgentCore flow includes a deterministic local trace. Each operator validates their own Box surfaces, Salesforce Agentforce configuration, and managed integrations. Do not present AWS or Databricks as live until that environment passes deployment tests.
 
 [Continue to architecture](#2-architecture)
 
@@ -87,7 +87,7 @@ Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies
 
 ## 5. Visual walkthrough
 
-The Box screenshots below reference the Box Automate Agentic Orchestration source files. Only the React screenshots are scenario-specific.
+Box screenshots below reference Box Automate Agentic Orchestration source files; only the React screenshots are scenario-specific.
 
 ### Unified React workspace
 

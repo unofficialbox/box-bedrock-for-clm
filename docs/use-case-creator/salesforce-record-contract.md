@@ -1,6 +1,6 @@
 # Salesforce CLM Record Contract
 
-This document completes manual tasks MT-030 and MT-031 at the repository-design level. Deployment and administrator validation remain separate tasks.
+Completes MT-030 and MT-031 at the repository-design level. Deployment and administrator validation are separate tasks.
 
 ## Decision
 
@@ -10,7 +10,7 @@ Use a dedicated custom object:
 CLM_Contract__c
 ```
 
-Do not overload Salesforce `Contract` or org-specific managed CLM objects. The demo keeps `CLM_Contract__c` as the authoritative structured record and links to existing standard Account and Opportunity records for business context.
+Do not overload Salesforce `Contract` or org-specific managed CLM objects. `CLM_Contract__c` is the authoritative structured record; it links to standard Account and Opportunity records for business context.
 
 ## Ownership and sharing
 
@@ -60,9 +60,9 @@ The duplicate-safe design is an upsert by external ID:
 PATCH /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}
 ```
 
-No custom Apex REST service is required for intake. The approved Box Automate branch maps validated values directly to Salesforce field API names and sends the request through an OAuth 2.0 HTTPS connection.
+No custom Apex REST service is required for intake. The approved Box Automate branch maps validated values directly to Salesforce field API names and sends the request over an OAuth 2.0 HTTPS connection.
 
-An insert can return a record ID, while a successful update can return `204 No Content`. Therefore, the next workflow step retrieves the record through the same external-ID resource:
+An insert returns a record ID; a successful update returns `204 No Content`. So the next step retrieves the record through the same external-ID resource:
 
 ```text
 GET /services/data/{apiVersion}/sobjects/CLM_Contract__c/Contract_ID__c/{urlEncodedContractId}?fields=Id,Contract_ID__c
@@ -77,7 +77,7 @@ Response mapping:
 }
 ```
 
-`Counterparty_Account__c` and `Opportunity__c` are not part of the intake path: the intake metadata supplies no Account or Opportunity ID, so the connector neither writes nor reads them. They are populated on the record by the packaged sample data or by manual entry, and the connector's `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
+`Counterparty_Account__c` and `Opportunity__c` are not part of the intake path: the intake metadata supplies no Account or Opportunity ID, so the connector neither writes nor reads them. They are populated by the packaged sample data or manual entry; `salesforceContractLookup` fetches only `Id` and `Contract_ID__c`.
 
 The Box Automate integration must:
 
@@ -89,7 +89,7 @@ The Box Automate integration must:
 6. Look up and return the same record on retry.
 7. Never accept contract bytes, access tokens, connector secrets, or unreviewed AI output.
 
-SOQL is not required for this path. If the Box Automate builder cannot retrieve by external ID, a second standard REST query operation may select `Id` and `Contract_ID__c` by the generated contract ID.
+SOQL is not required. If the Box Automate builder cannot retrieve by external ID, a second standard REST query may select `Id` and `Contract_ID__c` by the generated contract ID.
 
 ## Metadata and Extract mapping
 

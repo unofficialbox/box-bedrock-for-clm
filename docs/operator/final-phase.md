@@ -8,8 +8,6 @@ Use this phase after:
 4. Browser-admin configuration (Form/App/Hub/Automate + OAuth)
 5. Scenario-specific smoke test
 
-This phase is where the environment becomes presenter-ready and evidence-locked.
-
 ## 0) Scope and safety guardrails
 
 - Do not proceed if the target runtime differs from:
@@ -104,7 +102,7 @@ Capture this in `manual-task-register.md` as complete:
 
 ## 6) Optional private-API lab closure (non-production only)
 
-If you use private-lab executors, keep them separate from production setup:
+Keep private-lab executors separate from production setup:
 
 ```bash
 python3 ../../unofficialbox/box-capture/forms.py --dry-run

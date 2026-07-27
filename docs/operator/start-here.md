@@ -20,40 +20,38 @@ The generated IDs are stored only in `config/runtime/bootstrap-state.json`. The 
 - **Box Automate Agentic Orchestration:** Box-led, predictable Automate stages with agentic enrichment and human approval.
 - **Cross-Platform Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
 
-New operators should build and rehearse **Box Automate Agentic Orchestration first**. It is the foundation for both scenarios.
+Build and rehearse **Box Automate Agentic Orchestration first**; it is the foundation for both scenarios.
 
 ## 2. Confirm prerequisites
-
-You need:
 
 - Python 3.10+, Node.js/npm, Mermaid CLI (`mmdc`), [Box CLI](https://developer.box.com/guides/tooling/cli/), and [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli).
 - A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.
 - A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.
 - Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.
 
-Have the administrators complete the [product and permission checklist](entitlement-checklist.md). Do not infer entitlements from a successful CLI login.
+Have the administrators confirm the required Box and Salesforce product licenses and permissions before setup. Do not infer entitlements from a successful CLI login.
 
 Do not place client secrets, access tokens, private keys, or passwords in this repository.
 
-Install repository dependencies and seed runtime config in one step:
+Install dependencies and seed runtime config in one step:
 
 ```bash
 python3 scripts/setup_clm_dev.py
 ```
 
-For non-interactive runs:
+Non-interactive:
 
 ```bash
 python3 scripts/setup_clm_dev.py --automated
 ```
 
-To pull Box and Salesforce values from your logged-in CLIs:
+Pull Box and Salesforce values from your logged-in CLIs:
 
 ```bash
 python3 scripts/setup_clm_dev.py --automated --from-current-clis
 ```
 
-For a quick non-invasive onboarding check, run:
+Non-invasive onboarding check:
 
 ```bash
 python3 scripts/setup_clm_dev.py --smoke
@@ -67,13 +65,13 @@ From the repository root:
 cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json
 ```
 
-Fill only the values you know initially. If you are already authenticated to Box and Salesforce, you can skip most of this and auto-fill from CLIs:
+If already authenticated to Box and Salesforce, auto-fill from CLIs:
 
 ```bash
 python3 scripts/setup_clm_dev.py --automated --from-current-clis --pet off
 ```
 
-If you prefer, fill only initial values first:
+Otherwise fill only initial values first:
 
 - `box.parentFolderId`: the Box folder under which the demo may be created; use `0` only when the operator's root is appropriate.
 - `box.enterpriseId`: copy the authenticated enterprise ID from the Box administrator.
@@ -104,13 +102,13 @@ Then run:
 python3 scripts/demo_operator.py doctor
 ```
 
-For the most common operator path after config seeding, use:
+Most common path after config seeding:
 
 ```bash
 python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run
 ```
 
-and when approvals are confirmed:
+When approvals are confirmed:
 
 ```bash
 python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes
@@ -118,16 +116,13 @@ python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orche
 
 The one-shot `bootstrap` command always checks pre-requisites, avoids duplicates, and only creates missing resources.
 
-Expected result from `bootstrap` preview: no external writes.
-Expected result from confirmed apply: phase-by-phase status lines and a completion summary.
+Expected: preview makes no external writes; confirmed apply prints phase-by-phase status lines and a completion summary.
 
-You can still run:
+Standalone doctor check (expected: `Doctor passed`):
 
 ```bash
 python3 scripts/demo_operator.py doctor
 ```
-
-Expected result: `Doctor passed`.
 
 When Box and Salesforce administration is split between people, each can run a scoped preflight:
 
@@ -138,7 +133,7 @@ python3 scripts/demo_operator.py doctor --platform salesforce
 
 ## 4. Generate and create the reusable foundation
 
-Review the commands without changing either environment:
+Preview without changing either environment:
 
 ```bash
 python3 scripts/demo_operator.py generate-assets --dry-run
@@ -163,7 +158,7 @@ The Salesforce phase deploys the portable CLM data model and UI. It intentionall
 
 ## 5. Complete the administrator surfaces
 
-Follow [Browser and administrator configuration](browser-configuration.md) in order. It uses logical names from the repository and the IDs generated in `bootstrap-state.json`; it never asks you to reuse another tenant's IDs.
+Follow [Browser and administrator configuration](browser-configuration.md) in order. It uses logical names and the IDs generated in `bootstrap-state.json`; never reuse another tenant's IDs.
 
 Stop and obtain explicit owner approval immediately before any final **Publish**, **Share**, **Activate**, **Generate**, or **Send** action.
 
@@ -202,7 +197,7 @@ Use the presenter script inside the selected scenario guide:
 1. [Box Automate Agentic Orchestration](scenarios/box-automate-agentic-orchestration/README.md#4-presenter-script)
 2. [Cross-Platform Agentic Orchestration](scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
 
-Each step tells the audience what matters, shows one visible proof, then explains the outcome. Avoid narrating every click.
+Each step tells what matters, shows one proof, then explains the outcome. Avoid narrating every click.
 
 ## Setup flow
 
@@ -214,4 +209,3 @@ Each step tells the audience what matters, shows one visible proof, then explain
 - [Finalization checklist](final-phase.md)
 - [Manual-task register](manual-task-register.md)
 - [Machine-readable operator workflow](../../config/operator/operator-workflow.bcl)
-- [AI-assisted operator protocol](AI-OPERATOR.md)

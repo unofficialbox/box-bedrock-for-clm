@@ -1,18 +1,11 @@
 # CLM Use-Case Creator
 
-Use this path to understand or intentionally tailor the existing Contract Lifecycle Management use case. This repository is already a generated vertical; do not run a template generator or replace it with a generic scaffold.
+Use this path to understand or tailor the existing Contract Lifecycle Management use case. This repository is already a generated vertical; do not run a template generator or replace it with a generic scaffold.
 
 ## Review order
 
 1. [Architecture](architecture.md)
-2. [Agent Definitions](agent-definitions.md)
-3. [Domain References](domain-references.md)
-4. [Control Matrix](control-matrix.md)
-5. [ROI Analysis](roi-analysis.md)
-6. [Competitive Landscape](competitive-landscape.md)
-7. [Salesforce Experience Selection](salesforce-profile-selection.md)
-8. [Salesforce Record Contract](salesforce-record-contract.md)
-9. [Lifecycle Marketecture](marketecture.md)
+2. [Salesforce Record Contract](salesforce-record-contract.md)
 
 ## Definition of the use case
 
