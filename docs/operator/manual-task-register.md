@@ -2,8 +2,6 @@
 
 This register lists only work that cannot be completed safely by `scripts/demo_operator.py`. Complete it for each new environment.
 
-See [Manual Box Configuration and Automation Feasibility](manual-box-configuration.md) for the current public-API boundary and supported automation backlog.
-
 Status values: **Required**, **Per run**, **Optional**, and **Confirmation required**.
 
 ## Environment and access

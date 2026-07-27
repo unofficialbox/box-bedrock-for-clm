@@ -31,7 +31,7 @@ You need:
 - A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.
 - Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.
 
-Have the administrators complete the [product and permission checklist](entitlement-checklist.md). Do not infer entitlements from a successful CLI login.
+Have the administrators confirm the required Box and Salesforce product licenses and permissions before setup. Do not infer entitlements from a successful CLI login.
 
 Do not place client secrets, access tokens, private keys, or passwords in this repository.
 
@@ -214,4 +214,3 @@ Each step tells the audience what matters, shows one visible proof, then explain
 - [Finalization checklist](final-phase.md)
 - [Manual-task register](manual-task-register.md)
 - [Machine-readable operator workflow](../../config/operator/operator-workflow.bcl)
-- [AI-assisted operator protocol](AI-OPERATOR.md)

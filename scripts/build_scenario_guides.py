@@ -26,11 +26,9 @@ SCENARIOS = (
         "slug": "operator-setup",
         "sources": [
             ROOT / "docs" / "operator" / "start-here.md",
-            ROOT / "docs" / "operator" / "entitlement-checklist.md",
             ROOT / "docs" / "operator" / "browser-configuration.md",
             ROOT / "docs" / "operator" / "cross-platform-deployment.md",
             ROOT / "docs" / "operator" / "smoke-test.md",
-            ROOT / "docs" / "operator" / "ai-operator.md",
         ],
         "accent": "#f4c86a",
         "accent_2": "#5a95ff",

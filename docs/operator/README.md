@@ -15,22 +15,17 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
    python3 scripts/demo_operator.py bootstrap --scenario <scenario> --dry-run
    ```
 
-5. Complete the [Entitlement Checklist](entitlement-checklist.md).
-6. Follow [Start Here](start-here.md).
-7. Complete [Browser Configuration](browser-configuration.md).
-8. Complete [Cross-Platform Deployment](cross-platform-deployment.md) when that scenario is selected.
-9. Run the [Smoke Test](smoke-test.md).
-10. Rehearse one [Scenario Guide](scenarios/README.md).
-11. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
-12. Complete [Finalization](final-phase.md) before declaring presenter readiness.
-
-Use [Manual Box Configuration and Automation Feasibility](manual-box-configuration.md) to distinguish supported API automation from browser-only product setup and private-API research.
+5. Follow [Start Here](start-here.md).
+6. Complete [Browser Configuration](browser-configuration.md).
+7. Complete [Cross-Platform Deployment](cross-platform-deployment.md) when that scenario is selected.
+8. Run the [Smoke Test](smoke-test.md).
+9. Rehearse one [Scenario Guide](scenarios/README.md).
+10. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
+11. Complete [Finalization](final-phase.md) before declaring presenter readiness.
 
 Use [Inbound Email Intake Service](email-intake-service.md) to set up the Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
 
 Use Box Private-API Labs (see the box-capture repository) for isolated research on Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
-
-For assistant-driven execution, read [AI-Assisted Operator Protocol](ai-operator.md). Planning, generation, validation, and dry runs may proceed without external approval. Every external write requires the guide's explicit apply option, confirmation of the exact target, and any documented human decision gate.
 
 ## Live claim boundary
 
