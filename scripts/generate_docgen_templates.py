@@ -233,12 +233,72 @@ def renewal_notice():
     return doc
 
 
+def msa_redline():
+    """Current-year MSA still in redline: a Word contract with visible redline markup (not a merge template)."""
+    doc = Document()
+    configure(doc, "CLM MSA Redline 2026")
+    add_title(
+        doc,
+        "In negotiation",
+        "Master Services Agreement - Redline",
+        "Acme Robotics, Inc. and Northstar Health System | CLM-2026-Northstar | Draft, in redline",
+    )
+
+    def clause(heading, body, redline):
+        doc.add_heading(heading, level=2)
+        set_font(doc.add_paragraph().add_run(body), 11)
+        rp = doc.add_paragraph()
+        set_font(rp.add_run("NORTHSTAR REDLINE: " + redline), 11, bold=True, color="B91C1C")
+
+    clause(
+        "1. Fees, invoicing, and taxes",
+        "Customer will pay the fees stated in each Order Form. Subscription fees are invoiced annually in advance; undisputed amounts are due forty-five days from invoice date.",
+        "Customer requests Net 90 payment terms and a unilateral right to offset alleged damages against invoiced amounts.",
+    )
+    clause(
+        "2. Service levels and support",
+        "Service credits are Customer's sole monetary remedy for a service-level failure and will not exceed twenty percent of the monthly subscription fees for the affected Service.",
+        "Customer proposes uncapped service credits, a full monthly refund below 99.5 percent availability, and termination rights after any two failures in a rolling six-month period.",
+    )
+    clause(
+        "3. Information security",
+        "Acme will notify Customer of a confirmed Security Incident without undue delay and no later than seventy-two hours after confirmation. Annual audits are permitted with reasonable notice.",
+        "Customer requests notice within twelve hours of any suspected event, participation in Acme's forensic investigation, and unlimited on-site audits.",
+    )
+    clause(
+        "4. Limitation of liability",
+        "Except for Excluded Claims, each Party's aggregate liability will not exceed the fees paid or payable under the affected Order Form during the preceding twelve months.",
+        "Customer deletes the liability cap and proposes unlimited liability for direct and indirect damages, including lost revenue and regulatory penalties.",
+    )
+    clause(
+        "5. Term and termination",
+        "Each Order Form renews for successive one-year periods unless either Party provides at least ninety days' written notice before the current term ends.",
+        "Customer adds termination for convenience on thirty days' notice with a pro rata refund of prepaid fees.",
+    )
+    clause(
+        "6. Governing law",
+        "This Agreement is governed by Delaware law; courts in Wilmington, Delaware have exclusive jurisdiction.",
+        "Customer replaces Delaware law and venue with Minnesota law and exclusive venue in Hennepin County, Minnesota.",
+    )
+    doc.add_heading("Open items", level=2)
+    set_font(
+        doc.add_paragraph().add_run(
+            "Red text marks the counterparty's proposed changes still under negotiation. This document is a draft in Word and is not executed."
+        ),
+        10,
+        italic=True,
+        color=GRAY,
+    )
+    return doc
+
+
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     templates = {
         "clm-approval-memo-template.docx": approval_memo(),
         "clm-order-summary-template.docx": order_summary(),
         "clm-renewal-notice-template.docx": renewal_notice(),
+        "northstar-msa-2026-redline.docx": msa_redline(),
     }
     for name, document in templates.items():
         document.core_properties.title = name.removesuffix(".docx").replace("-", " ").title()

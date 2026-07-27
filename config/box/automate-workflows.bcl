@@ -25,24 +25,23 @@ locals {
           "schemaVersion" = "2.0"
           "workflows" = [
             {
-              "description" = "Trigger on applied CLM contract metadata, run the CLM intake agent, route human validation, and emit an approved integration event."
+              "description" = "Trigger on applied CLM contract metadata, run the CLM intake agent, route human validation, emit an approved integration event, then generate the agreement package and request signature."
               "initialStatus" = "inactive"
               "key" = "contract-intake-enrichment"
               "name" = "CLM - Contract Intake Enrichment"
               "openIssues" = [
                 "This workflow was redesigned from a Form trigger to a clmContract metadata trigger. The form-triggered variant was the one proven live on 2026-07-22; this metadata-triggered variant has not been re-verified and must be rebuilt and re-tested before activation."
                 "The metadata trigger assumes the clmContract structured fields are already applied to the file. If the demo should derive them from the document, add an Extract Agent plus Apply Metadata pre-step so the connector reads populated metadata rather than blank fields."
-                "POST to the sobject collection has no duplicate safety. The PATCH upsert it replaced was idempotent against a Contract_ID__c external ID; this is not. Re-triggering on the same contract would create a second Salesforce record. Decide on a duplicate strategy before activation."
-                "The connector step captures no output variable, so the created Salesforce record ID is not retained. The verified test outcome captured it as id from $.id."
-                "Risk_Level__c is no longer sent. It previously carried a fabricated literal, and the Box Agent emits unstructured text rather than a picklist value. Restore it once a structured Extract or Agent output supplies a real risk level."
+                "Duplicate safety: the POST is not idempotent (see the connector step's duplicateStrategy). It remains the proven path; switch to the external-ID PATCH upsert plus lookup for dedup if re-triggers are expected."
+                "Risk_Level__c is written only after the human validates it (see the approval task's riskLevelGate); the reviewer applies the validated value to clmContract metadata so the connector never binds raw Box Agent text into the picklist."
                 "Box substitutes the literal string 'Variable unavailable' for an unresolved variable, not an empty string. A live run on 2026-07-22 failed because the Currency and Number fields received that text. Only bind values whose clmContract metadata field is guaranteed populated before the trigger fires."
                 "The connector failure surfaced only as errorCode UNKNOWN_ERROR with an empty payload. Box does not expose the Salesforce error body, so connector faults have to be diagnosed from the request payload in the run events."
                 "The connector must target the Salesforce org that actually holds CLM_Contract__c. Two similarly named connectors in this environment point at different orgs, and the wrong one fails with an opaque UNKNOWN_ERROR even when the payload is valid."
                 "The live Active workflow is still the form-triggered version. Rebuilding it around the metadata trigger requires deactivating and re-activating, so always confirm the published version rather than the editor contents."
                 "The step uses the Agentforce Dev connector, while the verified POST was tested on Agentforce MyDomain Dev. Both resolve to the same development org host, but the POST contract has not been re-tested through this connector."
-                "No Salesforce lookup step exists, so the workflow captures no created record ID."
-                "The Rejected branch has no outcome, so rejected requests produce no notification or return-for-correction."
+                "The created record id is captured (outputVariables.recordId = $.id) but no Salesforce lookup step exists; add one only if a later step needs to re-read the record (e.g. when switching to the upsert path)."
                 "The Box Agent instructions embed the approved-clause-library folder ID as literal text, which is not portable across environments."
+                "The Generate Document + Request Signature tail (orders 8-10) is newly added to the spec and has NOT been built or verified in the live Automate workflow. docgenApprovalMemo must resolve to the uploaded template file, and the Request Signature recipient (counterparty signer) is bound at provisioning time - no live signer email is stored here."
               ]
               "optionalMetadataFields" = [
                 "dealValue"
@@ -151,6 +150,7 @@ locals {
                   ]
                   "requireOnlyOneAssigneeToComplete" = false
                   "required" = true
+                  "riskLevelGate" = "The reviewer sets or confirms the risk level here. Apply the validated value to the clmContract metadata so the connector binds Risk_Level__c from validated metadata, never from raw Box Agent text."
                   "type" = "Approval Task"
                 }
                 {
@@ -168,7 +168,7 @@ locals {
                       ]
                     }
                     {
-                      "behavior" = "Branch terminates. The live draft attaches no outcome to this branch, so a rejected request is silently dropped."
+                      "behavior" = "Returns the contract for correction; makes no Salesforce call."
                       "condition" = {
                         "leftOperand" = "static.outcome_<step4>.taskStatus"
                         "logicalConnector" = "EQUALS"
@@ -176,7 +176,9 @@ locals {
                         "type" = "task"
                       }
                       "label" = "Rejected"
-                      "next" = []
+                      "next" = [
+                        "returnForCorrection"
+                      ]
                     }
                   ]
                   "gatewaySubtype" = "exclusive"
@@ -192,6 +194,7 @@ locals {
                   "connectorName" = "the Salesforce connector whose base URL is the org holding CLM_Contract__c"
                   "connectorRef" = "config/box/https-connectors.bcl#salesforce-clm-rest"
                   "credentialId" = "<salesforceCredentialId>"
+                  "duplicateStrategy" = "This POST is not idempotent: a re-trigger on the same Contract_ID__c creates a second record. For dedup, switch to the external-ID PATCH upsert (salesforceContractUpsert) plus the lookup in config/box/https-connectors.bcl, or gate on an existing-record check before calling."
                   "endpoint" = "services/data/v67.0/sobjects/CLM_Contract__c"
                   "endpointNote" = "Stored without a leading slash. The connector switch normalised this to match the reference outcome."
                   "eventSubType" = "call"
@@ -199,12 +202,70 @@ locals {
                   "method" = "POST"
                   "operation" = "salesforceContractCreate"
                   "order" = 6
+                  "outputVariables" = {
+                    "recordId" = {
+                      "jsonPath" = "$.id"
+                      "key" = "recordId"
+                      "note" = "Created CLM_Contract__c record id; retained for downstream steps or a lookup."
+                    }
+                  }
                   "type" = "HTTPS Request"
+                }
+                {
+                  "assignees" = [
+                    "${box.reviewers.primary}"
+                  ]
+                  "branch" = "Rejected"
+                  "fileId" = {
+                    "type" = "variable"
+                    "value" = "static.trigger.fileId"
+                  }
+                  "key" = "returnForCorrection"
+                  "message" = "Correct the flagged terms or metadata, then re-apply the clmContract metadata to re-enter intake. No Salesforce record was created."
+                  "name" = "Return the contract for correction"
+                  "order" = 7
+                  "type" = "Create Task"
+                }
+                {
+                  "branch" = "Approved"
+                  "name" = "Approve document generation and signature send"
+                  "order" = 8
+                  "purpose" = "Human confirmation before generating the agreement package and sending it for signature. Required by the guardrail: never create a Box Sign request until all required approvals are complete and the send is separately approved."
+                  "type" = "Human Confirmation"
+                }
+                {
+                  "branch" = "Approved"
+                  "destinationFolderId" = "${box.folders.approvals}"
+                  "name" = "Generate the signature-ready agreement package"
+                  "order" = 9
+                  "templateFileId" = "${box.files.docgenApprovalMemo}"
+                  "type" = "Generate Document"
+                }
+                {
+                  "branch" = "Approved"
+                  "gate" = "Never created before the approval task (order 4) is Approved and the Human Confirmation (order 8) is passed."
+                  "message" = "Please review and sign the attached agreement package."
+                  "name" = "Request signature on the generated agreement"
+                  "order" = 10
+                  "recipients" = [
+                    {
+                      "note" = "Add the counterparty signer at provisioning time; do not store a live email here."
+                      "source" = "counterparty Contact on the linked Account"
+                    }
+                  ]
+                  "signFile" = {
+                    "note" = "The PDF produced by the Generate Document step (order 9)."
+                    "type" = "priorStepOutput"
+                    "value" = "static.outcome_<step9>.fileId"
+                  }
+                  "subject" = "Signature requested: <counterparty> <contractType>"
+                  "type" = "Request Signature"
                 }
               ]
               "testGate" = {
-                "firstTrigger" = "Creates one Salesforce record"
-                "rejectedValidation" = "Makes no Salesforce request"
+                "approvedExecution" = "After the Salesforce record: a human confirmation gates Generate Document (agreement PDF into the approvals folder) and Request Signature; signature is never requested before that confirmation"
+                "firstTrigger" = "Creates one Salesforce record and captures its recordId"
+                "rejectedValidation" = "Makes no Salesforce request; creates a return-for-correction task"
                 "repeatTrigger" = "Creates a second record (POST is not idempotent); restore the external-ID upsert if dedup is required"
               }
               "trigger" = {

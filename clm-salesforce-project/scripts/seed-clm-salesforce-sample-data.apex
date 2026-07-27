@@ -149,6 +149,8 @@ for (CLM_Contract__c contract : [
     FROM CLM_Contract__c
     WHERE Contract_ID__c IN :new List<String>{
         'CLM-SAMPLE-NST-001',
+        'CLM-SAMPLE-NST-2024',
+        'CLM-SAMPLE-NST-2025',
         'CLM-SAMPLE-ACM-001'
     }
 ]) {
@@ -172,7 +174,7 @@ northContract.Counterparty__c = 'Northstar Health';
 northContract.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
 northContract.Opportunity__c = opportunitiesByKey.get(northStarOppKey).Id;
 northContract.Contract_Type__c = 'MSA Package';
-northContract.Status__c = 'Intake';
+northContract.Status__c = 'Legal Review';
 northContract.Deal_Value__c = 250000;
 northContract.Term_Months__c = 36;
 northContract.Region__c = 'US';
@@ -184,6 +186,55 @@ northContract.Business_Owner_Name__c = 'Northstar Master Contract Owner';
 northContract.Record_Source__c = 'Manual';
 northContract.Risk_Level__c = 'Medium';
 northContract.Special_Terms_Risk_Notes__c = 'Sample contract record for demo use only.';
+
+// Prior-year executed Northstar MSAs (contract history for the same customer).
+CLM_Contract__c northContract2024 = contractsByContractId.get('CLM-SAMPLE-NST-2024');
+if (northContract2024 == null) {
+    northContract2024 = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-NST-2024');
+    contractsToInsert.add(northContract2024);
+} else {
+    contractsToUpdate.add(northContract2024);
+}
+northContract2024.Name = 'Northstar Health Master Service Agreement 2024';
+northContract2024.Counterparty__c = 'Northstar Health';
+northContract2024.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
+northContract2024.Contract_Type__c = 'MSA Package';
+northContract2024.Status__c = 'Executed';
+northContract2024.Deal_Value__c = 2150000;
+northContract2024.Term_Months__c = 36;
+northContract2024.Region__c = 'US';
+northContract2024.Data_Category__c = 'PHI';
+northContract2024.Target_Signature_Date__c = Date.newInstance(2024, 7, 31);
+northContract2024.Requester_Name__c = 'Alex Mendoza';
+northContract2024.Requester_Email__c = 'alex.mendoza@northstar.example';
+northContract2024.Business_Owner_Name__c = 'Northstar Master Contract Owner';
+northContract2024.Record_Source__c = 'Manual';
+northContract2024.Risk_Level__c = 'Low';
+northContract2024.Special_Terms_Risk_Notes__c = 'Executed prior-year MSA; retained for demo contract history.';
+
+CLM_Contract__c northContract2025 = contractsByContractId.get('CLM-SAMPLE-NST-2025');
+if (northContract2025 == null) {
+    northContract2025 = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-NST-2025');
+    contractsToInsert.add(northContract2025);
+} else {
+    contractsToUpdate.add(northContract2025);
+}
+northContract2025.Name = 'Northstar Health Master Service Agreement 2025';
+northContract2025.Counterparty__c = 'Northstar Health';
+northContract2025.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
+northContract2025.Contract_Type__c = 'MSA Package';
+northContract2025.Status__c = 'Executed';
+northContract2025.Deal_Value__c = 2275000;
+northContract2025.Term_Months__c = 36;
+northContract2025.Region__c = 'US';
+northContract2025.Data_Category__c = 'PHI';
+northContract2025.Target_Signature_Date__c = Date.newInstance(2025, 7, 31);
+northContract2025.Requester_Name__c = 'Alex Mendoza';
+northContract2025.Requester_Email__c = 'alex.mendoza@northstar.example';
+northContract2025.Business_Owner_Name__c = 'Northstar Master Contract Owner';
+northContract2025.Record_Source__c = 'Manual';
+northContract2025.Risk_Level__c = 'Low';
+northContract2025.Special_Terms_Risk_Notes__c = 'Executed prior-year MSA; retained for demo contract history.';
 
 CLM_Contract__c acmeContract = contractsByContractId.get('CLM-SAMPLE-ACM-001');
 if (acmeContract == null) {

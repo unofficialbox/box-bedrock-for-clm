@@ -45,6 +45,7 @@ locals {
           "contracts" = [
             {
               "businessOwner" = "Northstar Master Contract Owner"
+              "contractFile" = "northstar-msa-2026-redline.docx"
               "contractId" = "CLM-SAMPLE-NST-001"
               "contractType" = "MSA Package"
               "counterparty" = "Northstar Health"
@@ -58,9 +59,49 @@ locals {
               "requesterEmail" = "alex.mendoza@northstar.example"
               "requesterName" = "Alex Mendoza"
               "riskLevel" = "Medium"
-              "riskNotes" = "Sample contract record for demo use only."
-              "status" = "Intake"
+              "riskNotes" = "Current-year MSA still in redline; the contract file is a Word document."
+              "status" = "Legal Review"
               "targetSignatureDateOffsetMonths" = 5
+              "termMonths" = 36
+            }
+            {
+              "businessOwner" = "Northstar Master Contract Owner"
+              "contractFile" = "northstar-msa-2024-executed.pdf"
+              "contractId" = "CLM-SAMPLE-NST-2024"
+              "contractType" = "MSA Package"
+              "counterparty" = "Northstar Health"
+              "counterpartyAccount" = "Northstar Health"
+              "dataCategory" = "PHI"
+              "dealValue" = 2150000
+              "name" = "Northstar Health Master Service Agreement 2024"
+              "recordSource" = "Manual"
+              "region" = "US"
+              "requesterEmail" = "alex.mendoza@northstar.example"
+              "requesterName" = "Alex Mendoza"
+              "riskLevel" = "Low"
+              "riskNotes" = "Executed prior-year MSA; retained for demo contract history."
+              "status" = "Executed"
+              "targetSignatureDate" = "2024-07-31"
+              "termMonths" = 36
+            }
+            {
+              "businessOwner" = "Northstar Master Contract Owner"
+              "contractFile" = "northstar-msa-2025-executed.pdf"
+              "contractId" = "CLM-SAMPLE-NST-2025"
+              "contractType" = "MSA Package"
+              "counterparty" = "Northstar Health"
+              "counterpartyAccount" = "Northstar Health"
+              "dataCategory" = "PHI"
+              "dealValue" = 2275000
+              "name" = "Northstar Health Master Service Agreement 2025"
+              "recordSource" = "Manual"
+              "region" = "US"
+              "requesterEmail" = "alex.mendoza@northstar.example"
+              "requesterName" = "Alex Mendoza"
+              "riskLevel" = "Low"
+              "riskNotes" = "Executed prior-year MSA; retained for demo contract history."
+              "status" = "Executed"
+              "targetSignatureDate" = "2025-07-31"
               "termMonths" = 36
             }
             {
