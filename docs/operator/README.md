@@ -26,6 +26,8 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
 
 Use [Manual Box Configuration and Automation Feasibility](manual-box-configuration.md) to distinguish supported API automation from browser-only product setup and private-API research.
 
+Use [Inbound Email Intake Service](email-intake-service.md) to set up the Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
+
 Use Box Private-API Labs (see the box-capture repository) for isolated research on Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
 
 For assistant-driven execution, read [AI-Assisted Operator Protocol](ai-operator.md). Planning, generation, validation, and dry runs may proceed without external approval. Every external write requires the guide's explicit apply option, confirmation of the exact target, and any documented human decision gate.
