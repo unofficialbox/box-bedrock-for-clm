@@ -222,30 +222,29 @@
 <section class="guide-section" id="1-choose-a-scenario">
 <h2>1. Choose a scenario</h2>
 <ul><li><strong>Box Automate Agentic Orchestration:</strong> Box-led, predictable Automate stages with agentic enrichment and human approval.</li><li><strong>Cross-Platform Agentic Orchestration:</strong> Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.</li></ul>
-<p>New operators should build and rehearse <strong>Box Automate Agentic Orchestration first</strong>. It is the foundation for both scenarios.</p>
+<p>Build and rehearse <strong>Box Automate Agentic Orchestration first</strong>; it is the foundation for both scenarios.</p>
 </section>
 <section class="guide-section" id="2-confirm-prerequisites">
 <h2>2. Confirm prerequisites</h2>
-<p>You need:</p>
 <ul><li>Python 3.10+, Node.js/npm, Mermaid CLI (<code>mmdc</code>), <span class="source-ref">Box CLI<sup aria-label="reference 1">1</sup></span>, and <span class="source-ref">Salesforce CLI<sup aria-label="reference 2">2</sup></span>.</li><li>A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.</li><li>A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.</li><li>Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.</li></ul>
 <p>Have the administrators confirm the required Box and Salesforce product licenses and permissions before setup. Do not infer entitlements from a successful CLI login.</p>
 <p>Do not place client secrets, access tokens, private keys, or passwords in this repository.</p>
-<p>Install repository dependencies and seed runtime config in one step:</p>
+<p>Install dependencies and seed runtime config in one step:</p>
 <pre><code class="language-bash">python3 scripts/setup_clm_dev.py</code></pre>
-<p>For non-interactive runs:</p>
+<p>Non-interactive:</p>
 <pre><code class="language-bash">python3 scripts/setup_clm_dev.py --automated</code></pre>
-<p>To pull Box and Salesforce values from your logged-in CLIs:</p>
+<p>Pull Box and Salesforce values from your logged-in CLIs:</p>
 <pre><code class="language-bash">python3 scripts/setup_clm_dev.py --automated --from-current-clis</code></pre>
-<p>For a quick non-invasive onboarding check, run:</p>
+<p>Non-invasive onboarding check:</p>
 <pre><code class="language-bash">python3 scripts/setup_clm_dev.py --smoke</code></pre>
 </section>
 <section class="guide-section" id="3-create-local-configuration">
 <h2>3. Create local configuration</h2>
 <p>From the repository root:</p>
 <pre><code class="language-bash">cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json</code></pre>
-<p>Fill only the values you know initially. If you are already authenticated to Box and Salesforce, you can skip most of this and auto-fill from CLIs:</p>
+<p>If already authenticated to Box and Salesforce, auto-fill from CLIs:</p>
 <pre><code class="language-bash">python3 scripts/setup_clm_dev.py --automated --from-current-clis --pet off</code></pre>
-<p>If you prefer, fill only initial values first:</p>
+<p>Otherwise fill only initial values first:</p>
 <ul><li><code>box.parentFolderId</code>: the Box folder under which the demo may be created; use <code>0</code> only when the operator&#x27;s root is appropriate.</li><li><code>box.enterpriseId</code>: copy the authenticated enterprise ID from the Box administrator.</li><li><code>box.operatorLogin</code>: the exact login returned by <code>box users:get me --json</code>.</li><li><code>box.reviewerLogins</code>: at least one real collaborator who will own demo validation tasks.</li><li><code>box.allowRootFolder</code>: leave <code>false</code>; set it to <code>true</code> only when the owner explicitly approves creating the demo at Box root.</li><li><code>box.hostname</code>: your enterprise hostname, for example <code>example.ent.box.com</code>.</li><li><code>salesforce.orgAlias</code>: the alias used by the Salesforce CLI.</li><li><code>salesforce.orgId</code>: copy the exact org ID shown by <code>sf org display</code>; deployment refuses a mismatch.</li><li><code>salesforce.myDomainUrl</code>: your org&#x27;s My Domain URL.</li><li><code>salesforce.integrationUsername</code> and <code>integrationEmail</code>: the dedicated API-only user&#x27;s unique username and administrator contact email.</li></ul>
 <p>Leave generated IDs out of this file. Leave optional Agentforce, AgentCore, and Databricks values blank until those services are configured.</p>
 <p>Authenticate the CLIs. For interactive operator access:</p>
@@ -255,22 +254,21 @@ sf org display --target-org &lt;your-clm-org-alias&gt;</code></pre>
 <p>If your organization requires a Box JWT or client-credentials application, have the Box administrator configure it from a secret file stored <strong>outside</strong> this repository, then select that CLI environment. Confirm the authenticated Box user can create folders and enterprise metadata templates.</p>
 <p>Then run:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py doctor</code></pre>
-<p>For the most common operator path after config seeding, use:</p>
+<p>Most common path after config seeding:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run</code></pre>
-<p>and when approvals are confirmed:</p>
+<p>When approvals are confirmed:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes</code></pre>
 <p>The one-shot <code>bootstrap</code> command always checks pre-requisites, avoids duplicates, and only creates missing resources.</p>
-<p>Expected result from <code>bootstrap</code> preview: no external writes. Expected result from confirmed apply: phase-by-phase status lines and a completion summary.</p>
-<p>You can still run:</p>
+<p>Expected: preview makes no external writes; confirmed apply prints phase-by-phase status lines and a completion summary.</p>
+<p>Standalone doctor check (expected: <code>Doctor passed</code>):</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py doctor</code></pre>
-<p>Expected result: <code>Doctor passed</code>.</p>
 <p>When Box and Salesforce administration is split between people, each can run a scoped preflight:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py doctor --platform box
 python3 scripts/demo_operator.py doctor --platform salesforce</code></pre>
 </section>
 <section class="guide-section" id="4-generate-and-create-the-reusable-foundation">
 <h2>4. Generate and create the reusable foundation</h2>
-<p>Review the commands without changing either environment:</p>
+<p>Preview without changing either environment:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py generate-assets --dry-run
 python3 scripts/demo_operator.py box-foundation --dry-run
 python3 scripts/demo_operator.py seed-metadata --dry-run
@@ -286,7 +284,7 @@ python3 scripts/demo_operator.py resolve-config --allow-unresolved</code></pre>
 </section>
 <section class="guide-section" id="5-complete-the-administrator-surfaces">
 <h2>5. Complete the administrator surfaces</h2>
-<p>Follow <span class="source-ref">Browser and administrator configuration<sup aria-label="reference 3">3</sup></span> in order. It uses logical names from the repository and the IDs generated in <code>bootstrap-state.json</code>; it never asks you to reuse another tenant&#x27;s IDs.</p>
+<p>Follow <span class="source-ref">Browser and administrator configuration<sup aria-label="reference 3">3</sup></span> in order. It uses logical names and the IDs generated in <code>bootstrap-state.json</code>; never reuse another tenant&#x27;s IDs.</p>
 <p>Stop and obtain explicit owner approval immediately before any final <strong>Publish</strong>, <strong>Share</strong>, <strong>Activate</strong>, <strong>Generate</strong>, or <strong>Send</strong> action.</p>
 </section>
 <section class="guide-section" id="6-validate-finalize-and-rehearse">
@@ -307,7 +305,7 @@ python3 scripts/validate_clm.py</code></pre>
 <h2>7. Present with tell/show/tell</h2>
 <p>Use the presenter script inside the selected scenario guide:</p>
 <ol><li><span class="source-ref">Box Automate Agentic Orchestration<sup aria-label="reference 6">6</sup></span></li><li><span class="source-ref">Cross-Platform Agentic Orchestration<sup aria-label="reference 7">7</sup></span></li></ol>
-<p>Each step tells the audience what matters, shows one visible proof, then explains the outcome. Avoid narrating every click.</p>
+<p>Each step tells what matters, shows one proof, then explains the outcome. Avoid narrating every click.</p>
 </section>
 <section class="guide-section" id="setup-flow">
 <h2>Setup flow</h2>
@@ -328,13 +326,13 @@ python3 scripts/validate_clm.py</code></pre>
 <section class="guide-section" id="3-box-app">
 <h2>3. Box App</h2>
 <p>Build <strong>Contract Lifecycle Management</strong> from <code>config/box/box-app-blueprint.md</code>.</p>
-<p>Use the generated folder/template IDs only when the builder asks for a binding. Put the high-frequency actions first: <strong>Start a New Contract</strong>, <strong>Approved Clause Hub</strong>, and <strong>Executed Agreements</strong>. Add charts by status, risk, contract type, region, and clause family so the dashboard appears operational rather than empty.</p>
+<p>Use the generated folder/template IDs only when the builder asks for a binding. Put high-frequency actions first: <strong>Start a New Contract</strong>, <strong>Approved Clause Hub</strong>, and <strong>Executed Agreements</strong>. Add charts by status, risk, contract type, region, and clause family.</p>
 <p>Obtain approval before publishing. Record the published URL in <code>demo-environment.bcl</code>.</p>
 </section>
 <section class="guide-section" id="4-clause-library-hub">
 <h2>4. Clause Library Hub</h2>
 <p>Create <strong>Approved Contract Clause Library</strong> from <code>config/box/hub-blueprint.md</code>.</p>
-<p>Include the clause README, standard clauses, approved fallbacks, governance notes, ownership, and review cadence. Add enough usage metadata and recently reviewed content to demonstrate an actively maintained library. Obtain approval before publishing and record the URL.</p>
+<p>Include the clause README, standard clauses, approved fallbacks, governance notes, ownership, and review cadence. Add usage metadata and recently reviewed content. Obtain approval before publishing and record the URL.</p>
 </section>
 <section class="guide-section" id="5-salesforce-oauth-connection">
 <h2>5. Salesforce OAuth connection</h2>

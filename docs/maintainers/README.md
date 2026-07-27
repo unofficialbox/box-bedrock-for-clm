@@ -38,11 +38,11 @@ Repository release evidence requires:
 - Python tests pass;
 - no secret, live environment identifier, or machine-specific absolute path is committed.
 
-`python3 scripts/validate_clm.py --presenter-ready` is a separate live gate. It requires current secret-free receipts for Box, Salesforce, AgentCore, and Databricks. Repository tests never substitute for those receipts.
+`python3 scripts/validate_clm.py --presenter-ready` is a separate live gate requiring current secret-free receipts for Box, Salesforce, AgentCore, and Databricks. Repository tests never substitute for those receipts.
 
 ## Current maturity boundary
 
-The repository provides **Portable specification** and **Local deterministic fixture** evidence for both scenarios. Individual capabilities may be a **Deployed integration** only when current receipts prove the named target. The complete cross-platform scenario is **Presenter-ready live** only when all platform receipts, screenshots, reset evidence, and presenter rehearsal are current.
+The repository provides **Portable specification** and **Local deterministic fixture** evidence for both scenarios. A capability is a **Deployed integration** only when current receipts prove the named target. The complete cross-platform scenario is **Presenter-ready live** only when all platform receipts, screenshots, reset evidence, and presenter rehearsal are current.
 
 ## Historical decisions retained
 

@@ -22,7 +22,7 @@ Confirm the `01 - Intake` folder exists and that the `clmContract` template is a
 
 Build **Contract Lifecycle Management** from `config/box/box-app-blueprint.md`.
 
-Use the generated folder/template IDs only when the builder asks for a binding. Put the high-frequency actions first: **Start a New Contract**, **Approved Clause Hub**, and **Executed Agreements**. Add charts by status, risk, contract type, region, and clause family so the dashboard appears operational rather than empty.
+Use the generated folder/template IDs only when the builder asks for a binding. Put high-frequency actions first: **Start a New Contract**, **Approved Clause Hub**, and **Executed Agreements**. Add charts by status, risk, contract type, region, and clause family.
 
 Obtain approval before publishing. Record the published URL in `demo-environment.bcl`.
 
@@ -30,7 +30,7 @@ Obtain approval before publishing. Record the published URL in `demo-environment
 
 Create **Approved Contract Clause Library** from `config/box/hub-blueprint.md`.
 
-Include the clause README, standard clauses, approved fallbacks, governance notes, ownership, and review cadence. Add enough usage metadata and recently reviewed content to demonstrate an actively maintained library. Obtain approval before publishing and record the URL.
+Include the clause README, standard clauses, approved fallbacks, governance notes, ownership, and review cadence. Add usage metadata and recently reviewed content. Obtain approval before publishing and record the URL.
 
 ## 5. Salesforce OAuth connection
 

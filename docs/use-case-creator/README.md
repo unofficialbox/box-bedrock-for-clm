@@ -1,6 +1,6 @@
 # CLM Use-Case Creator
 
-Use this path to understand or intentionally tailor the existing Contract Lifecycle Management use case. This repository is already a generated vertical; do not run a template generator or replace it with a generic scaffold.
+Use this path to understand or tailor the existing Contract Lifecycle Management use case. This repository is already a generated vertical; do not run a template generator or replace it with a generic scaffold.
 
 ## Review order
 

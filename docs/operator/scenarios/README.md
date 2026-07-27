@@ -1,8 +1,8 @@
 # CLM Demo Scenarios
 
-Use one track per presentation. The Northstar contract package and governance rules are shared, but the runtime story and screenshots are intentionally separate.
+One track per presentation. The Northstar contract package and governance rules are shared; runtime story and screenshots are separate.
 
-Building this in a new environment? Complete [Operator Start Here](../start-here.md) before using either presenter guide.
+New environment? Complete [Operator Start Here](../start-here.md) first.
 
 | Track | Short name | Orchestration model | Presenter surface | Readiness |
 |---|---|---|---|---|
@@ -15,4 +15,4 @@ Building this in a new environment? Complete [Operator Start Here](../start-here
 - Use **Cross-Platform Agentic Orchestration** when a supervisor selects tools or specialist agents dynamically across platforms.
 - Describe the first as **workflow-directed** and the second as **supervisor-directed**. Do not describe managed integrations as live until they pass technical validation.
 
-Each scenario link opens one canonical, ordered guide containing orientation, architecture, flow, presenter script, screenshots, component readiness, and setup checks. Shared configuration, screenshots, generated galleries, and detailed runbooks remain single-source and are referenced from those guides.
+Each scenario link opens one ordered guide: orientation, architecture, flow, presenter script, screenshots, readiness, and setup checks.

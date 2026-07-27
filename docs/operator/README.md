@@ -1,6 +1,6 @@
 # Demo Operator
 
-Use this path to configure, deploy, validate, rehearse, or reset the CLM demo in a confirmed target environment.
+Configure, deploy, validate, rehearse, or reset the CLM demo in a confirmed target environment.
 
 ## Run order
 
@@ -23,9 +23,9 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
 10. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
 11. Complete [Finalization](final-phase.md) before declaring presenter readiness.
 
-Use [Inbound Email Intake Service](email-intake-service.md) to set up the Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
+[Inbound Email Intake Service](email-intake-service.md): Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
 
-Use Box Private-API Labs (see the box-capture repository) for isolated research on Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
+Box Private-API Labs (box-capture repository): isolated research on Apps, Automate, and Hub composition. Every executor requires an already-authenticated Box web-app tab on the exact configured hostname.
 
 ## Live claim boundary
 
@@ -33,11 +33,8 @@ Use the four readiness terms in `README.md`. Do not describe a **Portable specif
 
 ## Box surface authoring tooling
 
-This repository is a **golden copy** of the finished CLM scenario. The tooling that authors Box
-surfaces without a supported API — the guarded Forms, Apps, and Automate executors, their lab
-specifications, and the Automate graph inspector — lives in a separate repository:
+This repository is a **golden copy** of the finished CLM scenario. The tooling that authors Box surfaces without a supported API — guarded Forms, Apps, and Automate executors, their lab specifications, and the Automate graph inspector — lives in a separate repository:
 
     unofficialbox/box-capture
 
-Nothing here depends on it at runtime. Reach for it when you need to rebuild a Box surface in a new
-environment or capture a live workflow definition, not when running or presenting the demo.
+Nothing here depends on it at runtime. Use it to rebuild a Box surface in a new environment or capture a live workflow definition, not to run or present the demo.
