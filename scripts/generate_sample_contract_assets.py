@@ -329,6 +329,64 @@ def build_realistic_msa():
     make_doc(path).build(story)
 
 
+def build_executed_msa(year, effective_date, executed_date, arr, term_months=36):
+    """A fully-executed (signed) Northstar MSA for a prior year - no redlines, signed block."""
+    path = PDF_OUT / f"northstar-msa-{year}-executed.pdf"
+    story = doc_header(
+        f"Master Services Agreement - Executed {year}",
+        f"Acme Robotics, Inc. and Northstar Health System | Effective Date: {effective_date} | CLM-{year}-Northstar",
+    )
+    story += [
+        p(f"This Master Services Agreement (the <b>Agreement</b>) is entered into as of {effective_date} (the <b>Effective Date</b>) by and between Acme Robotics, Inc., a Delaware corporation (<b>Acme</b>), and Northstar Health System, a Minnesota nonprofit corporation (<b>Customer</b>). This Agreement was executed by the Parties and is in full force and effect."),
+        section("1. SERVICES AND USE RIGHTS"),
+        p("Subject to Customer's payment of applicable fees, Acme grants Customer a limited, non-exclusive, non-transferable right during the subscription term to access and use the Services for Customer's internal business operations."),
+        section("2. FEES, INVOICING, AND TAXES"),
+        p("Customer will pay the fees stated in each Order Form. Subscription fees are invoiced annually in advance; undisputed amounts are due forty-five days from invoice date. Fees exclude transaction taxes other than taxes on Acme's net income."),
+        section("3. SERVICE LEVELS AND SUPPORT"),
+        p("Acme will provide the support and service levels described in the applicable Order Form. Service credits are Customer's sole monetary remedy for a service-level failure and will not exceed twenty percent of the monthly subscription fees for the affected Service."),
+        section("4. DATA OWNERSHIP AND PRIVACY"),
+        p("As between the Parties, Customer owns Customer Data. Acme will process Customer Data only to provide, secure, support, and improve the Services. Where Acme processes personal data or PHI, the Data Processing Addendum and Business Associate Agreement govern that processing."),
+        section("5. INFORMATION SECURITY"),
+        p("Acme maintains a written information security program with administrative, technical, and physical safeguards, including encryption in transit and at rest, least-privilege access, logging, vulnerability management, and annual penetration testing. Acme will notify Customer of a confirmed Security Incident without undue delay and no later than seventy-two hours after confirmation."),
+        section("6. CONFIDENTIALITY"),
+        p("Each Party will use the other's Confidential Information only to perform or exercise rights under this Agreement and will protect it using at least reasonable care."),
+        section("7. LIMITATION OF LIABILITY"),
+        p("Except for Excluded Claims, each Party's aggregate liability will not exceed the fees paid or payable under the affected Order Form during the twelve months preceding the event giving rise to liability. Neither Party is liable for indirect, special, incidental, consequential, or punitive damages."),
+        section("8. TERM AND TERMINATION"),
+        p(f"This Agreement began on the Effective Date and continues for a subscription term of {term_months} months, renewing for successive one-year periods unless either Party provides at least ninety days' written notice before the current term ends. Either Party may terminate for uncured material breach."),
+        section("9. GOVERNING LAW"),
+        p("This Agreement is governed by Delaware law without regard to conflict-of-law rules. State and federal courts located in Wilmington, Delaware have exclusive jurisdiction."),
+        PageBreak(),
+        section("SIGNATURES"),
+        p(f"Executed by the Parties as of {executed_date}.", "Small"),
+        table(
+            [
+                ["ACME ROBOTICS, INC.", "NORTHSTAR HEALTH SYSTEM"],
+                ["By: /s/ Elena Martinez", "By: /s/ Marcus Bennett"],
+                ["Name: Elena Martinez", "Name: Marcus Bennett"],
+                ["Title: Chief Revenue Officer", "Title: Chief Procurement Officer"],
+                [f"Date: {executed_date}", f"Date: {executed_date}"],
+            ],
+            widths=[3.45 * inch, 3.45 * inch],
+        ),
+        section(f"EXHIBIT A - ORDER SUMMARY ({year})"),
+        table(
+            [
+                ["Commercial Term", "Agreed Value"],
+                ["Services", "Workflow Analytics, Robotics Ops Console, Premium Support"],
+                ["Subscription term", f"{term_months} months"],
+                ["Annual recurring fees", arr],
+                ["Payment terms", "Net 45"],
+                ["Governing law", "Delaware"],
+            ],
+            widths=[2.1 * inch, 4.8 * inch],
+        ),
+        Spacer(1, 0.2 * inch),
+        p("This synthetic executed agreement is designed for contract-lifecycle demonstrations. Names, terms, and provisions are fictional and are not legal advice.", "Small"),
+    ]
+    make_doc(path).build(story)
+
+
 def build_dpa():
     path = PDF_OUT / "northstar-dpa.pdf"
     story = doc_header("Data Processing Addendum", "Synthetic DPA for AI maturity demo")
@@ -505,6 +563,8 @@ def write_csv():
 def main():
     build_msa()
     build_realistic_msa()
+    build_executed_msa(2024, "July 31, 2024", "July 24, 2024", "$2,150,000")
+    build_executed_msa(2025, "July 31, 2025", "July 23, 2025", "$2,275,000")
     build_dpa()
     build_sow()
     build_order_form()
