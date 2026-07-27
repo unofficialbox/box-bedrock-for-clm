@@ -2,13 +2,16 @@
 private class BoxEmailAttachmentUploaderTest {
 
     private static void assertRoundTrip(String content) {
-        Blob mp = BoxEmailAttachmentUploader.buildMultipart('bnd123', 'redline.pdf', '402886371976', Blob.valueOf(content));
+        String attrs = '{"name":"redline.pdf","parent":{"id":"402886371976"}}';
+        Blob mp = BoxEmailAttachmentUploader.buildMultipart('bnd123', attrs, 'redline.pdf', Blob.valueOf(content));
         String decoded = mp.toString();
         System.assert(decoded.contains('name="attributes"'), 'attributes part present (len=' + content.length() + ')');
         System.assert(decoded.contains('"parent":{"id":"402886371976"}'), 'attributes reference the folder (len=' + content.length() + ')');
         System.assert(decoded.contains('filename="redline.pdf"'), 'file part names the file (len=' + content.length() + ')');
-        System.assert(decoded.contains(content), 'file content preserved byte-exact (len=' + content.length() + '): tail=' + decoded.right(24));
-        System.assert(decoded.endsWith('--bnd123--'), 'closing boundary intact (len=' + content.length() + ')');
+        // Content must sit byte-exact between the blank-line delimiter and the closing boundary —
+        // no stray padding bytes leaking into the file (regression guard).
+        System.assert(decoded.endsWith('\r\n\r\n' + content + '\r\n--bnd123--'),
+            'file content byte-exact between delimiter and footer (len=' + content.length() + '): tail=' + decoded.right(content.length() + 24));
     }
 
     @isTest
