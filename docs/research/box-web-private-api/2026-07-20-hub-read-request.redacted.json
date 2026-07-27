@@ -1,8 +1,0 @@
-{
-  "method": "POST",
-  "path": "/app-api/graphql",
-  "operationName": "GetHub",
-  "variables": {"id": "${HUB_ID}"},
-  "authentication": "existing authenticated Box web-app session",
-  "mutationAttempted": false
-}

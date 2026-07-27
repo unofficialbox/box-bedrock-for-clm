@@ -4,7 +4,7 @@ Use this path to configure, deploy, validate, rehearse, or reset the CLM demo in
 
 ## Run order
 
-Use [Demo Operator Handoff](./demo-operator-handoff.md) as the single consolidated script and validation reference.
+See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and validation commands.
 
 1. Confirm the repository, selected scenario, exact Box enterprise, Salesforce org, AWS account and region, Databricks workspace, and ignored runtime file.
 2. Run `python3 scripts/demo_operator.py status`.

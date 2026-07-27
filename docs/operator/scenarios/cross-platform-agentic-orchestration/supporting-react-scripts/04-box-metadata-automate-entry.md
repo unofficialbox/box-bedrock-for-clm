@@ -20,7 +20,7 @@ flowchart LR
     Context --> React["Open React CLM workspace"]
 ```
 
-Rendered version: [Box metadata entry-point flow](../../../../diagrams/clm-box-form-automate-entry.svg).
+Rendered version: [Box metadata entry-point flow](../../../../diagrams/clm-box-metadata-automate-entry.svg).
 
 ## Live anchors
 
