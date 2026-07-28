@@ -74,6 +74,7 @@ locals {
               "dataCategory" = "PHI"
               "dealValue" = 2150000
               "name" = "Northstar Health Master Service Agreement 2024"
+              "opportunity" = "Northstar Master Service Agreement 2024"
               "recordSource" = "Manual"
               "region" = "US"
               "requesterEmail" = "alex.mendoza@northstar.example"
@@ -94,6 +95,7 @@ locals {
               "dataCategory" = "PHI"
               "dealValue" = 2275000
               "name" = "Northstar Health Master Service Agreement 2025"
+              "opportunity" = "Northstar Master Service Agreement 2025"
               "recordSource" = "Manual"
               "region" = "US"
               "requesterEmail" = "alex.mendoza@northstar.example"
@@ -134,6 +136,20 @@ locals {
               "closeDateOffsetMonths" = 5
               "name" = "Northstar Master Service Agreement 2026"
               "stage" = "Prospecting"
+            }
+            {
+              "account" = "Northstar Health"
+              "amount" = 2150000
+              "closeDate" = "2024-07-31"
+              "name" = "Northstar Master Service Agreement 2024"
+              "stage" = "Closed Won"
+            }
+            {
+              "account" = "Northstar Health"
+              "amount" = 2275000
+              "closeDate" = "2025-07-31"
+              "name" = "Northstar Master Service Agreement 2025"
+              "stage" = "Closed Won"
             }
             {
               "account" = "Acme Cloudworks"
