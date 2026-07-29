@@ -94,6 +94,8 @@ for (Opportunity opp : [
     SELECT Id, Name, AccountId
     FROM Opportunity
     WHERE Name IN :new List<String>{
+        'Northstar Master Service Agreement 2024',
+        'Northstar Master Service Agreement 2025',
         'Northstar Master Service Agreement 2026',
         'Acme Cloudworks Cloud Security Expansion 2026'
     }
@@ -105,8 +107,28 @@ Integer opportunitiesCreated = 0;
 List<Opportunity> opportunitiesToInsert = new List<Opportunity>();
 
 String northStarOppKey = 'Northstar Master Service Agreement 2026|' + accountsByName.get('Northstar Health').Id;
+String northStar2024OppKey = 'Northstar Master Service Agreement 2024|' + accountsByName.get('Northstar Health').Id;
+String northStar2025OppKey = 'Northstar Master Service Agreement 2025|' + accountsByName.get('Northstar Health').Id;
 String acmeOppKey = 'Acme Cloudworks Cloud Security Expansion 2026|' + accountsByName.get('Acme Cloudworks').Id;
 
+if (!opportunitiesByKey.containsKey(northStar2024OppKey)) {
+    opportunitiesToInsert.add(new Opportunity(
+        Name = 'Northstar Master Service Agreement 2024',
+        AccountId = accountsByName.get('Northstar Health').Id,
+        Amount = 2150000,
+        CloseDate = Date.newInstance(2024, 7, 31),
+        StageName = 'Closed Won'
+    ));
+}
+if (!opportunitiesByKey.containsKey(northStar2025OppKey)) {
+    opportunitiesToInsert.add(new Opportunity(
+        Name = 'Northstar Master Service Agreement 2025',
+        AccountId = accountsByName.get('Northstar Health').Id,
+        Amount = 2275000,
+        CloseDate = Date.newInstance(2025, 7, 31),
+        StageName = 'Closed Won'
+    ));
+}
 if (!opportunitiesByKey.containsKey(northStarOppKey)) {
     opportunitiesToInsert.add(new Opportunity(
         Name = 'Northstar Master Service Agreement 2026',
@@ -135,6 +157,8 @@ for (Opportunity opp : [
     SELECT Id, Name, AccountId
     FROM Opportunity
     WHERE Name IN :new List<String>{
+        'Northstar Master Service Agreement 2024',
+        'Northstar Master Service Agreement 2025',
         'Northstar Master Service Agreement 2026',
         'Acme Cloudworks Cloud Security Expansion 2026'
     }
@@ -198,6 +222,7 @@ if (northContract2024 == null) {
 northContract2024.Name = 'Northstar Health Master Service Agreement 2024';
 northContract2024.Counterparty__c = 'Northstar Health';
 northContract2024.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
+northContract2024.Opportunity__c = opportunitiesByKey.get(northStar2024OppKey).Id;
 northContract2024.Contract_Type__c = 'MSA Package';
 northContract2024.Status__c = 'Executed';
 northContract2024.Deal_Value__c = 2150000;
@@ -222,6 +247,7 @@ if (northContract2025 == null) {
 northContract2025.Name = 'Northstar Health Master Service Agreement 2025';
 northContract2025.Counterparty__c = 'Northstar Health';
 northContract2025.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
+northContract2025.Opportunity__c = opportunitiesByKey.get(northStar2025OppKey).Id;
 northContract2025.Contract_Type__c = 'MSA Package';
 northContract2025.Status__c = 'Executed';
 northContract2025.Deal_Value__c = 2275000;
