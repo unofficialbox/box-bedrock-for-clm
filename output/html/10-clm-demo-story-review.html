@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark light">
+  <title>CLM Demo Story Review · Box Automate Agentic Orchestration</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #080b12;
+      --surface: #111622;
+      --surface-2: #181f2e;
+      --ink: #f7f8fc;
+      --muted: #aab3c6;
+      --faint: #778196;
+      --line: rgba(255, 255, 255, 0.12);
+      --accent: #72e3bd;
+      --accent-2: #5a95ff;
+      --success: #72e3bd;
+      --warning: #e3c572;
+      --danger: #e3728a;
+      --info: #72b7e3;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 16% 0%, color-mix(in srgb, var(--accent-2) 22%, transparent), transparent 34rem),
+        radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--accent) 14%, transparent), transparent 32rem),
+        var(--bg);
+      font: 16px/1.65 ui-sans-serif, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    a { color: var(--accent); text-underline-offset: 4px; }
+
+    .shell {
+      width: min(1100px, calc(100% - 36px));
+      margin: 0 auto;
+      padding: 36px 0 72px;
+    }
+
+    .masthead {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    h1 {
+      margin: 0 0 8px;
+      font-size: 2rem;
+      line-height: 1.2;
+      letter-spacing: -0.02em;
+    }
+
+    h2 {
+      margin: 0 0 12px;
+      font-size: 1.35rem;
+      letter-spacing: -0.015em;
+    }
+
+    h3 {
+      margin: 0 0 4px;
+      font-size: 1.05rem;
+    }
+
+    p { margin: 0; }
+    .muted { color: var(--muted); }
+    .faint { color: var(--faint); font-size: 0.88rem; }
+    .semibold { font-weight: 650; }
+
+    .print-button {
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 9px 15px;
+      color: var(--ink);
+      background: rgba(255, 255, 255, 0.06);
+      font: inherit;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+
+    .stack { display: flex; flex-direction: column; gap: 24px; }
+    .stack-sm { display: flex; flex-direction: column; gap: 12px; }
+    .stack-xs { display: flex; flex-direction: column; gap: 6px; }
+
+    .callout {
+      border: 1px solid color-mix(in srgb, var(--warning) 45%, var(--line));
+      border-radius: var(--radius);
+      background: color-mix(in srgb, var(--warning) 12%, var(--surface));
+      padding: 16px 18px;
+    }
+
+    .callout.info {
+      border-color: color-mix(in srgb, var(--info) 45%, var(--line));
+      background: color-mix(in srgb, var(--info) 12%, var(--surface));
+    }
+
+    .callout strong {
+      display: block;
+      margin-bottom: 6px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .stat {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      padding: 16px 18px;
+    }
+
+    .stat .value {
+      font-size: 1.5rem;
+      font-weight: 750;
+      letter-spacing: -0.02em;
+      margin-bottom: 4px;
+    }
+
+    .stat .label { color: var(--muted); font-size: 0.92rem; }
+    .stat.success .value { color: var(--success); }
+    .stat.warning .value { color: var(--warning); }
+    .stat.danger .value { color: var(--danger); }
+
+    hr {
+      border: 0;
+      border-top: 1px solid var(--line);
+      margin: 0;
+    }
+
+    .card {
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      background: var(--surface);
+      overflow: hidden;
+    }
+
+    .card-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      background: var(--surface-2);
+      font-weight: 650;
+    }
+
+    .card-body { padding: 16px; }
+
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      font-weight: 650;
+      color: var(--muted);
+      background: rgba(255, 255, 255, 0.04);
+      white-space: nowrap;
+    }
+
+    .pill.success { color: var(--success); border-color: color-mix(in srgb, var(--success) 40%, var(--line)); }
+    .pill.warning { color: var(--warning); border-color: color-mix(in srgb, var(--warning) 40%, var(--line)); }
+    .pill.danger { color: var(--danger); border-color: color-mix(in srgb, var(--danger) 40%, var(--line)); }
+    .pill.info { color: var(--info); border-color: color-mix(in srgb, var(--info) 40%, var(--line)); }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .beat {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+    }
+
+    .beat .pill { margin-top: 2px; min-width: 5.5rem; justify-content: center; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      overflow: hidden;
+      background: var(--surface);
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--line);
+      text-align: left;
+      vertical-align: top;
+    }
+
+    th {
+      color: var(--faint);
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: var(--surface-2);
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    td:first-child { font-weight: 650; width: 22%; }
+    .script-table td:first-child { width: 42%; color: var(--muted); font-weight: 500; }
+
+    .section { display: flex; flex-direction: column; gap: 12px; }
+
+    @media (max-width: 800px) {
+      .stats, .grid-2 { grid-template-columns: 1fr; }
+      .masthead { flex-direction: column; }
+      td:first-child, .script-table td:first-child { width: auto; }
+    }
+
+    @media print {
+      body { background: white; color: #111; }
+      .print-button { display: none; }
+      .card, .stat, .callout, table { break-inside: avoid; }
+      .muted, .faint, .pill, td:first-child { color: #333 !important; }
+      .stat.success .value, .pill.success { color: #0a7a4f !important; }
+      .stat.warning .value, .pill.warning { color: #8a6a00 !important; }
+      .stat.danger .value, .pill.danger { color: #a12a45 !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell stack">
+    <header class="masthead">
+      <div>
+        <h1>CLM demo story review</h1>
+        <p class="muted">Box Automate Agentic Orchestration — narrative fit for Legal Ops / Sales Ops buyers</p>
+      </div>
+      <button class="print-button" type="button" onclick="window.print()">Print / PDF</button>
+    </header>
+
+    <aside class="callout">
+      <strong>Verdict</strong>
+      <p>
+        Your instinct is right: the current README proves governed Automate orchestration well,
+        but the customer lifecycle story does not hang together. Fix the negotiation arc and align
+        Doc Gen to what you can actually show — do not keep both “upload already-redlined package”
+        and “later generate first draft then receive redlines.”
+      </p>
+    </aside>
+
+    <section class="stats" aria-label="Story health">
+      <div class="stat success">
+        <div class="value">Strong</div>
+        <div class="label">Automate control path</div>
+      </div>
+      <div class="stat warning">
+        <div class="value">Weak</div>
+        <div class="label">Negotiation realism</div>
+      </div>
+      <div class="stat danger">
+        <div class="value">Broken</div>
+        <div class="label">Paper timeline</div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>What is wrong with the current story</h2>
+      <p>
+        The presenter script sells a portfolio → intake → agent → approve → Salesforce → clause tour →
+        Doc Gen/Sign path. That is a product feature sequence, not a contract lifecycle. Buyers map
+        mental models to: request → paper → negotiate → approve exceptions → execute → retain.
+      </p>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Lifecycle order is confused</span>
+          <span class="pill danger">Critical</span>
+        </div>
+        <div class="card-body stack-xs">
+          <p class="semibold">Evidence</p>
+          <p class="muted">Intake already uploads a redlined MSA package, then the script later has a separate “Redlines” beat that is really a Clause Hub tour.</p>
+          <p class="semibold">Why customers reject it</p>
+          <p class="muted">Legal Ops will not recognize the process. In the real world, redlines arrive after paper is exchanged — not as a dashboard sidebar visit.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Doc Gen is the wrong artifact</span>
+          <span class="pill danger">Critical</span>
+        </div>
+        <div class="card-body stack-xs">
+          <p class="semibold">Evidence</p>
+          <p class="muted">Live templates are approval memo, order summary, and renewal notice — not the MSA first draft the 10-step story assumes.</p>
+          <p class="semibold">Why customers reject it</p>
+          <p class="muted">Claiming “we generate the contract from a DOCX template” will fail on-stage when the output is a memo, not the agreement.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Negotiation moment is underspecified</span>
+          <span class="pill warning">High</span>
+        </div>
+        <div class="card-body stack-xs">
+          <p class="semibold">Evidence</p>
+          <p class="muted">Steps 6–7 in the desired story (accept redlines + insert a new clause + query approved XYZ) collapse into one vague “open Clause Library” line.</p>
+          <p class="semibold">Why customers reject it</p>
+          <p class="muted">This is the moment buyers care about. Without a named clause decision, the demo feels like a product feature tour, not CLM.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Status is treated as a closing slide</span>
+          <span class="pill warning">High</span>
+        </div>
+        <div class="card-body stack-xs">
+          <p class="semibold">Evidence</p>
+          <p class="muted">Real CLM updates status at each gate: Submitted → Under Review → In Negotiation → Pending Signature → Executed.</p>
+          <p class="semibold">Why customers reject it</p>
+          <p class="muted">Sponsors ask “where does status live?” Metadata/charts only land if status moves throughout the story.</p>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="card-header">
+          <span>Demo claims vs live path diverge</span>
+          <span class="pill info">Medium</span>
+        </div>
+        <div class="card-body stack-xs">
+          <p class="semibold">Evidence</p>
+          <p class="muted">README already warns: no Extract Agent step, no upsert/duplicate protection, Reject ends silently.</p>
+          <p class="semibold">Why customers reject it</p>
+          <p class="muted">Trust collapses if the presenter narrates the architecture diagram instead of the live Automate run.</p>
+        </div>
+      </article>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Your 10 steps vs the live demo</h2>
+      <table>
+        <thead>
+          <tr>
+            <th>Desired beat</th>
+            <th>What the README / assets do today</th>
+            <th>Recommendation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Intake form + files</td>
+            <td>Form with Northstar package (already redlined)</td>
+            <td>Keep — but decide if this is inbound paper or outbound deal facts</td>
+          </tr>
+          <tr>
+            <td>2. Draft reviewed / approved</td>
+            <td>Human task before Salesforce write</td>
+            <td>Keep — this is the Automate control story; do not weaken it</td>
+          </tr>
+          <tr>
+            <td>3. Salesforce record</td>
+            <td>HTTPS Connector create after approval</td>
+            <td>Keep — frame as commercial system of record, not the workspace</td>
+          </tr>
+          <tr>
+            <td>4. Generate DOCX from template</td>
+            <td>Doc Gen exists, but not for the MSA</td>
+            <td>Change — either generate first-paper MSA, or drop “first draft” claim</td>
+          </tr>
+          <tr>
+            <td>5. Counterparty redlines returned</td>
+            <td>Implied by sample package; not a timed beat</td>
+            <td>Add — explicit fast-forward with a returned redline file</td>
+          </tr>
+          <tr>
+            <td>6. Accept redlines + add clause</td>
+            <td>Missing as a decision</td>
+            <td>Add — one accept, one replace with approved fallback</td>
+          </tr>
+          <tr>
+            <td>7. Ask approved clauses for XYZ</td>
+            <td>Hub shown; no concrete question</td>
+            <td>Add — agent/Hub query for Limitation of Liability (PHI)</td>
+          </tr>
+          <tr>
+            <td>8. Generate PDF</td>
+            <td>Not a dedicated beat</td>
+            <td>Add — final clean PDF before Sign</td>
+          </tr>
+          <tr>
+            <td>9. Send for signature</td>
+            <td>Mentioned under Execution</td>
+            <td>Keep — human-authorized Box Sign only</td>
+          </tr>
+          <tr>
+            <td>10. Update status</td>
+            <td>Portfolio charts; weak narrative</td>
+            <td>Strengthen — show metadata status flip to Executed</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Pick one paper model (do not mix)</h2>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-header">
+            <span>A. Inbound paper (matches assets)</span>
+            <span class="pill success">Recommended</span>
+          </div>
+          <div class="card-body stack-sm">
+            <p>
+              Sales uploads Northstar’s redlined MSA package at intake. Agent compares to playbook.
+              Human approves structured facts → Salesforce. Negotiation uses Clause Hub to resolve
+              remaining exceptions. Doc Gen produces approval memo / order summary; final clean PDF +
+              Sign close the deal.
+            </p>
+            <p class="muted">
+              Pros: works with current redline PDF, Doc Gen templates, and proven Automate path.
+              Cons: no “we authored first paper” beat.
+            </p>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-header">
+            <span>B. Outbound paper (matches your 10 steps)</span>
+            <span class="pill warning">Needs new asset</span>
+          </div>
+          <div class="card-body stack-sm">
+            <p>
+              Form captures deal facts only (or clean baseline). After SF create, Doc Gen emits
+              first-draft MSA. Fast-forward: upload counterparty redlines. Accept most changes;
+              insert one approved fallback clause; PDF → Sign → status.
+            </p>
+            <p class="muted">
+              Pros: classic vendor CLM story. Cons: requires an MSA Doc Gen template and a distinct
+              returned-redline file — not what templates are today.
+            </p>
+          </div>
+        </article>
+      </div>
+      <aside class="callout info">
+        <strong>Default recommendation</strong>
+        <p>
+          Ship Model A for the next customer demo unless you can add a real MSA Doc Gen template
+          this week. Rewrite the presenter script so redlines are the intake package, and the middle
+          act is exception resolution — not “generate first draft after Salesforce.”
+        </p>
+      </aside>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Make XYZ concrete</h2>
+      <p>
+        “Ask about approved clauses for XYZ” only resonates if XYZ is a named, high-stakes exception
+        already in the sample library.
+      </p>
+      <div class="grid-2">
+        <article class="card">
+          <div class="card-header">
+            <span>Limitation of Liability</span>
+            <span class="pill success">Primary</span>
+          </div>
+          <div class="card-body stack-xs">
+            <p>Northstar wants unlimited liability. Ask: “What is our approved liability position for a PHI deal over $1M?”</p>
+            <p class="muted">Answer from Hub: reject unlimited; use CLM-LIAB-002 (24-month cap + privacy/security super-cap). Owner: Commercial Legal.</p>
+          </div>
+        </article>
+        <article class="card">
+          <div class="card-header">
+            <span>Payment terms (optional)</span>
+            <span class="pill">Secondary</span>
+          </div>
+          <div class="card-body stack-xs">
+            <p>Accept Net 90 with Finance condition (playbook expects Net 45). Shows commercial compromise without inventing new clauses.</p>
+            <p class="muted">Keeps one “accept redline” and one “replace with approved language” decision — the minimum realistic negotiation.</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Recommended 12–15 minute arc (Model A)</h2>
+      <div class="stack-sm">
+        <div class="beat">
+          <span class="pill">0–2 min</span>
+          <div>
+            <h3>Portfolio</h3>
+            <p class="muted">Legal Ops sees every active deal by status, risk, and type — driven by governed metadata.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <span class="pill">2–5 min</span>
+          <div>
+            <h3>Intake + gate</h3>
+            <p class="muted">Sales submits Northstar MSA package. Automate enriches; a named person approves before Salesforce is writable.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <span class="pill">5–7 min</span>
+          <div>
+            <h3>CRM write</h3>
+            <p class="muted">Approved facts create the CLM_Contract__c record. Box remains content authority.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <span class="pill">7–11 min</span>
+          <div>
+            <h3>Negotiate</h3>
+            <p class="muted">Fast-forward remaining exceptions. Accept payment/renewal with conditions; reject unlimited liability; pull CLM-LIAB-002 fallback from the Hub.</p>
+          </div>
+        </div>
+        <div class="beat">
+          <span class="pill">11–14 min</span>
+          <div>
+            <h3>Execute + close</h3>
+            <p class="muted">Generate final PDF / approval artifacts, send Box Sign after approvals clear, flip status to Executed, return to portfolio.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>Script lines that should change</h2>
+      <table class="script-table">
+        <thead>
+          <tr>
+            <th>Stop saying</th>
+            <th>Say instead</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>We generate the contract from a DOCX template, then the customer redlines it.</td>
+            <td>Sales brought in Northstar’s redlined package. Automation prepares the record; Legal resolves exceptions against approved language.</td>
+          </tr>
+          <tr>
+            <td>Each clause issue belongs with the right domain expert. (while only opening the Hub)</td>
+            <td>Unlimited liability is out of policy. Here is the approved fallback CLM-LIAB-002 — Commercial Legal owns it, cited for this PHI deal.</td>
+          </tr>
+          <tr>
+            <td>Extract then agent review (unless Extract is live)</td>
+            <td>Agent review proposes cited findings; a person approves before Salesforce write.</td>
+          </tr>
+          <tr>
+            <td>Status updates at the end.</td>
+            <td>Watch status move: Submitted → Under Review → In Negotiation → Pending Signature → Executed.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr>
+
+    <section class="section">
+      <h2>What already resonates — keep it</h2>
+      <div class="grid-2">
+        <div class="stack-xs">
+          <p class="semibold">Deal context</p>
+          <p class="muted">Acme → Northstar Health, $2.4M MSA, PHI, US region. Healthcare + data sensitivity makes control and clause reuse believable.</p>
+        </div>
+        <div class="stack-xs">
+          <p class="semibold">Human gate before CRM write</p>
+          <p class="muted">Security and Legal sponsors buy this immediately. Do not let agents write Salesforce.</p>
+        </div>
+        <div class="stack-xs">
+          <p class="semibold">Box as content authority</p>
+          <p class="muted">Form, workspace, Hub, Doc Gen, Sign, audit trail in one system — Salesforce as structured outcome.</p>
+        </div>
+        <div class="stack-xs">
+          <p class="semibold">Honesty notes in the README</p>
+          <p class="muted">Calling out missing Extract and missing upsert is the right operator discipline — keep those stage constraints.</p>
+        </div>
+      </div>
+    </section>
+
+    <p class="faint">
+      Sources: docs/operator/scenarios/box-automate-agentic-orchestration/README.md,
+      form/docgen configs, sample clauses CLM-LIAB-002 / CLM-DATA-001,
+      Northstar package notes. Review date 2026-07-23. Self-contained export of the
+      clm-scenario-story-review canvas.
+    </p>
+  </main>
+</body>
+</html>
