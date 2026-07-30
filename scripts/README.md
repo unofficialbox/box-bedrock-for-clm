@@ -51,7 +51,7 @@ Three ways out, in the order they should be considered:
 | `build_customer_datasheet.py` | Build the nontechnical Box Solutions datasheet for generalists, sales teams, customers, and IT decision makers |
 | `build_contract_lifecycle_readiness_marketecture.py` | Build the lifecycle swimlane marketecture showing persistent platform responsibilities and human decision authority |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
-| `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
+| `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice, plus the in-redline Northstar MSA contract |
 
 For a fresh environment, start with:
 
@@ -122,6 +122,12 @@ python3 scripts/generate_docgen_templates.py
 ```
 
 The generated `.docx` files are written to `output/docgen/`. Sample merge data is in `config/box/docgen-template-data.bcl`.
+
+Three of the four files are merge templates. `northstar-msa-2026-redline.docx` is not: it is a real MSA draft still in redline, uploaded against the `CLM-SAMPLE-NST-001` sample record. It reads as an agreement would — recitals, defined terms, numbered clauses in legal prose, tracked-changes markup on the six contested clauses, counsel comments, an unsigned signature block, and an Exhibit A order form.
+
+Every value the Salesforce intake connector binds is stated the way a contract states it, never as a labelled extraction field. Box Extract has to normalise real prose: `Two Hundred Fifty Thousand Dollars ($250,000.00)` → `250000.00`, `thirty-six (36) months` → `36`, a United States territory clause → `US`. That is deliberate — it exercises the extraction and human-validation path instead of short-circuiting it. Prompts live in `config/box/extract-field-prompts.bcl`.
+
+Two bound fields are **not** in the document, because they are assessments rather than contract terms: `riskLevel` and `specialTermsRiskNotes` both come from the reviewer at the approval task. Keep the contract values aligned with `clm-salesforce-project/scripts/seed-clm-salesforce-sample-data.apex`.
 
 Rebuild both screenshot galleries from the CLM demo root:
 

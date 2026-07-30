@@ -32,6 +32,10 @@ locals {
                   "type" = "string"
                 }
                 {
+                  "key" = "requesterName"
+                  "type" = "string"
+                }
+                {
                   "key" = "contractType"
                   "options" = [
                     "MSA Package"
@@ -103,6 +107,10 @@ locals {
                   "type" = "enum"
                 }
                 {
+                  "key" = "specialTermsRiskNotes"
+                  "type" = "string"
+                }
+                {
                   "key" = "targetSignatureDate"
                   "type" = "date"
                 }
@@ -116,6 +124,29 @@ locals {
                 }
               ]
               "templateKey" = "clmContract"
+            }
+            {
+              "displayName" = "Salesforce Record"
+              "fields" = [
+                {
+                  "key" = "counterparty"
+                  "note" = "Counterparty display name. Binds Salesforce Counterparty__c (Text)."
+                  "type" = "string"
+                }
+                {
+                  "key" = "counterpartyAccount"
+                  "note" = "Counterparty Account name. Binds Salesforce Counterparty_Account__c, a Lookup to Account, so the connector must resolve the name to an Account Id before binding. Never post the display name into the Lookup field."
+                  "type" = "string"
+                }
+                {
+                  "key" = "opportunity"
+                  "note" = "Opportunity name. Binds Salesforce Opportunity__c, a Lookup to Opportunity, so the connector must resolve the name to an Opportunity Id before binding. Never post the display name into the Lookup field."
+                  "type" = "string"
+                }
+              ]
+              "purpose" = "Holds the Salesforce-facing identity values that the CLM intake connector reads separately from the commercial clmContract terms. Populated by Box Extract from the contract text: the customer party is taken from the opening parties paragraph and the procurement programme from the Exhibit A preamble."
+              "status" = "specified-not-live"
+              "templateKey" = "salesforceRecord"
             }
             {
               "displayName" = "CLM Document"

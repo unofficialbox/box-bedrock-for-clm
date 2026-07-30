@@ -274,6 +274,7 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             "clm-approval-memo-template.docx",
             "clm-order-summary-template.docx",
             "clm-renewal-notice-template.docx",
+            "northstar-msa-2026-redline.docx",
         }
         if {path.name for path in docgen_runs[0].glob("*.docx")} != expected_docx:
             raise ValidationError("Doc Gen output set is incomplete")
@@ -281,7 +282,7 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             first_archive = docx_semantic_archive(docgen_runs[0] / name)
             if first_archive != docx_semantic_archive(docgen_runs[1] / name) or first_archive != docx_semantic_archive(root / "output" / "docgen" / name):
                 raise ValidationError(f"Doc Gen template drift: {name}")
-    return "6 PDFs, 3 deterministic data fixtures, 1 trace, 3 Doc Gen templates"
+    return "6 PDFs, 3 deterministic data fixtures, 1 trace, 4 Doc Gen documents"
 
 
 def check_generated_presenters(root: Path = ROOT) -> str:
