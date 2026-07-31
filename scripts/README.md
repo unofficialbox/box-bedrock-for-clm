@@ -16,25 +16,11 @@ This repository is a **golden copy** of the finished CLM scenario. Machinery tha
 
 Nothing has been moved on this basis yet. Do not treat the current layout as a decision.
 
-## Known breakage: the BCL cutover is half-applied
+## Config formats: authored BCL, runtime JSON
 
-Config under `config/` is now `.bcl`; BCL is the only supported import format and every `.json` config was removed. Several scripts still expect the JSON paths and therefore fail:
+Authored spec config under `config/` is `.bcl` — BCL is the only supported admin-facing import format, and the canonical inventory matches what `box-dispatch` reads in `internal/bcl`. `scripts/bcl.py` is a dependency-free reader that parses the `locals { "bcl" = { … } }` envelope and returns the `resources[0].config` payload. `demo_operator.py` and `validate_clm.py` load authored config through it (`load_config` dispatches `.bcl` → BCL, `.json` → JSON).
 
-| Script | Stale references |
-|---|---|
-| `demo_operator.py` | 10 config paths |
-| `setup_clm_dev.py` | 1 |
-| `validate_clm.py` | 1 (`validation-receipts.json`) |
-
-Some tests error as a result, and `validate_clm.py` reports fewer passing rows than it did before the cutover. This is understood and accepted for now; it is not a regression to chase in isolation.
-
-A working Python BCL reader exists in `unofficialbox/box-capture/bcl.py` and parses the same inventory that `box-dispatch` reads in `internal/bcl`. It is deliberately **not** vendored back into this repository, because doing so would recreate the dependency the extraction just removed.
-
-Three ways out, in the order they should be considered:
-
-1. **Move the provisioning scripts out**, so the question disappears with them. Preferred if the boundary rule holds.
-2. **Let `box-dispatch` own config resolution** and delete the Python that duplicates it.
-3. **Vendor a shared BCL reader here** — cheapest, but keeps machinery in the golden copy.
+The `config/runtime/*` files are the exception and stay JSON: they are per-operator, gitignored, and round-tripped by the tooling (`setup_clm_dev.py` writes `demo-environment.json`, `demo_operator.py` writes `bootstrap-state.json`, and `resolve-config` emits resolved specs as JSON under `config/runtime/generated/`). Only the `*.example.json` templates are committed. No external tool imports these runtime files, so BCL would add a lossy emitter for no gain.
 
 ## Available scripts
 
@@ -42,7 +28,8 @@ Three ways out, in the order they should be considered:
 |--------|---------|
 | `validate_clm.py` | Run the complete repository matrix or fail-closed presenter-readiness validation from one command |
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
-| `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.bcl` |
+| `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.json` |
+| `bcl.py` | Dependency-free reader for authored `.bcl` config artifacts; returns the config payload from the `locals.bcl` envelope |
 | `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
@@ -56,7 +43,7 @@ Three ways out, in the order they should be considered:
 For a fresh environment, start with:
 
 ```bash
-cp config/runtime/demo-environment.example.bcl config/runtime/demo-environment.bcl
+cp config/runtime/demo-environment.example.json config/runtime/demo-environment.json
 python3 scripts/demo_operator.py doctor
 ```
 
@@ -79,7 +66,7 @@ Run a safe pre-flight check before full setup:
 python3 scripts/setup_clm_dev.py --smoke
 ```
 
-Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.bcl` and run `python3 scripts/validate_clm.py --presenter-ready`.
+Use `--skip-react` only for a narrow Python/content diagnostic. Use `--skip-playwright` only when browser binaries are unavailable and report the omitted gate. For a live presenter-readiness decision, populate the gitignored receipt file from `config/runtime/validation-receipts.example.json` and run `python3 scripts/validate_clm.py --presenter-ready`.
 
 The operator command sequence is:
 

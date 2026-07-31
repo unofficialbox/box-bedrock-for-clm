@@ -1,14 +1,14 @@
 # Browser and Administrator Configuration
 
-Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs from the local, gitignored `config/runtime/bootstrap-state.bcl`.
+Complete these steps after `box-foundation` and `salesforce-deploy`. Read IDs from the local, gitignored `config/runtime/bootstrap-state.json`.
 
-Before any browser-agent step, sign in to the intended Box web application with the intended builder account and keep that tab open. Confirm its hostname exactly matches `config/runtime/demo-environment.bcl`. Browser plans and private-lab executors use that existing web session; they do not perform login or contain credentials.
+Before any browser-agent step, sign in to the intended Box web application with the intended builder account and keep that tab open. Confirm its hostname exactly matches `config/runtime/demo-environment.json`. Browser plans and private-lab executors use that existing web session; they do not perform login or contain credentials.
 
 ## 1. Box content and metadata
 
 1. Open the generated `CLM-2026-Northstar` workspace.
 2. Mark the three Word files in `08 - DocGen Templates` as Box Doc Gen templates.
-3. Confirm `seed-metadata` applied the `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` values recorded in `bootstrap-state.bcl`.
+3. Confirm `seed-metadata` applied the `clmContract`, `clmDocument`, `clmObligation`, and `clmClause` values recorded in `bootstrap-state.json`.
 4. Confirm the generated **Approved Clauses** folder contains the README plus eight standard/fallback Markdown clauses.
 5. Assign real owners and collaborators from this environment; do not copy demo usernames.
 
@@ -24,7 +24,7 @@ Build **Contract Lifecycle Management** from `config/box/box-app-blueprint.md`.
 
 Use the generated folder/template IDs only when the builder asks for a binding. Put high-frequency actions first: **Start a New Contract**, **Approved Clause Hub**, and **Executed Agreements**. Add charts by status, risk, contract type, region, and clause family.
 
-Obtain approval before publishing. Record the published URL in `demo-environment.bcl`.
+Obtain approval before publishing. Record the published URL in `demo-environment.json`.
 
 ## 4. Clause Library Hub
 
@@ -83,7 +83,7 @@ This POST is **not idempotent** (`idempotency.safe = false`): resubmitting the s
 
 For Box Automate Agentic Orchestration, configure only the Agentforce actions used by the Box-led path. For Cross-Platform Agentic Orchestration, follow [Cross-Platform Agentic Orchestration deployment boundary](cross-platform-deployment.md). The repository provides a local deterministic trace; it does not yet automate managed AgentCore or Databricks provisioning.
 
-Record the new environment's IDs in `demo-environment.bcl`; never write secrets there.
+Record the new environment's IDs in `demo-environment.json`; never write secrets there.
 
 ## 8. Completion gate
 

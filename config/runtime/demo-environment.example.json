@@ -1,0 +1,34 @@
+{
+  "box": {
+    "parentFolderId": "",
+    "allowRootFolder": false,
+    "enterpriseId": "",
+    "operatorLogin": "",
+    "reviewerLogins": [],
+    "hostname": "",
+    "appUrl": "",
+    "formUrl": "",
+    "hubUrl": "",
+    "workflowUrl": ""
+  },
+  "salesforce": {
+    "orgAlias": "",
+    "orgId": "",
+    "myDomainUrl": "",
+    "operatorUsername": "",
+    "integrationUsername": "",
+    "integrationEmail": ""
+  },
+  "agentforce": {
+    "agentId": "",
+    "applicationId": ""
+  },
+  "agentcore": {
+    "region": "",
+    "runtimeArn": ""
+  },
+  "databricks": {
+    "workspaceUrl": "",
+    "warehouseId": ""
+  }
+}

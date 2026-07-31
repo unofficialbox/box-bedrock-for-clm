@@ -103,7 +103,7 @@ locals {
               "appliesWhen" = "All selected scenarios and integrations are represented in validation receipts"
               "command" = "python3 scripts/validate_clm.py --presenter-ready"
               "completeWhen" = "No unresolved mandatory tokens remain, scenario smoke validation passed, presenter-ready receipts are current, and manual finalization tasks are complete."
-              "dryRun" = "cp config/runtime/validation-receipts.example.bcl config/runtime/validation-receipts.json"
+              "dryRun" = "cp config/runtime/validation-receipts.example.json config/runtime/validation-receipts.json"
               "id" = "finalization"
               "owner" = "operator"
               "writesExternalState" = false

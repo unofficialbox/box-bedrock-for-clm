@@ -19,6 +19,10 @@ from html.parser import HTMLParser
 from pathlib import Path
 from typing import Callable
 
+# Load the sibling BCL module whether run as a script or imported via importlib.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bcl  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[1]
 REACT = ROOT / "clm-salesforce-project" / "force-app" / "main" / "default" / "uiBundles" / "clmreactapp"
@@ -134,9 +138,20 @@ def check_json_and_schemas(root: Path = ROOT) -> str:
                 schema_count += 1
         except Exception as error:
             failures.append(f"{path.relative_to(root)}: {error}")
+    bcl_count = 0
+    for path in sorted(root.rglob("*.bcl")):
+        if EXCLUDED_PARTS.intersection(path.relative_to(root).parts):
+            continue
+        try:
+            config = bcl.load_bcl(path)
+            if not isinstance(config, dict):
+                raise ValueError("artifact config is not an object")
+            bcl_count += 1
+        except Exception as error:
+            failures.append(f"{path.relative_to(root)}: {error}")
     if failures:
-        raise ValidationError("Invalid JSON or JSON Schema:\n" + "\n".join(failures))
-    return f"{count} JSON files, {schema_count} schemas"
+        raise ValidationError("Invalid JSON, JSON Schema, or BCL:\n" + "\n".join(failures))
+    return f"{count} JSON files, {schema_count} schemas, {bcl_count} BCL artifacts"
 
 
 def check_local_links(root: Path = ROOT) -> str:
@@ -250,8 +265,14 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             committed = root / "output" / relative
             if first.read_bytes() != second.read_bytes() or first.read_bytes() != committed.read_bytes():
                 raise ValidationError(f"Deterministic fixture drift: output/{relative}")
-        if len(list((sample_runs[0] / "pdf").glob("*.pdf"))) != 6:
-            raise ValidationError("Expected six generated contract PDFs")
+        generated_pdfs = {path.name for path in (sample_runs[0] / "pdf").glob("*.pdf")}
+        committed_pdfs = {path.name for path in (root / "output" / "pdf").glob("*.pdf")}
+        if generated_pdfs != committed_pdfs:
+            raise ValidationError(
+                "Generated contract PDFs do not match committed output/pdf: "
+                f"missing={sorted(committed_pdfs - generated_pdfs)}, "
+                f"unexpected={sorted(generated_pdfs - committed_pdfs)}"
+            )
 
         trace_runs: list[Path] = []
         for index in range(2):
@@ -270,18 +291,22 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             module.OUTPUT = temporary / f"docgen-{index}"
             module.main()
             docgen_runs.append(module.OUTPUT)
-        expected_docx = {
-            "clm-approval-memo-template.docx",
-            "clm-order-summary-template.docx",
-            "clm-renewal-notice-template.docx",
-        }
-        if {path.name for path in docgen_runs[0].glob("*.docx")} != expected_docx:
-            raise ValidationError("Doc Gen output set is incomplete")
+        expected_docx = {path.name for path in (root / "output" / "docgen").glob("*.docx")}
+        generated_docx = {path.name for path in docgen_runs[0].glob("*.docx")}
+        if generated_docx != expected_docx:
+            raise ValidationError(
+                "Doc Gen output set does not match committed output/docgen: "
+                f"missing={sorted(expected_docx - generated_docx)}, "
+                f"unexpected={sorted(generated_docx - expected_docx)}"
+            )
         for name in expected_docx:
             first_archive = docx_semantic_archive(docgen_runs[0] / name)
             if first_archive != docx_semantic_archive(docgen_runs[1] / name) or first_archive != docx_semantic_archive(root / "output" / "docgen" / name):
                 raise ValidationError(f"Doc Gen template drift: {name}")
-    return "6 PDFs, 3 deterministic data fixtures, 1 trace, 3 Doc Gen templates"
+    return (
+        f"{len(committed_pdfs)} PDFs, 3 deterministic data fixtures, 1 trace, "
+        f"{len(expected_docx)} Doc Gen templates"
+    )
 
 
 def check_generated_presenters(root: Path = ROOT) -> str:
@@ -381,12 +406,12 @@ class PortableResourceParser(HTMLParser):
 def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = None) -> str:
     today = today or datetime.now(UTC).date()
     failures: list[str] = []
-    scenario_paths = sorted((root / "config" / "demo").glob("*-demo-manifest.json"))
-    scenario_ids = {path.name.removesuffix("-demo-manifest.json") for path in scenario_paths}
+    scenario_paths = sorted((root / "config" / "demo").glob("*-demo-manifest.bcl"))
+    scenario_ids = {path.name.removesuffix("-demo-manifest.bcl") for path in scenario_paths}
     if len(scenario_paths) != 2:
         failures.append(f"expected 2 scenario manifests, found {len(scenario_paths)}")
     for path in scenario_paths:
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = bcl.load_bcl(path)
         for key in ("manifestVersion", "scenario", "presenterSurface", "included", "readiness", "documentation", "screenshots"):
             if key not in data:
                 failures.append(f"{path.relative_to(root)}: missing {key}")
@@ -394,8 +419,8 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
             if isinstance(target, str) and not (root / target).exists():
                 failures.append(f"{path.relative_to(root)}: missing {target}")
 
-    manifest_path = root / "config" / "demo" / "screenshot-manifest.json"
-    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest_path = root / "config" / "demo" / "screenshot-manifest.bcl"
+    manifest = bcl.load_bcl(manifest_path)
     entries = manifest.get("screenshots", [])
     declared = {entry.get("path") for entry in entries}
     actual = {
@@ -439,8 +464,8 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
 
 
 def check_reset_and_idempotency_contract(root: Path = ROOT) -> str:
-    operator = json.loads((root / "config" / "operator" / "operator-workflow.json").read_text(encoding="utf-8"))
-    connectors = json.loads((root / "config" / "box" / "https-connectors.json").read_text(encoding="utf-8"))
+    operator = bcl.load_bcl(root / "config" / "operator" / "operator-workflow.bcl")
+    connectors = bcl.load_bcl(root / "config" / "box" / "https-connectors.bcl")
     operator_text = json.dumps(operator).lower()
     connector_text = json.dumps(connectors).lower()
     manual_text = (root / "docs" / "operator" / "manual-task-register.md").read_text(encoding="utf-8").lower()
