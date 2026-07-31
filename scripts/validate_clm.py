@@ -32,6 +32,30 @@ EXCLUDED_PARTS = {
     "test-results", "__pycache__", ".pytest_cache",
 }
 MAX_TEXT_BYTES = 5_000_000
+# Canonical contracts, kept as named sets so checks compare membership instead of
+# asserting bare counts (which silently pass when the wrong item is added/removed).
+EXPECTED_SCENARIOS = {
+    "box-automate-agentic-orchestration",
+    "cross-platform-agentic-orchestration",
+}
+DETERMINISTIC_DATA_FIXTURES = (
+    "json/northstar-clm-records.json",
+    "json/clause-playbook.json",
+    "csv/historical-clause-outcomes.csv",
+)
+EXPECTED_PRESENTERS = {
+    "index.html",
+    "00-operator-setup-guide.html",
+    "01-box-automate-agentic-orchestration-guide.html",
+    "02-box-automate-agentic-orchestration-gallery.html",
+    "03-cross-platform-agentic-orchestration-guide.html",
+    "04-cross-platform-agentic-orchestration-gallery.html",
+    "05-executive-marketecture.html",
+    "06-agentcore-agent-experience-marketecture.html",
+    "07-customer-solution-datasheet.html",
+    "08-contract-lifecycle-readiness-marketecture.html",
+    "09-complete-presenter-edition.html",
+}
 RUNTIME_ID_SUFFIXES = {".md", ".json", ".py", ".ts", ".tsx", ".js", ".xml", ".sh", ".yml", ".yaml", ".toml", ".env", ".properties"}
 SECRET_ASSIGNMENT = re.compile(
     r'''(?ix)["']?(client[_-]?secret|access[_-]?token|refresh[_-]?token|api[_-]?key|password)["']?\s*[:=]\s*["']([^"'\n]+)'''
@@ -259,7 +283,7 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
                 output.mkdir(parents=True, exist_ok=True)
             module.main()
             sample_runs.append(destination)
-        for relative in ("json/northstar-clm-records.json", "json/clause-playbook.json", "csv/historical-clause-outcomes.csv"):
+        for relative in DETERMINISTIC_DATA_FIXTURES:
             first = sample_runs[0] / relative
             second = sample_runs[1] / relative
             committed = root / "output" / relative
@@ -304,8 +328,8 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
             if first_archive != docx_semantic_archive(docgen_runs[1] / name) or first_archive != docx_semantic_archive(root / "output" / "docgen" / name):
                 raise ValidationError(f"Doc Gen template drift: {name}")
     return (
-        f"{len(committed_pdfs)} PDFs, 3 deterministic data fixtures, 1 trace, "
-        f"{len(expected_docx)} Doc Gen templates"
+        f"{len(committed_pdfs)} PDFs, {len(DETERMINISTIC_DATA_FIXTURES)} deterministic data fixtures, "
+        f"1 trace, {len(expected_docx)} Doc Gen templates"
     )
 
 
@@ -331,21 +355,8 @@ def check_generated_presenters(root: Path = ROOT) -> str:
         module = load_script("build_presenter_portal", root)
         module.OUTPUT = output
         module.build()
-        expected = {
-            "index.html",
-            "00-operator-setup-guide.html",
-            "01-box-automate-agentic-orchestration-guide.html",
-            "02-box-automate-agentic-orchestration-gallery.html",
-            "03-cross-platform-agentic-orchestration-guide.html",
-            "04-cross-platform-agentic-orchestration-gallery.html",
-            "05-executive-marketecture.html",
-            "06-agentcore-agent-experience-marketecture.html",
-            "07-customer-solution-datasheet.html",
-            "08-contract-lifecycle-readiness-marketecture.html",
-            "09-complete-presenter-edition.html",
-        }
         generated = {path.name for path in output.glob("*.html")}
-        if generated != expected:
+        if generated != EXPECTED_PRESENTERS:
             raise ValidationError(f"Presenter output set is incomplete: {sorted(generated)}")
         drift = [
             path.name for path in sorted(output.glob("*.html"))
@@ -408,8 +419,12 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
     failures: list[str] = []
     scenario_paths = sorted((root / "config" / "demo").glob("*-demo-manifest.bcl"))
     scenario_ids = {path.name.removesuffix("-demo-manifest.bcl") for path in scenario_paths}
-    if len(scenario_paths) != 2:
-        failures.append(f"expected 2 scenario manifests, found {len(scenario_paths)}")
+    if scenario_ids != EXPECTED_SCENARIOS:
+        failures.append(
+            "scenario manifests do not match the expected set: "
+            f"missing={sorted(EXPECTED_SCENARIOS - scenario_ids)}, "
+            f"unexpected={sorted(scenario_ids - EXPECTED_SCENARIOS)}"
+        )
     for path in scenario_paths:
         data = bcl.load_bcl(path)
         for key in ("manifestVersion", "scenario", "presenterSurface", "included", "readiness", "documentation", "screenshots"):
@@ -451,8 +466,13 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
             failures.append(f"{entry.get('path')}: readiness must be real-demo")
 
     html_paths = sorted((root / "output" / "html").glob("*.html"))
-    if len(html_paths) != 11:
-        failures.append(f"expected 11 HTML outputs, found {len(html_paths)}")
+    html_names = {path.name for path in html_paths}
+    if html_names != EXPECTED_PRESENTERS:
+        failures.append(
+            "output/html does not match the presenter set: "
+            f"missing={sorted(EXPECTED_PRESENTERS - html_names)}, "
+            f"unexpected={sorted(html_names - EXPECTED_PRESENTERS)}"
+        )
     for path in html_paths:
         parser = PortableResourceParser()
         parser.feed(path.read_text(encoding="utf-8"))
