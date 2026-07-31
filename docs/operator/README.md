@@ -29,7 +29,7 @@ Box Private-API Labs (box-capture repository): isolated research on Apps, Automa
 
 ## Live claim boundary
 
-Use the four readiness terms in `README.md`. Do not describe a **Portable specification** or **Local deterministic fixture** as a **Deployed integration**. Do not describe a scenario as **Presenter-ready live** until `python3 scripts/validate_clm.py --presenter-ready` passes with current receipts.
+Use the four readiness terms in `docs/conventions.md`. Do not describe a **Portable specification** or **Local deterministic fixture** as a **Deployed integration**. Do not describe a scenario as **Presenter-ready live** until `python3 scripts/validate_clm.py --presenter-ready` passes with current receipts.
 
 ## Box surface authoring tooling
 
