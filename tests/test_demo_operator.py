@@ -132,7 +132,7 @@ class DemoOperatorTests(unittest.TestCase):
             state_path = Path(directory) / "state.json"
             template_keys = [
                 item["templateKey"]
-                for item in demo_operator.load_json(demo_operator.ROOT / "config/box/metadata-templates.json")["templates"]
+                for item in demo_operator.load_config(demo_operator.ROOT / "config/box/metadata-templates.bcl")["templates"]
             ]
             state = {
                 "box": {

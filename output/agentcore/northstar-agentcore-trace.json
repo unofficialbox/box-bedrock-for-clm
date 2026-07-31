@@ -1,6 +1,6 @@
 {
   "demo": "CLM-2026-Northstar",
-  "generatedAt": "2026-07-21T17:02:01.882818+00:00",
+  "generatedAt": "2026-07-31T20:05:24.614341+00:00",
   "orchestrationLayer": "AWS Bedrock AgentCore",
   "framework": "Strands",
   "systems": {
@@ -11,7 +11,7 @@
   "finalState": "signature_blocked_pending_human_approvals",
   "trace": [
     {
-      "timestamp": "2026-07-21T17:02:01.882112+00:00",
+      "timestamp": "2026-07-31T20:05:24.614023+00:00",
       "agent": "clm-supervisor-agent",
       "action": "start_workflow",
       "status": "started",
@@ -19,17 +19,17 @@
         "contractId": "CLM-2026-Northstar",
         "routingMode": "supervisor",
         "framework": "Strands",
-        "workspaceFolderId": "399081692991",
-        "workspaceSource": "operator-bootstrap-state"
+        "workspaceFolderId": "local-fixture",
+        "workspaceSource": "generated-local-assets"
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882794+00:00",
+      "timestamp": "2026-07-31T20:05:24.614324+00:00",
       "agent": "box-contract-package-agent",
       "action": "validate_package",
       "status": "complete",
       "details": {
-        "folderId": "399081692991",
+        "folderId": "local-fixture",
         "requiredDocuments": [
           "northstar-msa-redline-v3.pdf",
           "northstar-dpa.pdf",
@@ -42,7 +42,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882798+00:00",
+      "timestamp": "2026-07-31T20:05:24.614327+00:00",
       "agent": "salesforce-commercial-agent",
       "action": "compare_order_form_to_opportunity",
       "status": "exception",
@@ -54,7 +54,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882802+00:00",
+      "timestamp": "2026-07-31T20:05:24.614329+00:00",
       "agent": "clause-risk-agent",
       "action": "compare_to_playbook",
       "status": "findings_created",
@@ -97,7 +97,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882810+00:00",
+      "timestamp": "2026-07-31T20:05:24.614334+00:00",
       "agent": "databricks-analytics-agent",
       "action": "query_clause_outcomes",
       "status": "benchmarks_returned",
@@ -135,7 +135,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882813+00:00",
+      "timestamp": "2026-07-31T20:05:24.614337+00:00",
       "agent": "salesforce-approval-agent",
       "action": "route_approvals",
       "status": "approvals_required",
@@ -175,7 +175,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882815+00:00",
+      "timestamp": "2026-07-31T20:05:24.614338+00:00",
       "agent": "clm-supervisor-agent",
       "action": "enforce_guardrails",
       "status": "blocked",
@@ -192,7 +192,7 @@
       }
     },
     {
-      "timestamp": "2026-07-21T17:02:01.882817+00:00",
+      "timestamp": "2026-07-31T20:05:24.614340+00:00",
       "agent": "obligation-monitor-agent",
       "action": "extract_obligations",
       "status": "candidate_obligations_created",

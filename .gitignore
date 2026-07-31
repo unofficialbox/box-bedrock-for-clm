@@ -85,7 +85,8 @@ web_modules/
 .env.production.local
 .env.local
 
-# Generated per-operator environment bindings (copy from the example)
+# Generated per-operator environment bindings (copy from the example).
+# Runtime files are JSON; only the *.example.json templates are committed.
 config/runtime/demo-environment.json
 config/runtime/bootstrap-state.json
 config/runtime/validation-receipts.json

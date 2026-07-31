@@ -14,8 +14,15 @@ from pathlib import Path
 from typing import Any
 from urllib.parse import urlparse
 
+# Load the sibling BCL module whether run as a script or imported via importlib.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import bcl  # noqa: E402
+
 
 ROOT = Path(__file__).resolve().parents[1]
+# Authored spec config is BCL (the single admin-facing import format). The
+# config/runtime/* files are per-operator, gitignored, and round-tripped by the
+# setup/operator tooling, so they stay JSON.
 DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
 STATE_PATH = ROOT / "config/runtime/bootstrap-state.json"
 CLI_COMMAND_NAME = "python3 scripts/demo_operator.py"
@@ -66,13 +73,13 @@ FILE_BINDINGS = {
     "docgenRenewalNotice": "clm-renewal-notice-template.docx",
 }
 PORTABLE_SPECS = [
-    "config/box/automate-workflows.json",
-    "config/box/https-connectors.json",
-    "config/box/ai-agent-specs.json",
-    "config/agentforce/clm-react-agentforce-spec.json",
-    "config/salesforce/clm-contract-record.json",
-    "config/agentcore/agent-handoff-payloads.json",
-    "config/clm/expert-routing.json",
+    "config/box/automate-workflows.bcl",
+    "config/box/https-connectors.bcl",
+    "config/box/ai-agent-specs.bcl",
+    "config/agentforce/clm-react-agentforce-spec.bcl",
+    "config/salesforce/clm-contract-record.bcl",
+    "config/agentcore/agent-handoff-payloads.bcl",
+    "config/clm/expert-routing.bcl",
 ]
 UPLOADS = {
     "02 - Drafts and Redlines": [
@@ -136,6 +143,17 @@ def load_json(path: Path) -> dict[str, Any]:
             "to config/runtime/demo-environment.json and fill in your environment values."
         )
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def load_config(path: Path) -> dict[str, Any]:
+    """Load a config artifact, dispatching by extension.
+
+    Authored spec config is BCL; runtime files (and test fixtures) are JSON.
+    Both yield the same payload shape.
+    """
+    if str(path).endswith(".bcl"):
+        return bcl.load_bcl(path)
+    return load_json(path)
 
 
 def run(command: list[str], *, cwd: Path = ROOT, dry_run: bool = False) -> str:
@@ -253,7 +271,7 @@ def salesforce_identity(alias: str) -> dict[str, Any]:
 
 def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -> None:
     print_header("Doctor")
-    config = load_json(config_path)
+    config = load_config(config_path)
     tools = ["python3"]
     if platform in ("all", "box"):
         tools.append("box")
@@ -279,7 +297,7 @@ def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -
             problems.append("box.operatorLogin is blank")
     source_paths = []
     if platform in ("all", "box"):
-        source_paths.append(ROOT / "config/box/metadata-templates.json")
+        source_paths.append(ROOT / "config/box/metadata-templates.bcl")
     if platform in ("all", "salesforce"):
         source_paths.append(ROOT / "clm-salesforce-project/sfdx-project.json")
     for path in source_paths:
@@ -345,7 +363,7 @@ def save_state(state: dict[str, Any]) -> None:
 
 
 def box_foundation(config_path: Path, *, dry_run: bool) -> None:
-    config = load_json(config_path)
+    config = load_config(config_path)
     doctor(config_path, offline=dry_run, platform="box")
     parent_id = str(config["box"].get("parentFolderId") or "0")
     state: dict[str, Any] = load_json(STATE_PATH) if STATE_PATH.exists() and not dry_run else {}
@@ -383,7 +401,7 @@ def box_foundation(config_path: Path, *, dry_run: bool) -> None:
         if not dry_run:
             save_state(state)
 
-    templates = load_json(ROOT / "config/box/metadata-templates.json")["templates"]
+    templates = bcl.load_bcl(ROOT / "config/box/metadata-templates.bcl")["templates"]
     for template in templates:
         if template["templateKey"] in templates_state:
             print(f"SKIP     metadata template already recorded: {template['templateKey']}")
@@ -584,16 +602,25 @@ def resolve_value(value: Any, bindings: dict[str, Any], unresolved: set[str]) ->
     return TOKEN_PATTERN.sub(replace, value)
 
 
+def generated_spec_path(relative: str) -> Path:
+    """Path of an environment-resolved spec under config/runtime/generated/.
+
+    Authored specs are BCL, but the resolved output is machine-generated
+    runtime JSON (gitignored), so the generated copy carries a ``.json`` suffix.
+    """
+    return (ROOT / "config/runtime/generated" / Path(relative).relative_to("config")).with_suffix(".json")
+
+
 def resolve_config(config_path: Path, *, allow_unresolved: bool) -> None:
-    config = load_json(config_path)
+    config = load_config(config_path)
     state = load_json(STATE_PATH)
     bindings = runtime_bindings(config, state)
     unresolved: set[str] = set()
     output_root = ROOT / "config/runtime/generated"
     for relative in PORTABLE_SPECS:
         source = ROOT / relative
-        resolved = resolve_value(load_json(source), bindings, unresolved)
-        destination = output_root / Path(relative).relative_to("config")
+        resolved = resolve_value(load_config(source), bindings, unresolved)
+        destination = generated_spec_path(relative)
         destination.parent.mkdir(parents=True, exist_ok=True)
         destination.write_text(json.dumps(resolved, indent=2) + "\n", encoding="utf-8")
     if unresolved and not allow_unresolved:
@@ -604,10 +631,9 @@ def resolve_config(config_path: Path, *, allow_unresolved: bool) -> None:
 
 
 def unresolved_bindings_in_generated_specs() -> set[str]:
-    generated_root = ROOT / "config/runtime/generated"
     unresolved: set[str] = set()
     for relative in PORTABLE_SPECS:
-        path = generated_root / Path(relative).relative_to("config")
+        path = generated_spec_path(relative)
         if not path.exists():
             continue
         text = path.read_text(encoding="utf-8")
@@ -617,7 +643,7 @@ def unresolved_bindings_in_generated_specs() -> set[str]:
 
 def provision_status(config_path: Path, scenario: str) -> None:
     print_header("Provision status")
-    config = load_json(config_path)
+    config = load_config(config_path)
     doctor(config_path, offline=True, platform="all")
 
     state_exists = STATE_PATH.exists()
@@ -630,14 +656,13 @@ def provision_status(config_path: Path, scenario: str) -> None:
 
     required_folders = ["workspace", *FOLDERS]
     required_files = [Path(path).name for paths in UPLOADS.values() for path in paths]
-    required_templates = [item["templateKey"] for item in load_json(ROOT / "config/box/metadata-templates.json")["templates"]]
+    required_templates = [item["templateKey"] for item in bcl.load_bcl(ROOT / "config/box/metadata-templates.bcl")["templates"]]
 
     missing_folders = [name for name in required_folders if not folders.get(name)]
     missing_files = [filename for filename in required_files if not files.get(filename)]
     missing_templates = [item for item in required_templates if not templates.get(item)]
 
-    generated_root = ROOT / "config/runtime/generated"
-    missing_specs = [str((generated_root / Path(relative).relative_to("config")).relative_to(ROOT)) for relative in PORTABLE_SPECS if not (generated_root / Path(relative).relative_to("config")).exists()]
+    missing_specs = [str(generated_spec_path(relative).relative_to(ROOT)) for relative in PORTABLE_SPECS if not generated_spec_path(relative).exists()]
     unresolved = unresolved_bindings_in_generated_specs()
 
     print(f"{STATUS_ICONS['success'] if state_exists else STATUS_ICONS['warn']} Bootstrap state file: {'present' if state_exists else 'missing'}")
@@ -744,7 +769,7 @@ def provision(
 
 
 def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
-    config = load_json(config_path)
+    config = load_config(config_path)
     doctor(config_path, offline=dry_run, platform="salesforce")
     alias = config["salesforce"].get("orgAlias")
     if not alias:
@@ -824,7 +849,7 @@ def validate_urls(config: dict[str, Any]) -> list[str]:
 
 
 def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None:
-    config = load_json(config_path)
+    config = load_config(config_path)
     required = {
         "box.hostname": config.get("box", {}).get("hostname"),
         "box.appUrl": config.get("box", {}).get("appUrl"),
@@ -862,16 +887,15 @@ def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None
     required_folders = ["workspace", *FOLDERS]
     missing_folders = [key for key in required_folders if not box_state.get("folders", {}).get(key)]
     missing_files = [filename for paths in UPLOADS.values() for filename in [Path(path).name for path in paths] if not box_state.get("files", {}).get(filename)]
-    missing_templates = [item["templateKey"] for item in load_json(ROOT / "config/box/metadata-templates.json")["templates"] if not box_state.get("metadataTemplates", {}).get(item["templateKey"])]
+    missing_templates = [item["templateKey"] for item in bcl.load_bcl(ROOT / "config/box/metadata-templates.bcl")["templates"] if not box_state.get("metadataTemplates", {}).get(item["templateKey"])]
     if missing_folders or missing_files or missing_templates:
         raise OperatorError(f"Bootstrap state is incomplete: folders={missing_folders}, files={missing_files}, templates={missing_templates}")
     if len(box_state.get("metadataSeeds", {})) < 16:
         raise OperatorError("Deterministic metadata seed is incomplete. Run seed-metadata.")
-    generated_root = ROOT / "config/runtime/generated"
     missing_generated = []
     unresolved_generated: set[str] = set()
     for relative in PORTABLE_SPECS:
-        path = generated_root / Path(relative).relative_to("config")
+        path = generated_spec_path(relative)
         if not path.exists():
             missing_generated.append(str(path.relative_to(ROOT)))
             continue
