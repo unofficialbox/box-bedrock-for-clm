@@ -154,7 +154,7 @@ python3 scripts/demo_operator.py resolve-config --allow-unresolved
 
 The Box phases create the Northstar folder hierarchy, all five metadata templates, upload six synthetic contract documents, upload three Doc Gen templates, seed the approved-clause Markdown library, and apply deterministic metadata that populates the App charts. They do not publish or share anything.
 
-The Salesforce phase deploys the portable CLM data model and UI, including the CLM Lightning record page with its Box tab. It assigns the required CLM and managed Box permission sets to the authenticated administrator. Install Box for Salesforce before this phase so the `box:recordBoxFolder` component and managed permission sets are available. The phase intentionally excludes the External Client App metadata because its org scope, consumer key, callback URL, and Run As user are environment-specific.
+The Salesforce phase deploys the portable CLM data model and UI, including the CLM Lightning record page with its Box tab. It assigns the required CLM and managed Box permission sets to the authenticated administrator. Install Box for Salesforce before this phase so the `box:recordBoxFolder` component and managed permission sets are available. The phase intentionally excludes the External Client App metadata because its org scope, consumer key, callback URL, and Run As user are environment-specific. Use `salesforce-deploy --dry-run` for a non-mutating plan first if you are not yet ready to apply.
 
 ## 5. Complete the administrator surfaces
 
