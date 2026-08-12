@@ -2,8 +2,36 @@
 <CustomApplication xmlns="http://soap.sforce.com/2006/04/metadata">
     <description>Contract Lifecycle Management demo workspace for contract intake, review, routing, and Box-backed content coordination.</description>
     <formFactors>Large</formFactors>
+    <isNavAutoTempTabsDisabled>false</isNavAutoTempTabsDisabled>
+    <isNavPersonalizationDisabled>false</isNavPersonalizationDisabled>
+    <isNavTabPersistenceDisabled>false</isNavTabPersistenceDisabled>
+    <isOmniPinnedViewEnabled>false</isOmniPinnedViewEnabled>
     <label>Contract Lifecycle Management</label>
     <navType>Standard</navType>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>CLM_Contract_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>CLM_Contract__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Admin</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>CLM_Contract_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>CLM_Contract__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>Standard</profile>
+    </profileActionOverrides>
+    <profileActionOverrides>
+        <actionName>View</actionName>
+        <content>CLM_Contract_Record_Page</content>
+        <formFactor>Large</formFactor>
+        <pageOrSobjectType>CLM_Contract__c</pageOrSobjectType>
+        <type>Flexipage</type>
+        <profile>ContractManager</profile>
+    </profileActionOverrides>
     <tabs>standard-home</tabs>
     <tabs>CLM_Contract__c</tabs>
     <uiType>Lightning</uiType>

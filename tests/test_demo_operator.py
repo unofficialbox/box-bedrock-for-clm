@@ -93,7 +93,12 @@ class DemoOperatorTests(unittest.TestCase):
                 "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
                 " ".join(" ".join(cmd) for cmd in deploy_commands),
             )
-            self.assertTrue(any("CLM_Demo_Operator" in command for command in commands))
+            core_deploy = " ".join(" ".join(cmd) for cmd in deploy_commands)
+            self.assertIn("CLM_Contract_Record_Page.flexipage-meta.xml", core_deploy)
+            self.assertIn("CLM_Demo.app-meta.xml", core_deploy)
+            assignment = next(command for command in commands if command[:4] == ["sf", "org", "assign", "permset"])
+            for permission_set in demo_operator.SALESFORCE_ADMIN_PERMISSION_SETS:
+                self.assertIn(permission_set, assignment)
 
     def test_salesforce_deploy_duplicate_permission_set_assignment_is_tolerated(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -115,6 +120,18 @@ class DemoOperatorTests(unittest.TestCase):
                     with redirect_stdout(io.StringIO()):
                         demo_operator.salesforce_deploy(path, dry_run=False)
             self.assertTrue(run_json_allow_fail.called)
+
+    def test_salesforce_permission_assignment_rejects_mixed_failures(self):
+        with patch.object(demo_operator, "run_json_allow_fail", return_value=(68, {
+            "result": {
+                "failures": [
+                    {"message": "Duplicate PermissionSetAssignment"},
+                    {"message": "Permission set box__Box_Sign_Admin not found"},
+                ]
+            }
+        })):
+            with self.assertRaisesRegex(demo_operator.OperatorError, "required Salesforce permission sets"):
+                demo_operator.assign_salesforce_admin_permission_sets(Path("."), alias="demo", dry_run=False)
 
     def test_parser_includes_bootstrap_with_yes_alias(self):
         args = demo_operator.parser().parse_args([

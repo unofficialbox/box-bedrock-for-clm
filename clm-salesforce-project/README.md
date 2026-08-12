@@ -1,6 +1,6 @@
 # CLM Salesforce Project
 
-This Salesforce DX project contains the portable `CLM_Contract__c` data model, layout, permission sets, tab, and Salesforce Multi-Framework React UI Bundle.
+This Salesforce DX project contains the portable `CLM_Contract__c` data model, layout, permission sets, tab, Lightning record page, and Salesforce Multi-Framework React UI Bundle.
 
 Start with [CLM Demo Operator Start Here](../docs/operator/start-here.md). The root automation deploys the portable components and deliberately excludes tenant-specific OAuth metadata.
 
@@ -39,7 +39,15 @@ From the repository root:
 python3 scripts/demo_operator.py salesforce-deploy --dry-run
 python3 scripts/demo_operator.py salesforce-deploy
 ```
-This deploys the object, fields, layout, operator and integration permission sets, tab, and UI Bundle. It then assigns `CLM_Demo_Operator` to the authenticated operator. Environment-specific OAuth metadata is intentionally not included.
+This deploys the object, fields, layout, operator and integration permission sets, tab, CLM app, Lightning record page, Box tab, and UI Bundle. It then assigns the required CLM and Box permission sets to the authenticated administrator:
+
+- Box Admin (All Licenses)
+- Box Doc Gen Template Manager
+- Box Sign
+- CLM Box Automate Integration
+- CLM Demo Operator
+
+The Box tab uses the `box:recordBoxFolder` component from the Box for Salesforce managed package, so install that package before running the deployment. Environment-specific OAuth metadata is intentionally not included.
 
 ## Salesforce sample data (packageable)
 

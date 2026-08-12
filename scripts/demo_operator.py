@@ -38,6 +38,13 @@ STATUS_ICONS = {
     "fail": "❌",
 }
 PHASE_WIDTH = 54
+SALESFORCE_ADMIN_PERMISSION_SETS = (
+    "box__Box_Admin_All_Licenses",
+    "box__Docgen_Template_Manager",
+    "box__Box_Sign_Admin",
+    "CLM_Box_Automate_Integration",
+    "CLM_Demo_Operator",
+)
 FOLDERS = [
     "01 - Intake",
     "02 - Drafts and Redlines",
@@ -267,6 +274,35 @@ def box_identity() -> dict[str, Any]:
 def salesforce_identity(alias: str) -> dict[str, Any]:
     payload = run_json(["sf", "org", "display", "--target-org", alias, "--json"], cwd=ROOT / "clm-salesforce-project")
     return payload.get("result", payload)
+
+
+def assign_salesforce_admin_permission_sets(project: Path, *, alias: str, dry_run: bool) -> None:
+    command = ["sf", "org", "assign", "permset"]
+    for permission_set in SALESFORCE_ADMIN_PERMISSION_SETS:
+        command.extend(["--name", permission_set])
+    command.extend(["--target-org", alias, "--json"])
+    if dry_run:
+        run(command, cwd=project, dry_run=True)
+        return
+
+    return_code, payload = run_json_allow_fail(command, cwd=project)
+    if not return_code:
+        return
+    failures = (payload.get("result") or {}).get("failures") if isinstance(payload, dict) else None
+    failures = failures if isinstance(failures, list) else []
+    non_duplicate_failures = [
+        item
+        for item in failures
+        if not isinstance(item, dict)
+        or "Duplicate PermissionSetAssignment" not in str(item.get("message", ""))
+    ]
+    if failures and not non_duplicate_failures:
+        _status(STATUS_ICONS["warn"], "Required Salesforce permission-set assignments already exist; continuing.")
+        return
+    raise OperatorError(
+        "Failed to assign required Salesforce permission sets to the authenticated admin. "
+        f"return_code={return_code} result={payload}"
+    )
 
 
 def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -> None:
@@ -789,6 +825,8 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         "force-app/main/default/staticresources",
         "force-app/main/default/objects/CLM_Contract__c",
         "force-app/main/default/layouts/CLM_Contract__c-CLM Contract Layout.layout-meta.xml",
+        "force-app/main/default/flexipages/CLM_Contract_Record_Page.flexipage-meta.xml",
+        "force-app/main/default/applications/CLM_Demo.app-meta.xml",
         "force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",
         "force-app/main/default/permissionsets/CLM_Demo_Operator.permissionset-meta.xml",
         "force-app/main/default/tabs/CLM_Contract__c.tab-meta.xml",
@@ -810,28 +848,8 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         deploy_uibundle(project, alias=alias, dry_run=dry_run)
     else:
         deploy_uibundle(project, alias=alias, dry_run=dry_run)
-    if dry_run:
-        run(["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias, "--json"], cwd=project, dry_run=True)
-    else:
-        return_code, payload = run_json_allow_fail(
-            ["sf", "org", "assign", "permset", "--name", "CLM_Demo_Operator", "--target-org", alias, "--json"],
-            cwd=project,
-        )
-        if return_code and payload and isinstance(payload, dict):
-            failures = (payload.get("result") or {}).get("failures") or []
-            duplicate = any(
-                isinstance(item, dict) and "Duplicate PermissionSetAssignment" in str(item.get("message", ""))
-                for item in failures
-            )
-            if duplicate:
-                _status(STATUS_ICONS["warn"], "PermissionSet assignment already exists; continuing.")
-            else:
-                raise OperatorError(
-                    f"Failed to assign CLM_Demo_Operator. return_code={return_code} result={payload}"
-                )
-        elif return_code:
-            raise OperatorError("sf org assign permset failed without machine-readable failure details.")
-    action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, tab, layout, and UI Bundle deployed"
+    assign_salesforce_admin_permission_sets(project, alias=alias, dry_run=dry_run)
+    action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, app, record page, Box tab, and UI Bundle deployed"
     print(f"{action}.")
 
 
