@@ -34,29 +34,26 @@ locals {
                 }
                 "salesforceContractCreate" = {
                   "authType" = "OAUTH2_CLIENT_CREDENTIALS_GRANT"
-                  "blankSafety" = "The clmContract metadata sources must be populated before the trigger fires. Box substitutes the literal string 'Variable unavailable' for an unresolved metadata variable, so an unpopulated field corrupts a typed Salesforce field rather than arriving blank."
+                  "blankSafety" = "Only contractId, dealValue, and targetSignatureDate are bound dynamically. They supply Salesforce's three required demo fields: Name, Amount, and Target Signature Date. Optional metadata is deliberately omitted because Box substitutes the literal string 'Variable unavailable' for an unresolved value."
                   "body" = {
                     "Contract_ID__c" = {
                       "bind" = "metadata.contractId"
-                      "salesforceRequired" = true
+                      "integrationKey" = true
                     }
-                    "Contract_Type__c" = {
-                      "bind" = "metadata.contractType"
-                      "note" = "Restricted picklist. Must come from a populated clmContract metadata field."
-                      "salesforceRequired" = true
-                    }
-                    "Counterparty__c" = {
-                      "bind" = "metadata.counterparty"
-                      "salesforceRequired" = true
+                    "Deal_Value__c" = {
+                      "bind" = "metadata.dealValue"
+                      "demoRequired" = true
                     }
                     "Name" = {
-                      "bind" = "metadata.counterparty"
+                      "bind" = "metadata.contractId"
                       "literalPrefix" = "CLM Intake - "
+                      "demoRequired" = true
                     }
                     "Record_Source__c" = "Box Automate"
-                    "Requester_Email__c" = {
-                      "bind" = "metadata.requesterEmail"
-                      "salesforceRequired" = true
+                    "Target_Signature_Date__c" = {
+                      "bind" = "metadata.targetSignatureDate"
+                      "format" = "YYYY-MM-DD"
+                      "demoRequired" = true
                     }
                   }
                   "bodyEncoding" = {
@@ -76,9 +73,9 @@ locals {
                   "bodyImplementation" = {
                     "designRule" = "Bind only values whose clmContract metadata field is guaranteed populated before the trigger fires. Box substitutes the literal 'Variable unavailable' for anything unresolved, so an unpopulated source can poison a typed Salesforce field."
                     "history" = "A 19-field version bound every Form field, including optional ones. It failed in a live run because Deal_Value__c (Currency) and Term_Months__c (Number) received 'Variable unavailable'. The Form was later removed entirely and every dynamic value re-sourced from clmContract metadata."
-                    "note" = "Re-sourced from the proven form-triggered body. Every dynamic value now addresses a clmContract metadata field as trigger.metadata.<key> instead of a Form field. This metadata-sourced body has NOT been re-verified against a live run; the CONCAT reconstruction below describes the proven form-triggered body it was derived from."
+                    "note" = "The current metadata body is intentionally reduced to contractId, dealValue, and targetSignatureDate. It has NOT been re-verified against a live run."
                     "trigger" = "metadata"
-                    "verification" = "The form-triggered body was reconstructed from the persisted CONCAT operands (15 operands, 7 dynamic, 10 fields) and parsed as JSON, every dynamic value backed by a required Form field. The metadata re-source preserves the same fields but must be re-verified live before activation."
+                    "verification" = "The earlier form-triggered body was proven live, but that evidence does not cover this minimized three-input metadata body. Re-verify the current request before activation."
                   }
                   "bodyOmissions" = {
                     "howToRestore" = "Populate the source clmContract metadata field before the trigger fires, then bind it. That is the only way to guarantee it resolves."
@@ -89,14 +86,15 @@ locals {
                     "note" = "Deliberately absent. Each is sourced from an optional clmContract metadata field, so binding it risks sending 'Variable unavailable' into a typed Salesforce field."
                     "textAndOptional" = {
                       "Business_Owner_Name__c" = "Text."
+                      "Contract_Type__c" = "Restricted picklist with a Salesforce default."
+                      "Counterparty__c" = "Text."
+                      "Requester_Email__c" = "Email."
                       "Requester_Name__c" = "Text. Would read 'Variable unavailable' rather than fail."
                       "Special_Terms_Risk_Notes__c" = "Text."
                     }
                     "typeSensitiveAndOptional" = {
                       "Data_Category__c" = "Restricted picklist."
-                      "Deal_Value__c" = "Currency. Caused the 2026-07-22 live failure."
                       "Region__c" = "Restricted picklist."
-                      "Target_Signature_Date__c" = "Date, composed from three DATE_FORMAT operands. Would fail whenever the metadata date is blank."
                       "Term_Months__c" = "Number. Caused the 2026-07-22 live failure."
                     }
                   }
@@ -135,14 +133,13 @@ locals {
                     ]
                     "note" = "Both literals below are valid members of their restricted picklists."
                   }
-                  "salesforceRequiredFields" = {
+                  "demoRequiredFields" = {
                     "fields" = [
-                      "Contract_ID__c"
-                      "Contract_Type__c"
-                      "Counterparty__c"
-                      "Requester_Email__c"
+                      "Name"
+                      "Deal_Value__c"
+                      "Target_Signature_Date__c"
                     ]
-                    "note" = "Read from clm-salesforce-project object metadata. Each must map to a populated clmContract metadata field or the POST fails."
+                    "note" = "The Salesforce record layout intentionally requires only Name, Amount, and Target Signature Date. The custom fields remain schema-optional so existing demo records do not block an upgrade. Name is generated from contractId for Box intake, keeping the metadata trigger to three inputs."
                   }
                   "verified" = {
                     "currentMetadataBodyReVerified" = false
@@ -150,7 +147,7 @@ locals {
                     "fixtureRef" = "config/box/private-api-lab-automate-https-outcome-definition.bcl"
                     "formTriggeredRunSucceeded" = true
                     "provenOn" = "2026-07-22"
-                    "reVerifyBeforeActivation" = "The Form was removed and this body re-sourced from clmContract metadata (trigger.metadata.<key>). The 2026-07-22 proof covers only the form-triggered body; re-run end to end before activation."
+                    "reVerifyBeforeActivation" = "The 2026-07-22 proof covers only the former form-triggered body. Re-run the minimized three-input metadata request end to end before activation."
                   }
                 }
                 "salesforceContractLookup" = {
@@ -176,7 +173,7 @@ locals {
                     "Counterparty__c" = "counterparty"
                     "Data_Category__c" = "dataCategory"
                     "Deal_Value__c" = "dealValue"
-                    "Name" = "<counterparty> <contractType>"
+                    "Name" = "CLM Intake - <contractId>"
                     "Record_Source__c" = "Box Automate"
                     "Region__c" = "region"
                     "Requester_Email__c" = "requesterEmail"

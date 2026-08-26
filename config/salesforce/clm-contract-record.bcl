@@ -15,28 +15,34 @@ locals {
           "enterprise_id" = ""
           "fieldMappings" = [
             {
-              "required" = true
+              "required" = false
               "source" = "contractId"
               "target" = "Contract_ID__c"
               "validation" = "non-blank"
             }
             {
               "required" = true
+              "source" = "contractId"
+              "target" = "Name"
+              "transform" = "CLM Intake - <contractId>"
+            }
+            {
+              "required" = false
               "source" = "requesterName"
               "target" = "Requester_Name__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "requesterEmail"
               "target" = "Requester_Email__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "counterparty"
               "target" = "Counterparty__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "contractType"
               "target" = "Contract_Type__c"
             }
@@ -51,12 +57,12 @@ locals {
               "target" = "Term_Months__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "region"
               "target" = "Region__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "dataCategory"
               "target" = "Data_Category__c"
             }
@@ -66,7 +72,7 @@ locals {
               "target" = "Target_Signature_Date__c"
             }
             {
-              "required" = true
+              "required" = false
               "source" = "businessOwner"
               "target" = "Business_Owner_Name__c"
             }
@@ -89,7 +95,7 @@ locals {
             }
             {
               "default" = "Box Automate"
-              "required" = true
+              "required" = false
               "source" = "recordSource"
               "target" = "Record_Source__c"
             }
@@ -123,11 +129,11 @@ locals {
             "status" = "specified-pending-org-configuration"
             "type" = "Salesforce standard REST API"
           }
-          "label" = "CLM Contract"
+          "label" = "Contract"
           "nameField" = {
             "apiName" = "Name"
             "type" = "Text"
-            "value" = "<counterparty> <contractType>"
+            "value" = "User-entered in Salesforce; Box intake uses CLM Intake - <contractId>"
           }
           "objectApiName" = "CLM_Contract__c"
           "ownership" = {
@@ -138,7 +144,7 @@ locals {
             "sharingModel" = "Private"
             "unresolvedBusinessOwnerField" = "Business_Owner_Name__c"
           }
-          "pluralLabel" = "CLM Contracts"
+          "pluralLabel" = "Contracts"
           "provider" = "generic"
           "provider_object_id" = "salesforce/clm-contract-record"
           "schemaVersion" = "1.0"

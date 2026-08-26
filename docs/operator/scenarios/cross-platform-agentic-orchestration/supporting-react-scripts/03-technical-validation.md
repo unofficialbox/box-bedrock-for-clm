@@ -47,6 +47,8 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 
 - `clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp/`.
 - `clmreactapp.uibundle-meta.xml` with target `Experience`.
+- `settings/Communities.settings-meta.xml` and `settings/ExperienceBundle.settings-meta.xml` enabling deployable Digital Experiences metadata.
+- `sites/CLM_Experience.site-meta.xml`, `networks/CLM_Experience.network-meta.xml`, and the `CLM_Experience1` Digital Experience bundle/config mounting `c__clmreactapp` at `/clm`.
 - `src/Workspace.tsx`, `src/components/BoxWorkspace.tsx`, and `src/components/AgentforcePanel.tsx`.
 
 **Explain**
@@ -54,6 +56,8 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 - React owns layout and interaction state.
 - Box Workspace owns content rendering/token acquisition.
 - Agentforce Panel owns the embedded conversation client.
+- The app is external-facing through Experience Cloud, but the packaged site requires authenticated access and disables self-registration.
+- Dispatch publishes the Experience after metadata deployment and waits for the Salesforce background operation to complete before reporting the external application as ready.
 
 ### Act 2 — Prove the credential boundary (4 minutes)
 

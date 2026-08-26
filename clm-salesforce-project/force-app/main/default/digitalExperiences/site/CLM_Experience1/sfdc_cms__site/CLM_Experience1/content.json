@@ -1,0 +1,10 @@
+{
+  "type": "sfdc_cms__site",
+  "title": "CLM Experience",
+  "urlName": "clm",
+  "contentBody": {
+    "authenticationType": "AUTHENTICATED",
+    "appContainer": true,
+    "appSpace": "c__clmreactapp"
+  }
+}

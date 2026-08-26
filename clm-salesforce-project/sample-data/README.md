@@ -16,7 +16,7 @@ This folder contains portable, demo-safe sample data definitions and an executab
   - `Northstar Master Service Agreement 2026`
   - `Acme Cloudworks Cloud Security Expansion 2026`
 
-- **CLM Contracts**
+- **Contracts**
   - `CLM-SAMPLE-NST-001` — Northstar 2026, **Legal Review** (in redline)
   - `CLM-SAMPLE-NST-2024` — Northstar 2024, **Executed** (contract history)
   - `CLM-SAMPLE-NST-2025` — Northstar 2025, **Executed** (contract history)

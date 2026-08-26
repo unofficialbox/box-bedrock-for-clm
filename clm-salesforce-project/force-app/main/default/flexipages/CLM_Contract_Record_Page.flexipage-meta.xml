@@ -222,7 +222,7 @@
         <name>sidebar</name>
         <type>Region</type>
     </flexiPageRegions>
-    <masterLabel>CLM Contract Record Page</masterLabel>
+    <masterLabel>Contract Record Page</masterLabel>
     <parentFlexiPage>flexipage__default_rec_L</parentFlexiPage>
     <sobjectType>CLM_Contract__c</sobjectType>
     <template>

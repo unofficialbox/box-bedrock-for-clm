@@ -17,7 +17,7 @@ locals {
           "provider_object_id" = "box/metadata-templates"
           "templates" = [
             {
-              "displayName" = "CLM Contract"
+              "displayName" = "Contract"
               "fields" = [
                 {
                   "key" = "contractId"
@@ -118,7 +118,7 @@ locals {
               "templateKey" = "clmContract"
             }
             {
-              "displayName" = "CLM Document"
+              "displayName" = "Contract Document"
               "fields" = [
                 {
                   "key" = "documentType"

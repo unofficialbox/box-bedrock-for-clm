@@ -10,7 +10,7 @@
     <columns>Target_Signature_Date__c</columns>
     <columns>LAST_UPDATE</columns>
     <filterScope>Everything</filterScope>
-    <label>All CLM Contracts</label>
+    <label>All Contracts</label>
     <sharedTo>
         <allInternalUsers></allInternalUsers>
     </sharedTo>

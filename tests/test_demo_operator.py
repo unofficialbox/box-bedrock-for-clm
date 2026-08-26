@@ -3,6 +3,7 @@ import io
 import json
 import tempfile
 import unittest
+import xml.etree.ElementTree as ET
 from contextlib import redirect_stdout
 from pathlib import Path
 from unittest.mock import patch
@@ -88,7 +89,7 @@ class DemoOperatorTests(unittest.TestCase):
             commands = [call.args[0] for call in run.call_args_list]
             self.assertIn("demo", commands[0])
             deploy_commands = [cmd for cmd in commands if "project deploy start" in " ".join(cmd)]
-            self.assertGreaterEqual(len(deploy_commands), 2)
+            self.assertGreaterEqual(len(deploy_commands), 4)
             self.assertIn(
                 "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
                 " ".join(" ".join(cmd) for cmd in deploy_commands),
@@ -96,9 +97,47 @@ class DemoOperatorTests(unittest.TestCase):
             core_deploy = " ".join(" ".join(cmd) for cmd in deploy_commands)
             self.assertIn("CLM_Contract_Record_Page.flexipage-meta.xml", core_deploy)
             self.assertIn("CLM_Demo.app-meta.xml", core_deploy)
+            self.assertIn("Communities.settings-meta.xml", core_deploy)
+            self.assertIn("ExperienceBundle.settings-meta.xml", core_deploy)
+            self.assertIn("CLM_Experience.site-meta.xml", core_deploy)
+            self.assertIn("CLM_Experience.network-meta.xml", core_deploy)
+            self.assertIn("CLM_Experience1.digitalExperienceConfig-meta.xml", core_deploy)
+            self.assertIn("digitalExperiences/site/CLM_Experience1", core_deploy)
             assignment = next(command for command in commands if command[:4] == ["sf", "org", "assign", "permset"])
             for permission_set in demo_operator.SALESFORCE_ADMIN_PERMISSION_SETS:
                 self.assertIn(permission_set, assignment)
+
+    def test_external_experience_metadata_mounts_the_react_bundle(self):
+        metadata_root = demo_operator.ROOT / "clm-salesforce-project/force-app/main/default"
+        namespace = {"m": "http://soap.sforce.com/2006/04/metadata"}
+
+        communities = ET.parse(metadata_root / "settings/Communities.settings-meta.xml").getroot()
+        experience_bundle = ET.parse(metadata_root / "settings/ExperienceBundle.settings-meta.xml").getroot()
+        ui_bundle = ET.parse(metadata_root / "uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml").getroot()
+        network = ET.parse(metadata_root / "networks/CLM_Experience.network-meta.xml").getroot()
+        site = ET.parse(metadata_root / "sites/CLM_Experience.site-meta.xml").getroot()
+        experience_config = ET.parse(
+            metadata_root / "digitalExperienceConfigs/CLM_Experience1.digitalExperienceConfig-meta.xml"
+        ).getroot()
+        experience_content = json.loads(
+            (
+                metadata_root
+                / "digitalExperiences/site/CLM_Experience1/sfdc_cms__site/CLM_Experience1/content.json"
+            ).read_text(encoding="utf-8")
+        )
+
+        self.assertEqual(communities.findtext("m:enableNetworksEnabled", namespaces=namespace), "true")
+        self.assertEqual(
+            experience_bundle.findtext("m:enableExperienceBundleMetadata", namespaces=namespace),
+            "true",
+        )
+        self.assertEqual(ui_bundle.findtext("m:target", namespaces=namespace), "Experience")
+        self.assertEqual(network.findtext("m:site", namespaces=namespace), "CLM_Experience")
+        self.assertEqual(network.findtext("m:picassoSite", namespaces=namespace), "CLM_Experience1")
+        self.assertEqual(site.findtext("m:active", namespaces=namespace), "true")
+        self.assertEqual(experience_config.findtext("m:space", namespaces=namespace), "site/CLM_Experience1")
+        self.assertEqual(experience_content["contentBody"]["authenticationType"], "AUTHENTICATED")
+        self.assertEqual(experience_content["contentBody"]["appSpace"], "c__clmreactapp")
 
     def test_salesforce_deploy_duplicate_permission_set_assignment_is_tolerated(self):
         with tempfile.TemporaryDirectory() as directory:

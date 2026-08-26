@@ -44,11 +44,9 @@ locals {
                 "The Generate Document + Request Signature tail (orders 8-10) is newly added to the spec and has NOT been built or verified in the live Automate workflow. docgenApprovalMemo must resolve to the uploaded template file, and the Request Signature recipient (counterparty signer) is bound at provisioning time - no live signer email is stored here."
               ]
               "optionalMetadataFields" = [
-                "dealValue"
                 "termMonths"
                 "region"
                 "dataCategory"
-                "targetSignatureDate"
                 "owner"
               ]
               "placeholderConvention" = {
@@ -59,11 +57,10 @@ locals {
               "required" = true
               "requiredMetadataFields" = [
                 "contractId"
-                "contractType"
-                "counterparty"
-                "requesterEmail"
+                "dealValue"
+                "targetSignatureDate"
               ]
-              "requiredMetadataFieldsNote" = "Salesforce marks Contract_ID__c, Contract_Type__c, Counterparty__c, and Requester_Email__c required on CLM_Contract__c, so their clmContract metadata sources must be populated before the trigger fires. Box substitutes the literal string 'Variable unavailable' for an unresolved metadata variable, not an empty string, so an unpopulated field corrupts a typed Salesforce field rather than arriving blank. requesterEmail was added to the clmContract template for this purpose. The triggering file must also be present because the Box Agent and approval task read it."
+              "requiredMetadataFieldsNote" = "The demo intentionally asks for only three values: Contract ID, Amount, and Target Signature Date. Contract ID becomes both the integration key and the Salesforce Name (CLM Intake - <contractId>); the other two populate the Salesforce record form's only required custom fields. All remaining business metadata is optional and omitted from the live POST when unresolved."
               "steps" = [
                 {
                   "destinationFolderId" = "${box.folders.intake}"
