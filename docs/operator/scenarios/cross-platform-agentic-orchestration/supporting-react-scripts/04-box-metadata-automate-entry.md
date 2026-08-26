@@ -46,19 +46,15 @@ Treat the workflow as inactive until the target environment's Salesforce object,
 
 ## Intake metadata values
 
-Upload the Northstar contract package to `01 - Intake`, then apply the `clmContract` metadata template with these values. The four Salesforce-required fields (`contractId`, `contractType`, `counterparty`, `requesterEmail`) must be populated before the trigger fires, or Box sends the literal `Variable unavailable` into a typed Salesforce field.
+Upload the Northstar contract package to `01 - Intake`, then apply the `clmContract` metadata template with Contract ID, Amount, and Target Signature Date. Contract ID generates the Salesforce Name; the other two values populate the Salesforce record form's only required custom fields. Optional metadata stays out of the connector request when blank.
 
-| Metadata field | Demo value |
-|---|---|
-| contractId | A unique labeled test ID |
-| counterparty | `Northstar Health System` |
-| requesterEmail | `jordan.lee@acmerobotics.example` |
-| contractType | `MSA Package` |
-| dealValue | `2400000` |
-| region | `US` |
-| dataCategory | `PHI` |
-| targetSignatureDate | `2026-07-31` |
-| owner | `Account Executive` |
+| Required metadata field | Demo value | Salesforce result |
+|---|---|---|
+| contractId | A unique labeled test ID | Name (`CLM Intake - <contractId>`) and integration key |
+| dealValue | `2400000` | Amount |
+| targetSignatureDate | `2026-07-31` | Target Signature Date |
+
+Counterparty, requester, contract type, region, data category, owner, and other enrichment fields are optional for the demo.
 
 ## Presenter script
 

@@ -3,7 +3,7 @@
 // - Accounts by Name
 // - Contacts by Email
 // - Opportunities by Name + AccountId
-// - CLM Contracts by Contract_ID__c
+// - Contracts by Contract_ID__c
 
 Map<String, Account> accountsByName = new Map<String, Account>();
 for (Account acct : [

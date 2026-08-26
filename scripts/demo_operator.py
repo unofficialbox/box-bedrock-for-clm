@@ -820,6 +820,10 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         actual_org = salesforce_identity(alias)
         if str(actual_org.get("id") or "") != str(expected_org_id):
             raise OperatorError(f"Refusing deployment: authenticated Salesforce org {actual_org.get('id') or 'unknown'} does not match configured {expected_org_id}.")
+    experience_settings_sources = [
+        "force-app/main/default/settings/Communities.settings-meta.xml",
+        "force-app/main/default/settings/ExperienceBundle.settings-meta.xml",
+    ]
     core_sources = [
         "force-app/main/default/classes",
         "force-app/main/default/staticresources",
@@ -831,25 +835,27 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         "force-app/main/default/permissionsets/CLM_Demo_Operator.permissionset-meta.xml",
         "force-app/main/default/tabs/CLM_Contract__c.tab-meta.xml",
     ]
-    ui_bundle_sources = [
-        "force-app/main/default/uiBundles/clmreactapp/ui-bundle.json",
-        "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
-        "force-app/main/default/uiBundles/clmreactapp/index.html",
-        "force-app/main/default/uiBundles/clmreactapp/dist",
+    experience_site_sources = [
+        "force-app/main/default/sites/CLM_Experience.site-meta.xml",
+        "force-app/main/default/networks/CLM_Experience.network-meta.xml",
+        "force-app/main/default/digitalExperienceConfigs/CLM_Experience1.digitalExperienceConfig-meta.xml",
+        "force-app/main/default/digitalExperiences/site/CLM_Experience1",
     ]
     for name, sources in [
+        ("Digital Experiences settings", experience_settings_sources),
         ("Salesforce core metadata", core_sources),
     ]:
         command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
         for source in sources:
             command.extend(["--source-dir", source])
         run(command, cwd=project, dry_run=dry_run)
-    if not dry_run:
-        deploy_uibundle(project, alias=alias, dry_run=dry_run)
-    else:
-        deploy_uibundle(project, alias=alias, dry_run=dry_run)
+    deploy_uibundle(project, alias=alias, dry_run=dry_run)
+    experience_command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
+    for source in experience_site_sources:
+        experience_command.extend(["--source-dir", source])
+    run(experience_command, cwd=project, dry_run=dry_run)
     assign_salesforce_admin_permission_sets(project, alias=alias, dry_run=dry_run)
-    action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, app, record page, Box tab, and UI Bundle deployed"
+    action = "Salesforce deployment plan validated" if dry_run else "Salesforce data model, permissions, app, record page, Box tab, UI Bundle, and authenticated Experience Cloud site deployed"
     print(f"{action}.")
 
 

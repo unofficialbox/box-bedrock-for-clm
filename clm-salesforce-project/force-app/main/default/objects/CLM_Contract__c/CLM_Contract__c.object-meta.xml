@@ -5,11 +5,11 @@
     <enableReports>true</enableReports>
     <enableSearch>true</enableSearch>
     <externalSharingModel>Private</externalSharingModel>
-    <label>CLM Contract</label>
+    <label>Contract</label>
     <nameField>
-        <label>Contract Name</label>
+        <label>Name</label>
         <type>Text</type>
     </nameField>
-    <pluralLabel>CLM Contracts</pluralLabel>
+    <pluralLabel>Contracts</pluralLabel>
     <sharingModel>Private</sharingModel>
 </CustomObject>

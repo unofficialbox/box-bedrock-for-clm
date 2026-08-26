@@ -7,20 +7,20 @@
         <label>Contract Overview</label>
         <layoutColumns>
             <layoutItems><behavior>Required</behavior><field>Name</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Contract_ID__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Counterparty__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Contract_ID__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Counterparty__c</field></layoutItems>
             <layoutItems><behavior>Edit</behavior><field>Counterparty_Account__c</field></layoutItems>
             <layoutItems><behavior>Edit</behavior><field>Opportunity__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Contract_Type__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Status__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Contract_Type__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Status__c</field></layoutItems>
         </layoutColumns>
         <layoutColumns>
             <layoutItems><behavior>Required</behavior><field>Deal_Value__c</field></layoutItems>
             <layoutItems><behavior>Edit</behavior><field>Term_Months__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Region__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Data_Category__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Region__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Data_Category__c</field></layoutItems>
             <layoutItems><behavior>Required</behavior><field>Target_Signature_Date__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Record_Source__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Record_Source__c</field></layoutItems>
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
@@ -30,9 +30,9 @@
         <editHeading>true</editHeading>
         <label>People and Intake</label>
         <layoutColumns>
-            <layoutItems><behavior>Required</behavior><field>Requester_Name__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Requester_Email__c</field></layoutItems>
-            <layoutItems><behavior>Required</behavior><field>Business_Owner_Name__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Requester_Name__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Requester_Email__c</field></layoutItems>
+            <layoutItems><behavior>Edit</behavior><field>Business_Owner_Name__c</field></layoutItems>
             <layoutItems><behavior>Edit</behavior><field>Business_Owner__c</field></layoutItems>
         </layoutColumns>
         <layoutColumns>

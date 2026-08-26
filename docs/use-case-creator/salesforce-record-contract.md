@@ -1,4 +1,4 @@
-# Salesforce CLM Record Contract
+# Salesforce Contract Record
 
 Completes MT-030 and MT-031 at the repository-design level. Deployment and administrator validation are separate tasks.
 
@@ -25,10 +25,11 @@ Do not overload Salesforce `Contract` or org-specific managed CLM objects. `CLM_
 
 ## Record identity and idempotency
 
-- `Contract_ID__c` is required, unique, and an external ID.
+- `Contract_ID__c` is optional for manual demo records, but remains the external ID used by Box for duplicate-safe synchronization.
 - The Box HTTPS Connector uses Salesforce's standard external-ID REST resource to upsert by `Contract_ID__c`.
 - A retry with the same `contractId` returns the existing `recordId`.
-- The human-readable `Name` is `<counterparty> <contractType>`.
+- The Salesforce record form requires only three user-facing values: `Name`, `Deal_Value__c` (labeled **Amount**), and `Target_Signature_Date__c`.
+- For Box intake, `Name` is generated as `CLM Intake - <contractId>`, so the trigger still asks for only Contract ID, Amount, and Target Signature Date.
 - Redline task routing uses a separate idempotency key: `contractId:redlineFileId:domain`.
 
 ## System-of-record boundary
@@ -39,7 +40,7 @@ Salesforce stores validated structured context and ownership metadata. Contract 
 
 | Group | Fields |
 |---|---|
-| Identity | `Contract_ID__c`, `Name`, `Record_Source__c` |
+| Identity | `Name`, `Contract_ID__c`, `Record_Source__c` |
 | Intake | `Requester_Name__c`, `Requester_Email__c`, `Counterparty__c`, `Counterparty_Account__c`, `Opportunity__c`, `Contract_Type__c`, `Deal_Value__c`, `Term_Months__c`, `Region__c`, `Data_Category__c`, `Target_Signature_Date__c`, `Special_Terms_Risk_Notes__c` |
 | Ownership | `OwnerId`, `Business_Owner__c`, `Business_Owner_Name__c` |
 | Lifecycle | `Status__c`, `Risk_Level__c` |
@@ -95,6 +96,7 @@ SOQL is not required. If the Box Automate builder cannot retrieve by external ID
 
 The authoritative mapping is the `fieldMappings` array in `config/salesforce/clm-contract-record.bcl`. Key rules:
 
+- Only Name, Amount, and Target Signature Date are mandatory on the Salesforce record layout; every other field is optional for a fast demo flow. Amount and Target Signature Date stay schema-optional so older records with blanks do not block an upgrade.
 - Metadata values are written only after the Box human-validation gate.
 - `riskLevel` is written only when a human validated the Extract/AI result.
 - `boxFolderId` must be the allowlisted workspace associated with the intake.

@@ -1,6 +1,6 @@
 # CLM Salesforce Project
 
-This Salesforce DX project contains the portable `CLM_Contract__c` data model, layout, permission sets, tab, Lightning record page, and Salesforce Multi-Framework React UI Bundle.
+This Salesforce DX project contains the portable `CLM_Contract__c` data model, layout, permission sets, tab, Lightning record page, and an authenticated external Experience Cloud site powered by a Salesforce Multi-Framework React UI Bundle.
 
 Start with [CLM Demo Operator Start Here](../docs/operator/start-here.md). The root automation deploys the portable components and deliberately excludes tenant-specific OAuth metadata.
 
@@ -39,7 +39,7 @@ From the repository root:
 python3 scripts/demo_operator.py salesforce-deploy --dry-run
 python3 scripts/demo_operator.py salesforce-deploy
 ```
-This deploys the object, fields, layout, operator and integration permission sets, tab, CLM app, Lightning record page, Box tab, and UI Bundle. It then assigns the required CLM and Box permission sets to the authenticated administrator:
+This deploys the Digital Experiences settings, object, fields, layout, operator and integration permission sets, tab, CLM app, Lightning record page, Box tab, Experience-targeted UI Bundle, and authenticated external Experience Cloud site. Dispatch then publishes the site, waits for Salesforce's publish job to finish, and assigns the required CLM and Box permission sets to the authenticated administrator:
 
 - Box Admin (All Licenses)
 - Box Doc Gen Template Manager
@@ -51,7 +51,7 @@ The Box tab uses the `box:recordBoxFolder` component from the Box for Salesforce
 
 ## Salesforce sample data (packageable)
 
-The `sample-data/` folder captures a deterministic CLM dataset (Accounts, Contacts, Opportunities, Contracts) plus an idempotent Apex seed and a BCL manifest.
+The `sample-data/` folder captures a deterministic CLM dataset (Accounts, Contacts, Opportunities, Contracts) plus an idempotent Apex seed and a BCL manifest. Dispatch runs the packaged seed after metadata deployment and verifies the expected `CLM_Contract__c` records by external ID.
 
 - Idempotent Apex seed (source of truth):
   - `./scripts/seed-clm-sample-data.sh <orgAlias>`
@@ -88,7 +88,7 @@ Use client credentials, `api` scope only, administrator preauthorization, and th
 
 1. Set Agentforce IDs through protected runtime configuration or supported `VITE_AGENTFORCE_*` build variables.
 2. Implement the same-origin, authorized, downscoped Box-token endpoint before claiming live embedded Box content.
-3. Add the UI Bundle to the intended Lightning/Experience page.
+3. Open the authenticated Experience Cloud site at its generated `/clm` URL. The packaged site metadata mounts `c__clmreactapp` as the application space.
 4. Pass this environment's `recordId`, `contractId`, and `folderId`.
 5. Use Salesforce standard REST external-ID upsert and lookup for intake record creation; no custom Apex intake service is required.
 
