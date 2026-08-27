@@ -91,9 +91,11 @@ class DemoOperatorTests(unittest.TestCase):
             deploy_commands = [cmd for cmd in commands if "project deploy start" in " ".join(cmd)]
             self.assertGreaterEqual(len(deploy_commands), 4)
             self.assertIn(
-                "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
+                "--source-dir force-app/main/default/uiBundles/clmreactapp",
                 " ".join(" ".join(cmd) for cmd in deploy_commands),
             )
+            # The bundle folder is deployed whole; .forceignore keeps node_modules out.
+            self.assertTrue((demo_operator.ROOT / "clm-salesforce-project/.forceignore").exists())
             core_deploy = " ".join(" ".join(cmd) for cmd in deploy_commands)
             self.assertIn("CLM_Contract_Record_Page.flexipage-meta.xml", core_deploy)
             self.assertIn("CLM_Demo.app-meta.xml", core_deploy)

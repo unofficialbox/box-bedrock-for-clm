@@ -174,39 +174,22 @@ def run(command: list[str], *, cwd: Path = ROOT, dry_run: bool = False) -> str:
 
 
 def deploy_uibundle(project: Path, *, alias: str, dry_run: bool) -> None:
-    if dry_run:
-        command = ["sf", "project", "deploy", "start", "--target-org", alias, "--wait", "20"]
-        ui_bundle_sources = [
-            "force-app/main/default/uiBundles/clmreactapp/ui-bundle.json",
-            "force-app/main/default/uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml",
-            "force-app/main/default/uiBundles/clmreactapp/index.html",
-            "force-app/main/default/uiBundles/clmreactapp/dist",
-        ]
-        for source in ui_bundle_sources:
-            command.extend(["--source-dir", source])
-        run(command, cwd=project, dry_run=dry_run)
-        return
-
-    source_root = project / "force-app/main/default/uiBundles/clmreactapp"
-    with tempfile.TemporaryDirectory(prefix="clmreactapp-uibundle-deploy-") as staging_root:
-        stage = Path(staging_root) / "force-app/main/default/uiBundles/clmreactapp"
-        stage.mkdir(parents=True, exist_ok=True)
-        for source_name in ["ui-bundle.json", "clmreactapp.uibundle-meta.xml", "index.html"]:
-            shutil.copy2(source_root / source_name, stage / source_name)
-        shutil.copytree(source_root / "dist", stage / "dist")
-        command = [
-            "sf",
-            "project",
-            "deploy",
-            "start",
-            "--target-org",
-            alias,
-            "--wait",
-            "20",
-            "--source-dir",
-            str(stage),
-        ]
-        run(command, cwd=project, dry_run=dry_run)
+    # Deploy the bundle directory itself. `.forceignore` keeps node_modules and the
+    # other build inputs out of the package; without it the UIBundle component packs
+    # the whole folder (~357 MB) and the Metadata API rejects the 50 MB request.
+    command = [
+        "sf",
+        "project",
+        "deploy",
+        "start",
+        "--target-org",
+        alias,
+        "--wait",
+        "20",
+        "--source-dir",
+        "force-app/main/default/uiBundles/clmreactapp",
+    ]
+    run(command, cwd=project, dry_run=dry_run)
 
 
 def run_json(command: list[str], *, cwd: Path = ROOT) -> Any:
