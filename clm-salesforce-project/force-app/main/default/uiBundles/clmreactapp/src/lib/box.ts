@@ -14,7 +14,65 @@ declare global {
         hide(): void;
         removeAllListeners(): void;
       };
+      Preview: new () => {
+        show(fileId: string, accessToken: string, options: Record<string, unknown>): void;
+        hide(): void;
+        removeAllListeners(): void;
+      };
     };
+  }
+}
+
+/** Box Content Preview, served from the Box CDN. */
+const PREVIEW_VERSION = "2.106.0";
+const PREVIEW_BASE = `https://cdn01.boxcdn.net/platform/preview/${PREVIEW_VERSION}/en-US`;
+
+export interface BoxFolderItem {
+  id: string;
+  name: string;
+  type: string;
+}
+
+let previewLoader: Promise<boolean> | null = null;
+
+/**
+ * Inject the Content Preview bundle once. Resolves false when the CDN is blocked
+ * (no CSP Trusted Site, offline, local dev) so callers can fall back instead of hang.
+ */
+export function loadBoxPreview(): Promise<boolean> {
+  if (window.Box?.Preview) return Promise.resolve(true);
+  if (previewLoader) return previewLoader;
+
+  previewLoader = new Promise<boolean>((resolve) => {
+    if (typeof document === "undefined") return resolve(false);
+
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = `${PREVIEW_BASE}/preview.css`;
+    document.head.appendChild(stylesheet);
+
+    const script = document.createElement("script");
+    script.src = `${PREVIEW_BASE}/preview.js`;
+    script.async = true;
+    script.onload = () => resolve(Boolean(window.Box?.Preview));
+    script.onerror = () => resolve(false);
+    document.head.appendChild(script);
+  });
+  return previewLoader;
+}
+
+/** List a folder with the downscoped token. Empty on any failure; the caller falls back. */
+export async function listBoxFolderItems(folderId: string, accessToken: string): Promise<BoxFolderItem[]> {
+  try {
+    const response = await fetch(
+      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type&limit=100`,
+      { headers: { Authorization: `Bearer ${accessToken}` } }
+    );
+    if (!response.ok) return [];
+    const result = (await response.json()) as { entries?: BoxFolderItem[] };
+    return (result.entries || []).filter((entry) => entry.type === "file");
+  } catch {
+    return [];
   }
 }
 
