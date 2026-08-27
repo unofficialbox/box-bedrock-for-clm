@@ -63,15 +63,32 @@ Secrets go in the external credential, never in a file.
 
 ## Part 3 — Non-secret settings
 
-1. **Setup → Custom Settings → CLM Box Config → Manage → New** (the org default record).
-2. Set:
-   - **Enterprise Id** — the Box enterprise ID from Part 1.
-   - **Allowed Folder Ids** — a comma-separated list of Box folder IDs the endpoint may
-     mint tokens for. Leave blank to allow any folder; populate it to restrict the
-     endpoint to the demo workspace.
-3. Assign the `CLM_Demo_Operator` permission set to anyone who will open the workspace. It
-   grants both the Apex class and access to the credential principal.
-   `python3 scripts/demo_operator.py salesforce-deploy` assigns it automatically.
+Two values go on the `CLM_Box_Config__c` org-default record:
+
+- **Enterprise Id** — the Box enterprise ID from Part 1. The endpoint returns
+  `box_not_configured` until this is set.
+- **Allowed Folder Ids** — a comma-separated list of Box folder IDs the endpoint may mint
+  tokens for. Leave blank to allow **any** folder; populate it to restrict the endpoint to
+  the demo workspace.
+
+Apply them with the script, which validates both values, upserts the org default, and
+prints a masked summary. Rerunning it updates the same record rather than adding one:
+
+```bash
+BOX_ENTERPRISE_ID=<id> BOX_ALLOWED_FOLDER_IDS=<id,id> \
+  clm-salesforce-project/scripts/configure-clm-box-settings.sh <alias>
+```
+
+The values are substituted into a temporary copy at run time, so no live identifier is
+written into the working tree. Retrieve them with `box users:get --fields=enterprise` and
+`box folders:items 0 --fields=id,name,type`.
+
+The equivalent by hand is **Setup → Custom Settings → CLM Box Config → Manage → New** (the
+org default record), setting the same two fields.
+
+Then assign the `CLM_Demo_Operator` permission set to anyone who will open the workspace. It
+grants both the Apex class and access to the credential principal.
+`python3 scripts/demo_operator.py salesforce-deploy` assigns it automatically.
 
 ## Part 4 — Point the workspace at a real folder
 
