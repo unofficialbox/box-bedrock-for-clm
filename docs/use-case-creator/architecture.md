@@ -3,7 +3,7 @@
 ## Design Principles
 
 1. **One content foundation** - Box stores contract documents, signatures, metadata, versions, and audit trail.
-2. **Two explicit presenter paths** - Box Automate Agentic Orchestration stays Box-centric; Cross-Platform Agentic Orchestration adds the React workspace, Databricks, and AgentCore/Strands.
+2. **One presenter path** - Cross-Platform Agentic Orchestration presents the React workspace, Databricks, and AgentCore/Strands over the governed Box foundation.
 3. **Human accountability** - AI drafts, summarizes, compares, extracts, and recommends. Humans approve legal positions, concessions, signatures, and obligations.
 4. **Composable integrations** - Box is the system of record for unstructured content, Salesforce for structured deal data, Databricks for governed analytics context.
 5. **Reusable demo factory** - Domain demos reuse the same abstraction layers, metadata conventions, agent patterns, and handoff workflow.
@@ -50,7 +50,7 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 ---
 
-## Scenario B: Cross-Platform Agentic Orchestration
+## Scenario: Cross-Platform Agentic Orchestration
 
 Supervisor-directed, cross-platform scenario. Status: specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
 
@@ -146,17 +146,15 @@ Box Sign + Obligation Monitor
 
 ---
 
-## Scenario A: Box Automate Agentic Orchestration
+## Box Entry-Point Path
 
-Workflow-directed, Box-centric presenter path. Automate owns the sequence, agents enrich individual steps, humans own approvals. React is not part of this path.
+The metadata-triggered intake that opens the scenario. Automate owns the intake sequence, agents enrich individual steps, humans own approvals; the React workspace opens on the record it creates.
 
-Canonical guide: [Box Automate Agentic Orchestration](../operator/scenarios/box-automate-agentic-orchestration/README.md)
+Canonical module: [Entry-Point Variation: Box Metadata Trigger to Salesforce Record](../operator/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/04-box-metadata-automate-entry.md)
 
-Architecture: [rendered](../diagrams/box-automate-agentic-orchestration-architecture.svg) · [source](../diagrams/box-automate-agentic-orchestration-architecture.mmd)
+Flow: [rendered](../diagrams/clm-box-metadata-automate-entry.svg) · [source](../diagrams/clm-box-metadata-automate-entry.mmd)
 
-Flow: [rendered](../diagrams/box-automate-agentic-orchestration-flow.svg) · [source](../diagrams/box-automate-agentic-orchestration-flow.mmd)
-
-### Variation rules
+### Entry-point rules
 
 | Rule | Implementation |
 |---|---|
@@ -166,7 +164,7 @@ Flow: [rendered](../diagrams/box-automate-agentic-orchestration-flow.svg) · [so
 | Routing is deterministic | Domains resolve through `config/clm/expert-routing.json`; low-confidence, unclassified, inaccessible, and unconfigured assignments go to Legal Operations triage. |
 | Tasks are consolidated | The routing action creates or reuses one open task per contract, redline file, and domain. |
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
-| No external agent runtime | No request is sent to AgentCore, Strands, Databricks, or custom middleware. |
+| No external agent runtime in intake | Intake itself sends no request to AgentCore, Strands, Databricks, or custom middleware. |
 
 Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.bcl)
 

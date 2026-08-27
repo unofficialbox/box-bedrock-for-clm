@@ -32,7 +32,6 @@ class HTMLBrandingTests(unittest.TestCase):
         module = load_script("build_scenario_guides")
         expected = {
             "operator-setup": {"box", "salesforce", "databricks"},
-            "box-automate-agentic-orchestration": {"box", "salesforce"},
             "cross-platform-agentic-orchestration": {
                 "box",
                 "salesforce",
@@ -50,7 +49,6 @@ class HTMLBrandingTests(unittest.TestCase):
     def test_scenario_galleries_embed_the_correct_official_logos(self) -> None:
         module = load_script("build_clm_experience_gallery")
         expected = {
-            "box-automate-agentic-orchestration": {"box", "salesforce"},
             "cross-platform-agentic-orchestration": {
                 "box",
                 "salesforce",

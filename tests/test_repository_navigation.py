@@ -19,7 +19,6 @@ class RepositoryNavigationTests(unittest.TestCase):
             "docs/operator/README.md",
             "docs/use-case-creator/README.md",
             "docs/maintainers/README.md",
-            "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
             "docs/operator/scenarios/cross-platform-agentic-orchestration/README.md",
         }
         self.assertTrue(expected.issubset(targets), expected - targets)
@@ -31,6 +30,7 @@ class RepositoryNavigationTests(unittest.TestCase):
             "docs/runbooks/04-box-agentforce-react-demo.md",
             "docs/operator/scenarios/cross-platform-agentic-orchestration/"
             "supporting-react-scripts/component-manifest.md",
+            "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
         ]
         for relative_path in removed:
             self.assertFalse((ROOT / relative_path).exists(), relative_path)

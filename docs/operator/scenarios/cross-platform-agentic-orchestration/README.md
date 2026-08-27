@@ -87,7 +87,7 @@ Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies
 
 ## 5. Visual walkthrough
 
-Box screenshots below reference Box Automate Agentic Orchestration source files; only the React screenshots are scenario-specific.
+Box screenshots below come from the shared Box surface capture set; the React screenshots are workspace-specific.
 
 ### Unified React workspace
 
@@ -105,7 +105,7 @@ Box screenshots below reference Box Automate Agentic Orchestration source files;
 
 ![Human approval branch](../../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../../output/html/04-cross-platform-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../../output/html/03-cross-platform-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
+Optional offline presentation: [self-contained visual gallery](../../../../output/html/02-cross-platform-agentic-orchestration-gallery.html). For the complete narrative, use the [portable guide](../../../../output/html/01-cross-platform-agentic-orchestration-guide.html). No live Databricks or AWS console screenshots are claimed; use the architecture, flow, and [local trace](../../../../output/agentcore/northstar-agentcore-trace.json) until managed deployment is verified.
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -135,7 +135,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 ## 7. Setup and validation
 
-1. Complete [Operator Start Here](../../start-here.md) and the Box Automate Agentic Orchestration foundation first.
+1. Complete [Operator Start Here](../../start-here.md) and the Box surface foundation first.
 2. Run `python3 scripts/run_agentcore_mock.py` and validate `output/agentcore/northstar-agentcore-trace.json`.
 3. Start the React workspace with this environment's Salesforce record ID, contract ID, and generated Box workspace folder ID.
 4. Confirm Box content and the safe Salesforce Agentforce fallback render without browser secrets.

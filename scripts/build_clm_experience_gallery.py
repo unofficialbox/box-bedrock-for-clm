@@ -94,16 +94,6 @@ for experience in REACT_EXPERIENCES:
 SCENARIOS = [
     {
         "order": "02",
-        "slug": "box-automate-agentic-orchestration",
-        "title": "Box Automate Agentic Orchestration",
-        "headline": "Agentic contract operations directed by Box Automate.",
-        "description": "A workflow-directed orchestration of Apps, Forms, Automate, Extract, Box AI, Agentforce, human approvals, Hubs, Doc Gen, and execution controls.",
-        "status": "Live Box surfaces. Automate is saved and inactive while its final OAuth smoke and activation remain gated.",
-        "experiences": BOX_EXPERIENCES,
-        "brands": ("box", "salesforce"),
-    },
-    {
-        "order": "04",
         "slug": "cross-platform-agentic-orchestration",
         "title": "Cross-Platform Agentic Orchestration",
         "headline": "The complete multi-platform CLM operating model.",

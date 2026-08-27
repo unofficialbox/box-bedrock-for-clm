@@ -15,12 +15,11 @@ Use this guide to build the demo in a **new Box enterprise and Salesforce org**.
 
 The generated IDs are stored only in `config/runtime/bootstrap-state.json`. The operator's URLs and environment settings are stored only in `config/runtime/demo-environment.json`. Both files are ignored by Git. The Box bootstrap checkpoints after each successful create/upload, so rerunning it skips recorded resources instead of duplicating them.
 
-## 1. Choose a scenario
+## 1. Scenario
 
-- **Box Automate Agentic Orchestration:** Box-led, predictable Automate stages with agentic enrichment and human approval.
 - **Cross-Platform Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
 
-Build and rehearse **Box Automate Agentic Orchestration first**; it is the foundation for both scenarios.
+Box intake, metadata, and Automate enrichment are the entry-point path into this scenario. Build and rehearse the Box surfaces first; they are the foundation the React workspace opens on.
 
 ## 2. Confirm prerequisites
 
@@ -105,13 +104,13 @@ python3 scripts/demo_operator.py doctor
 Most common path after config seeding:
 
 ```bash
-python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run
+python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --dry-run
 ```
 
 When approvals are confirmed:
 
 ```bash
-python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes
+python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --yes
 ```
 
 The one-shot `bootstrap` command always checks pre-requisites, avoids duplicates, and only creates missing resources.
@@ -168,7 +167,7 @@ Run the final lock-down phase after browser/admin handoff:
 
 ```bash
 python3 scripts/demo_operator.py resolve-config --allow-unresolved
-python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 python3 scripts/validate_clm.py
 ```
 
@@ -192,10 +191,9 @@ The receipt file is ignored by Git and must not contain credentials.
 
 ## 7. Present with tell/show/tell
 
-Use the presenter script inside the selected scenario guide:
+Use the presenter script inside the scenario guide:
 
-1. [Box Automate Agentic Orchestration](scenarios/box-automate-agentic-orchestration/README.md#4-presenter-script)
-2. [Cross-Platform Agentic Orchestration](scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
+1. [Cross-Platform Agentic Orchestration](scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
 
 Each step tells what matters, shows one proof, then explains the outcome. Avoid narrating every click.
 

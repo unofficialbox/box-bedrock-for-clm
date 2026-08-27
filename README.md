@@ -2,7 +2,7 @@
 
 # Contract Lifecycle Management Demo
 
-This repository contains a mature Contract Lifecycle Management demo with two orchestration scenarios, deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter output.
+This repository contains a mature Contract Lifecycle Management demo with a cross-platform orchestration scenario, deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter output.
 
 ## Choose one path
 
@@ -18,10 +18,9 @@ The complete persona index is in [docs/README.md](docs/README.md). AI assistants
 
 | Scenario | Primary surface | Coordination model |
 |---|---|---|
-| [Box Automate Agentic Orchestration](docs/operator/scenarios/box-automate-agentic-orchestration/README.md) | Box | Box Automate coordinates Forms, Extract, Box and Agentforce agents, human approvals, Hubs, Doc Gen, Sign, and a governed Salesforce REST handoff. |
 | [Cross-Platform Agentic Orchestration](docs/operator/scenarios/cross-platform-agentic-orchestration/README.md) | Salesforce Multi-Framework React | Amazon Bedrock AgentCore coordinates Box, Salesforce Agentforce, and Databricks specialists while humans retain decision authority. |
 
-Both scenarios use the same Northstar contract package and governance model. Box remains authoritative for contract content; Salesforce `CLM_Contract__c` remains authoritative for structured commercial truth.
+The scenario uses the Northstar contract package and governance model. Box remains authoritative for contract content; Salesforce `CLM_Contract__c` remains authoritative for structured commercial truth.
 
 ## Get started
 
@@ -71,7 +70,7 @@ This fails closed unless Box, Salesforce, AgentCore, and Databricks have current
 
 ## Presenter output
 
-Start with the [presenter library](output/html/index.html). It routes to every standalone chapter and to the [complete self-contained edition](output/html/09-complete-presenter-edition.html), which embeds all nine chapters and needs no sibling files or network access. The Markdown source remains authoritative; generated HTML is the portable sharing layer.
+Start with the [presenter library](output/html/index.html). It routes to every standalone chapter and to the [complete self-contained edition](output/html/07-complete-presenter-edition.html), which embeds all seven chapters and needs no sibling files or network access. The Markdown source remains authoritative; generated HTML is the portable sharing layer.
 
 ## Source map
 

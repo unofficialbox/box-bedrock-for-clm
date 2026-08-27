@@ -17,14 +17,14 @@ locals {
             "architectureSource" = "docs/diagrams/clm-agentcore-architecture.mmd"
             "flowRendered" = "docs/diagrams/cross-platform-agentic-orchestration-flow.svg"
             "flowSource" = "docs/diagrams/cross-platform-agentic-orchestration-flow.mmd"
-            "gallery" = "output/html/04-cross-platform-agentic-orchestration-gallery.html"
+            "gallery" = "output/html/02-cross-platform-agentic-orchestration-gallery.html"
             "guide" = "docs/operator/scenarios/cross-platform-agentic-orchestration/README.md"
-            "portableGuide" = "output/html/03-cross-platform-agentic-orchestration-guide.html"
+            "portableGuide" = "output/html/01-cross-platform-agentic-orchestration-guide.html"
             "technicalValidation" = "docs/operator/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/03-technical-validation.md"
           }
           "enterprise_id" = ""
           "included" = [
-            "all Box Automate Agentic Orchestration components"
+            "Box intake, metadata, Automate enrichment, Hubs, Doc Gen, and Sign surfaces"
             "Salesforce Agentforce CLM record, Contract Copilot, and Multi-Framework React UI Bundle"
             "Databricks analytics agent"
             "AWS Bedrock AgentCore supervisor"

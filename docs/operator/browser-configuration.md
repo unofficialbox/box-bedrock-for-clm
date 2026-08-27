@@ -81,7 +81,7 @@ This POST is **not idempotent** (`idempotency.safe = false`): resubmitting the s
 
 ## 7. Agentforce and optional orchestration
 
-For Box Automate Agentic Orchestration, configure only the Agentforce actions used by the Box-led path. For Cross-Platform Agentic Orchestration, follow [Cross-Platform Agentic Orchestration deployment boundary](cross-platform-deployment.md). The repository provides a local deterministic trace; it does not yet automate managed AgentCore or Databricks provisioning.
+Configure only the Agentforce actions used by the CLM path, then follow [Cross-Platform Agentic Orchestration deployment boundary](cross-platform-deployment.md). The repository provides a local deterministic trace; it does not yet automate managed AgentCore or Databricks provisioning.
 
 Record the new environment's IDs in `demo-environment.json`; never write secrets there.
 

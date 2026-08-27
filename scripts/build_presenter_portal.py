@@ -32,56 +32,42 @@ PAGES = (
         "Configure, deploy, validate, and rehearse the demo in a new environment.",
     ),
     PresenterPage(
-        "01-box-automate-agentic-orchestration-guide.html",
-        "Box Automate Scenario Guide",
-        "Scenario 1",
-        "Tell / show / tell",
-        "Present the Box-led orchestration flow, controls, and operator sequence.",
-    ),
-    PresenterPage(
-        "02-box-automate-agentic-orchestration-gallery.html",
-        "Box Automate Experience Gallery",
-        "Scenario 1",
-        "Real demo evidence",
-        "Review the live Box Apps, Forms, Automate, Hub, and expert-review experiences.",
-    ),
-    PresenterPage(
-        "03-cross-platform-agentic-orchestration-guide.html",
+        "01-cross-platform-agentic-orchestration-guide.html",
         "Cross-Platform Scenario Guide",
-        "Scenario 2",
+        "Scenario",
         "Tell / show / tell",
         "Present coordinated contract work across Box, Salesforce Agentforce, Databricks, and AgentCore.",
     ),
     PresenterPage(
-        "04-cross-platform-agentic-orchestration-gallery.html",
+        "02-cross-platform-agentic-orchestration-gallery.html",
         "Cross-Platform Experience Gallery",
-        "Scenario 2",
+        "Scenario",
         "Real demo evidence",
         "Review the application, governed content, contract context, and human-decision experiences.",
     ),
     PresenterPage(
-        "05-executive-marketecture.html",
+        "03-executive-marketecture.html",
         "Executive Marketecture",
         "Communicate",
         "Leadership view",
         "Connect the operating model, platform responsibilities, outcomes, and delivery path.",
     ),
     PresenterPage(
-        "06-agentcore-agent-experience-marketecture.html",
+        "04-agentcore-agent-experience-marketecture.html",
         "Coordinated Contract Work",
         "Communicate",
         "AgentCore experience",
         "Show how agents, systems, and experts coordinate around governed contract work.",
     ),
     PresenterPage(
-        "07-customer-solution-datasheet.html",
+        "05-customer-solution-datasheet.html",
         "Customer Solution Datasheet",
         "Communicate",
         "Customer overview",
         "Share the business problem, solution experience, outcomes, and platform contribution.",
     ),
     PresenterPage(
-        "08-contract-lifecycle-readiness-marketecture.html",
+        "06-contract-lifecycle-readiness-marketecture.html",
         "Contract Lifecycle Readiness",
         "Communicate",
         "Lifecycle view",
@@ -133,7 +119,6 @@ h1 { max-width:900px; margin:0; font-size:clamp(40px,6vw,72px); line-height:.98;
 .card .open svg { width:15px; height:15px; }
 .prepare { --card-accent:var(--orange); }
 .scenario-one { --card-accent:var(--green); }
-.scenario-two { --card-accent:var(--violet); }
 .communicate { --card-accent:var(--blue); }
 .combined-callout { display:grid; grid-template-columns:1.4fr .6fr; gap:28px; align-items:center; margin-top:-28px; padding:28px 30px; border:1px solid #8bb9ef; border-radius:18px; background:linear-gradient(120deg,#e8f3ff,#fff 62%); box-shadow:var(--shadow); }
 .combined-callout h2 { margin:0 0 8px; font-size:28px; letter-spacing:-.035em; }
@@ -165,8 +150,7 @@ ARROW = """<svg viewBox="0 0 20 20" aria-hidden="true"><path d="M4 10h11m-4-4 4 
 def page_class(page: PresenterPage) -> str:
     return {
         "Prepare": "prepare",
-        "Scenario 1": "scenario-one",
-        "Scenario 2": "scenario-two",
+        "Scenario": "scenario-one",
         "Communicate": "communicate",
     }[page.group]
 
@@ -178,8 +162,7 @@ def build_landing(output: Path | None = None) -> Path:
     sections: list[str] = []
     group_copy = {
         "Prepare": "Start here when configuring or rehearsing the solution in a new environment.",
-        "Scenario 1": "Workflow-directed orchestration centered on Box Automate and governed human decisions.",
-        "Scenario 2": "Supervisor-led orchestration across content, business context, analytics, and specialist agents.",
+        "Scenario": "Supervisor-led orchestration across content, business context, analytics, and specialist agents.",
         "Communicate": "Executive, customer, and lifecycle views for non-technical and technical conversations.",
     }
     for group in group_copy:
@@ -206,13 +189,13 @@ def build_landing(output: Path | None = None) -> Path:
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Acme CLM · Presenter Library</title><style>{SHARED_CSS}</style></head>
 <body><header class="masthead"><div class="shell masthead-inner">
-  <div class="brandline"><div class="brand"><span class="brand-mark">CLM</span><span>Acme Contract Operations</span></div><span class="status">Portable presenter library · 9 chapters</span></div>
+  <div class="brandline"><div class="brand"><span class="brand-mark">CLM</span><span>Acme Contract Operations</span></div><span class="status">Portable presenter library · 7 chapters</span></div>
   <p class="kicker">Start here</p><h1>Choose the right story for the room.</h1>
-  <p class="intro">One entry point for environment setup, two complete demo scenarios, real experience galleries, and executive-ready solution narratives. Every chapter remains available as its own portable file.</p>
-  <div class="actions"><a class="button primary" href="09-complete-presenter-edition.html">Open the combined edition {ARROW}</a><a class="button secondary" href="#library">Browse individual files</a></div>
+  <p class="intro">One entry point for environment setup, the complete demo scenario, real experience galleries, and executive-ready solution narratives. Every chapter remains available as its own portable file.</p>
+  <div class="actions"><a class="button primary" href="07-complete-presenter-edition.html">Open the combined edition {ARROW}</a><a class="button secondary" href="#library">Browse individual files</a></div>
 </div></header>
 <main id="library" class="shell content">
-  <aside class="combined-callout"><div><h2>Need one file?</h2><p>The combined edition packages all nine chapters into a single self-contained HTML file with chapter navigation, keyboard controls, and no network dependencies.</p></div><a class="button" href="09-complete-presenter-edition.html">Launch combined edition {ARROW}</a></aside>
+  <aside class="combined-callout"><div><h2>Need one file?</h2><p>The combined edition packages all seven chapters into a single self-contained HTML file with chapter navigation, keyboard controls, and no network dependencies.</p></div><a class="button" href="07-complete-presenter-edition.html">Launch combined edition {ARROW}</a></aside>
   {"".join(sections)}
 </main><footer><div class="shell"><span>Acme CLM · Portable specification and local deterministic fixture</span><span>Markdown remains authoritative · HTML is the sharing layer</span></div></footer></body></html>'''
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -245,7 +228,7 @@ def build_combined(source_dir: Path | None = None, output: Path | None = None) -
     """Build one offline file containing all standalone presenter documents."""
 
     source_dir = source_dir or OUTPUT
-    target = output or OUTPUT / "09-complete-presenter-edition.html"
+    target = output or OUTPUT / "07-complete-presenter-edition.html"
     page_data = json.dumps(embedded_pages(source_dir), separators=(",", ":"))
     document = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

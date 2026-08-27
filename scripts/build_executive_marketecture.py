@@ -10,7 +10,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SCREENSHOTS = ROOT / "output" / "screenshots"
-OUTPUT = ROOT / "output" / "html" / "05-executive-marketecture.html"
+OUTPUT = ROOT / "output" / "html" / "03-executive-marketecture.html"
 BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 PROOF = (

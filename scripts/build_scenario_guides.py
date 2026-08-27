@@ -37,15 +37,6 @@ SCENARIOS = (
     },
     {
         "order": "01",
-        "slug": "box-automate-agentic-orchestration",
-        "source": ROOT / "docs" / "operator" / "scenarios" / "box-automate-agentic-orchestration" / "README.md",
-        "accent": "#72e3bd",
-        "accent_2": "#5a95ff",
-        "label": "Workflow-directed agentic orchestration in Box Automate",
-        "brands": ("box", "salesforce"),
-    },
-    {
-        "order": "03",
         "slug": "cross-platform-agentic-orchestration",
         "source": ROOT / "docs" / "operator" / "scenarios" / "cross-platform-agentic-orchestration" / "README.md",
         "accent": "#a98bff",

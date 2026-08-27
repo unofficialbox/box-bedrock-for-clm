@@ -35,7 +35,6 @@ MAX_TEXT_BYTES = 5_000_000
 # Canonical contracts, kept as named sets so checks compare membership instead of
 # asserting bare counts (which silently pass when the wrong item is added/removed).
 EXPECTED_SCENARIOS = {
-    "box-automate-agentic-orchestration",
     "cross-platform-agentic-orchestration",
 }
 DETERMINISTIC_DATA_FIXTURES = (
@@ -46,15 +45,13 @@ DETERMINISTIC_DATA_FIXTURES = (
 EXPECTED_PRESENTERS = {
     "index.html",
     "00-operator-setup-guide.html",
-    "01-box-automate-agentic-orchestration-guide.html",
-    "02-box-automate-agentic-orchestration-gallery.html",
-    "03-cross-platform-agentic-orchestration-guide.html",
-    "04-cross-platform-agentic-orchestration-gallery.html",
-    "05-executive-marketecture.html",
-    "06-agentcore-agent-experience-marketecture.html",
-    "07-customer-solution-datasheet.html",
-    "08-contract-lifecycle-readiness-marketecture.html",
-    "09-complete-presenter-edition.html",
+    "01-cross-platform-agentic-orchestration-guide.html",
+    "02-cross-platform-agentic-orchestration-gallery.html",
+    "03-executive-marketecture.html",
+    "04-agentcore-agent-experience-marketecture.html",
+    "05-customer-solution-datasheet.html",
+    "06-contract-lifecycle-readiness-marketecture.html",
+    "07-complete-presenter-edition.html",
 }
 RUNTIME_ID_SUFFIXES = {".md", ".json", ".py", ".ts", ".tsx", ".js", ".xml", ".sh", ".yml", ".yaml", ".toml", ".env", ".properties"}
 SECRET_ASSIGNMENT = re.compile(
@@ -344,10 +341,10 @@ def check_generated_presenters(root: Path = ROOT) -> str:
         module.OUTPUT = output
         module.build()
         for name, filename in (
-            ("build_executive_marketecture", "05-executive-marketecture.html"),
-            ("build_agentcore_primary_marketecture", "06-agentcore-agent-experience-marketecture.html"),
-            ("build_customer_datasheet", "07-customer-solution-datasheet.html"),
-            ("build_contract_lifecycle_readiness_marketecture", "08-contract-lifecycle-readiness-marketecture.html"),
+            ("build_executive_marketecture", "03-executive-marketecture.html"),
+            ("build_agentcore_primary_marketecture", "04-agentcore-agent-experience-marketecture.html"),
+            ("build_customer_datasheet", "05-customer-solution-datasheet.html"),
+            ("build_contract_lifecycle_readiness_marketecture", "06-contract-lifecycle-readiness-marketecture.html"),
         ):
             module = load_script(name, root)
             module.OUTPUT = output / filename
@@ -364,7 +361,8 @@ def check_generated_presenters(root: Path = ROOT) -> str:
         ]
         if drift:
             raise ValidationError("Generated presenter drift:\n" + "\n".join(drift))
-    return "9 standalone chapters, 1 landing page, and 1 self-contained combined edition"
+    standalone = len(EXPECTED_PRESENTERS) - 2  # excludes index.html and the combined edition
+    return f"{standalone} standalone chapters, 1 landing page, and 1 self-contained combined edition"
 
 
 class PortableResourceParser(HTMLParser):
@@ -480,7 +478,7 @@ def check_manifests_and_screenshots(root: Path = ROOT, *, today: date | None = N
             failures.append(f"{path.relative_to(root)}: external asset reference")
     if failures:
         raise ValidationError("Manifest, screenshot, or portability failures:\n" + "\n".join(failures))
-    return f"2 scenarios, {len(entries)} current real screenshots, 11 portable HTML files"
+    return f"{len(scenario_ids)} scenario, {len(entries)} current real screenshots, {len(EXPECTED_PRESENTERS)} portable HTML files"
 
 
 def check_reset_and_idempotency_contract(root: Path = ROOT) -> str:

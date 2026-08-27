@@ -80,7 +80,7 @@ locals {
               "writesExternalState" = false
             }
             {
-              "command" = "python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration"
+              "command" = "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration"
               "completeWhen" = "Live Box resources, resolved portable specs, and the Salesforce data model validate."
               "id" = "readiness"
               "owner" = "operator"

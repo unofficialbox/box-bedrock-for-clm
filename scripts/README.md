@@ -30,7 +30,7 @@ The `config/runtime/*` files are the exception and stay JSON: they are per-opera
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
 | `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.json` |
 | `bcl.py` | Dependency-free reader for authored `.bcl` config artifacts; returns the config payload from the `locals.bcl` envelope |
-| `build_clm_experience_gallery.py` | Build separate self-contained Box Automate Agentic Orchestration and Cross-Platform Agentic Orchestration galleries from their scenario screenshot directories |
+| `build_clm_experience_gallery.py` | Build the self-contained Cross-Platform Agentic Orchestration gallery from the Box and React screenshot directories |
 | `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
 | `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
 | `build_presenter_portal.py` | Build the presenter landing page plus a single self-contained edition that embeds all nine standalone chapters |
@@ -81,15 +81,15 @@ python3 scripts/demo_operator.py salesforce-deploy
 python3 scripts/demo_operator.py resolve-config --allow-unresolved
 # Complete browser/admin configuration and record published URLs.
 python3 scripts/demo_operator.py resolve-config
-python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 ```
 
 For a clean single-shot operator flow that checks and creates what is missing:
 
 ```bash
-python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --dry-run
-python3 scripts/demo_operator.py bootstrap --scenario box-automate-agentic-orchestration --yes
-python3 scripts/demo_operator.py status --scenario box-automate-agentic-orchestration
+python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --dry-run
+python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --yes
+python3 scripts/demo_operator.py status --scenario cross-platform-agentic-orchestration
 ```
 
 `provision` remains as a legacy alias for backward compatibility.
@@ -157,8 +157,8 @@ Review outputs in this order:
 - `output/html/index.html` — landing page and table of contents for the presenter library.
 
 1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
-2. `output/html/01-box-automate-agentic-orchestration-guide.html` — complete narrative.
-3. `output/html/02-box-automate-agentic-orchestration-gallery.html` — visual-only companion.
+2. `output/html/01-cross-platform-agentic-orchestration-guide.html` — complete narrative.
+3. `output/html/02-cross-platform-agentic-orchestration-gallery.html` — visual-only companion.
 4. `output/html/03-cross-platform-agentic-orchestration-guide.html` — complete narrative.
 5. `output/html/04-cross-platform-agentic-orchestration-gallery.html` — visual-only companion.
 6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.

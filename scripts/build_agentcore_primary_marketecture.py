@@ -10,7 +10,7 @@ from build_executive_marketecture import PROOF, asset_data_uri, data_uri, icon
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "html" / "06-agentcore-agent-experience-marketecture.html"
+OUTPUT = ROOT / "output" / "html" / "04-agentcore-agent-experience-marketecture.html"
 
 AGENTS = (
     {

@@ -31,7 +31,7 @@ Expected output:
 ## 2) Validate end-to-end automation boundary
 
 ```bash
-python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 python3 scripts/validate_clm.py
 ```
 

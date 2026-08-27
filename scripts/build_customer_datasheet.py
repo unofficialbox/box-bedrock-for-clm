@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "html" / "07-customer-solution-datasheet.html"
+OUTPUT = ROOT / "output" / "html" / "05-customer-solution-datasheet.html"
 BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 

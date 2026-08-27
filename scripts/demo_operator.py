@@ -27,7 +27,6 @@ DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
 STATE_PATH = ROOT / "config/runtime/bootstrap-state.json"
 CLI_COMMAND_NAME = "python3 scripts/demo_operator.py"
 SCENARIOS = (
-    "box-automate-agentic-orchestration",
     "cross-platform-agentic-orchestration",
 )
 STATUS_ICONS = {
@@ -952,8 +951,8 @@ def parser() -> argparse.ArgumentParser:
         description=__doc__,
         epilog=(
             "Examples:\n"
-            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-automate-agentic-orchestration --dry-run\n"
-            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-automate-agentic-orchestration --yes\n"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario cross-platform-agentic-orchestration --dry-run\n"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario cross-platform-agentic-orchestration --yes\n"
             f"  {CLI_COMMAND_NAME} status --scenario cross-platform-agentic-orchestration\n"
             f"  {CLI_COMMAND_NAME} validate --scenario cross-platform-agentic-orchestration --offline"
         ),

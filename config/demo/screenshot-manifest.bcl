@@ -23,63 +23,63 @@ locals {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Automate approval flow"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/automate-https-connector.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Automate HTTPS Connector"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/automate-intake-agents.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Automate intake agents"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-app-approved-standards-view.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Apps approved standards view"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Apps clause library"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-actions-live.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Apps dashboard actions"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Apps dashboard"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-docgen-templates.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Doc Gen templates"
             }
             {
               "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png"
               "readiness" = "real-demo"
-              "scenario" = "box-automate-agentic-orchestration"
+              "scenario" = "cross-platform-agentic-orchestration"
               "sourceSurface" = "Box Hubs clause library"
             }
             {

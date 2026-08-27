@@ -2,7 +2,7 @@
 
 Use a clearly labeled non-production request. Record new IDs in a run log, not in repository documentation.
 
-## Box Automate Agentic Orchestration gate
+## Box surface gate
 
 1. Upload `northstar-msa-redline-v3.pdf` into `01 - Intake` and apply the `clmContract` metadata with contract ID `CLM-2026-0017`, the queue's Northstar values (`contractType`, `counterparty`), and `requesterEmail`; confirm applying the metadata starts the intake workflow.
 2. Confirm the extracted contract type is `MSA Package`, risk is reviewable as `Critical`, material deviations cite the redline, and no agent claims approval.

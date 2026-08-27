@@ -16,7 +16,7 @@ Deploy the Salesforce UI Bundle with `demo_operator.py salesforce-deploy`, open 
 Run:
 
 ```bash
-python3 scripts/demo_operator.py validate --scenario box-automate-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
 ```
 
 Do not claim managed AgentCore or Databricks execution.
