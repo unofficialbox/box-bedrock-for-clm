@@ -45,8 +45,6 @@ private class ClmBoxTokenServiceTest {
     private static void configure(String allowedFolders) {
         insert new CLM_Box_Config__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
-            Client_Id__c = 'client-id',
-            Client_Secret__c = 'client-secret',
             Enterprise_Id__c = '99999',
             Allowed_Folder_Ids__c = allowedFolders
         );
@@ -114,7 +112,14 @@ private class ClmBoxTokenServiceTest {
             'The exchange must present the parent token as subject_token');
         System.assert(exchange.contains(EncodingUtil.urlEncode('https://api.box.com/2.0/folders/' + FOLDER_ID, 'UTF-8')),
             'The exchange must scope the token to the requested folder');
-        System.assert(!exchange.contains('client_secret'), 'The exchange must not resend the client secret');
+        System.assert(!exchange.contains('client_secret'), 'The exchange must not resend the client credentials');
+
+        String grant = mock.bodies[0];
+        System.assert(grant.contains('{!$Credential.Username}'),
+            'The grant must reference the external credential rather than a stored client id');
+        System.assert(grant.contains('{!$Credential.Password}'),
+            'The grant must reference the external credential rather than a stored client secret');
+        System.assert(grant.contains('box_subject_type=enterprise'), 'Box requires an explicit CCG subject');
     }
 
     @IsTest

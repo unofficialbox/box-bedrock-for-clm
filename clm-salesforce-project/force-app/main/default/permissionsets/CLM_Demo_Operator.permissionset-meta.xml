@@ -8,6 +8,10 @@
         <application>CLM_Demo</application>
         <visible>true</visible>
     </applicationVisibilities>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>CLM_Box-CLM_Box_Principal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <fieldPermissions>
         <editable>true</editable>
         <field>CLM_Contract__c.Counterparty_Account__c</field>

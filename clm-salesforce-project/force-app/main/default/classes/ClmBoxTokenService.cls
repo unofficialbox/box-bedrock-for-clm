@@ -1,28 +1,37 @@
 /**
  * Same-origin endpoint that hands the CLM React workspace a short-lived Box token
- * scoped to a single folder. The browser never sees a client secret and never sees
- * the parent token.
+ * scoped to a single folder. The browser never sees a credential, and neither does
+ * this class.
  *
- * Two Box calls, in order:
+ * Two Box calls, both through the CLM_Box named credential:
  *   1. Client Credentials Grant  -> an enterprise-scoped parent token.
  *   2. Token exchange (downscope) -> a token limited to `scope` on one folder.
  * Only the downscoped token is returned.
  *
+ * Credentials live in the CLM_Box external credential (Basic protocol: Username is
+ * the Box client id, Password is the client secret). Salesforce stores them
+ * encrypted and substitutes them into the request body at callout time via merge
+ * fields, so Apex holds only placeholders and no secret can reach source control.
+ * This requires "Allow Merge Fields in HTTP Body" on the named credential.
+ *
  * The Box for Salesforce managed package cannot back this: box.Toolkit exposes no
  * token accessor, and the Authorization header it sets is not readable after
- * sendRequest, so there is no parent token to exchange. Hence a dedicated Box
- * platform app, with its credentials held in the protected CLM_Box_Config__c
- * custom setting (data, never committed metadata).
+ * sendRequest, so there is no parent token to exchange.
  */
 @RestResource(urlMapping='/clm/box-token/*')
 global with sharing class ClmBoxTokenService {
 
-    private static final String TOKEN_URL = 'https://api.box.com/oauth2/token';
+    @TestVisible
+    private static final String TOKEN_ENDPOINT = 'callout:CLM_Box/oauth2/token';
     private static final String TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange';
     private static final String ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token';
 
     /** Read-only preview scopes. Deliberately excludes upload, delete, and share. */
     private static final String DOWNSCOPE_SCOPE = 'base_explorer,item_preview,item_read';
+
+    /** Reuse the enterprise token across requests so each preview costs one Box call, not two. */
+    private static final String CACHE_KEY = 'ClmBoxParentToken';
+    private static final Integer CACHE_SAFETY_MARGIN_SECONDS = 300;
 
     global class TokenResponse {
         global String accessToken;
@@ -45,7 +54,7 @@ global with sharing class ClmBoxTokenService {
         RestRequest request = RestContext.request;
         RestResponse response = RestContext.response;
         response.addHeader('Content-Type', 'application/json');
-        // A token is per-user and short-lived; never let a proxy or browser cache it.
+        // A token is short-lived and folder-scoped; never let a proxy or browser cache it.
         response.addHeader('Cache-Control', 'no-store');
 
         String folderId = request.params.get('folderId');
@@ -60,10 +69,9 @@ global with sharing class ClmBoxTokenService {
         }
 
         CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
-        if (config == null || String.isBlank(config.Client_Id__c) || String.isBlank(config.Client_Secret__c)
-            || String.isBlank(config.Enterprise_Id__c)) {
+        if (config == null || String.isBlank(config.Enterprise_Id__c)) {
             fail(response, 503, 'box_not_configured',
-                'Populate the CLM Box Config custom setting with the Box app client id, client secret, and enterprise id.');
+                'Set Enterprise Id on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
             return;
         }
         if (!isFolderAllowed(config, folderId)) {
@@ -73,7 +81,7 @@ global with sharing class ClmBoxTokenService {
         }
 
         try {
-            String parentToken = requestEnterpriseToken(config);
+            String parentToken = enterpriseToken(config);
             if (String.isBlank(parentToken)) {
                 fail(response, 502, 'box_auth_failed', 'Box did not return an enterprise access token.');
                 return;
@@ -107,33 +115,39 @@ global with sharing class ClmBoxTokenService {
         return false;
     }
 
-    /** Client Credentials Grant against the Box enterprise. Returns the parent token. */
-    private static String requestEnterpriseToken(CLM_Box_Config__c config) {
-        Map<String, String> form = new Map<String, String>{
-            'grant_type' => 'client_credentials',
-            'client_id' => config.Client_Id__c,
-            'client_secret' => config.Client_Secret__c,
-            'box_subject_type' => 'enterprise',
-            'box_subject_id' => config.Enterprise_Id__c
-        };
-        HttpResponse res = post(form);
+    /** Cached enterprise token, falling back to a fresh grant. */
+    private static String enterpriseToken(CLM_Box_Config__c config) {
+        String cached = cacheGet();
+        if (String.isNotBlank(cached)) {
+            return cached;
+        }
+        HttpResponse res = post(
+            'grant_type=client_credentials'
+            // Merge fields are substituted by Salesforce and must not be encoded here.
+            + '&client_id={!$Credential.Username}'
+            + '&client_secret={!$Credential.Password}'
+            + '&box_subject_type=enterprise'
+            + '&box_subject_id=' + EncodingUtil.urlEncode(config.Enterprise_Id__c, 'UTF-8')
+        );
         if (res.getStatusCode() != 200) {
             return null;
         }
         Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-        return (String) body.get('access_token');
+        String token = (String) body.get('access_token');
+        Integer expiresIn = body.get('expires_in') == null ? 0 : Integer.valueOf(body.get('expires_in'));
+        cachePut(token, expiresIn);
+        return token;
     }
 
     /** Exchange the parent token for one limited to preview scopes on a single folder. */
     private static TokenResponse downscope(String parentToken, String folderId) {
-        Map<String, String> form = new Map<String, String>{
-            'grant_type' => TOKEN_EXCHANGE_GRANT,
-            'subject_token' => parentToken,
-            'subject_token_type' => ACCESS_TOKEN_TYPE,
-            'scope' => DOWNSCOPE_SCOPE,
-            'resource' => 'https://api.box.com/2.0/folders/' + folderId
-        };
-        HttpResponse res = post(form);
+        HttpResponse res = post(
+            'grant_type=' + EncodingUtil.urlEncode(TOKEN_EXCHANGE_GRANT, 'UTF-8')
+            + '&subject_token=' + EncodingUtil.urlEncode(parentToken, 'UTF-8')
+            + '&subject_token_type=' + EncodingUtil.urlEncode(ACCESS_TOKEN_TYPE, 'UTF-8')
+            + '&scope=' + EncodingUtil.urlEncode(DOWNSCOPE_SCOPE, 'UTF-8')
+            + '&resource=' + EncodingUtil.urlEncode('https://api.box.com/2.0/folders/' + folderId, 'UTF-8')
+        );
         if (res.getStatusCode() != 200) {
             return null;
         }
@@ -150,22 +164,38 @@ global with sharing class ClmBoxTokenService {
         return payload;
     }
 
-    private static HttpResponse post(Map<String, String> form) {
+    private static HttpResponse post(String body) {
         HttpRequest req = new HttpRequest();
-        req.setEndpoint(TOKEN_URL);
+        req.setEndpoint(TOKEN_ENDPOINT);
         req.setMethod('POST');
         req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
         req.setTimeout(20000);
-        req.setBody(encodeForm(form));
+        req.setBody(body);
         return new Http().send(req);
     }
 
-    private static String encodeForm(Map<String, String> form) {
-        List<String> pairs = new List<String>();
-        for (String key : form.keySet()) {
-            pairs.add(EncodingUtil.urlEncode(key, 'UTF-8') + '=' + EncodingUtil.urlEncode(form.get(key), 'UTF-8'));
+    /** Org cache is optional: without a partition these are no-ops, not failures. */
+    private static String cacheGet() {
+        try {
+            return (String) Cache.Org.get(CACHE_KEY);
+        } catch (Exception e) {
+            return null;
         }
-        return String.join(pairs, '&');
+    }
+
+    private static void cachePut(String token, Integer expiresIn) {
+        if (String.isBlank(token)) {
+            return;
+        }
+        Integer ttl = expiresIn - CACHE_SAFETY_MARGIN_SECONDS;
+        if (ttl < 60) {
+            return;
+        }
+        try {
+            Cache.Org.put(CACHE_KEY, token, Math.min(ttl, 28800));
+        } catch (Exception e) {
+            // No partition allocated; every request simply re-grants.
+        }
     }
 
     private static void fail(RestResponse response, Integer status, String error, String detail) {
