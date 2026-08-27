@@ -18,10 +18,11 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
 5. Follow [Start Here](start-here.md).
 6. Complete [Browser Configuration](browser-configuration.md).
 7. Complete [Cross-Platform Deployment](cross-platform-deployment.md) when that scenario is selected.
-8. Run the [Smoke Test](smoke-test.md).
-9. Rehearse one [Scenario Guide](scenarios/README.md).
-10. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
-11. Complete [Finalization](final-phase.md) before declaring presenter readiness.
+8. Complete [Box Preview Setup](box-preview-setup.md) to replace the synthetic file fixtures with governed Box content.
+9. Run the [Smoke Test](smoke-test.md).
+10. Rehearse one [Scenario Guide](scenarios/README.md).
+11. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
+12. Complete [Finalization](final-phase.md) before declaring presenter readiness.
 
 [Inbound Email Intake Service](email-intake-service.md): Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
 
