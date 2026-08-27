@@ -18,7 +18,7 @@ The runtime path is:
 4. Salesforce hosts the Multi-Framework React UI Bundle.
 5. The React app passes the Salesforce record, contract, and Box folder context to Agentforce.
 6. The React app and Agentforce use Box APIs/capabilities for content operations.
-7. Salesforce provides a short-lived, downscoped Box token through a same-origin endpoint.
+7. Salesforce provides a short-lived, downscoped Box token through the same-origin `/services/apexrest/clm/box-token` endpoint (`ClmBoxTokenService`).
 8. Structured redline findings are validated against a schema and grouped into one Box task per expert domain.
 9. Human reviewers complete approval decisions before Box Sign.
 
@@ -65,13 +65,30 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 
 - `fetchDownscopedBoxToken()` in `src/lib/box.ts`.
 - Request path: `/services/apexrest/clm/box-token?folderId=<id>`.
+- `ClmBoxTokenService.cls`: two Box calls, a client-credentials grant then a token
+  exchange scoped to one folder with `base_explorer,item_preview,item_read`.
+- The credential merge fields in the grant body. Apex holds
+  `{!$Credential.Username}` and `{!$Credential.Password}`, never a secret; Salesforce
+  substitutes the encrypted values from the `CLM_Box` external credential at callout time.
 - The source scan that rejects `CLIENT_SECRET` and `client_secret` in browser code.
 
 **Explain**
 
 - The browser receives only a short-lived token scoped to the requested Box folder.
-- Box and Salesforce client secrets remain server-side.
+  The enterprise parent token is exchanged, never returned.
+- No Box secret exists in Apex, in metadata, or in source control. It is entered once
+  in Setup and cannot be retrieved back out.
+- Non-numeric folder ids are rejected before any call reaches Box, and an optional
+  allowlist restricts the endpoint to the demo workspace.
 - Local mode renders a safe file-link fallback without credentials.
+
+**Credential model**
+
+The demo uses a Box Client Credentials Grant app: one-time admin setup, no per-user
+consent, so any authorized viewer of the site gets a preview. For production, the
+committed `CLM_Box` auth provider supports moving to per-user Box OAuth, which gives
+per-person attribution in Box's audit log and removes the enterprise-wide token, at
+the cost of a one-time consent per user. See MT-037 through MT-040.
 
 ### Act 3 — Validate context and source authority (4 minutes)
 
