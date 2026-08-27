@@ -43,7 +43,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-036 | Configure the Salesforce origin in the Box application | Box app admin | Required for live embedded Box | Only approved origins can load content |
 | MT-037 | Create the Box platform app for the downscoped-token service | Box admin | Required for live Box preview | A Client Credentials Grant app exists and is authorized in the Box Admin Console |
 | MT-038 | Set the Box client id and secret on the `CLM_Box` external credential | Salesforce admin | Required for live Box preview | Username and Password are set on the `CLM_Box_Principal`; values stay encrypted in the org |
-| MT-039 | Set the Box enterprise id and folder allowlist | Salesforce admin | Required for live Box preview | `CLM_Box_Config__c` has `Enterprise_Id__c`, and `Allowed_Folder_Ids__c` restricts the endpoint to the demo workspace |
+| MT-039 | Set the Box enterprise id and folder allowlist with `configure-clm-box-settings.sh` | Salesforce admin | Required for live Box preview | `CLM_Box_Config__c` has `Enterprise_Id__c`, and `Allowed_Folder_Ids__c` restricts the endpoint to the demo workspace |
 | MT-040 | Switch to per-user Box OAuth for production | Box/Salesforce admins | Optional; production hardening | The `CLM_Box` auth provider holds real consumer credentials, the Box app carries its callback URL, and the external credential uses a per-user principal |
 
 ## Review routing and testing
