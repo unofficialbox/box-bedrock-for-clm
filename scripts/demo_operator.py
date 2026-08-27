@@ -837,7 +837,7 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
     ]
     experience_site_sources = [
         "force-app/main/default/sites/CLM_Experience.site-meta.xml",
-        "force-app/main/default/networks/CLM_Experience.network-meta.xml",
+        "force-app/main/default/networks/CLM Experience.network-meta.xml",
         "force-app/main/default/digitalExperienceConfigs/CLM_Experience1.digitalExperienceConfig-meta.xml",
         "force-app/main/default/digitalExperiences/site/CLM_Experience1",
     ]

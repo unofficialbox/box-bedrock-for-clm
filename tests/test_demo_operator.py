@@ -100,7 +100,7 @@ class DemoOperatorTests(unittest.TestCase):
             self.assertIn("Communities.settings-meta.xml", core_deploy)
             self.assertIn("ExperienceBundle.settings-meta.xml", core_deploy)
             self.assertIn("CLM_Experience.site-meta.xml", core_deploy)
-            self.assertIn("CLM_Experience.network-meta.xml", core_deploy)
+            self.assertIn("CLM Experience.network-meta.xml", core_deploy)
             self.assertIn("CLM_Experience1.digitalExperienceConfig-meta.xml", core_deploy)
             self.assertIn("digitalExperiences/site/CLM_Experience1", core_deploy)
             assignment = next(command for command in commands if command[:4] == ["sf", "org", "assign", "permset"])
@@ -114,7 +114,7 @@ class DemoOperatorTests(unittest.TestCase):
         communities = ET.parse(metadata_root / "settings/Communities.settings-meta.xml").getroot()
         experience_bundle = ET.parse(metadata_root / "settings/ExperienceBundle.settings-meta.xml").getroot()
         ui_bundle = ET.parse(metadata_root / "uiBundles/clmreactapp/clmreactapp.uibundle-meta.xml").getroot()
-        network = ET.parse(metadata_root / "networks/CLM_Experience.network-meta.xml").getroot()
+        network = ET.parse(metadata_root / "networks/CLM Experience.network-meta.xml").getroot()
         site = ET.parse(metadata_root / "sites/CLM_Experience.site-meta.xml").getroot()
         experience_config = ET.parse(
             metadata_root / "digitalExperienceConfigs/CLM_Experience1.digitalExperienceConfig-meta.xml"

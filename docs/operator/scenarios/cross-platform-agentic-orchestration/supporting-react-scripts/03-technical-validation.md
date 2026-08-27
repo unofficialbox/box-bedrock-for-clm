@@ -48,7 +48,7 @@ There is no call to AgentCore, Strands, Databricks, or external custom middlewar
 - `clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp/`.
 - `clmreactapp.uibundle-meta.xml` with target `Experience`.
 - `settings/Communities.settings-meta.xml` and `settings/ExperienceBundle.settings-meta.xml` enabling deployable Digital Experiences metadata.
-- `sites/CLM_Experience.site-meta.xml`, `networks/CLM_Experience.network-meta.xml`, and the `CLM_Experience1` Digital Experience bundle/config mounting `c__clmreactapp` at `/clm`.
+- `sites/CLM_Experience.site-meta.xml`, `networks/CLM Experience.network-meta.xml`, and the `CLM_Experience1` Digital Experience bundle/config mounting `c__clmreactapp` at `/clm`.
 - `src/Workspace.tsx`, `src/components/BoxWorkspace.tsx`, and `src/components/AgentforcePanel.tsx`.
 
 **Explain**
