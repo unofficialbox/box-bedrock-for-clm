@@ -23,9 +23,15 @@ declare global {
   }
 }
 
-/** Box Content Preview, served from the Box CDN. */
-const PREVIEW_VERSION = "2.106.0";
-const PREVIEW_BASE = `https://cdn01.boxcdn.net/platform/preview/${PREVIEW_VERSION}/en-US`;
+/**
+ * Box Content Preview 2.106.0, vendored rather than loaded from cdn01.boxcdn.net.
+ * The Experience Cloud CSP grants the Box CDN under style-src, connect-src, and
+ * frame-src, but script-src allows only 'self' plus a Salesforce allowlist, and
+ * CspTrustedSite has no script-src field to change that. Serving the bundle from
+ * the UI bundle itself is the only way the script loads at all.
+ */
+import previewScriptUrl from "../vendor/box-preview/preview.js?url";
+import "../vendor/box-preview/preview.css";
 
 export interface BoxFolderItem {
   id: string;
@@ -36,8 +42,8 @@ export interface BoxFolderItem {
 let previewLoader: Promise<boolean> | null = null;
 
 /**
- * Inject the Content Preview bundle once. Resolves false when the CDN is blocked
- * (no CSP Trusted Site, offline, local dev) so callers can fall back instead of hang.
+ * Inject the Content Preview bundle once. Resolves false if the script fails to
+ * evaluate, so callers fall back to the file list instead of hanging.
  */
 export function loadBoxPreview(): Promise<boolean> {
   if (window.Box?.Preview) return Promise.resolve(true);
@@ -46,13 +52,9 @@ export function loadBoxPreview(): Promise<boolean> {
   previewLoader = new Promise<boolean>((resolve) => {
     if (typeof document === "undefined") return resolve(false);
 
-    const stylesheet = document.createElement("link");
-    stylesheet.rel = "stylesheet";
-    stylesheet.href = `${PREVIEW_BASE}/preview.css`;
-    document.head.appendChild(stylesheet);
-
+    // preview.css is bundled through the import above; only the script needs injecting.
     const script = document.createElement("script");
-    script.src = `${PREVIEW_BASE}/preview.js`;
+    script.src = previewScriptUrl;
     script.async = true;
     script.onload = () => resolve(Boolean(window.Box?.Preview));
     script.onerror = () => resolve(false);

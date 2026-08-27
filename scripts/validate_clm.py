@@ -27,9 +27,12 @@ import bcl  # noqa: E402
 ROOT = Path(__file__).resolve().parents[1]
 REACT = ROOT / "clm-salesforce-project" / "force-app" / "main" / "default" / "uiBundles" / "clmreactapp"
 MARKDOWN_LINK = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+# "vendor" holds third-party bundles committed verbatim (see src/vendor/box-preview).
+# Excluded for the same reason as node_modules: the secret scan governs code we write,
+# and minified third-party output produces false positives.
 EXCLUDED_PARTS = {
     ".git", "node_modules", "dist", "build", "coverage", "playwright-report",
-    "test-results", "__pycache__", ".pytest_cache",
+    "test-results", "__pycache__", ".pytest_cache", "vendor",
 }
 MAX_TEXT_BYTES = 5_000_000
 # Canonical contracts, kept as named sets so checks compare membership instead of
