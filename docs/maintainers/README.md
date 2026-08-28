@@ -25,6 +25,37 @@ Files under `output/` and rendered `docs/diagrams/*.svg` are derived evidence. U
 8. Review the diff for secrets, live IDs, absolute local paths, stale readiness claims, and unexplained generated drift.
 9. Commit one coherent change and open a pull request.
 
+## Testing the live Box workspace locally
+
+The Box token endpoint is Apex, so it does not exist off-platform: by default a local run
+can only ever exercise the synthetic-fixture path. `--mode live` closes that gap by serving
+a **real** downscoped token at the Apex path, minted through the Salesforce CLI as the
+current user and held in memory only.
+
+```bash
+cd clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+export CLM_BOX_FOLDER_ID=<box-folder-id>   # required
+export CLM_ORG_ALIAS=agentforce            # optional, this is the default
+npm run preview:live
+```
+
+Add the localhost origin (for example `http://localhost:4173`) to the Box application's
+**CORS Domains**. The browser calls `api.box.com` directly, so Box rejects the folder
+listing without it, and the workspace falls back to fixtures.
+
+**Use `preview:live`, not `dev:live`, for anything involving Box UI Elements.**
+`preview:live` builds and serves the production bundle; `dev:live` runs the Vite dev
+server, where a box-ui-elements dependency throws `Dynamic require of "react" is not
+supported` from esbuild's CJS interop and the elements never mount. The two also diverge
+in ways that matter: a broken vendored Content Preview reproduced only in the production
+bundle. `dev:live` remains useful for the rest of the app, where hot reload is worth more.
+
+This exists because the workspace falls back to fixtures on **any** Box failure. A CORS
+rejection, a dead token endpoint, and a crashed component all render the same screen, so
+diagnosing through a deploy cycle is slow and ambiguous. Both failure paths in
+`src/lib/box.ts` log the cause; check the browser console before assuming the demo simply
+has no content.
+
 ## Release readiness
 
 Repository release evidence requires:
