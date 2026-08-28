@@ -13,7 +13,7 @@ Related manual tasks: MT-037 through MT-040 in the [Manual-Task Register](manual
 ```
 Browser ──GET /services/apexrest/clm/box-token?folderId=<id>──▶ ClmBoxTokenService (Apex)
                                                                   │
-                                        1. client credentials grant│ (Box app -> enterprise token)
+                                        1. client credentials grant│ (Box app -> parent token)
                                         2. token exchange          │ (downscope to one folder)
                                                                   ▼
 Browser ◀────────── short-lived token, scoped to that folder only ─┘
@@ -37,17 +37,22 @@ request body at callout time.
 
 1. In the Box Developer Console, create a **Custom App** with **Server Authentication
    (Client Credentials Grant)**.
-2. Set **App Access Level** to **App + Enterprise Access**. The service identity must be
-   able to see the contract folder.
-3. Under **Application Scopes**, enable reading all files and folders. Write, delete, and
-   share scopes are not required — the endpoint only ever mints read-only preview tokens.
-4. Under **CORS Domains**, add the Experience Cloud origin, for example
+2. Set **App Access Level** to **App + Enterprise Access**.
+3. Under **Advanced Features**, enable **Generate User Access Tokens**. The demo grants as a
+   Box user rather than the service account, and that setting is what permits it.
+4. Under **Application Scopes**, enable reading **and writing** all files and folders.
+   Write is required because the workspace embeds the Box Content Uploader; delete, share,
+   and admin scopes are not required and should stay off. The downscoped token the browser
+   receives is limited to `base_explorer,item_preview,item_read,item_upload` on one folder.
+5. Under **CORS Domains**, add the Experience Cloud origin, for example
    `https://<your-site>.my.site.com`. The browser calls `api.box.com` directly with the
    downscoped token, so Box refuses the folder listing without this.
-5. Save, then have a Box admin **authorize the app** in the Admin Console under
+6. Save, then have a Box admin **authorize the app** in the Admin Console under
    **Apps → Custom Apps Manager**, using the app's Client ID. A Client Credentials Grant
    app returns `unauthorized` until this is done.
-6. Record the **Client ID**, **Client Secret**, and **Enterprise ID**.
+7. Record the **Client ID**, **Client Secret**, and the **Box user id** the preview should
+   act as (`box users:get --fields=id,login`). That user must be able to open the contract
+   folder; nothing needs collaborating because the token inherits their access.
 
 ## Part 2 — Salesforce credential
 
@@ -63,24 +68,28 @@ Secrets go in the external credential, never in a file.
 
 ## Part 3 — Non-secret settings
 
-Two values go on the `CLM_Box_Config__c` org-default record:
+These go on the `CLM_Box_Config__c` org-default record:
 
-- **Enterprise Id** — the Box enterprise ID from Part 1. The endpoint returns
-  `box_not_configured` until this is set.
+- **Box User Id** — the Box user the preview acts as. The endpoint returns
+  `box_not_configured` until a subject is set.
+- **Enterprise Id** — the alternative subject. Setting this instead grants a **Service
+  Account** token, whose root starts empty, so the service identity must be added as a
+  collaborator on the folder. Prefer the user id; it needs no collaboration. If both are
+  set the user wins.
 - **Allowed Folder Ids** — a comma-separated list of Box folder IDs the endpoint may mint
   tokens for. Leave blank to allow **any** folder; populate it to restrict the endpoint to
   the demo workspace.
 
-Apply them with the script, which validates both values, upserts the org default, and
+Apply them with the script, which validates the values, upserts the org default, and
 prints a masked summary. Rerunning it updates the same record rather than adding one:
 
 ```bash
-BOX_ENTERPRISE_ID=<id> BOX_ALLOWED_FOLDER_IDS=<id,id> \
+BOX_USER_ID=<id> BOX_ALLOWED_FOLDER_IDS=<id,id> \
   clm-salesforce-project/scripts/configure-clm-box-settings.sh <alias>
 ```
 
 The values are substituted into a temporary copy at run time, so no live identifier is
-written into the working tree. Retrieve them with `box users:get --fields=enterprise` and
+written into the working tree. Retrieve them with `box users:get --fields=id,login` and
 `box folders:items 0 --fields=id,name,type`.
 
 The equivalent by hand is **Setup → Custom Settings → CLM Box Config → Manage → New** (the
@@ -123,10 +132,10 @@ Then open the workspace and confirm the redlined contract renders in place of th
 |---|---|---|
 | `missing_folder_id` (400) | No `folderId` parameter | Call with `?folderId=<box-folder-id>` |
 | `invalid_folder_id` (400) | `folderId` is not numeric | Usually the `demo-workspace` default; see Part 4 |
-| `box_not_configured` (503) | `Enterprise_Id__c` is blank | Complete Part 3 |
+| `box_not_configured` (503) | No CCG subject is set | Complete Part 3 |
 | `folder_not_allowed` (403) | Folder is not in `Allowed_Folder_Ids__c` | Add the folder ID, or clear the field to allow any |
 | `box_auth_failed` (502) | Box rejected the client credentials | Check Part 2 values; confirm the app is authorized in the Admin Console (Part 1 step 5) |
-| `box_downscope_failed` (502) | Box refused the token exchange | Confirm App + Enterprise Access and that the service identity can see the folder |
+| `box_downscope_failed` (502) | Box refused the token exchange | Confirm the subject can see the folder. With a user subject, check that user's access; with an enterprise subject, collaborate the service account onto the folder |
 | `box_request_failed` (502) | The callout itself failed | Check the named credential is enabled and the permission set grants principal access |
 | 200, but the file list still shows | Preview script or listing blocked | Check the browser console; confirm the Box app's CORS domains include the site origin |
 
