@@ -42,8 +42,12 @@ global with sharing class ClmBoxTokenService {
      * Scopes minted for the browser. item_upload is present because the workspace embeds
      * the Box Content Uploader; delete, share, and admin scopes remain excluded, and the
      * token is still bound to a single folder by the downscope resource.
+     *
+     * Space separated, per OAuth 2.0. A comma separated list is rejected by Box as a
+     * single unsupported scope name -- each value is valid on its own, so the failure
+     * only appears once more than one scope is requested.
      */
-    private static final String DOWNSCOPE_SCOPE = 'base_explorer,item_preview,item_read,item_upload';
+    private static final String DOWNSCOPE_SCOPE = 'base_explorer item_preview item_read item_upload';
 
     /** Reuse the parent token across requests so each preview costs one Box call, not two. */
     private static final String CACHE_KEY_PREFIX = 'ClmBoxParentToken';

@@ -87,6 +87,10 @@ private class ClmBoxTokenServiceTest {
             'The workspace needs preview and upload scopes for the embedded Box elements');
         System.assert(!scope.contains('item_delete') && !scope.contains('item_share'),
             'Delete and share must stay out of a browser token');
+        // Box rejects a comma separated list as one unsupported scope name, and only
+        // when more than one scope is requested -- each value is valid on its own.
+        System.assert(!scope.contains(','),
+            'OAuth scopes must be space separated; commas make Box reject the downscope');
     }
 
     @IsTest
