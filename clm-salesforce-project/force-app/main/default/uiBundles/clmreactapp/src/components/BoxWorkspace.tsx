@@ -3,6 +3,7 @@ import { ExternalLink, FileText, FolderOpen, LockKeyhole } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
 import { fetchDownscopedBoxToken, listBoxFolderItems, loadBoxPreview, type BoxFolderItem } from "../lib/box";
+import { BoxElements } from "./BoxElements";
 
 /** Lead with the redline when the folder has one; that is the contract under review. */
 function preferredFile(files: BoxFolderItem[]): BoxFolderItem | null {
@@ -94,6 +95,7 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
           <div ref={hostRef} className="box-preview-host" data-testid="box-preview-host" />
         </div>
         <div className="secure-note"><LockKeyhole size={15} /> Browser source contains no Box client secret.</div>
+        <BoxElements folderId={folderId} token={token} />
       </section>
     );
   }

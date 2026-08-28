@@ -82,6 +82,11 @@ private class ClmBoxTokenServiceTest {
         System.assertEquals(CHILD_TOKEN, payload.get('accessToken'), 'Should return the downscoped token');
         System.assertEquals(FOLDER_ID, payload.get('folderId'), 'Should echo the requested folder');
         System.assertEquals(2400, payload.get('expiresIn'), 'Should surface the Box expiry');
+        String scope = (String) payload.get('scope');
+        System.assert(scope.contains('item_preview') && scope.contains('item_upload'),
+            'The workspace needs preview and upload scopes for the embedded Box elements');
+        System.assert(!scope.contains('item_delete') && !scope.contains('item_share'),
+            'Delete and share must stay out of a browser token');
     }
 
     @IsTest

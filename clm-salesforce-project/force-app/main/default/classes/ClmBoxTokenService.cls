@@ -33,8 +33,12 @@ global with sharing class ClmBoxTokenService {
     private static final String TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange';
     private static final String ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token';
 
-    /** Read-only preview scopes. Deliberately excludes upload, delete, and share. */
-    private static final String DOWNSCOPE_SCOPE = 'base_explorer,item_preview,item_read';
+    /**
+     * Scopes minted for the browser. item_upload is present because the workspace embeds
+     * the Box Content Uploader; delete, share, and admin scopes remain excluded, and the
+     * token is still bound to a single folder by the downscope resource.
+     */
+    private static final String DOWNSCOPE_SCOPE = 'base_explorer,item_preview,item_read,item_upload';
 
     /** Reuse the parent token across requests so each preview costs one Box call, not two. */
     private static final String CACHE_KEY_PREFIX = 'ClmBoxParentToken';
