@@ -12,7 +12,9 @@
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "npm run build -- --mode standalone && playwright test",
-    "lint": "eslint src --max-warnings=0"
+    "lint": "eslint src --max-warnings=0",
+    "dev:live": "vite --mode live",
+    "preview:live": "npm run build -- --mode standalone && vite preview --mode live"
   },
   "dependencies": {
     "@box/activity-feed": "^2.4.2",
