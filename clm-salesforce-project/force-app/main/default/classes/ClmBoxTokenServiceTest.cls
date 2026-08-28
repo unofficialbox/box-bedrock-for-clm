@@ -4,6 +4,7 @@ private class ClmBoxTokenServiceTest {
     private static final String PARENT_TOKEN = 'parent-token-value';
     private static final String CHILD_TOKEN = 'downscoped-token-value';
     private static final String FOLDER_ID = '123456789';
+    private static final String BOX_USER_ID = '24680';
 
     /**
      * Answers both Box calls in sequence and records what was sent, so the tests can
@@ -119,7 +120,8 @@ private class ClmBoxTokenServiceTest {
             'The grant must reference the external credential rather than a stored client id');
         System.assert(grant.contains('{!$Credential.Password}'),
             'The grant must reference the external credential rather than a stored client secret');
-        System.assert(grant.contains('box_subject_type=enterprise'), 'Box requires an explicit CCG subject');
+        System.assert(grant.contains('box_subject_type=enterprise'),
+            'With only an enterprise id configured, the grant must use the enterprise subject');
     }
 
     @IsTest
@@ -191,5 +193,59 @@ private class ClmBoxTokenServiceTest {
 
         System.assertEquals(502, RestContext.response.statusCode);
         System.assertEquals('box_downscope_failed', body().get('error'));
+    }
+
+    @IsTest
+    static void grantsAsTheConfiguredBoxUserWhenOneIsSet() {
+        insert new CLM_Box_Config__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Box_User_Id__c = BOX_USER_ID
+        );
+        BoxMock mock = okMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        call(FOLDER_ID);
+        Test.stopTest();
+
+        System.assertEquals(200, RestContext.response.statusCode, 'A user subject should mint a token');
+        String grant = mock.bodies[0];
+        System.assert(grant.contains('box_subject_type=user'),
+            'A configured Box user id must grant as that user, not the service account');
+        System.assert(grant.contains('box_subject_id=' + BOX_USER_ID),
+            'The configured user id must be the CCG subject');
+    }
+
+    @IsTest
+    static void prefersTheBoxUserOverTheEnterpriseSubject() {
+        insert new CLM_Box_Config__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Enterprise_Id__c = '99999',
+            Box_User_Id__c = BOX_USER_ID
+        );
+        BoxMock mock = okMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        call(FOLDER_ID);
+        Test.stopTest();
+
+        String grant = mock.bodies[0];
+        System.assert(grant.contains('box_subject_type=user'),
+            'The user subject must win when both are configured');
+        System.assert(!grant.contains('box_subject_type=enterprise'),
+            'The enterprise subject must not be used once a user id is set');
+    }
+
+    @IsTest
+    static void reportsWhenNeitherSubjectIsConfigured() {
+        insert new CLM_Box_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
+
+        Test.startTest();
+        call(FOLDER_ID);
+        Test.stopTest();
+
+        System.assertEquals(503, RestContext.response.statusCode, 'A record with no subject must fail closed');
+        System.assertEquals('box_not_configured', body().get('error'));
     }
 }

@@ -4,9 +4,16 @@
  * this class.
  *
  * Two Box calls, both through the CLM_Box named credential:
- *   1. Client Credentials Grant  -> an enterprise-scoped parent token.
+ *   1. Client Credentials Grant  -> a parent token for the configured subject.
  *   2. Token exchange (downscope) -> a token limited to `scope` on one folder.
  * Only the downscoped token is returned.
+ *
+ * The CCG subject is configuration, not code. A Box user id on CLM_Box_Config__c
+ * yields box_subject_type=user, and the parent token inherits that user's existing
+ * access -- nothing needs collaborating. An enterprise id instead yields a Service
+ * Account token, whose root starts empty, so the service identity must be added as a
+ * collaborator on the folder. User is the demo default; enterprise remains for
+ * deployments that want a non-human identity.
  *
  * Credentials live in the CLM_Box external credential (Basic protocol: Username is
  * the Box client id, Password is the client secret). Salesforce stores them
@@ -29,8 +36,8 @@ global with sharing class ClmBoxTokenService {
     /** Read-only preview scopes. Deliberately excludes upload, delete, and share. */
     private static final String DOWNSCOPE_SCOPE = 'base_explorer,item_preview,item_read';
 
-    /** Reuse the enterprise token across requests so each preview costs one Box call, not two. */
-    private static final String CACHE_KEY = 'ClmBoxParentToken';
+    /** Reuse the parent token across requests so each preview costs one Box call, not two. */
+    private static final String CACHE_KEY_PREFIX = 'ClmBoxParentToken';
     private static final Integer CACHE_SAFETY_MARGIN_SECONDS = 300;
 
     global class TokenResponse {
@@ -69,9 +76,9 @@ global with sharing class ClmBoxTokenService {
         }
 
         CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
-        if (config == null || String.isBlank(config.Enterprise_Id__c)) {
+        if (config == null || (String.isBlank(config.Box_User_Id__c) && String.isBlank(config.Enterprise_Id__c))) {
             fail(response, 503, 'box_not_configured',
-                'Set Enterprise Id on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
+                'Set Box User Id (or Enterprise Id) on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
             return;
         }
         if (!isFolderAllowed(config, folderId)) {
@@ -81,9 +88,9 @@ global with sharing class ClmBoxTokenService {
         }
 
         try {
-            String parentToken = enterpriseToken(config);
+            String parentToken = grantParentToken(config);
             if (String.isBlank(parentToken)) {
-                fail(response, 502, 'box_auth_failed', 'Box did not return an enterprise access token.');
+                fail(response, 502, 'box_auth_failed', 'Box did not return a parent access token.');
                 return;
             }
             TokenResponse payload = downscope(parentToken, folderId);
@@ -115,9 +122,15 @@ global with sharing class ClmBoxTokenService {
         return false;
     }
 
-    /** Cached enterprise token, falling back to a fresh grant. */
-    private static String enterpriseToken(CLM_Box_Config__c config) {
-        String cached = cacheGet();
+    /** Cached parent token for the configured subject, falling back to a fresh grant. */
+    private static String grantParentToken(CLM_Box_Config__c config) {
+        Boolean asUser = String.isNotBlank(config.Box_User_Id__c);
+        String subjectType = asUser ? 'user' : 'enterprise';
+        String subjectId = asUser ? config.Box_User_Id__c : config.Enterprise_Id__c;
+        // Key by subject: switching subject type must not serve the previous token.
+        String cacheKey = CACHE_KEY_PREFIX + subjectType + subjectId;
+
+        String cached = cacheGet(cacheKey);
         if (String.isNotBlank(cached)) {
             return cached;
         }
@@ -126,8 +139,8 @@ global with sharing class ClmBoxTokenService {
             // Merge fields are substituted by Salesforce and must not be encoded here.
             + '&client_id={!$Credential.Username}'
             + '&client_secret={!$Credential.Password}'
-            + '&box_subject_type=enterprise'
-            + '&box_subject_id=' + EncodingUtil.urlEncode(config.Enterprise_Id__c, 'UTF-8')
+            + '&box_subject_type=' + subjectType
+            + '&box_subject_id=' + EncodingUtil.urlEncode(subjectId, 'UTF-8')
         );
         if (res.getStatusCode() != 200) {
             return null;
@@ -135,7 +148,7 @@ global with sharing class ClmBoxTokenService {
         Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
         String token = (String) body.get('access_token');
         Integer expiresIn = body.get('expires_in') == null ? 0 : Integer.valueOf(body.get('expires_in'));
-        cachePut(token, expiresIn);
+        cachePut(cacheKey, token, expiresIn);
         return token;
     }
 
@@ -175,15 +188,15 @@ global with sharing class ClmBoxTokenService {
     }
 
     /** Org cache is optional: without a partition these are no-ops, not failures. */
-    private static String cacheGet() {
+    private static String cacheGet(String cacheKey) {
         try {
-            return (String) Cache.Org.get(CACHE_KEY);
+            return (String) Cache.Org.get(cacheKey);
         } catch (Exception e) {
             return null;
         }
     }
 
-    private static void cachePut(String token, Integer expiresIn) {
+    private static void cachePut(String cacheKey, String token, Integer expiresIn) {
         if (String.isBlank(token)) {
             return;
         }
@@ -192,7 +205,7 @@ global with sharing class ClmBoxTokenService {
             return;
         }
         try {
-            Cache.Org.put(CACHE_KEY, token, Math.min(ttl, 28800));
+            Cache.Org.put(cacheKey, token, Math.min(ttl, 28800));
         } catch (Exception e) {
             // No partition allocated; every request simply re-grants.
         }
