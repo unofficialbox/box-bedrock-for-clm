@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { FolderOpen, LockKeyhole, Upload } from "lucide-react";
+import { IntlProvider } from "react-intl";
+import { LockKeyhole, Upload } from "lucide-react";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
 import ContentUploader from "box-ui-elements/es/elements/content-uploader";
 import "box-ui-elements/dist/explorer.css";
@@ -26,13 +27,13 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
   }
 
   return (
+    // box-ui-elements components read from react-intl context and throw
+    // "Could not find required `intl` object" without a provider above them. Empty
+    // messages fall back to each component's defaultMessage, which is English.
+    <IntlProvider locale="en" messages={{}}>
     <section className="box-elements" data-testid="box-elements">
-      <div className="box-fallback-head">
-        <div>
-          <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
-          <h2>Contract folder</h2>
-          <p>Browse and add contract documents in Box, scoped to this folder.</p>
-        </div>
+      {/* No heading here: BoxWorkspace already renders the folder header above. */}
+      <div className="box-elements-toolbar">
         <button
           type="button"
           className="secondary-button"
@@ -62,7 +63,12 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           key={refreshKey}
           token={token}
           rootFolderId={folderId}
-          canPreview
+          // Preview stays off here. ContentExplorer's preview loads Box Content Preview
+          // from cdn01.boxcdn.net, which Experience Cloud CSP blocks under script-src --
+          // the same wall cf3b54a hit -- and it throws "Missing or malformed preview.js
+          // library". The workspace renders the vendored Content Preview above this,
+          // served from 'self', so previewing here would be redundant anyway.
+          canPreview={false}
           canUpload
           canCreateNewFolder={false}
           canDelete={false}
@@ -77,5 +83,6 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
         scoped to this folder.
       </div>
     </section>
+    </IntlProvider>
   );
 }

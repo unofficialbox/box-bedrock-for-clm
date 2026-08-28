@@ -8,18 +8,6 @@ declare global {
       agentforceAppId?: string;
       salesforceOrigin?: string;
     };
-    Box?: {
-      ContentExplorer: new () => {
-        show(folderId: string, accessToken: string, options: Record<string, unknown>): void;
-        hide(): void;
-        removeAllListeners(): void;
-      };
-      Preview: new () => {
-        show(fileId: string, accessToken: string, options: Record<string, unknown>): void;
-        hide(): void;
-        removeAllListeners(): void;
-      };
-    };
   }
 }
 
@@ -30,8 +18,6 @@ declare global {
  * CspTrustedSite has no script-src field to change that. Serving the bundle from
  * the UI bundle itself is the only way the script loads at all.
  */
-import previewScriptUrl from "../vendor/box-preview/preview.js?url";
-import "../vendor/box-preview/preview.css";
 
 export interface BoxFolderItem {
   id: string;
@@ -39,41 +25,33 @@ export interface BoxFolderItem {
   type: string;
 }
 
-let previewLoader: Promise<boolean> | null = null;
-
 /**
- * Inject the Content Preview bundle once. Resolves false if the script fails to
- * evaluate, so callers fall back to the file list instead of hanging.
+ * List a folder with the downscoped token. Empty on any failure; the caller falls back
+ * to synthetic fixtures.
+ *
+ * The failure is logged because the fallback is otherwise indistinguishable from a
+ * working demo with no files: the page renders fixtures and says nothing. A CORS
+ * rejection is the usual cause, and Box reports it in the body as
+ * cors_origin_not_whitelisted with the offending origin.
  */
-export function loadBoxPreview(): Promise<boolean> {
-  if (window.Box?.Preview) return Promise.resolve(true);
-  if (previewLoader) return previewLoader;
-
-  previewLoader = new Promise<boolean>((resolve) => {
-    if (typeof document === "undefined") return resolve(false);
-
-    // preview.css is bundled through the import above; only the script needs injecting.
-    const script = document.createElement("script");
-    script.src = previewScriptUrl;
-    script.async = true;
-    script.onload = () => resolve(Boolean(window.Box?.Preview));
-    script.onerror = () => resolve(false);
-    document.head.appendChild(script);
-  });
-  return previewLoader;
-}
-
-/** List a folder with the downscoped token. Empty on any failure; the caller falls back. */
 export async function listBoxFolderItems(folderId: string, accessToken: string): Promise<BoxFolderItem[]> {
   try {
     const response = await fetch(
       `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type&limit=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
-    if (!response.ok) return [];
+    if (!response.ok) {
+      console.warn(
+        `[CLM] Box folder listing failed (${response.status}); falling back to fixtures.`,
+        await response.text().catch(() => "")
+      );
+      return [];
+    }
     const result = (await response.json()) as { entries?: BoxFolderItem[] };
     return (result.entries || []).filter((entry) => entry.type === "file");
-  } catch {
+  } catch (error) {
+    // A CORS rejection surfaces here as an opaque TypeError with no response to read.
+    console.warn("[CLM] Box folder listing threw; check the Box app's CORS domains.", error);
     return [];
   }
 }
@@ -117,10 +95,17 @@ export async function fetchDownscopedBoxToken(folderId: string): Promise<string>
       `/services/apexrest/clm/box-token?folderId=${encodeURIComponent(folderId)}`,
       { headers: { Accept: "application/json" } }
     );
-    if (!response.ok) return "";
+    if (!response.ok) {
+      console.warn(
+        `[CLM] Token endpoint returned ${response.status}; falling back to fixtures.`,
+        await response.text().catch(() => "")
+      );
+      return "";
+    }
     const result = (await response.json()) as { accessToken?: string };
     return result.accessToken || "";
-  } catch {
+  } catch (error) {
+    console.warn("[CLM] Token endpoint unreachable; falling back to fixtures.", error);
     return "";
   }
 }

@@ -1,25 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { ExternalLink, FileText, FolderOpen, LockKeyhole } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
-import { fetchDownscopedBoxToken, listBoxFolderItems, loadBoxPreview, type BoxFolderItem } from "../lib/box";
-import { BoxElements } from "./BoxElements";
+import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem } from "../lib/box";
 
-/** Lead with the redline when the folder has one; that is the contract under review. */
-function preferredFile(files: BoxFolderItem[]): BoxFolderItem | null {
-  if (!files.length) return null;
-  return files.find((file) => /redline/i.test(file.name)) || files[0];
-}
+/**
+ * Loaded lazily to keep box-ui-elements out of the initial bundle. It is several
+ * megabytes, and the synthetic-fixture path never needs it, so the entry chunk stays
+ * small for anyone who does not reach live Box content.
+ */
+const BoxElements = lazy(() =>
+  import("./BoxElements").then((module) => ({ default: module.BoxElements })),
+);
 
 export function BoxWorkspace({ folderId }: { folderId: string }) {
-  const hostRef = useRef<HTMLDivElement>(null);
   const [token, setToken] = useState("");
   const [files, setFiles] = useState<BoxFolderItem[]>([]);
-  const [activeFileId, setActiveFileId] = useState("");
-  const [previewReady, setPreviewReady] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Resolve the governed token, then the folder contents and the preview bundle.
+  /**
+   * Resolve the governed token, then probe the folder.
+   *
+   * ContentExplorer fetches its own listing, so this call is a liveness check rather
+   * than the source of what gets rendered: it decides between live Box content and the
+   * synthetic fixtures, and it logs why when Box refuses.
+   */
   useEffect(() => {
     let active = true;
     (async () => {
@@ -30,14 +35,9 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
         setLoading(false);
         return;
       }
-      const [entries, ready] = await Promise.all([
-        listBoxFolderItems(folderId, accessToken),
-        loadBoxPreview(),
-      ]);
+      const entries = await listBoxFolderItems(folderId, accessToken);
       if (!active) return;
       setFiles(entries);
-      setPreviewReady(ready);
-      setActiveFileId(preferredFile(entries)?.id || "");
       setLoading(false);
     })();
     return () => {
@@ -45,33 +45,18 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
     };
   }, [folderId]);
 
-  // Mount Content Preview on the selected file.
-  useEffect(() => {
-    if (!token || !activeFileId || !previewReady || !hostRef.current || !window.Box?.Preview) return;
-    const preview = new window.Box.Preview();
-    preview.show(activeFileId, token, {
-      container: hostRef.current,
-      showDownload: false,
-      showAnnotations: false,
-    });
-    return () => {
-      preview.removeAllListeners();
-      preview.hide();
-    };
-  }, [token, activeFileId, previewReady]);
-
   if (loading) {
     return <div className="workspace-state" data-testid="box-loading">Connecting to the governed Box workspace…</div>;
   }
 
-  if (token && previewReady && activeFileId) {
+  if (token && files.length > 0) {
     return (
       <section className="box-live" data-testid="box-preview">
         <div className="box-fallback-head">
           <div>
             <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
             <h2>{CLM_CONFIG.workspace.name}</h2>
-            <p>Previewed from Box with a short-lived token scoped to this folder.</p>
+            <p>Browsed from Box with a short-lived token scoped to this folder.</p>
           </div>
           {CLM_CONFIG.workspace.boxUrl ? (
             <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
@@ -79,23 +64,9 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
             </a>
           ) : null}
         </div>
-        <div className="box-preview-layout">
-          <nav className="box-file-rail" aria-label="Box files">
-            {files.map((file) => (
-              <button
-                key={file.id}
-                className={file.id === activeFileId ? "file-row file-row-active" : "file-row"}
-                onClick={() => setActiveFileId(file.id)}
-              >
-                <span className="file-icon"><FileText size={18} /></span>
-                <span className="file-copy"><strong>{file.name}</strong></span>
-              </button>
-            ))}
-          </nav>
-          <div ref={hostRef} className="box-preview-host" data-testid="box-preview-host" />
-        </div>
-        <div className="secure-note"><LockKeyhole size={15} /> Browser source contains no Box client secret.</div>
-        <BoxElements folderId={folderId} token={token} />
+        <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
+          <BoxElements folderId={folderId} token={token} />
+        </Suspense>
       </section>
     );
   }
@@ -106,7 +77,7 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
         <div>
           <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
           <h2>{CLM_CONFIG.workspace.name}</h2>
-          <p>Synthetic file fixtures are shown; previews activate when Salesforce supplies a downscoped Box token.</p>
+          <p>Synthetic file fixtures are shown; live content activates when Salesforce supplies a downscoped Box token.</p>
         </div>
         {CLM_CONFIG.workspace.boxUrl ? (
           <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
