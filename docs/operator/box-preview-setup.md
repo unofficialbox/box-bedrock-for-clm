@@ -56,15 +56,27 @@ request body at callout time.
 
 ## Part 2 — Salesforce credential
 
-Secrets go in the external credential, never in a file.
+Secrets go in the external credential, never in a file. Set them with the script:
 
-1. **Setup → Named Credentials → External Credentials → CLM Box**.
-2. Under **Principals**, edit `CLM_Box_Principal` and set the two authentication
-   parameters:
-   - **Username** — the Box **Client ID**
-   - **Password** — the Box **Client Secret**
-3. Save. Salesforce stores both encrypted; they cannot be retrieved back into source, and
-   Apex only ever holds `{!$Credential.Username}` and `{!$Credential.Password}` placeholders.
+```bash
+read -rs BOX_CLIENT_SECRET && export BOX_CLIENT_SECRET
+BOX_CLIENT_ID=<id> clm-salesforce-project/scripts/configure-clm-box-credential.sh <alias>
+```
+
+Reading the secret with `read -rs` keeps it out of shell history. The values are
+substituted into a temporary copy at run time, so no secret reaches the working tree.
+Salesforce stores both encrypted; they cannot be retrieved back into source, and Apex only
+ever holds `{!$Credential.CLM_Box.ClientId}` and `{!$Credential.CLM_Box.ClientSecret}`
+placeholders. Rerunning updates the existing principal rather than failing.
+
+The equivalent by hand is **Setup → Named Credentials → External Credentials → CLM Box →
+Principals**, editing `CLM_Box_Principal` and setting the `ClientId` and `ClientSecret`
+authentication parameters.
+
+`CLM_Box` uses the **Custom** authentication protocol rather than Basic. The values are a
+client id and a secret, not a username and password — and `ConnectApi.CredentialInput`
+accepts only `AwsSv4` or `Custom`, so a Basic principal could not be populated
+programmatically at all and would always have to be typed in by hand.
 
 ## Part 3 — Non-secret settings
 

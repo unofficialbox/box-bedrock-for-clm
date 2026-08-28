@@ -15,11 +15,16 @@
  * collaborator on the folder. User is the demo default; enterprise remains for
  * deployments that want a non-human identity.
  *
- * Credentials live in the CLM_Box external credential (Basic protocol: Username is
- * the Box client id, Password is the client secret). Salesforce stores them
- * encrypted and substitutes them into the request body at callout time via merge
- * fields, so Apex holds only placeholders and no secret can reach source control.
- * This requires "Allow Merge Fields in HTTP Body" on the named credential.
+ * Credentials live in the CLM_Box external credential as Custom authentication
+ * parameters named ClientId and ClientSecret. Salesforce stores them encrypted and
+ * substitutes them into the request body at callout time via merge fields, so Apex
+ * holds only placeholders and no secret can reach source control. This requires
+ * "Allow Merge Fields in HTTP Body" on the named credential.
+ *
+ * Custom rather than Basic for two reasons: the values are a client id and a secret
+ * rather than a username and password, and ConnectApi.CredentialInput accepts only
+ * AwsSv4 or Custom -- so a Basic principal cannot be populated programmatically and
+ * would have to be typed into Setup by hand.
  *
  * The Box for Salesforce managed package cannot back this: box.Toolkit exposes no
  * token accessor, and the Authorization header it sets is not readable after
@@ -141,8 +146,8 @@ global with sharing class ClmBoxTokenService {
         HttpResponse res = post(
             'grant_type=client_credentials'
             // Merge fields are substituted by Salesforce and must not be encoded here.
-            + '&client_id={!$Credential.Username}'
-            + '&client_secret={!$Credential.Password}'
+            + '&client_id={!$Credential.CLM_Box.ClientId}'
+            + '&client_secret={!$Credential.CLM_Box.ClientSecret}'
             + '&box_subject_type=' + subjectType
             + '&box_subject_id=' + EncodingUtil.urlEncode(subjectId, 'UTF-8')
         );
