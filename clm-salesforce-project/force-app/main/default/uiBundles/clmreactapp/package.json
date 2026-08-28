@@ -7,14 +7,15 @@
     "node": ">=22"
   },
   "scripts": {
-    "dev": "vite --mode standalone",
-    "build": "tsc -b && vite build",
+    "dev": "node scripts/stage-box-preview-assets.mjs && vite --mode standalone",
+    "build": "node scripts/stage-box-preview-assets.mjs && tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest",
     "test:e2e": "npm run build -- --mode standalone && playwright test",
     "lint": "eslint src --max-warnings=0",
-    "dev:live": "vite --mode live",
-    "preview:live": "npm run build -- --mode standalone && vite preview --mode live"
+    "dev:live": "node scripts/stage-box-preview-assets.mjs && vite --mode live",
+    "preview:live": "npm run build -- --mode standalone && vite preview --mode live",
+    "stage:preview": "node scripts/stage-box-preview-assets.mjs"
   },
   "dependencies": {
     "@box/activity-feed": "^2.4.2",
@@ -46,6 +47,7 @@
     "@salesforce/ui-bundle": "^10.12.2",
     "@tanstack/react-virtual": "^3.14.10",
     "axios": "^0.33.0",
+    "box-content-preview": "^3.85.0",
     "box-ui-elements": "^27.0.0",
     "classnames": "^2.5.1",
     "color": "^3.2.1",

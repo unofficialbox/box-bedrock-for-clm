@@ -8,6 +8,7 @@ declare global {
       agentforceAppId?: string;
       salesforceOrigin?: string;
     };
+    Box?: { Preview: unknown };
   }
 }
 
