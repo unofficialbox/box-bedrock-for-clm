@@ -38,13 +38,14 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-031 | Create a dedicated API-only integration user | Salesforce admin | Required | User has `CLM_Box_Automate_Integration` and no broad business access |
 | MT-032 | Create/configure the environment-specific External Client App | Salesforce admin | Required | Client credentials, `api` scope, Run As user, and admin preauthorization are set |
 | MT-033 | Configure the Box-managed OAuth connection | Box/Salesforce admins | Required | Token test succeeds without exposing the token |
-| MT-034 | Add the UI Bundle to a Lightning or Experience page | Salesforce admin | Required for Cross-Platform Agentic Orchestration | Intended users can open it with record and Box context |
+| MT-034 | Add the UI Bundle to a Lightning or Experience page (requires MT-041) | Salesforce admin | Required for Cross-Platform Agentic Orchestration | Intended users can open it with record and Box context |
 | MT-035 | Configure Contract Copilot topics, actions, and guardrails | Agentforce admin | Required for live Agentforce | Cited reads work; mutations require confirmation |
 | MT-036 | Configure the Salesforce origin in the Box application | Box app admin | Required for live embedded Box | Only approved origins can load content |
 | MT-037 | Create the Box platform app for the downscoped-token service | Box admin | Required for live Box preview | A Client Credentials Grant app exists and is authorized in the Box Admin Console |
 | MT-038 | Set the Box client id and secret on the `CLM_Box` external credential | Salesforce admin | Required for live Box preview | Username and Password are set on the `CLM_Box_Principal`; values stay encrypted in the org |
 | MT-039 | Set the Box enterprise id and folder allowlist with `configure-clm-box-settings.sh` | Salesforce admin | Required for live Box preview | `CLM_Box_Config__c` has `Enterprise_Id__c`, and `Allowed_Folder_Ids__c` restricts the endpoint to the demo workspace |
 | MT-040 | Switch to per-user Box OAuth for production | Box/Salesforce admins | Optional; production hardening | The `CLM_Box` auth provider holds real consumer credentials, the Box app carries its callback URL, and the external credential uses a per-user principal |
+| MT-041 | Enable Salesforce Multi-Framework in the target org | Salesforce admin | Required before any UI Bundle deploy | **Setup → React Development with Salesforce Multi-Framework** is on, and `UIBundle` appears in the org's metadata types |
 
 ## Review routing and testing
 

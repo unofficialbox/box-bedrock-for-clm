@@ -23,9 +23,13 @@ Box intake, metadata, and Automate enrichment are the entry-point path into this
 
 ## 2. Confirm prerequisites
 
-- Python 3.10+, Node.js/npm, Mermaid CLI (`mmdc`), [Box CLI](https://developer.box.com/guides/tooling/cli/), and [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli).
+- Python 3.11+ (`validate_clm.py` imports `datetime.UTC`), Node.js/npm, Mermaid CLI (`mmdc`), [Box CLI](https://developer.box.com/guides/tooling/cli/), and [Salesforce CLI](https://developer.salesforce.com/tools/salesforcecli).
 - A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.
 - A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.
+- **Salesforce Multi-Framework enabled in the target org.** The React workspace deploys as a
+  `UIBundle`, and that metadata type does not exist in an org until **Setup → React Development
+  with Salesforce Multi-Framework** is turned on. It is per-org, so enable it in every org you
+  deploy to, including new scratch orgs. Tracked as MT-041.
 - Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.
 
 Have the administrators confirm the required Box and Salesforce product licenses and permissions before setup. Do not infer entitlements from a successful CLI login.

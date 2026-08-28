@@ -226,7 +226,9 @@
 </section>
 <section class="guide-section" id="2-confirm-prerequisites">
 <h2>2. Confirm prerequisites</h2>
-<ul><li>Python 3.10+, Node.js/npm, Mermaid CLI (<code>mmdc</code>), <span class="source-ref">Box CLI<sup aria-label="reference 1">1</sup></span>, and <span class="source-ref">Salesforce CLI<sup aria-label="reference 2">2</sup></span>.</li><li>A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.</li><li>A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.</li><li>Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.</li></ul>
+<ul><li>Python 3.11+ (<code>validate_clm.py</code> imports <code>datetime.UTC</code>), Node.js/npm, Mermaid CLI (<code>mmdc</code>), <span class="source-ref">Box CLI<sup aria-label="reference 1">1</sup></span>, and <span class="source-ref">Salesforce CLI<sup aria-label="reference 2">2</sup></span>.</li><li>A Box enterprise with Apps, Forms, Automate, Extract/AI, Hubs, Doc Gen, Sign, metadata, and tasks enabled for the operator.</li><li>A Salesforce org with permission to deploy metadata, create an integration user, configure an External Client App, and use Agentforce/UI Bundles where applicable.</li><li><strong>Salesforce Multi-Framework enabled in the target org.</strong> The React workspace deploys as a</li></ul>
+<p><code>UIBundle</code>, and that metadata type does not exist in an org until <strong>Setup → React Development with Salesforce Multi-Framework</strong> is turned on. It is per-org, so enable it in every org you deploy to, including new scratch orgs. Tracked as MT-041.</p>
+<ul><li>Named Box, Salesforce, workflow, legal, privacy, security, and finance owners.</li></ul>
 <p>Have the administrators confirm the required Box and Salesforce product licenses and permissions before setup. Do not infer entitlements from a successful CLI login.</p>
 <p>Do not place client secrets, access tokens, private keys, or passwords in this repository.</p>
 <p>Install dependencies and seed runtime config in one step:</p>
@@ -368,6 +370,7 @@ python3 scripts/validate_clm.py</code></pre>
 <pre><code class="language-bash">python3 scripts/run_agentcore_mock.py
 python3 -m json.tool output/agentcore/northstar-agentcore-trace.json &gt;/dev/null</code></pre>
 <p>Deploy the Salesforce UI Bundle with <code>demo_operator.py salesforce-deploy</code>, open the React workspace, and disclose that AgentCore/Strands and Databricks are represented by deterministic local fixtures.</p>
+<p>The UI Bundle deploy requires Multi-Framework enabled in the target org (MT-041). Without it the <code>UIBundle</code> metadata type is not exposed and the deploy fails before the bundle itself is evaluated. Confirm with <code>sf org list metadata-types --target-org &lt;alias&gt; --json</code>, which lists <code>UIBundle</code> only when the setting is on.</p>
 <p>Run:</p>
 <pre><code class="language-bash">python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration</code></pre>
 <p>Do not claim managed AgentCore or Databricks execution.</p>
