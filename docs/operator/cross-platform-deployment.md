@@ -13,6 +13,11 @@ python3 -m json.tool output/agentcore/northstar-agentcore-trace.json >/dev/null
 
 Deploy the Salesforce UI Bundle with `demo_operator.py salesforce-deploy`, open the React workspace, and disclose that AgentCore/Strands and Databricks are represented by deterministic local fixtures.
 
+The UI Bundle deploy requires Multi-Framework enabled in the target org (MT-041). Without it the
+`UIBundle` metadata type is not exposed and the deploy fails before the bundle itself is evaluated.
+Confirm with `sf org list metadata-types --target-org <alias> --json`, which lists `UIBundle` only
+when the setting is on.
+
 Run:
 
 ```bash
