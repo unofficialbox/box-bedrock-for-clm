@@ -138,17 +138,43 @@ is diagnosable from the table below.
 
 Then open the workspace and confirm the redlined contract renders in place of the file list.
 
+## Part 6 -- Let the site user reach the endpoint
+
+The React workspace calls the endpoint from the browser, so the request runs as the
+**Experience Cloud site user**, not as the admin who deployed. `CLM_Demo_Operator` is
+assigned to the deploying user and does not cover that.
+
+For an unauthenticated site, assign **CLM Box Preview Guest** to the site's guest user
+(Setup -> Users -> the site guest user -> Permission Set Assignments). It grants three
+things and nothing else:
+
+- the `ClmBoxTokenService` Apex class,
+- the `CLM_Box-CLM_Box_Principal` external credential principal,
+- **read on `UserExternalCredential`**.
+
+That third grant is the one that is easy to miss. Without it the callout throws
+`System.CalloutException: You don't have read permissions on the User External Credential
+object`, which the endpoint reports only as `box_request_failed`.
+
+`CLM_Demo_Operator` cannot be used here: a Guest User License disallows its
+`CLM_Contract__c` edit, delete, and view-all permissions, and the assignment is rejected.
+
+Anyone reaching the site can then mint a folder-scoped, read-and-upload token without
+logging in. The scope is one folder with no delete or share, but treat it as a demo
+posture rather than a production one. For an authenticated site, assign the same
+permission set to the community user profile instead of the guest user.
+
 ## Troubleshooting
 
 | Response | Meaning | Fix |
 |---|---|---|
 | `missing_folder_id` (400) | No `folderId` parameter | Call with `?folderId=<box-folder-id>` |
 | `invalid_folder_id` (400) | `folderId` is not numeric | Usually the `demo-workspace` default; see Part 4 |
-| `box_not_configured` (503) | No CCG subject is set | Complete Part 3 |
+| `box_not_configured` (500) | No CCG subject is set | Complete Part 3 |
 | `folder_not_allowed` (403) | Folder is not in `Allowed_Folder_Ids__c` | Add the folder ID, or clear the field to allow any |
-| `box_auth_failed` (502) | Box rejected the client credentials | Check Part 2 values; confirm the app is authorized in the Admin Console (Part 1 step 5) |
-| `box_downscope_failed` (502) | Box refused the token exchange | Confirm the subject can see the folder. With a user subject, check that user's access; with an enterprise subject, collaborate the service account onto the folder |
-| `box_request_failed` (502) | The callout itself failed | Check the named credential is enabled and the permission set grants principal access |
+| `box_auth_failed` (500) | Box rejected the client credentials | Check Part 2 values; confirm the app is authorized in the Admin Console |
+| `box_downscope_failed` (500) | Box refused the token exchange | Confirm the subject can see the folder. With a user subject, check that user's access; with an enterprise subject, collaborate the service account onto the folder |
+| `box_request_failed` (500) | The callout itself threw | Usually the caller lacks **read on `UserExternalCredential`** -- see Part 6. Also check the named credential is enabled and the permission set grants principal access |
 | 200, but the file list still shows | Preview script or listing blocked | Check the browser console; confirm the Box app's CORS domains include the site origin |
 
 ## Production variant: per-user OAuth

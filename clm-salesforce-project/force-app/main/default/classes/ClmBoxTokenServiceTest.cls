@@ -174,7 +174,7 @@ private class ClmBoxTokenServiceTest {
         call(FOLDER_ID);
         Test.stopTest();
 
-        System.assertEquals(503, RestContext.response.statusCode, 'An unconfigured org should fail closed');
+        System.assertEquals(500, RestContext.response.statusCode, 'An unconfigured org should fail closed');
         System.assertEquals('box_not_configured', body().get('error'));
     }
 
@@ -187,7 +187,7 @@ private class ClmBoxTokenServiceTest {
         call(FOLDER_ID);
         Test.stopTest();
 
-        System.assertEquals(502, RestContext.response.statusCode);
+        System.assertEquals(500, RestContext.response.statusCode);
         System.assertEquals('box_auth_failed', body().get('error'));
     }
 
@@ -200,7 +200,7 @@ private class ClmBoxTokenServiceTest {
         call(FOLDER_ID);
         Test.stopTest();
 
-        System.assertEquals(502, RestContext.response.statusCode);
+        System.assertEquals(500, RestContext.response.statusCode);
         System.assertEquals('box_downscope_failed', body().get('error'));
     }
 
@@ -254,7 +254,7 @@ private class ClmBoxTokenServiceTest {
         call(FOLDER_ID);
         Test.stopTest();
 
-        System.assertEquals(503, RestContext.response.statusCode, 'A record with no subject must fail closed');
+        System.assertEquals(500, RestContext.response.statusCode, 'A record with no subject must fail closed');
         System.assertEquals('box_not_configured', body().get('error'));
     }
 }

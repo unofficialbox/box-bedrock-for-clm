@@ -90,7 +90,7 @@ global with sharing class ClmBoxTokenService {
 
         CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
         if (config == null || (String.isBlank(config.Box_User_Id__c) && String.isBlank(config.Enterprise_Id__c))) {
-            fail(response, 503, 'box_not_configured',
+            fail(response, 500, 'box_not_configured',
                 'Set Box User Id (or Enterprise Id) on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
             return;
         }
@@ -103,19 +103,19 @@ global with sharing class ClmBoxTokenService {
         try {
             String parentToken = grantParentToken(config);
             if (String.isBlank(parentToken)) {
-                fail(response, 502, 'box_auth_failed', 'Box did not return a parent access token.');
+                fail(response, 500, 'box_auth_failed', 'Box did not return a parent access token.');
                 return;
             }
             TokenResponse payload = downscope(parentToken, folderId);
             if (payload == null) {
-                fail(response, 502, 'box_downscope_failed', 'Box did not return a downscoped access token.');
+                fail(response, 500, 'box_downscope_failed', 'Box did not return a downscoped access token.');
                 return;
             }
             response.statusCode = 200;
             response.responseBody = Blob.valueOf(JSON.serialize(payload));
         } catch (Exception e) {
             // Never surface the raw Box body or the parent token in an error path.
-            fail(response, 502, 'box_request_failed', e.getTypeName());
+            fail(response, 500, 'box_request_failed', e.getTypeName());
         }
     }
 
@@ -224,6 +224,12 @@ global with sharing class ClmBoxTokenService {
         }
     }
 
+    /**
+     * Apex REST rejects some status codes outright -- a 502 comes back to the caller as
+     * INTERNAL_SERVER_ERROR "Invalid status code for HTTP response: 502" and the body is
+     * discarded, which hides the error entirely. Upstream failures therefore use 500 and
+     * carry the specific cause in the `error` field.
+     */
     private static void fail(RestResponse response, Integer status, String error, String detail) {
         response.statusCode = status;
         response.responseBody = Blob.valueOf(JSON.serialize(new ServiceError(error, detail)));
