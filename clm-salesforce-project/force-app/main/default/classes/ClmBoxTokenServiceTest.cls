@@ -121,9 +121,9 @@ private class ClmBoxTokenServiceTest {
         System.assert(!exchange.contains('client_secret'), 'The exchange must not resend the client credentials');
 
         String grant = mock.bodies[0];
-        System.assert(grant.contains('{!$Credential.Username}'),
+        System.assert(grant.contains('{!$Credential.CLM_Box.ClientId}'),
             'The grant must reference the external credential rather than a stored client id');
-        System.assert(grant.contains('{!$Credential.Password}'),
+        System.assert(grant.contains('{!$Credential.CLM_Box.ClientSecret}'),
             'The grant must reference the external credential rather than a stored client secret');
         System.assert(grant.contains('box_subject_type=enterprise'),
             'With only an enterprise id configured, the grant must use the enterprise subject');
