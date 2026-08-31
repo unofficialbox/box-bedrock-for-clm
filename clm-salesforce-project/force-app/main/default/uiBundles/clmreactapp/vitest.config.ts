@@ -12,7 +12,7 @@ export default defineConfig({
     // through the same transform pipeline the build uses.
     server: {
       deps: {
-        inline: [/box-ui-elements/, /@box\//],
+        inline: [/box-ui-elements/, /@box\//, /@salesforce\/platform-sdk/, /o11y/],
       },
     },
   },

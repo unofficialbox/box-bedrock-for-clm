@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, FileStack, ShieldAlert } from "lucide-react";
 import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
+import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 import { NORTHSTAR_CONTRACT } from "../data";
 
 /** Stands in when no org is behind the page, so the dashboard is never empty. */
@@ -20,15 +21,28 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
   const [contracts, setContracts] = useState<ClmContractSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [live, setLive] = useState(false);
+  const [source, setSource] = useState<"graphql" | "apex" | "fixture">("fixture");
 
+  /**
+   * GraphQL first, Apex second.
+   *
+   * The UI API runs as the logged-in user, so the platform enforces sharing and field
+   * security rather than a hand-written projection. It is preferred wherever it is
+   * available. `null` means the surface does not offer it, which is distinct from an
+   * empty result -- a user who can genuinely see no contracts must not silently fall
+   * through to the Apex endpoint and get a different answer.
+   */
   useEffect(() => {
     let active = true;
-    fetchClmContracts().then((rows) => {
+    (async () => {
+      const viaGraphql = await fetchContractsViaGraphql();
+      const rows = viaGraphql ?? (await fetchClmContracts());
       if (!active) return;
+      setSource(rows.length === 0 ? "fixture" : viaGraphql ? "graphql" : "apex");
       setLive(rows.length > 0);
       setContracts(rows.length > 0 ? rows : FIXTURE_ROWS);
       setLoading(false);
-    });
+    })();
     return () => {
       active = false;
     };
@@ -39,14 +53,14 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
   }
 
   return (
-    <section className="contract-list-card" data-testid="contracts-view">
+    <section className="contract-list-card" data-testid="contracts-view" data-source={source}>
       <div className="section-heading">
         <div>
           <span className="eyebrow"><FileStack size={15} /> Contract records</span>
           <h2>CLM contracts</h2>
           <p>
             {live
-              ? "Read from Salesforce. Opening one resolves its Box folder from the Box for Salesforce record mapping."
+              ? `Read from Salesforce over ${source === "graphql" ? "the GraphQL UI API" : "Apex"}. Opening one resolves its Box folder from the Box for Salesforce record mapping.`
               : "Synthetic fixture shown; the live list activates when Salesforce is reachable."}
           </p>
         </div>
