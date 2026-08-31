@@ -9,12 +9,29 @@ beforeEach(() => {
 });
 
 describe("Workspace", () => {
-  test("renders the Box-backed Northstar contract and safe Agentforce state", async () => {
+  test("opens on the contract list when the page carries no record context", async () => {
     render(<Workspace />);
+    // Nothing identifies a contract yet, so the dashboard is the entry point.
+    expect(await screen.findByTestId("contracts-view")).toBeVisible();
+    // Salesforce is unreachable here, so the list says so rather than showing empty.
+    expect(screen.getByTestId("contracts-fixture-note")).toBeVisible();
+  });
+
+  test("opens the workspace for a contract chosen from the list", async () => {
+    render(<Workspace />);
+    fireEvent.click(await screen.findByTestId("contract-row"));
     expect(screen.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
     expect(await screen.findByTestId("box-fallback")).toBeVisible();
     expect(screen.getByTestId("agentforce-placeholder")).toBeVisible();
     expect(screen.getByText("northstar-msa-redline-v3.pdf")).toBeVisible();
+  });
+
+  test("goes straight to the workspace when the page is opened on a record", async () => {
+    // A Lightning or Experience page bound to one contract should not ask again.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    render(<Workspace />);
+    expect(await screen.findByTestId("box-fallback")).toBeVisible();
+    expect(screen.queryByTestId("contracts-view")).not.toBeInTheDocument();
   });
 
   test("groups cited redline findings by human expert and never presents an automated approval control", () => {

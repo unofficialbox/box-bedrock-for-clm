@@ -49,6 +49,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-042 | Grant the Experience Cloud site user access to the token endpoint | Salesforce admin | Required for live Box preview from a site | `CLM_Box_Preview_Guest` is assigned to the site's guest user (or community profile), including read on `UserExternalCredential` |
 | MT-043 | Deploy the `CLM_Box_App` trusted site so previews can frame | Salesforce admin | Required for in-app document preview | **Setup → Trusted URLs** lists `https://*.app.box.com` with frame-src active; selecting a file in the workspace renders the document instead of an empty frame |
 | MT-044 | Associate the demo Box folder with the CLM record in the Box for Salesforce package | Salesforce admin | Required for live Box without a folder id in the URL | A `box__FRUP__c` row links the record to the workspace folder, and opening the page with only `?recordId=` renders live Box content |
+| MT-045 | Decide whether site visitors may read contract records, and create a guest user sharing rule if so | Demo owner + Salesforce admin | Required for the live contract dashboard | `CLM_Contract__c` is Private/Private, so the guest user sees no records and the dashboard shows its synthetic fixture. A guest user sharing rule makes real contracts readable by **unauthenticated** visitors — approve that exposure before creating it |
 
 ## Review routing and testing
 

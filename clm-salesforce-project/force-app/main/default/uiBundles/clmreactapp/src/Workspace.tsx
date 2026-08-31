@@ -1,19 +1,36 @@
 import { useMemo, useState } from "react";
-import { ClipboardCheck, FileSignature, GitCompareArrows, LayoutDashboard, Sparkles, UserRoundCheck } from "lucide-react";
+import { ClipboardCheck, FileSignature, FileStack, GitCompareArrows, LayoutDashboard, Sparkles, UserRoundCheck } from "lucide-react";
 import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
+import { ContractList } from "./components/ContractList";
+import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
 import { EXPERT_ROUTES, NORTHSTAR_CONTRACT, REDLINE_FINDINGS } from "./data";
 import { getAgentContextPrompt, getClmPageContext } from "./lib/box";
 import { groupRedlineFindings, type RedlineReviewGroup } from "./lib/redlines";
 
-type View = "workspace" | "approvals";
+type View = "contracts" | "workspace" | "approvals";
 
 const REDLINE_REVIEW_GROUPS = groupRedlineFindings(REDLINE_FINDINGS, EXPERT_ROUTES);
 
 export function Workspace() {
   const context = useMemo(() => getClmPageContext(), []);
-  const [view, setView] = useState<View>("workspace");
+  const [selected, setSelected] = useState<ClmContractSummary | null>(null);
+  /**
+   * A record in the URL means the page was opened with context -- a Lightning or
+   * Experience page bound to one contract -- so it goes straight to that workspace.
+   * Without one there is nothing to show yet, and the dashboard is the entry point.
+   */
+  const [view, setView] = useState<View>(context.salesforceRecordId ? "workspace" : "contracts");
   const [copied, setCopied] = useState(false);
+
+  // The record the workspace resolves a Box folder from: the chosen row, else the URL.
+  const workspaceContext = useMemo(
+    () => ({
+      ...context,
+      ...(selected?.recordId ? { salesforceRecordId: selected.recordId } : {}),
+    }),
+    [context, selected],
+  );
 
   async function copyAgentContext() {
     await navigator.clipboard.writeText(getAgentContextPrompt());
@@ -25,6 +42,7 @@ export function Workspace() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark">A</span><span><strong>Acme Contracts</strong><small>Box-powered CLM</small></span></div>
         <nav aria-label="Primary">
+          <button className={view === "contracts" ? "nav-active" : ""} onClick={() => setView("contracts")}><FileStack size={16} /> Contracts</button>
           <button className={view === "workspace" ? "nav-active" : ""} onClick={() => setView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
           <button className={view === "approvals" ? "nav-active" : ""} onClick={() => setView("approvals")}><ClipboardCheck size={16} /> Redline reviews <span className="count">{REDLINE_REVIEW_GROUPS.length}</span></button>
         </nav>
@@ -32,18 +50,29 @@ export function Workspace() {
       </header>
 
       <div className="contract-banner">
-        <div><span className="eyebrow">{context.contractId}{context.salesforceRecordId ? ` · Salesforce ${context.salesforceRecordId}` : ""}</span><h1>{NORTHSTAR_CONTRACT.name}</h1><p>{NORTHSTAR_CONTRACT.counterparty} · {NORTHSTAR_CONTRACT.contractType}</p></div>
+        <div><span className="eyebrow">{selected?.contractId || context.contractId}{workspaceContext.salesforceRecordId ? ` · Salesforce ${workspaceContext.salesforceRecordId}` : ""}</span><h1>{selected?.name || NORTHSTAR_CONTRACT.name}</h1><p>{[selected?.counterparty || NORTHSTAR_CONTRACT.counterparty, selected?.contractType || NORTHSTAR_CONTRACT.contractType].join(" · ")}</p></div>
         <div className="banner-metrics">
-          <Metric label="Value" value={NORTHSTAR_CONTRACT.value} />
-          <Metric label="Term" value={NORTHSTAR_CONTRACT.term} />
-          <Metric label="Risk" value={NORTHSTAR_CONTRACT.risk} danger />
-          <Metric label="Status" value={NORTHSTAR_CONTRACT.status} warning />
+          <Metric label="Value" value={selected ? formatDealValue(selected.dealValue) : NORTHSTAR_CONTRACT.value} />
+          <Metric label="Term" value={selected?.termMonths != null ? `${selected.termMonths} months` : NORTHSTAR_CONTRACT.term} />
+          <Metric label="Risk" value={selected?.riskLevel || NORTHSTAR_CONTRACT.risk} danger />
+          <Metric label="Status" value={selected?.status || NORTHSTAR_CONTRACT.status} warning />
         </div>
       </div>
 
       <div className="content-grid">
         <main>
-          {view === "workspace" ? <BoxWorkspace context={context} /> : <Approvals />}
+          {view === "contracts" ? (
+            <ContractList
+              onSelect={(contract) => {
+                setSelected(contract);
+                setView("workspace");
+              }}
+            />
+          ) : view === "workspace" ? (
+            <BoxWorkspace context={workspaceContext} />
+          ) : (
+            <Approvals />
+          )}
         </main>
         <AgentforcePanel />
       </div>
