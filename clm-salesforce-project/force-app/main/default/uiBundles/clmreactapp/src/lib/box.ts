@@ -117,26 +117,57 @@ export function getAgentContextPrompt(search = window.location.search): string {
   return context.join("\n");
 }
 
-export async function fetchDownscopedBoxToken(folderId: string): Promise<string> {
+export interface BoxWorkspaceToken {
+  accessToken: string;
+  /** The folder the endpoint actually minted for, which may differ from what was asked. */
+  folderId: string;
+}
+
+const NO_TOKEN: BoxWorkspaceToken = { accessToken: "", folderId: "" };
+
+/**
+ * Ask Salesforce for a folder-scoped Box token.
+ *
+ * A Salesforce record id is the preferred input. The endpoint resolves the folder from
+ * the Box for Salesforce package's own record-to-folder association, so the workspace
+ * never has to know a Box folder id and one cannot be supplied from the URL. The folder
+ * comes back in the response because the caller does not know it up front.
+ *
+ * `folderId` remains for pages with no record context and for the local harness. It is
+ * the reason a page opened without either still shows fixtures rather than failing: the
+ * default `demo-workspace` is not numeric and the endpoint rejects it outright.
+ */
+export async function fetchDownscopedBoxToken(
+  context: { folderId: string; salesforceRecordId?: string },
+): Promise<BoxWorkspaceToken> {
   const injectedToken = window.__CLM_RUNTIME_CONFIG__?.boxAccessToken;
-  if (injectedToken) return injectedToken;
+  if (injectedToken) return { accessToken: injectedToken, folderId: context.folderId };
+
+  const query = context.salesforceRecordId
+    ? `recordId=${encodeURIComponent(context.salesforceRecordId)}`
+    : `folderId=${encodeURIComponent(context.folderId)}`;
 
   try {
-    const response = await fetch(
-      `/services/apexrest/clm/box-token?folderId=${encodeURIComponent(folderId)}`,
-      { headers: { Accept: "application/json" } }
-    );
+    const response = await fetch(`/services/apexrest/clm/box-token?${query}`, {
+      headers: { Accept: "application/json" },
+    });
     if (!response.ok) {
       console.warn(
         `[CLM] Token endpoint returned ${response.status}; falling back to fixtures.`,
         await response.text().catch(() => "")
       );
-      return "";
+      return NO_TOKEN;
     }
-    const result = (await response.json()) as { accessToken?: string };
-    return result.accessToken || "";
+    const result = (await response.json()) as { accessToken?: string; folderId?: string };
+    if (!result.accessToken) return NO_TOKEN;
+    return {
+      accessToken: result.accessToken,
+      // Trust the endpoint's folder over the requested one; with a recordId it is the
+      // only place the answer exists.
+      folderId: result.folderId || context.folderId,
+    };
   } catch (error) {
     console.warn("[CLM] Token endpoint unreachable; falling back to fixtures.", error);
-    return "";
+    return NO_TOKEN;
   }
 }

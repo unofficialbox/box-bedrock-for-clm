@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "vitest";
-import { fetchBoxEmbedLink, getAgentContextPrompt, getClmPageContext, listBoxFolderItems } from "./box";
+import { fetchBoxEmbedLink, fetchDownscopedBoxToken, getAgentContextPrompt, getClmPageContext, listBoxFolderItems } from "./box";
 
 describe("CLM page context", () => {
   test("uses a tenant-neutral Northstar workspace fixture by default", () => {
@@ -96,5 +96,66 @@ describe("Box embed link", () => {
       throw new Error("network blocked");
     }) as unknown as typeof fetch;
     expect(await fetchBoxEmbedLink("99", "scoped-token")).toBe("");
+  });
+});
+
+describe("Downscoped token request", () => {
+  const originalFetch = globalThis.fetch;
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+    delete window.__CLM_RUNTIME_CONFIG__;
+  });
+
+  test("asks by record id so the org's Box mapping picks the folder", async () => {
+    let seenUrl = "";
+    globalThis.fetch = (async (url: string) => {
+      seenUrl = url;
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123456789" }) };
+    }) as unknown as typeof fetch;
+
+    const granted = await fetchDownscopedBoxToken({
+      folderId: "demo-workspace",
+      salesforceRecordId: "a0JNS000009dn8X2AQ",
+    });
+
+    expect(seenUrl).toContain("recordId=a0JNS000009dn8X2AQ");
+    // The unusable default must not be sent alongside it.
+    expect(seenUrl).not.toContain("folderId=");
+    // The endpoint's answer wins: the caller never knew this folder.
+    expect(granted).toEqual({ accessToken: "example-scoped-token", folderId: "123456789" });
+  });
+
+  test("falls back to folderId when there is no record context", async () => {
+    let seenUrl = "";
+    globalThis.fetch = (async (url: string) => {
+      seenUrl = url;
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123" }) };
+    }) as unknown as typeof fetch;
+
+    await fetchDownscopedBoxToken({ folderId: "123" });
+    expect(seenUrl).toContain("folderId=123");
+    expect(seenUrl).not.toContain("recordId=");
+  });
+
+  test("returns no folder when the endpoint refuses, so the caller shows fixtures", async () => {
+    globalThis.fetch = (async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '{"error":"no_box_folder_mapping"}',
+      json: async () => ({}),
+    })) as unknown as typeof fetch;
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a0J" }))
+      .toEqual({ accessToken: "", folderId: "" });
+  });
+
+  test("uses the injected token from the local harness without calling Salesforce", async () => {
+    window.__CLM_RUNTIME_CONFIG__ = { boxAccessToken: "example-harness-token" };
+    globalThis.fetch = (async () => {
+      throw new Error("must not call the endpoint");
+    }) as unknown as typeof fetch;
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123456789" }))
+      .toEqual({ accessToken: "example-harness-token", folderId: "123456789" });
   });
 });

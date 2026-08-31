@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { ExternalLink, FileText, FolderOpen, LockKeyhole } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
-import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem } from "../lib/box";
+import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem, type ClmPageContext } from "../lib/box";
 
 /**
  * Loaded lazily to keep box-ui-elements out of the initial bundle. It is several
@@ -13,13 +13,18 @@ const BoxElements = lazy(() =>
   import("./BoxElements").then((module) => ({ default: module.BoxElements })),
 );
 
-export function BoxWorkspace({ folderId }: { folderId: string }) {
+export function BoxWorkspace({ context }: { context: ClmPageContext }) {
   const [token, setToken] = useState("");
+  const [folderId, setFolderId] = useState("");
   const [files, setFiles] = useState<BoxFolderItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   /**
    * Resolve the governed token, then probe the folder.
+   *
+   * The folder is an output, not an input: with a record id the endpoint reads the Box
+   * for Salesforce association and tells us which folder it minted for. Everything below
+   * uses that answer rather than anything the URL supplied.
    *
    * ContentExplorer fetches its own listing, so this call is a liveness check rather
    * than the source of what gets rendered: it decides between live Box content and the
@@ -28,14 +33,15 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
   useEffect(() => {
     let active = true;
     (async () => {
-      const accessToken = await fetchDownscopedBoxToken(folderId);
+      const granted = await fetchDownscopedBoxToken(context);
       if (!active) return;
-      setToken(accessToken);
-      if (!accessToken) {
+      setToken(granted.accessToken);
+      setFolderId(granted.folderId);
+      if (!granted.accessToken) {
         setLoading(false);
         return;
       }
-      const entries = await listBoxFolderItems(folderId, accessToken);
+      const entries = await listBoxFolderItems(granted.folderId, granted.accessToken);
       if (!active) return;
       setFiles(entries);
       setLoading(false);
@@ -43,7 +49,7 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
     return () => {
       active = false;
     };
-  }, [folderId]);
+  }, [context]);
 
   if (loading) {
     return <div className="workspace-state" data-testid="box-loading">Connecting to the governed Box workspace…</div>;

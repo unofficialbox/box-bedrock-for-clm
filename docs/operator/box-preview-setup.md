@@ -11,12 +11,13 @@ Related manual tasks: MT-037 through MT-040 in the [Manual-Task Register](manual
 ## What this builds
 
 ```
-Browser ──GET /services/apexrest/clm/box-token?folderId=<id>──▶ ClmBoxTokenService (Apex)
+Browser ──GET /services/apexrest/clm/box-token?recordId=<sfid>─▶ ClmBoxTokenService (Apex)
                                                                   │
+                                        0. box__FRUP__c lookup     │ (record -> Box folder)
                                         1. client credentials grant│ (Box app -> parent token)
                                         2. token exchange          │ (downscope to one folder)
                                                                   ▼
-Browser ◀────────── short-lived token, scoped to that folder only ─┘
+Browser ◀───── short-lived token + the folder it was minted for ───┘
    │
    ├── GET api.box.com/2.0/folders/<id>/items                    (list files)
    └── GET api.box.com/2.0/files/<id>?fields=expiring_embed_link (preview URL)
@@ -30,6 +31,16 @@ deliberate: the Box Content Preview script is served from `cdn01.boxcdn.net`, an
 Experience Cloud CSP allows only `'self'` plus a Salesforce allowlist under `script-src`
 -- `CspTrustedSite` has no `script-src` field that can widen it. It *does* have
 `isApplicableToFrameSrc`, so an iframe is the one preview path the platform can grant.
+
+The folder is chosen by the org, not the caller. `box__FRUP__c` is where the Box for
+Salesforce managed package stores the record-to-folder association, so the browser names
+a Salesforce record and the endpoint answers with the folder that record is linked to --
+no Box folder id travels in a URL, and a caller cannot request a folder the record is not
+associated with. `Allowed_Folder_Ids__c` is applied to the resolved folder as well, so the
+mapping is not a way around the allowlist.
+
+`folderId=<box-folder-id>` still works for pages with no record context and for the local
+harness.
 
 The browser never receives a client secret and never receives the enterprise token. Apex
 never holds a credential either: Salesforce substitutes the encrypted values into the
@@ -177,7 +188,9 @@ permission set to the community user profile instead of the guest user.
 
 | Response | Meaning | Fix |
 |---|---|---|
-| `missing_folder_id` (400) | No `folderId` parameter | Call with `?folderId=<box-folder-id>` |
+| `missing_folder_id` (400) | Neither `recordId` nor `folderId` | Call with `?recordId=<salesforce-id>` |
+| `invalid_record_id` (400) | `recordId` is not a Salesforce id | Check the page is passing real record context |
+| `no_box_folder_mapping` (404) | No `box__FRUP__c` row for that record | Associate a Box folder with the record in the Box for Salesforce package (MT-044) |
 | `invalid_folder_id` (400) | `folderId` is not numeric | Usually the `demo-workspace` default; see Part 4 |
 | `box_not_configured` (500) | No CCG subject is set | Complete Part 3 |
 | `folder_not_allowed` (403) | Folder is not in `Allowed_Folder_Ids__c` | Add the folder ID, or clear the field to allow any |

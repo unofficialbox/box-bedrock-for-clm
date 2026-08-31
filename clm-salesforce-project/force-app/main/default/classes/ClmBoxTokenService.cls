@@ -77,9 +77,32 @@ global with sharing class ClmBoxTokenService {
         // A token is short-lived and folder-scoped; never let a proxy or browser cache it.
         response.addHeader('Cache-Control', 'no-store');
 
+        String recordId = request.params.get('recordId');
         String folderId = request.params.get('folderId');
+
+        // recordId is the real entry point: the browser names a Salesforce record and the
+        // org's own Box mapping decides the folder, so no Box id travels in a URL and a
+        // caller cannot ask for a folder the record is not associated with. folderId
+        // remains for the local harness and for pages with no record context.
+        if (String.isNotBlank(recordId)) {
+            Id parsedRecordId;
+            try {
+                parsedRecordId = Id.valueOf(recordId);
+            } catch (Exception e) {
+                fail(response, 400, 'invalid_record_id', 'recordId is not a Salesforce id.');
+                return;
+            }
+            // Inner classes cannot hold static members in Apex, hence the instance.
+            folderId = new FolderMapping().forRecord(parsedRecordId);
+            if (String.isBlank(folderId)) {
+                fail(response, 404, 'no_box_folder_mapping',
+                    'No Box folder is associated with that record. Associate one with the Box for Salesforce package first.');
+                return;
+            }
+        }
+
         if (String.isBlank(folderId)) {
-            fail(response, 400, 'missing_folder_id', 'folderId is required.');
+            fail(response, 400, 'missing_folder_id', 'Pass recordId, or folderId.');
             return;
         }
         if (!folderId.isNumeric()) {
@@ -116,6 +139,38 @@ global with sharing class ClmBoxTokenService {
         } catch (Exception e) {
             // Never surface the raw Box body or the parent token in an error path.
             fail(response, 500, 'box_request_failed', e.getTypeName());
+        }
+    }
+
+    /**
+     * Resolve a record's Box folder from the Box for Salesforce managed package.
+     *
+     * `box__FRUP__c` is where the package stores the record-to-folder association:
+     * box__Record_ID_Indexed__c is the indexed copy of the Salesforce id and
+     * box__Folder_ID__c is the Box folder. `box.Toolkit.getFolderIdByRecordId()` is the
+     * package's supported accessor and is the better call from a logged-in context; it
+     * is avoided here because this endpoint also serves the Experience Cloud guest user,
+     * where the Toolkit's own sharing and setup assumptions are harder to reason about
+     * than one indexed query.
+     *
+     * `without sharing` is deliberate and narrow. Guest users see no FRUP records under
+     * normal sharing, so a `with sharing` lookup would resolve nothing on the very
+     * surface this exists for. It reads two fields on one row and returns a folder id --
+     * it grants no record access to the caller, and Allowed_Folder_Ids__c is still
+     * applied afterwards, so the endpoint cannot return a folder outside the configured
+     * workspace no matter what the mapping says.
+     */
+    private without sharing class FolderMapping {
+        private String forRecord(Id recordId) {
+            List<box__FRUP__c> mappings = [
+                SELECT box__Folder_ID__c
+                FROM box__FRUP__c
+                WHERE box__Record_ID_Indexed__c = :String.valueOf(recordId)
+                  AND box__Folder_ID__c != null
+                ORDER BY LastModifiedDate DESC
+                LIMIT 1
+            ];
+            return mappings.isEmpty() ? null : mappings[0].box__Folder_ID__c;
         }
     }
 

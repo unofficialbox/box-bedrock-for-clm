@@ -52,15 +52,35 @@ private class ClmBoxTokenServiceTest {
     }
 
     private static void call(String folderId) {
+        callWith(folderId, null);
+    }
+
+    private static void callWith(String folderId, String recordId) {
         RestRequest request = new RestRequest();
         request.requestURI = '/services/apexrest/clm/box-token';
         request.httpMethod = 'GET';
         if (folderId != null) {
             request.addParameter('folderId', folderId);
         }
+        if (recordId != null) {
+            request.addParameter('recordId', recordId);
+        }
         RestContext.request = request;
         RestContext.response = new RestResponse();
         ClmBoxTokenService.getDownscopedToken();
+    }
+
+    /** A record-to-folder association as the Box for Salesforce package stores it. */
+    private static Id mapRecordToFolder(String folderId) {
+        CLM_Contract__c contract = new CLM_Contract__c(Name = 'Northstar MSA');
+        insert contract;
+        insert new box__FRUP__c(
+            box__Record_ID__c = contract.Id,
+            box__Record_ID_Indexed__c = contract.Id,
+            box__Object_Name__c = 'CLM_Contract__c',
+            box__Folder_ID__c = folderId
+        );
+        return contract.Id;
     }
 
     private static Map<String, Object> body() {
@@ -256,5 +276,77 @@ private class ClmBoxTokenServiceTest {
 
         System.assertEquals(500, RestContext.response.statusCode, 'A record with no subject must fail closed');
         System.assertEquals('box_not_configured', body().get('error'));
+    }
+
+    @IsTest
+    static void resolvesTheFolderFromTheBoxRecordMapping() {
+        configure(null);
+        Id recordId = mapRecordToFolder(FOLDER_ID);
+        BoxMock mock = okMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        callWith(null, recordId);
+        Test.stopTest();
+
+        System.assertEquals(200, RestContext.response.statusCode, 'A mapped record must mint a token');
+        System.assertEquals(FOLDER_ID, body().get('folderId'),
+            'The folder must come from the Box mapping, not from the caller');
+        System.assert(mock.bodies[1].contains(EncodingUtil.urlEncode(FOLDER_ID, 'UTF-8')),
+            'The downscope resource must name the mapped folder');
+    }
+
+    @IsTest
+    static void refusesARecordWithNoBoxFolder() {
+        configure(null);
+        CLM_Contract__c contract = new CLM_Contract__c(Name = 'Unmapped');
+        insert contract;
+
+        Test.startTest();
+        callWith(null, contract.Id);
+        Test.stopTest();
+
+        System.assertEquals(404, RestContext.response.statusCode, 'An unmapped record must not mint a token');
+        System.assertEquals('no_box_folder_mapping', body().get('error'));
+    }
+
+    @IsTest
+    static void rejectsARecordIdThatIsNotAnId() {
+        configure(null);
+
+        Test.startTest();
+        callWith(null, 'demo-workspace');
+        Test.stopTest();
+
+        System.assertEquals(400, RestContext.response.statusCode, 'A malformed record id must fail before any callout');
+        System.assertEquals('invalid_record_id', body().get('error'));
+    }
+
+    @IsTest
+    static void appliesTheAllowlistToTheMappedFolder() {
+        // The mapping is not a bypass: a record may point anywhere, and the allowlist
+        // still decides what this endpoint is willing to mint.
+        configure('999');
+        Id recordId = mapRecordToFolder(FOLDER_ID);
+
+        Test.startTest();
+        callWith(null, recordId);
+        Test.stopTest();
+
+        System.assertEquals(403, RestContext.response.statusCode,
+            'A mapped folder outside the allowlist must still be refused');
+        System.assertEquals('folder_not_allowed', body().get('error'));
+    }
+
+    @IsTest
+    static void reportsWhenNeitherRecordNorFolderIsGiven() {
+        configure(null);
+
+        Test.startTest();
+        callWith(null, null);
+        Test.stopTest();
+
+        System.assertEquals(400, RestContext.response.statusCode);
+        System.assertEquals('missing_folder_id', body().get('error'));
     }
 }

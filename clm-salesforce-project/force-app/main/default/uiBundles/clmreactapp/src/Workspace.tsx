@@ -43,7 +43,7 @@ export function Workspace() {
 
       <div className="content-grid">
         <main>
-          {view === "workspace" ? <BoxWorkspace folderId={context.folderId} /> : <Approvals />}
+          {view === "workspace" ? <BoxWorkspace context={context} /> : <Approvals />}
         </main>
         <AgentforcePanel />
       </div>
