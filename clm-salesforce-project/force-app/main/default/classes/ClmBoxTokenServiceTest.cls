@@ -297,7 +297,9 @@ private class ClmBoxTokenServiceTest {
     }
 
     @IsTest
-    static void refusesARecordWithNoBoxFolder() {
+    static void reportsARecordWithNoBoxFolderRatherThanProvisioningOne() {
+        // Provisioning writes the association, and Apex refuses a callout after DML, so
+        // it cannot happen here. The client calls ClmBoxFolderService and retries.
         configure(null);
         CLM_Contract__c contract = new CLM_Contract__c(Name = 'Unmapped');
         insert contract;
@@ -323,18 +325,33 @@ private class ClmBoxTokenServiceTest {
     }
 
     @IsTest
-    static void appliesTheAllowlistToTheMappedFolder() {
-        // The mapping is not a bypass: a record may point anywhere, and the allowlist
-        // still decides what this endpoint is willing to mint.
+    static void doesNotApplyTheAllowlistToAFolderReachedThroughARecord() {
+        // The allowlist bounds what a caller may name. A record's own folder is chosen by
+        // the record, and the package provisions folders that no list could enumerate in
+        // advance, so the list must not gate that path.
         configure('999');
         Id recordId = mapRecordToFolder(FOLDER_ID);
+        Test.setMock(HttpCalloutMock.class, okMock());
 
         Test.startTest();
         callWith(null, recordId);
         Test.stopTest();
 
+        System.assertEquals(200, RestContext.response.statusCode,
+            'A record-resolved folder is bounded by the record, not the allowlist');
+        System.assertEquals(FOLDER_ID, body().get('folderId'));
+    }
+
+    @IsTest
+    static void stillAppliesTheAllowlistToACallerSuppliedFolder() {
+        configure('999');
+
+        Test.startTest();
+        call(FOLDER_ID);
+        Test.stopTest();
+
         System.assertEquals(403, RestContext.response.statusCode,
-            'A mapped folder outside the allowlist must still be refused');
+            'A folder named by the caller must still be checked against the allowlist');
         System.assertEquals('folder_not_allowed', body().get('error'));
     }
 

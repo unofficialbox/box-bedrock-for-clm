@@ -158,4 +158,51 @@ describe("Downscoped token request", () => {
     expect(await fetchDownscopedBoxToken({ folderId: "123456789" }))
       .toEqual({ accessToken: "example-harness-token", folderId: "123456789" });
   });
+
+  test("provisions the record's folder when it has none, then retries", async () => {
+    // Provisioning writes the association and Apex forbids a callout after DML, so the
+    // package cannot create the folder and mint in one request. Two calls is the design,
+    // not a retry loop -- the second attempt is made once and only after provisioning.
+    const calls: string[] = [];
+    let provisioned = false;
+    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+      const target = String(url);
+      calls.push(`${init?.method || "GET"} ${target}`);
+      if (target.includes("box-folder")) {
+        provisioned = true;
+        return { ok: true, json: async () => ({ folderId: "555" }) };
+      }
+      if (!provisioned) {
+        return {
+          ok: false,
+          status: 404,
+          text: async () => '{"error":"no_box_folder_mapping"}',
+          json: async () => ({}),
+        };
+      }
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "555" }) };
+    }) as unknown as typeof fetch;
+
+    const granted = await fetchDownscopedBoxToken({
+      folderId: "demo-workspace",
+      salesforceRecordId: "a01xx0000009abcAAA",
+    });
+
+    expect(granted).toEqual({ accessToken: "example-scoped-token", folderId: "555" });
+    expect(calls.filter((c) => c.includes("box-folder"))).toHaveLength(1);
+    expect(calls.filter((c) => c.includes("box-token"))).toHaveLength(2);
+    expect(calls[1]).toContain("POST");
+  });
+
+  test("does not provision when the failure is not a missing folder", async () => {
+    const calls: string[] = [];
+    globalThis.fetch = (async (url: string) => {
+      calls.push(String(url));
+      return { ok: false, status: 403, text: async () => '{"error":"folder_not_allowed"}', json: async () => ({}) };
+    }) as unknown as typeof fetch;
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a01xx0000009abcAAA" }))
+      .toEqual({ accessToken: "", folderId: "" });
+    expect(calls.some((c) => c.includes("box-folder"))).toBe(false);
+  });
 });

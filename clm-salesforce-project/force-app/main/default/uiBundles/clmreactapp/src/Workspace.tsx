@@ -67,19 +67,22 @@ export function Workspace() {
   /**
    * Which Box folder the workspace opens.
    *
-   * A contract record carries its own workspace folder in Box_Workspace_Folder_ID__c, so
-   * when the selected row has one it is used directly and no lookup is needed. Falling
-   * back to the record id asks the endpoint to resolve the folder from the Box for
-   * Salesforce mapping instead. The two are not combined: the endpoint prefers a record
-   * id when given one, so sending both would ignore a folder the record already names.
+   * The record id wins when there is one. The Box for Salesforce package owns the
+   * record-to-folder association and provisions a folder for a record that has none, so
+   * asking by record is both authoritative and self-healing; Box_Workspace_Folder_ID__c
+   * is a denormalised copy that can fall behind it.
+   *
+   * A folder id is used only when there is no record to ask about -- a deep link or the
+   * local harness -- and that path is still bounded by Allowed_Folder_Ids__c, because
+   * there the caller chose the folder rather than a record.
    */
   const workspaceContext = useMemo(() => {
-    if (selected?.boxFolderId) {
-      return { ...context, folderId: selected.boxFolderId };
+    if (selected?.recordId) {
+      return { ...context, salesforceRecordId: selected.recordId };
     }
     return {
       ...context,
-      ...(selected?.recordId ? { salesforceRecordId: selected.recordId } : {}),
+      ...(selected?.boxFolderId ? { folderId: selected.boxFolderId } : {}),
     };
   }, [context, selected]);
 

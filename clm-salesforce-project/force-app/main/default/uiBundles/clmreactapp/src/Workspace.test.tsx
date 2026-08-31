@@ -55,9 +55,10 @@ describe("Workspace", () => {
     expect(screen.getByText(/CLM-99 · Salesforce a01xx0000001234/)).toBeVisible();
   });
 
-  test("opens the folder the contract record names, without asking the endpoint to resolve one", async () => {
-    // The endpoint prefers recordId when both are sent, so a record that already names a
-    // folder must not also send one -- it would resolve the mapping and ignore the field.
+  test("asks by record so the package resolves or provisions the folder", async () => {
+    // The package owns the association and provisions a folder for a record that has
+    // none, so the record id is asked for even when a folder is already denormalised
+    // onto the row -- that copy can fall behind the association.
     const urls: string[] = [];
     vi.stubGlobal(
       "fetch",
@@ -80,8 +81,8 @@ describe("Workspace", () => {
 
     await screen.findByTestId("box-fallback");
     const tokenCall = urls.find((url) => url.includes("box-token")) || "";
-    expect(tokenCall).toContain("folderId=123456789");
-    expect(tokenCall).not.toContain("recordId=");
+    expect(tokenCall).toContain("recordId=a01xx0000009abcAAA");
+    expect(tokenCall).not.toContain("folderId=");
   });
 
   test("puts the contract in the address bar so it can be linked and reloaded", async () => {

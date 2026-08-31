@@ -117,7 +117,10 @@ global with sharing class ClmBoxTokenService {
                 'Set Box User Id (or Enterprise Id) on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
             return;
         }
-        if (!isFolderAllowed(config, folderId)) {
+        // The allowlist bounds what a caller may name. A folder resolved from a record
+        // was never named by the caller -- the record's own association chose it -- so
+        // applying the list there would refuse every folder the package provisions.
+        if (String.isBlank(recordId) && !isFolderAllowed(config, folderId)) {
             fail(response, 403, 'folder_not_allowed',
                 'folderId is not in the configured Allowed Folder Ids list.');
             return;
@@ -143,29 +146,30 @@ global with sharing class ClmBoxTokenService {
     }
 
     /**
-     * Resolve a record's Box folder through the Box for Salesforce managed package.
+     * Read a record's Box workspace folder from the Box for Salesforce package.
      *
-     * `box.Toolkit.getFolderIdByRecordId` is the package's supported accessor. It reads
-     * the same record-to-folder association this class used to query directly on
-     * `box__FRUP__c.box__Record_ID_Indexed__c`, and makes no Box API call -- so the
-     * behaviour is identical while the field names stay the package's business rather
-     * than ours.
+     * Read only, deliberately. `createFolderForRecordId` provisions a folder by writing
+     * the association, and Apex forbids a callout once a transaction has done DML --
+     * "You have uncommitted work pending" -- so provisioning here would break the token
+     * callout that follows. Provisioning lives in ClmBoxFolderService, which the client
+     * calls first when this returns nothing.
      *
-     * Null on any failure, which the caller reports as no_box_folder_mapping. The
-     * Toolkit is a managed-package class, so a caller without access to it throws rather
-     * than returning nothing; that is caught here so the workspace falls back to
-     * fixtures instead of surfacing a stack.
+     * `getFolderIdByRecordId` makes no Box API call, so this stays a single indexed read.
+     *
+     * Null on failure, which the caller reports as no_box_folder_mapping. box.Toolkit is
+     * a managed-package class, so a caller without access to it throws rather than
+     * returning nothing.
      *
      * `without sharing` because this endpoint also serves the Experience Cloud guest
      * user, which sees no association records under normal sharing. It returns a folder
-     * id and grants the caller no record access, and Allowed_Folder_Ids__c is still
-     * applied afterwards.
+     * id and grants the caller no record access.
      */
     private without sharing class FolderMapping {
         private String forRecord(Id recordId) {
             try {
                 return new box.Toolkit().getFolderIdByRecordId(recordId);
             } catch (Exception e) {
+                System.debug(LoggingLevel.WARN, 'CLM Box: folder lookup failed: ' + e.getMessage());
                 return null;
             }
         }
@@ -174,6 +178,9 @@ global with sharing class ClmBoxTokenService {
     /**
      * An empty allowlist means "any folder". Populate Allowed_Folder_Ids__c with a
      * comma-separated list to restrict the endpoint to the demo workspace.
+     *
+     * This applies only to a caller-supplied folderId. Folders reached through a record
+     * are bounded by the record instead.
      */
     private static Boolean isFolderAllowed(CLM_Box_Config__c config, String folderId) {
         if (String.isBlank(config.Allowed_Folder_Ids__c)) {

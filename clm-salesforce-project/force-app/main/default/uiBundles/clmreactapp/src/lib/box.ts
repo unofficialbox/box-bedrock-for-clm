@@ -143,31 +143,75 @@ export async function fetchDownscopedBoxToken(
   const injectedToken = window.__CLM_RUNTIME_CONFIG__?.boxAccessToken;
   if (injectedToken) return { accessToken: injectedToken, folderId: context.folderId };
 
-  const query = context.salesforceRecordId
-    ? `recordId=${encodeURIComponent(context.salesforceRecordId)}`
+  const recordId = context.salesforceRecordId;
+  const query = recordId
+    ? `recordId=${encodeURIComponent(recordId)}`
     : `folderId=${encodeURIComponent(context.folderId)}`;
 
   try {
-    const response = await fetch(`/services/apexrest/clm/box-token?${query}`, {
-      headers: { Accept: "application/json" },
-    });
-    if (!response.ok) {
-      console.warn(
-        `[CLM] Token endpoint returned ${response.status}; falling back to fixtures.`,
-        await response.text().catch(() => "")
-      );
-      return NO_TOKEN;
+    let granted = await requestToken(query, context.folderId);
+
+    // A record with no folder yet is provisioned rather than refused. Provisioning writes
+    // the association, and Apex forbids a callout after DML, so the package cannot create
+    // the folder and mint a token in one request -- hence provision, then retry.
+    if (!granted.accessToken && granted.needsFolder && recordId) {
+      const provisioned = await provisionBoxFolder(recordId);
+      if (provisioned) {
+        granted = await requestToken(query, context.folderId);
+      }
     }
-    const result = (await response.json()) as { accessToken?: string; folderId?: string };
-    if (!result.accessToken) return NO_TOKEN;
-    return {
-      accessToken: result.accessToken,
-      // Trust the endpoint's folder over the requested one; with a recordId it is the
-      // only place the answer exists.
-      folderId: result.folderId || context.folderId,
-    };
+    return granted.accessToken ? { accessToken: granted.accessToken, folderId: granted.folderId } : NO_TOKEN;
   } catch (error) {
     console.warn("[CLM] Token endpoint unreachable; falling back to fixtures.", error);
     return NO_TOKEN;
+  }
+}
+
+interface TokenAttempt extends BoxWorkspaceToken {
+  /** The record has no Box folder yet, so provisioning it is worth a try. */
+  needsFolder: boolean;
+}
+
+async function requestToken(query: string, requestedFolderId: string): Promise<TokenAttempt> {
+  const response = await fetch(`/services/apexrest/clm/box-token?${query}`, {
+    headers: { Accept: "application/json" },
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    console.warn(`[CLM] Token endpoint returned ${response.status}.`, detail);
+    return { ...NO_TOKEN, needsFolder: detail.includes("no_box_folder_mapping") };
+  }
+  const result = (await response.json()) as { accessToken?: string; folderId?: string };
+  return {
+    accessToken: result.accessToken || "",
+    // Trust the endpoint's folder over the requested one; with a recordId it is the only
+    // place the answer exists.
+    folderId: result.folderId || requestedFolderId,
+    needsFolder: false,
+  };
+}
+
+/**
+ * Ask the Box for Salesforce package to create this record's workspace folder. Returns
+ * false rather than throwing, so a workspace that cannot be provisioned falls back to
+ * fixtures like every other Box failure here.
+ */
+async function provisionBoxFolder(recordId: string): Promise<boolean> {
+  try {
+    const response = await fetch(
+      `/services/apexrest/clm/box-folder?recordId=${encodeURIComponent(recordId)}`,
+      { method: "POST", headers: { Accept: "application/json" } },
+    );
+    if (!response.ok) {
+      console.warn(
+        `[CLM] Could not provision a Box folder (${response.status}).`,
+        await response.text().catch(() => ""),
+      );
+      return false;
+    }
+    return true;
+  } catch (error) {
+    console.warn("[CLM] Folder provisioning unreachable.", error);
+    return false;
   }
 }
