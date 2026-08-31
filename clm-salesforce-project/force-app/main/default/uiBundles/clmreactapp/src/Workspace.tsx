@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { ClipboardCheck, FileSignature, FileStack, GitCompareArrows, LayoutDashboard, Sparkles, UserRoundCheck } from "lucide-react";
 import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
@@ -12,8 +12,24 @@ type View = "contracts" | "workspace" | "approvals";
 
 const REDLINE_REVIEW_GROUPS = groupRedlineFindings(REDLINE_FINDINGS, EXPERT_ROUTES);
 
+/**
+ * The query string a selected contract should produce.
+ *
+ * `folderId` is what the workspace needs and `recordId` is the fallback the endpoint
+ * resolves from, so both are written when known; `contractId` is there to make the URL
+ * readable. Selecting a contract has to change the URL, or the workspace cannot be
+ * linked to, reloaded, or reached with the back button.
+ */
+function contractSearch(contract: ClmContractSummary): string {
+  const params = new URLSearchParams();
+  if (contract.contractId) params.set("contractId", contract.contractId);
+  if (contract.recordId) params.set("recordId", contract.recordId);
+  if (contract.boxFolderId) params.set("folderId", contract.boxFolderId);
+  return params.toString();
+}
+
 export function Workspace() {
-  const context = useMemo(() => getClmPageContext(), []);
+  const [context, setContext] = useState(() => getClmPageContext());
   const [selected, setSelected] = useState<ClmContractSummary | null>(null);
   /**
    * A record in the URL means the page was opened with context -- a Lightning or
@@ -22,6 +38,31 @@ export function Workspace() {
    */
   const [view, setView] = useState<View>(context.salesforceRecordId ? "workspace" : "contracts");
   const [copied, setCopied] = useState(false);
+
+  /**
+   * Keep the app in step with the address bar. Without this, Back after opening a
+   * contract changes the URL and leaves the workspace on screen. The URL is the
+   * authority here: going back re-reads it and drops the row selection, so the folder in
+   * the URL is what the workspace opens.
+   */
+  useEffect(() => {
+    function syncToUrl() {
+      const params = new URLSearchParams(window.location.search);
+      const namesAContract = params.has("recordId") || params.has("folderId");
+      setContext(getClmPageContext());
+      setSelected(null);
+      setView(namesAContract ? "workspace" : "contracts");
+    }
+    window.addEventListener("popstate", syncToUrl);
+    return () => window.removeEventListener("popstate", syncToUrl);
+  }, []);
+
+  const openContract = useCallback((contract: ClmContractSummary) => {
+    const search = contractSearch(contract);
+    window.history.pushState({}, "", search ? `?${search}` : window.location.pathname);
+    setSelected(contract);
+    setView("workspace");
+  }, []);
 
   /**
    * Which Box folder the workspace opens.
@@ -72,12 +113,7 @@ export function Workspace() {
       <div className="content-grid">
         <main>
           {view === "contracts" ? (
-            <ContractList
-              onSelect={(contract) => {
-                setSelected(contract);
-                setView("workspace");
-              }}
-            />
+            <ContractList onSelect={openContract} />
           ) : view === "workspace" ? (
             <BoxWorkspace context={workspaceContext} />
           ) : (

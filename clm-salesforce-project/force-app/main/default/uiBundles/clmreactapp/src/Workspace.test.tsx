@@ -83,4 +83,36 @@ describe("Workspace", () => {
     expect(tokenCall).toContain("folderId=123456789");
     expect(tokenCall).not.toContain("recordId=");
   });
+
+  test("puts the contract in the address bar so it can be linked and reloaded", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        if (String(url).includes("/clm/contracts")) {
+          return {
+            ok: true,
+            json: async () => [
+              {
+                recordId: "a01xx0000009abcAAA",
+                contractId: "CLM-2026-0017",
+                name: "Northstar MSA",
+                boxFolderId: "123456789",
+              },
+            ],
+          };
+        }
+        throw new Error("no box endpoint in this test");
+      }),
+    );
+
+    render(<Workspace />);
+    expect(window.location.search).toBe("");
+
+    fireEvent.click(await screen.findByTestId("contract-row"));
+
+    const params = new URLSearchParams(window.location.search);
+    expect(params.get("folderId")).toBe("123456789");
+    expect(params.get("recordId")).toBe("a01xx0000009abcAAA");
+    expect(params.get("contractId")).toBe("CLM-2026-0017");
+  });
 });
