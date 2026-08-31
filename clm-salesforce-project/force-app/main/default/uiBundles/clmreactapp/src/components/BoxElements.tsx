@@ -1,11 +1,12 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IntlProvider } from "react-intl";
-import { LockKeyhole, Upload } from "lucide-react";
-import ContentExplorer, { type BoxItem } from "box-ui-elements/es/elements/content-explorer";
+import { Eye, LockKeyhole, Upload } from "lucide-react";
+import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
 import ContentUploader from "box-ui-elements/es/elements/content-uploader";
 import "box-ui-elements/dist/explorer.css";
 import "box-ui-elements/dist/uploader.css";
 import { BoxDocumentPreview } from "./BoxDocumentPreview";
+import { listBoxFolderItems, type BoxFolderItem } from "../lib/box";
 
 /**
  * Box UI Elements mounted on the same downscoped token the preview uses.
@@ -22,7 +23,29 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
   const [uploaderOpen, setUploaderOpen] = useState(false);
   // Remount the explorer after an upload so the new item appears without a reload.
   const [refreshKey, setRefreshKey] = useState(0);
-  const [selected, setSelected] = useState<BoxItem | null>(null);
+  const [selected, setSelected] = useState<BoxFolderItem | null>(null);
+  const [folderInView, setFolderInView] = useState(folderId);
+  const [previewable, setPreviewable] = useState<BoxFolderItem[]>([]);
+
+  /**
+   * Track the files in whichever folder the explorer is showing, so the picker offers
+   * the documents the user is actually looking at.
+   *
+   * The picker exists because ContentExplorer will not surrender a file click on its
+   * own terms. Its ItemList only calls onItemClick for a file when `canPreview` is on,
+   * and turning that on also mounts its preview dialog, which has no library to load
+   * here and fails to a "Sad Box Cloud" modal. There is no prop that separates the two,
+   * so the trigger lives outside the explorer.
+   */
+  useEffect(() => {
+    let active = true;
+    listBoxFolderItems(folderInView, token).then((items) => {
+      if (active) setPreviewable(items);
+    });
+    return () => {
+      active = false;
+    };
+  }, [folderInView, token, refreshKey]);
 
   if (!token || !folderId) {
     return null;
@@ -36,6 +59,28 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
     <section className="box-elements" data-testid="box-elements">
       {/* No heading here: BoxWorkspace already renders the folder header above. */}
       <div className="box-elements-toolbar">
+        {previewable.length > 0 ? (
+          <label className="box-preview-picker">
+            <Eye size={15} />
+            <span className="visually-hidden">Preview a document</span>
+            <select
+              value={selected?.id || ""}
+              onChange={(event) => {
+                const file = previewable.find((item) => item.id === event.target.value);
+                setSelected(file || null);
+              }}
+              data-testid="box-preview-picker"
+            >
+              <option value="">Preview a document…</option>
+              {previewable.map((file) => (
+                <option key={file.id} value={file.id}>
+                  {file.name}
+                </option>
+              ))}
+            </select>
+          </label>
+        ) : null}
+
         <button
           type="button"
           className="secondary-button"
@@ -75,14 +120,15 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           key={refreshKey}
           token={token}
           rootFolderId={folderId}
-          // The explorer's own preview stays off: it loads Box Content Preview from
-          // cdn01.boxcdn.net, which the Experience Cloud CSP blocks under script-src --
-          // the wall cf3b54a hit. Selecting a file opens BoxDocumentPreview instead,
-          // which embeds Box's own rendering in an iframe and needs no library here.
+          // Must stay off. It loads Box Content Preview from cdn01.boxcdn.net, which the
+          // Experience Cloud CSP blocks under script-src -- the wall cf3b54a hit -- and
+          // the dialog then renders a "Sad Box Cloud" error over the workspace.
           canPreview={false}
-          onSelect={(items) => {
-            const file = items.find((item) => item.type === "file");
-            if (file) setSelected(file);
+          // Follow the explorer so the picker lists the folder on screen.
+          onNavigate={(item) => {
+            setFolderInView(item.id);
+            // A preview from the previous folder should not outlive the navigation.
+            setSelected(null);
           }}
           canUpload
           canCreateNewFolder={false}

@@ -74,6 +74,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 | `.../clmreactapp/src/components/BoxWorkspace.tsx` | Live branch (token + folder listing) with synthetic-fixture fallback; both failure paths log |
 | `.../clmreactapp/src/components/BoxElements.tsx` | Lazy-loaded Content Explorer + Content Uploader; needs a `react-intl` provider |
 | `.../clmreactapp/src/components/BoxDocumentPreview.tsx` | Inline document preview: Box's expiring embed URL in an iframe, no preview library |
+| ... opened from the toolbar picker in `BoxElements.tsx` | ContentExplorer will not emit a file click unless its own broken preview is enabled — see thread 3 |
 | `.../cspTrustedSites/CLM_Box_App.cspTrustedSite-meta.xml` | frame-src grant for `*.app.box.com`, without which the preview frame is blank (MT-043) |
 | `.../clmreactapp/vite.live-box.ts` | Dev-only plugin serving a real downscoped token locally (`npm run preview:live`) |
 | `.../clmreactapp/.npmrc` | `legacy-peer-deps=true`, without which `npm ci` cannot reproduce the lockfile — do not delete |
@@ -88,7 +89,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
 ## 6. Open threads / caveats
 
-1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** Newly required is **MT-043**, the `CLM_Box_App` trusted site that lets the preview iframe render; it is committed but not deployed. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing and the workspace silently falls back to fixtures. Check the browser console: both failure paths log now.
+1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** Newly required is **MT-043**, the `CLM_Box_App` trusted site that lets the preview iframe render; it is committed but not deployed. `http://localhost:4173` was added to the Box app's CORS domains on 2026-08-31, so the local harness reaches live Box. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing and the workspace silently falls back to fixtures. Check the browser console: both failure paths log now.
 2. **Folder-id gotcha.** The workspace still defaults to the non-numeric string `demo-workspace` (`src/config.ts`), which the endpoint rejects as `invalid_folder_id` before any Box call. Pass `?folderId=` or rebuild with `VITE_BOX_FOLDER_ID`; locally, `CLM_BOX_FOLDER_ID` for `preview:live`.
 3. **Document preview deliberately avoids the Box Content Preview library.** The npm
    package `box-content-preview` cannot be used here: it declares peers on React 18 and
@@ -99,6 +100,16 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    cf3b54a hit from a different side. The workspace requests `expiring_embed_link`
    instead and frames Box's own rendering, which needs only `item_preview` scope
    (already granted) and a frame-src trusted site.
+
+   **The trigger cannot live on an explorer row.** `ContentExplorer` delegates rows to
+   `ItemList`, whose handler is `if (type === FOLDER || !isTouch && (type === WEBLINK ||
+   canPreview)) onItemClick(item)` — a file click is emitted only when `canPreview` is
+   on, and turning it on also mounts the built-in preview dialog, which has no library
+   to load and renders a "Sad Box Cloud" error over the workspace. No prop separates
+   the two. So `canPreview` stays `false` and the preview is opened from a picker in the
+   toolbar, fed by `onNavigate` so it lists the folder currently on screen. Folder
+   navigation still works because folders short-circuit that condition — which is why
+   the coupling is easy to miss until a file is clicked against live Box.
 4. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 5. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
 6. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before PR #37 replaced the hand-rolled file rail and preview mount with Content Explorer. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
