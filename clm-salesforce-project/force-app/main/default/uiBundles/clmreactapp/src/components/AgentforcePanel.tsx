@@ -10,10 +10,22 @@ export function AgentforcePanel() {
   const runtime = window.__CLM_RUNTIME_CONFIG__;
   const agentId = runtime?.agentforceAgentId || CLM_CONFIG.agentforce.agentId;
   const appId = runtime?.agentforceAppId || CLM_CONFIG.agentforce.appId;
+
+  // Salesforce injects SFDC_ENV into a UI bundle at runtime. origin and basePath are the
+  // two things the conversation client cannot work out for itself.
+  const sfdcEnv = (globalThis as { SFDC_ENV?: { origin?: string; basePath?: string } }).SFDC_ENV;
   const salesforceOrigin =
     runtime?.salesforceOrigin ||
-    (globalThis as { SFDC_ENV?: { origin?: string } }).SFDC_ENV?.origin ||
-    CLM_CONFIG.agentforce.salesforceOrigin;
+    sfdcEnv?.origin ||
+    CLM_CONFIG.agentforce.salesforceOrigin ||
+    window.location.origin;
+
+  /**
+   * An Experience Cloud site is served under a path prefix -- this one is /clm -- and the
+   * client builds its endpoints from it. Without a prefix it calls the wrong paths on a
+   * site and the panel stays empty, so this is not optional once the app leaves Lightning.
+   */
+  const sitePrefix = sfdcEnv?.basePath ? sfdcEnv.basePath.replace(/\/+$/, "") : undefined;
 
   useEffect(() => {
     if (!hostRef.current || !agentId || !appId || !salesforceOrigin || initializedRef.current) return;
@@ -22,6 +34,7 @@ export function AgentforcePanel() {
       container: hostRef.current,
       salesforceOrigin,
       appId,
+      ...(sitePrefix ? { sitePrefix } : {}),
       agentforceClientConfig: {
         agentId,
         agentLabel: "Contract Copilot",
@@ -35,11 +48,17 @@ export function AgentforcePanel() {
           inboundMessageTextColor: "#071b33",
         },
       },
-      onError: () => {
+      onReady: () => {
+        console.info("[CLM] Agentforce conversation ready.");
+      },
+      // Logged for the same reason the Box paths log: the placeholder and a failed embed
+      // look identical from outside, so a silent failure reads as "not configured yet".
+      onError: (error: { type?: string; detail?: unknown }) => {
+        console.warn(`[CLM] Agentforce embed failed (${error?.type ?? "unknown"}).`, error?.detail);
         initializedRef.current = false;
       },
     });
-  }, [agentId, appId, salesforceOrigin]);
+  }, [agentId, appId, salesforceOrigin, sitePrefix]);
 
   return (
     <aside className="agent-panel" aria-label="Contract Copilot">
