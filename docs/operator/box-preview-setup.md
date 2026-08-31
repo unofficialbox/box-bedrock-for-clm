@@ -18,9 +18,18 @@ Browser ──GET /services/apexrest/clm/box-token?folderId=<id>──▶ ClmBox
                                                                   ▼
 Browser ◀────────── short-lived token, scoped to that folder only ─┘
    │
-   ├── GET api.box.com/2.0/folders/<id>/items      (list files)
-   └── Box Content Preview renders the selected file
+   ├── GET api.box.com/2.0/folders/<id>/items                    (list files)
+   └── GET api.box.com/2.0/files/<id>?fields=expiring_embed_link (preview URL)
+                    │
+                    ▼
+       <iframe src="https://<enterprise>.app.box.com/preview/expiring_embed/...">
 ```
+
+Box renders the document on its own origin, so no preview library is downloaded. That is
+deliberate: the Box Content Preview script is served from `cdn01.boxcdn.net`, and the
+Experience Cloud CSP allows only `'self'` plus a Salesforce allowlist under `script-src`
+-- `CspTrustedSite` has no `script-src` field that can widen it. It *does* have
+`isApplicableToFrameSrc`, so an iframe is the one preview path the platform can grant.
 
 The browser never receives a client secret and never receives the enterprise token. Apex
 never holds a credential either: Salesforce substitutes the encrypted values into the
@@ -175,7 +184,9 @@ permission set to the community user profile instead of the guest user.
 | `box_auth_failed` (500) | Box rejected the client credentials | Check Part 2 values; confirm the app is authorized in the Admin Console |
 | `box_downscope_failed` (500) | Box refused the token exchange | Confirm the subject can see the folder. With a user subject, check that user's access; with an enterprise subject, collaborate the service account onto the folder |
 | `box_request_failed` (500) | The callout itself threw | Usually the caller lacks **read on `UserExternalCredential`** -- see Part 6. Also check the named credential is enabled and the permission set grants principal access |
-| 200, but the file list still shows | Preview script or listing blocked | Check the browser console; confirm the Box app's CORS domains include the site origin |
+| 200, but the file list still shows | Listing blocked | Check the browser console; confirm the Box app's CORS domains include the site origin (MT-036) |
+| File selected, but the preview frame is empty | `frame-src` blocks the Box app domain | Deploy `CLM_Box_App` and confirm **Setup → Trusted URLs** lists `https://*.app.box.com` for frame-src (MT-043) |
+| "Box did not return a preview link" | Token lacks `item_preview` | Box answers 200 with the field absent rather than an error; check `DOWNSCOPE_SCOPE` in `ClmBoxTokenService` |
 
 ## Production variant: per-user OAuth
 

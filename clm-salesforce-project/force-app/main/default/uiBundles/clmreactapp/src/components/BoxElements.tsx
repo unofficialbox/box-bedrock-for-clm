@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { IntlProvider } from "react-intl";
 import { LockKeyhole, Upload } from "lucide-react";
-import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
+import ContentExplorer, { type BoxItem } from "box-ui-elements/es/elements/content-explorer";
 import ContentUploader from "box-ui-elements/es/elements/content-uploader";
 import "box-ui-elements/dist/explorer.css";
 import "box-ui-elements/dist/uploader.css";
+import { BoxDocumentPreview } from "./BoxDocumentPreview";
 
 /**
  * Box UI Elements mounted on the same downscoped token the preview uses.
@@ -21,6 +22,7 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
   const [uploaderOpen, setUploaderOpen] = useState(false);
   // Remount the explorer after an upload so the new item appears without a reload.
   const [refreshKey, setRefreshKey] = useState(0);
+  const [selected, setSelected] = useState<BoxItem | null>(null);
 
   if (!token || !folderId) {
     return null;
@@ -44,6 +46,16 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
         </button>
       </div>
 
+      {selected ? (
+        <BoxDocumentPreview
+          key={selected.id}
+          fileId={selected.id}
+          fileName={selected.name}
+          token={token}
+          onClose={() => setSelected(null)}
+        />
+      ) : null}
+
       {uploaderOpen ? (
         <div className="box-element-host" data-testid="box-content-uploader">
           <ContentUploader
@@ -63,12 +75,15 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           key={refreshKey}
           token={token}
           rootFolderId={folderId}
-          // Preview stays off here. ContentExplorer's preview loads Box Content Preview
-          // from cdn01.boxcdn.net, which Experience Cloud CSP blocks under script-src --
-          // the same wall cf3b54a hit -- and it throws "Missing or malformed preview.js
-          // library". The workspace renders the vendored Content Preview above this,
-          // served from 'self', so previewing here would be redundant anyway.
+          // The explorer's own preview stays off: it loads Box Content Preview from
+          // cdn01.boxcdn.net, which the Experience Cloud CSP blocks under script-src --
+          // the wall cf3b54a hit. Selecting a file opens BoxDocumentPreview instead,
+          // which embeds Box's own rendering in an iframe and needs no library here.
           canPreview={false}
+          onSelect={(items) => {
+            const file = items.find((item) => item.type === "file");
+            if (file) setSelected(file);
+          }}
           canUpload
           canCreateNewFolder={false}
           canDelete={false}
