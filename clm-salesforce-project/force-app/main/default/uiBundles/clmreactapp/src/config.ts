@@ -20,7 +20,9 @@ export const CLM_CONFIG = {
     docgen: import.meta.env.VITE_BOX_DOCGEN_FOLDER_ID || "",
   },
   agentforce: {
-    agentId: import.meta.env.VITE_AGENTFORCE_AGENT_ID || "",
+    // The developer name of the agent, not an org id -- portable across orgs, so it
+    // ships as the default. See aiAuthoringBundles/CLM_Contract_Copilot.
+    agentId: import.meta.env.VITE_AGENTFORCE_AGENT_ID || "CLM_Contract_Copilot",
     appId: import.meta.env.VITE_AGENTFORCE_APP_ID || "",
     salesforceOrigin: import.meta.env.VITE_SALESFORCE_ORIGIN || "",
   },

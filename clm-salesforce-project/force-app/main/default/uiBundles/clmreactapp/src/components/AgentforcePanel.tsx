@@ -14,11 +14,18 @@ export function AgentforcePanel() {
   // Salesforce injects SFDC_ENV into a UI bundle at runtime. origin and basePath are the
   // two things the conversation client cannot work out for itself.
   const sfdcEnv = (globalThis as { SFDC_ENV?: { origin?: string; basePath?: string } }).SFDC_ENV;
+  /**
+   * The current origin is a fallback only when SFDC_ENV proves we are on-platform. An
+   * Experience site sets basePath but leaves origin undefined, so without this the panel
+   * shows a placeholder on a site that could host the conversation. Off-platform -- a
+   * standalone build, a test, the local harness -- there is no org behind the page, and
+   * defaulting to the current origin would attempt an embed that cannot work.
+   */
   const salesforceOrigin =
     runtime?.salesforceOrigin ||
     sfdcEnv?.origin ||
     CLM_CONFIG.agentforce.salesforceOrigin ||
-    window.location.origin;
+    (sfdcEnv ? window.location.origin : "");
 
   /**
    * An Experience Cloud site is served under a path prefix -- this one is /clm -- and the
@@ -28,12 +35,15 @@ export function AgentforcePanel() {
   const sitePrefix = sfdcEnv?.basePath ? sfdcEnv.basePath.replace(/\/+$/, "") : undefined;
 
   useEffect(() => {
-    if (!hostRef.current || !agentId || !appId || !salesforceOrigin || initializedRef.current) return;
+    // appId is optional: it is a Lightning Out 2.0 app id, and the client only needs one
+    // for apps created after Spring '26. agentId and an origin are what it cannot do
+    // without, so gating the embed on appId kept the placeholder up for no reason.
+    if (!hostRef.current || !agentId || !salesforceOrigin || initializedRef.current) return;
     initializedRef.current = true;
     embedAgentforceClient({
       container: hostRef.current,
       salesforceOrigin,
-      appId,
+      ...(appId ? { appId } : {}),
       ...(sitePrefix ? { sitePrefix } : {}),
       agentforceClientConfig: {
         agentId,
@@ -66,13 +76,13 @@ export function AgentforcePanel() {
         <div className="agent-title"><Bot size={19} /> Contract Copilot</div>
         <span className="live-pill">Agentforce</span>
       </div>
-      {agentId && appId && salesforceOrigin ? (
+      {agentId && salesforceOrigin ? (
         <div ref={hostRef} className="agent-host" data-testid="agentforce-host" />
       ) : (
         <div className="agent-placeholder" data-testid="agentforce-placeholder">
           <div className="agent-shield"><ShieldCheck size={23} /></div>
           <strong>Human-controlled contract review</strong>
-          <p>Configure the Agentforce runtime IDs to activate chat. The recommended CLM prompts are ready:</p>
+          <p>Set the Agentforce agent id and Salesforce origin to activate chat. The recommended CLM prompts are ready:</p>
           <ul>
             {AGENT_PROMPTS.map((prompt) => <li key={prompt}>{prompt}</li>)}
           </ul>
