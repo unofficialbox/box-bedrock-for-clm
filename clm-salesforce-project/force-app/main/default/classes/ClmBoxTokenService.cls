@@ -143,34 +143,31 @@ global with sharing class ClmBoxTokenService {
     }
 
     /**
-     * Resolve a record's Box folder from the Box for Salesforce managed package.
+     * Resolve a record's Box folder through the Box for Salesforce managed package.
      *
-     * `box__FRUP__c` is where the package stores the record-to-folder association:
-     * box__Record_ID_Indexed__c is the indexed copy of the Salesforce id and
-     * box__Folder_ID__c is the Box folder. `box.Toolkit.getFolderIdByRecordId()` is the
-     * package's supported accessor and is the better call from a logged-in context; it
-     * is avoided here because this endpoint also serves the Experience Cloud guest user,
-     * where the Toolkit's own sharing and setup assumptions are harder to reason about
-     * than one indexed query.
+     * `box.Toolkit.getFolderIdByRecordId` is the package's supported accessor. It reads
+     * the same record-to-folder association this class used to query directly on
+     * `box__FRUP__c.box__Record_ID_Indexed__c`, and makes no Box API call -- so the
+     * behaviour is identical while the field names stay the package's business rather
+     * than ours.
      *
-     * `without sharing` is deliberate and narrow. Guest users see no FRUP records under
-     * normal sharing, so a `with sharing` lookup would resolve nothing on the very
-     * surface this exists for. It reads two fields on one row and returns a folder id --
-     * it grants no record access to the caller, and Allowed_Folder_Ids__c is still
-     * applied afterwards, so the endpoint cannot return a folder outside the configured
-     * workspace no matter what the mapping says.
+     * Null on any failure, which the caller reports as no_box_folder_mapping. The
+     * Toolkit is a managed-package class, so a caller without access to it throws rather
+     * than returning nothing; that is caught here so the workspace falls back to
+     * fixtures instead of surfacing a stack.
+     *
+     * `without sharing` because this endpoint also serves the Experience Cloud guest
+     * user, which sees no association records under normal sharing. It returns a folder
+     * id and grants the caller no record access, and Allowed_Folder_Ids__c is still
+     * applied afterwards.
      */
     private without sharing class FolderMapping {
         private String forRecord(Id recordId) {
-            List<box__FRUP__c> mappings = [
-                SELECT box__Folder_ID__c
-                FROM box__FRUP__c
-                WHERE box__Record_ID_Indexed__c = :String.valueOf(recordId)
-                  AND box__Folder_ID__c != null
-                ORDER BY LastModifiedDate DESC
-                LIMIT 1
-            ];
-            return mappings.isEmpty() ? null : mappings[0].box__Folder_ID__c;
+            try {
+                return new box.Toolkit().getFolderIdByRecordId(recordId);
+            } catch (Exception e) {
+                return null;
+            }
         }
     }
 
