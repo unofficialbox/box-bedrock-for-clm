@@ -13,6 +13,11 @@
     </classAccesses>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CLM_Contract__c.Box_Workspace_Folder_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CLM_Contract__c.Contract_ID__c</field>
         <readable>true</readable>
     </fieldPermissions>

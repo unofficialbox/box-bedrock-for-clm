@@ -17,6 +17,8 @@ export interface ClmContractSummary {
   riskLevel?: string;
   dealValue?: number;
   termMonths?: number;
+  /** The Box workspace folder associated with this contract record. */
+  boxFolderId?: string;
 }
 
 /**

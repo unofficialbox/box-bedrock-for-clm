@@ -54,4 +54,33 @@ describe("Workspace", () => {
     render(<Workspace />);
     expect(screen.getByText(/CLM-99 · Salesforce a01xx0000001234/)).toBeVisible();
   });
+
+  test("opens the folder the contract record names, without asking the endpoint to resolve one", async () => {
+    // The endpoint prefers recordId when both are sent, so a record that already names a
+    // folder must not also send one -- it would resolve the mapping and ignore the field.
+    const urls: string[] = [];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        urls.push(String(url));
+        if (String(url).includes("/clm/contracts")) {
+          return {
+            ok: true,
+            json: async () => [
+              { recordId: "a01xx0000009abcAAA", name: "Northstar MSA 2025", boxFolderId: "123456789" },
+            ],
+          };
+        }
+        throw new Error("no box endpoint in this test");
+      }),
+    );
+
+    render(<Workspace />);
+    fireEvent.click(await screen.findByTestId("contract-row"));
+
+    await screen.findByTestId("box-fallback");
+    const tokenCall = urls.find((url) => url.includes("box-token")) || "";
+    expect(tokenCall).toContain("folderId=123456789");
+    expect(tokenCall).not.toContain("recordId=");
+  });
 });

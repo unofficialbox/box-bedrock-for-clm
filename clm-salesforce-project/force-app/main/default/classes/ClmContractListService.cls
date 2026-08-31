@@ -32,6 +32,8 @@ global with sharing class ClmContractListService {
         global String riskLevel;
         global Decimal dealValue;
         global Integer termMonths;
+        /** The Box workspace folder this contract is associated with. */
+        global String boxFolderId;
     }
 
     @HttpGet
@@ -58,7 +60,8 @@ global with sharing class ClmContractListService {
             List<ContractSummary> summaries = new List<ContractSummary>();
             for (CLM_Contract__c record : [
                 SELECT Id, Name, Contract_ID__c, Counterparty__c, Contract_Type__c,
-                       Status__c, Risk_Level__c, Deal_Value__c, Term_Months__c
+                       Status__c, Risk_Level__c, Deal_Value__c, Term_Months__c,
+                       Box_Workspace_Folder_ID__c
                 FROM CLM_Contract__c
                 ORDER BY LastModifiedDate DESC
                 LIMIT :MAX_RECORDS
@@ -75,6 +78,7 @@ global with sharing class ClmContractListService {
                 summary.termMonths = record.Term_Months__c == null
                     ? null
                     : Integer.valueOf(record.Term_Months__c);
+                summary.boxFolderId = record.Box_Workspace_Folder_ID__c;
                 summaries.add(summary);
             }
             return summaries;

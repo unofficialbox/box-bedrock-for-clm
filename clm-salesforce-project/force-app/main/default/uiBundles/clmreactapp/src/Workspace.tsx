@@ -23,14 +23,24 @@ export function Workspace() {
   const [view, setView] = useState<View>(context.salesforceRecordId ? "workspace" : "contracts");
   const [copied, setCopied] = useState(false);
 
-  // The record the workspace resolves a Box folder from: the chosen row, else the URL.
-  const workspaceContext = useMemo(
-    () => ({
+  /**
+   * Which Box folder the workspace opens.
+   *
+   * A contract record carries its own workspace folder in Box_Workspace_Folder_ID__c, so
+   * when the selected row has one it is used directly and no lookup is needed. Falling
+   * back to the record id asks the endpoint to resolve the folder from the Box for
+   * Salesforce mapping instead. The two are not combined: the endpoint prefers a record
+   * id when given one, so sending both would ignore a folder the record already names.
+   */
+  const workspaceContext = useMemo(() => {
+    if (selected?.boxFolderId) {
+      return { ...context, folderId: selected.boxFolderId };
+    }
+    return {
       ...context,
       ...(selected?.recordId ? { salesforceRecordId: selected.recordId } : {}),
-    }),
-    [context, selected],
-  );
+    };
+  }, [context, selected]);
 
   async function copyAgentContext() {
     await navigator.clipboard.writeText(getAgentContextPrompt());

@@ -30,6 +30,7 @@ const GET_CLM_CONTRACTS = gql`
               Risk_Level__c { value }
               Deal_Value__c { value }
               Term_Months__c { value }
+              Box_Workspace_Folder_ID__c { value }
             }
           }
         }
@@ -52,6 +53,7 @@ interface ContractNode {
   Risk_Level__c?: FieldValue<string>;
   Deal_Value__c?: FieldValue<number>;
   Term_Months__c?: FieldValue<number>;
+  Box_Workspace_Folder_ID__c?: FieldValue<string>;
 }
 
 interface ContractsQuery {
@@ -94,6 +96,7 @@ export async function fetchContractsViaGraphql(): Promise<ClmContractSummary[] |
         riskLevel: node.Risk_Level__c?.value ?? undefined,
         dealValue: node.Deal_Value__c?.value ?? undefined,
         termMonths: node.Term_Months__c?.value ?? undefined,
+        boxFolderId: node.Box_Workspace_Folder_ID__c?.value ?? undefined,
       }];
     });
   } catch (error) {
