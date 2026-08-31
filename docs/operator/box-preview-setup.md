@@ -221,3 +221,40 @@ why it is not the demo default. Tracked as MT-040.
 - Keep every value from this guide out of committed files. Client IDs, secrets, enterprise
   IDs, and folder IDs belong in the org, and `python3 scripts/validate_clm.py` fails the
   build if they appear in source.
+
+## Appendix: create the Lightning Out 2.0 app for Agentforce
+
+The Agentforce conversation client loads through Lightning Out 2.0. Without an enabled
+`LightningOutApp` whose host domains include the site, the panel mounts and stays empty
+with no error -- the failure is silent, so check this before debugging the client.
+
+`LightningOutApp` is not a Metadata API type, but it is createable through the Tooling
+API, so this does not have to be done by hand in Setup:
+
+```bash
+sf data create record --use-tooling-api --sobject LightningOutApp --target-org <alias> \
+  --values "DeveloperName=CLM_Workspace_LO MasterLabel='CLM Workspace' \
+            ApplicationName=CLM_Workspace_LO IsEnabled=true Runtime=CLWR"
+
+sf data create record --use-tooling-api --sobject LightningOutAppHost --target-org <alias> \
+  --values "LightningOutAppId=<id-from-above> DeveloperName=CLM_Site_Host \
+            MasterLabel='CLM Site Host' ApplicationName=CLM_Workspace_LO \
+            HostDomain=https://<your-site-domain>"
+```
+
+`IsEnabled=true` matters: Salesforce documents that a disabled app fails user
+authentication and the embedded components never load. `Runtime` accepts `CLWR` or
+`LWR_CORE`; `CLWR` is the Experience Cloud runtime. The field is updateable if wrong.
+
+Then rebuild with the id and deploy:
+
+```bash
+VITE_AGENTFORCE_APP_ID=<18-digit-id> npm run build
+```
+
+The id is environment-bound, so it belongs in the build environment or the gitignored
+runtime config -- never in committed source.
+
+Lightning Out 2.0 initializes from an existing Salesforce session. As the Experience
+Cloud guest user every call returns 401 and the panel stays empty, so this can only be
+verified while signed in.
