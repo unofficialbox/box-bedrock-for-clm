@@ -1,4 +1,5 @@
 import { CLM_CONFIG } from "../config";
+import { apexRestUrl } from "./apexRest";
 
 declare global {
   interface Window {
@@ -173,7 +174,7 @@ interface TokenAttempt extends BoxWorkspaceToken {
 }
 
 async function requestToken(query: string, requestedFolderId: string): Promise<TokenAttempt> {
-  const response = await fetch(`/services/apexrest/clm/box-token?${query}`, {
+  const response = await fetch(apexRestUrl(`/services/apexrest/clm/box-token?${query}`), {
     headers: { Accept: "application/json" },
   });
   if (!response.ok) {
@@ -199,7 +200,7 @@ async function requestToken(query: string, requestedFolderId: string): Promise<T
 async function provisionBoxFolder(recordId: string): Promise<boolean> {
   try {
     const response = await fetch(
-      `/services/apexrest/clm/box-folder?recordId=${encodeURIComponent(recordId)}`,
+      apexRestUrl(`/services/apexrest/clm/box-folder?recordId=${encodeURIComponent(recordId)}`),
       { method: "POST", headers: { Accept: "application/json" } },
     );
     if (!response.ok) {

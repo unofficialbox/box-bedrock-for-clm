@@ -7,6 +7,8 @@
  * below is the whole of what the browser can see, by design.
  */
 
+import { apexRestUrl } from "./apexRest";
+
 export interface ClmContractSummary {
   recordId: string;
   contractId?: string;
@@ -29,7 +31,7 @@ export interface ClmContractSummary {
  */
 export async function fetchClmContracts(): Promise<ClmContractSummary[]> {
   try {
-    const response = await fetch("/services/apexrest/clm/contracts", {
+    const response = await fetch(apexRestUrl("/services/apexrest/clm/contracts"), {
       headers: { Accept: "application/json" },
     });
     if (!response.ok) {
