@@ -25,5 +25,9 @@ export const CLM_CONFIG = {
     agentId: import.meta.env.VITE_AGENTFORCE_AGENT_ID || "CLM_Contract_Copilot",
     appId: import.meta.env.VITE_AGENTFORCE_APP_ID || "",
     salesforceOrigin: import.meta.env.VITE_SALESFORCE_ORIGIN || "",
+    // The shipped agent is defined by an Agent Script authoring bundle, which is what
+    // "file-based" means to the conversation client. Set this to "false" when pointing
+    // VITE_AGENTFORCE_AGENT_ID at an agent built in Agent Builder instead.
+    fileBased: (import.meta.env.VITE_AGENTFORCE_FILE_BASED || "true") !== "false",
   },
 } as const;

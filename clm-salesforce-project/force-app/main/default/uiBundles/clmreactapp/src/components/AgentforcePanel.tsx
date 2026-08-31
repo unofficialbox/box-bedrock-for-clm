@@ -10,6 +10,7 @@ export function AgentforcePanel() {
   const runtime = window.__CLM_RUNTIME_CONFIG__;
   const agentId = runtime?.agentforceAgentId || CLM_CONFIG.agentforce.agentId;
   const appId = runtime?.agentforceAppId || CLM_CONFIG.agentforce.appId;
+  const fileBased = CLM_CONFIG.agentforce.fileBased;
 
   // Salesforce injects SFDC_ENV into a UI bundle at runtime. origin and basePath are the
   // two things the conversation client cannot work out for itself.
@@ -47,6 +48,10 @@ export function AgentforcePanel() {
       ...(sitePrefix ? { sitePrefix } : {}),
       agentforceClientConfig: {
         agentId,
+        // Required for an agent defined by an authoring bundle. Without it the client
+        // resolves the agent the Agent Builder way, finds nothing, and mounts an empty
+        // panel rather than reporting an error.
+        ...(fileBased ? { isFileBased: true } : {}),
         agentLabel: "Contract Copilot",
         renderingConfig: { mode: "inline", width: "100%", height: "100%", headerEnabled: false },
         styleTokens: {
@@ -68,7 +73,7 @@ export function AgentforcePanel() {
         initializedRef.current = false;
       },
     });
-  }, [agentId, appId, salesforceOrigin, sitePrefix]);
+  }, [agentId, appId, salesforceOrigin, sitePrefix, fileBased]);
 
   return (
     <aside className="agent-panel" aria-label="Contract Copilot">
