@@ -23,7 +23,8 @@ declare module "box-ui-elements/es/elements/content-explorer" {
     canShare?: boolean;
     canCreateNewFolder?: boolean;
     canPreview?: boolean;
-    onSelect?: (items: BoxItem[]) => void;
+    /** Fires with the folder the explorer navigated into. */
+    onNavigate?: (item: BoxItem) => void;
     onUpload?: (items: BoxItem[]) => void;
     language?: string;
   }

@@ -47,6 +47,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 | MT-040 | Switch to per-user Box OAuth for production | Box/Salesforce admins | Optional; production hardening | The `CLM_Box` auth provider holds real consumer credentials, the Box app carries its callback URL, and the external credential uses a per-user principal |
 | MT-041 | Enable Salesforce Multi-Framework in the target org | Salesforce admin | Required before any UI Bundle deploy | **Setup → React Development with Salesforce Multi-Framework** is on, and `UIBundle` appears in the org's metadata types |
 | MT-042 | Grant the Experience Cloud site user access to the token endpoint | Salesforce admin | Required for live Box preview from a site | `CLM_Box_Preview_Guest` is assigned to the site's guest user (or community profile), including read on `UserExternalCredential` |
+| MT-043 | Deploy the `CLM_Box_App` trusted site so previews can frame | Salesforce admin | Required for in-app document preview | **Setup → Trusted URLs** lists `https://*.app.box.com` with frame-src active; selecting a file in the workspace renders the document instead of an empty frame |
 
 ## Review routing and testing
 
