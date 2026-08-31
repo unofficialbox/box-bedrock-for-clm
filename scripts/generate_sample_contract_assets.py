@@ -556,7 +556,9 @@ def write_csv():
         ["Termination for Convenience", "68", "21", "4.1", "Medium"],
     ]
     with (CSV_OUT / "historical-clause-outcomes.csv").open("w", newline="", encoding="utf-8") as handle:
-        writer = csv.writer(handle)
+        # Force LF: the repository normalizes text to LF via .gitattributes, so a
+        # CRLF write here reads back as drift on any fresh clone.
+        writer = csv.writer(handle, lineterminator="\n")
         writer.writerows(rows)
 
 
