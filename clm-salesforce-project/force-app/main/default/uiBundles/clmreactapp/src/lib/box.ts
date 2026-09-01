@@ -19,15 +19,22 @@ export interface BoxFolderItem {
 }
 
 /**
- * List a folder with the downscoped token. Empty on any failure; the caller falls back
- * to synthetic fixtures.
+ * List a folder with the downscoped token.
+ *
+ * Null means the listing failed and the caller should fall back; an empty array means the
+ * folder is genuinely empty, which a freshly provisioned contract folder always is. The
+ * two must stay distinct -- conflating them renders fixtures over a working workspace and
+ * makes a healthy empty folder look like a broken connection.
  *
  * The failure is logged because the fallback is otherwise indistinguishable from a
  * working demo with no files: the page renders fixtures and says nothing. A CORS
  * rejection is the usual cause, and Box reports it in the body as
  * cors_origin_not_whitelisted with the offending origin.
  */
-export async function listBoxFolderItems(folderId: string, accessToken: string): Promise<BoxFolderItem[]> {
+export async function listBoxFolderItems(
+  folderId: string,
+  accessToken: string,
+): Promise<BoxFolderItem[] | null> {
   try {
     const response = await fetch(
       `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type&limit=100`,
@@ -38,14 +45,14 @@ export async function listBoxFolderItems(folderId: string, accessToken: string):
         `[CLM] Box folder listing failed (${response.status}); falling back to fixtures.`,
         await response.text().catch(() => "")
       );
-      return [];
+      return null;
     }
     const result = (await response.json()) as { entries?: BoxFolderItem[] };
     return (result.entries || []).filter((entry) => entry.type === "file");
   } catch (error) {
     // A CORS rejection surfaces here as an opaque TypeError with no response to read.
     console.warn("[CLM] Box folder listing threw; check the Box app's CORS domains.", error);
-    return [];
+    return null;
   }
 }
 

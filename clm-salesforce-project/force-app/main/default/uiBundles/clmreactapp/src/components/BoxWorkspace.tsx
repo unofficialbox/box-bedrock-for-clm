@@ -16,7 +16,7 @@ const BoxElements = lazy(() =>
 export function BoxWorkspace({ context }: { context: ClmPageContext }) {
   const [token, setToken] = useState("");
   const [folderId, setFolderId] = useState("");
-  const [files, setFiles] = useState<BoxFolderItem[]>([]);
+  const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   /**
@@ -55,7 +55,9 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
     return <div className="workspace-state" data-testid="box-loading">Connecting to the governed Box workspace…</div>;
   }
 
-  if (token && files.length > 0) {
+  // A token plus a listing that came back is live content, even when the folder is empty.
+  // A newly provisioned contract folder has no files yet and is still the real workspace.
+  if (token && files !== null) {
     return (
       <section className="box-live" data-testid="box-preview">
         <div className="box-fallback-head">

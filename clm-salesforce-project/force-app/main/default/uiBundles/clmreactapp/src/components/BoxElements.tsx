@@ -40,7 +40,8 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
   useEffect(() => {
     let active = true;
     listBoxFolderItems(folderInView, token).then((items) => {
-      if (active) setPreviewable(items);
+      // Null is a failed listing; an empty folder is simply nothing to preview.
+      if (active) setPreviewable(items ?? []);
     });
     return () => {
       active = false;

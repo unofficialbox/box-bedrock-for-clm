@@ -44,15 +44,22 @@ describe("Box folder listing", () => {
     expect(seenAuth).toBe("Bearer scoped-token");
   });
 
-  test("returns an empty list when Box rejects the request so the caller can fall back", async () => {
+  test("returns null when Box rejects the request so the caller can fall back", async () => {
     globalThis.fetch = (async () => ({ ok: false, json: async () => ({}) })) as unknown as typeof fetch;
-    expect(await listBoxFolderItems("42", "bad-token")).toEqual([]);
+    expect(await listBoxFolderItems("42", "bad-token")).toBeNull();
   });
 
-  test("returns an empty list when the request throws", async () => {
+  test("returns null when the request throws", async () => {
     globalThis.fetch = (async () => {
       throw new Error("network blocked");
     }) as unknown as typeof fetch;
+    expect(await listBoxFolderItems("42", "scoped-token")).toBeNull();
+  });
+
+  test("returns an empty array for a folder that is genuinely empty", async () => {
+    // A freshly provisioned contract folder has no files yet and is still live content.
+    // Conflating this with a failure renders fixtures over a working workspace.
+    globalThis.fetch = (async () => ({ ok: true, json: async () => ({ entries: [] }) })) as unknown as typeof fetch;
     expect(await listBoxFolderItems("42", "scoped-token")).toEqual([]);
   });
 });
