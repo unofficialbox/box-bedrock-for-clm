@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Counter_Position_Template_ID__c</fullName>
+    <description>Box file ID of the registered Doc Gen template for the counter-position memo. Configuration rather than a caller argument, for the same reason as the clause library Hub: the agent may generate the memo, but it may not choose which template the org generates from.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Box file ID of the counter-position Doc Gen template. Set per environment; not stored in source.</inlineHelpText>
+    <label>Counter-Position Template ID</label>
+    <length>32</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

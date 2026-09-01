@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Clause_Library_Hub_Id__c</fullName>
+    <description>Box Hub ID of the approved clause library. Configuration rather than a caller argument: the agent may read the playbook, but it may not name which playbook to read.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Box Hub ID for the approved clause library. Set per environment; not stored in source.</inlineHelpText>
+    <label>Clause Library Hub ID</label>
+    <length>32</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

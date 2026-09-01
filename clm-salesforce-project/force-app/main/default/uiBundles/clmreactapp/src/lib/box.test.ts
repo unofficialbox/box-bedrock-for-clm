@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test } from "vitest";
-import { fetchBoxEmbedLink, getAgentContextPrompt, getClmPageContext, listBoxFolderItems } from "./box";
+import { fetchDownscopedBoxToken, getAgentContextPrompt, getClmPageContext, listBoxFolderItems } from "./box";
 
 describe("CLM page context", () => {
   test("uses a tenant-neutral Northstar workspace fixture by default", () => {
@@ -44,57 +44,130 @@ describe("Box folder listing", () => {
     expect(seenAuth).toBe("Bearer scoped-token");
   });
 
-  test("returns an empty list when Box rejects the request so the caller can fall back", async () => {
+  test("returns null when Box rejects the request so the caller can fall back", async () => {
     globalThis.fetch = (async () => ({ ok: false, json: async () => ({}) })) as unknown as typeof fetch;
-    expect(await listBoxFolderItems("42", "bad-token")).toEqual([]);
+    expect(await listBoxFolderItems("42", "bad-token")).toBeNull();
   });
 
-  test("returns an empty list when the request throws", async () => {
+  test("returns null when the request throws", async () => {
     globalThis.fetch = (async () => {
       throw new Error("network blocked");
     }) as unknown as typeof fetch;
+    expect(await listBoxFolderItems("42", "scoped-token")).toBeNull();
+  });
+
+  test("returns an empty array for a folder that is genuinely empty", async () => {
+    // A freshly provisioned contract folder has no files yet and is still live content.
+    // Conflating this with a failure renders fixtures over a working workspace.
+    globalThis.fetch = (async () => ({ ok: true, json: async () => ({ entries: [] }) })) as unknown as typeof fetch;
     expect(await listBoxFolderItems("42", "scoped-token")).toEqual([]);
   });
 });
 
-describe("Box embed link", () => {
+describe("Downscoped token request", () => {
   const originalFetch = globalThis.fetch;
   afterEach(() => {
     globalThis.fetch = originalFetch;
+    delete window.__CLM_RUNTIME_CONFIG__;
   });
 
-  test("requests the expiring embed link with the downscoped token", async () => {
+  test("asks by record id so the org's Box mapping picks the folder", async () => {
     let seenUrl = "";
-    let seenAuth = "";
-    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+    globalThis.fetch = (async (url: string) => {
       seenUrl = url;
-      seenAuth = String((init?.headers as Record<string, string>)?.Authorization || "");
-      return { ok: true, json: async () => ({ expiring_embed_link: { url: "https://acme.app.box.com/preview/expiring_embed/abc" } }) };
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123456789" }) };
     }) as unknown as typeof fetch;
 
-    expect(await fetchBoxEmbedLink("99", "scoped-token")).toBe(
-      "https://acme.app.box.com/preview/expiring_embed/abc",
-    );
-    // The field has to be requested explicitly; Box omits it from the default response.
-    expect(seenUrl).toContain("fields=expiring_embed_link");
-    expect(seenUrl).toContain("/2.0/files/99");
-    expect(seenAuth).toBe("Bearer scoped-token");
+    const granted = await fetchDownscopedBoxToken({
+      folderId: "demo-workspace",
+      salesforceRecordId: "a0JNS000009dn8X2AQ",
+    });
+
+    expect(seenUrl).toContain("recordId=a0JNS000009dn8X2AQ");
+    // The unusable default must not be sent alongside it.
+    expect(seenUrl).not.toContain("folderId=");
+    // The endpoint's answer wins: the caller never knew this folder.
+    expect(granted).toEqual({ accessToken: "example-scoped-token", folderId: "123456789" });
   });
 
-  test("returns empty when the token lacks item_preview, which Box reports as a 200 with no link", async () => {
-    globalThis.fetch = (async () => ({ ok: true, json: async () => ({ type: "file", id: "99" }) })) as unknown as typeof fetch;
-    expect(await fetchBoxEmbedLink("99", "scoped-token")).toBe("");
+  test("falls back to folderId when there is no record context", async () => {
+    let seenUrl = "";
+    globalThis.fetch = (async (url: string) => {
+      seenUrl = url;
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123" }) };
+    }) as unknown as typeof fetch;
+
+    await fetchDownscopedBoxToken({ folderId: "123" });
+    expect(seenUrl).toContain("folderId=123");
+    expect(seenUrl).not.toContain("recordId=");
   });
 
-  test("returns empty when Box rejects the request", async () => {
-    globalThis.fetch = (async () => ({ ok: false, text: async () => "forbidden", json: async () => ({}) })) as unknown as typeof fetch;
-    expect(await fetchBoxEmbedLink("99", "bad-token")).toBe("");
+  test("returns no folder when the endpoint refuses, so the caller shows fixtures", async () => {
+    globalThis.fetch = (async () => ({
+      ok: false,
+      status: 404,
+      text: async () => '{"error":"no_box_folder_mapping"}',
+      json: async () => ({}),
+    })) as unknown as typeof fetch;
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a0J" }))
+      .toEqual({ accessToken: "", folderId: "" });
   });
 
-  test("returns empty when the request throws", async () => {
+  test("uses the injected token from the local harness without calling Salesforce", async () => {
+    window.__CLM_RUNTIME_CONFIG__ = { boxAccessToken: "example-harness-token" };
     globalThis.fetch = (async () => {
-      throw new Error("network blocked");
+      throw new Error("must not call the endpoint");
     }) as unknown as typeof fetch;
-    expect(await fetchBoxEmbedLink("99", "scoped-token")).toBe("");
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123456789" }))
+      .toEqual({ accessToken: "example-harness-token", folderId: "123456789" });
+  });
+
+  test("provisions the record's folder when it has none, then retries", async () => {
+    // Provisioning writes the association and Apex forbids a callout after DML, so the
+    // package cannot create the folder and mint in one request. Two calls is the design,
+    // not a retry loop -- the second attempt is made once and only after provisioning.
+    const calls: string[] = [];
+    let provisioned = false;
+    globalThis.fetch = (async (url: string, init?: RequestInit) => {
+      const target = String(url);
+      calls.push(`${init?.method || "GET"} ${target}`);
+      if (target.includes("box-folder")) {
+        provisioned = true;
+        return { ok: true, json: async () => ({ folderId: "555" }) };
+      }
+      if (!provisioned) {
+        return {
+          ok: false,
+          status: 404,
+          text: async () => '{"error":"no_box_folder_mapping"}',
+          json: async () => ({}),
+        };
+      }
+      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "555" }) };
+    }) as unknown as typeof fetch;
+
+    const granted = await fetchDownscopedBoxToken({
+      folderId: "demo-workspace",
+      salesforceRecordId: "a01xx0000009abcAAA",
+    });
+
+    expect(granted).toEqual({ accessToken: "example-scoped-token", folderId: "555" });
+    expect(calls.filter((c) => c.includes("box-folder"))).toHaveLength(1);
+    expect(calls.filter((c) => c.includes("box-token"))).toHaveLength(2);
+    expect(calls[1]).toContain("POST");
+  });
+
+  test("does not provision when the failure is not a missing folder", async () => {
+    const calls: string[] = [];
+    globalThis.fetch = (async (url: string) => {
+      calls.push(String(url));
+      return { ok: false, status: 403, text: async () => '{"error":"folder_not_allowed"}', json: async () => ({}) };
+    }) as unknown as typeof fetch;
+
+    expect(await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a01xx0000009abcAAA" }))
+      .toEqual({ accessToken: "", folderId: "" });
+    expect(calls.some((c) => c.includes("box-folder"))).toBe(false);
   });
 });

@@ -74,12 +74,10 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 | 2. Plan | “AgentCore/Strands selects specialists for the evidence it needs.” | Open the trace and highlight the delegated work. | “The plan is observable and each handoff has a defined contract.” |
 | 3. Content | “Box remains authoritative for files, versions, metadata, and clauses.” | Show the governed package and cited missing-evidence result. | “Specialists reason over governed content without replacing it.” |
 | 4. Commercial truth | “Salesforce Agentforce contributes record context and native actions.” | Show Net 90 in the order form versus Net 45 on the record. | “The discrepancy is explicit and sourced; Agentforce and Salesforce are one platform role.” |
-| 5. Redlines | “Specialists turn document differences into reviewable findings.” | Show cited liability, PHI, SLA, renewal, and termination findings. | “Each finding has a domain, risk, confidence, approved position, and source.” |
 | 6. Intelligence | “Portfolio history can inform—but not decide—the negotiation.” | Show Databricks outcome and cycle-time context. | “Analytics never overwrites authoritative contract state.” |
-| 7. Ownership | “Material findings must reach qualified people.” | Show Legal, Finance, Privacy, and Security assignments. | “Low-confidence or unmapped work returns to Legal Operations triage.” |
-| 8. Workspace | “The operator should not have to chase six systems.” | Show Box context, findings, queue, and Contract Copilot together in React. | “The unified view preserves each system's authority while reducing clicks.” |
-| 9. Guardrail | “Autonomy stops at legal approval and signature.” | Attempt the premature signature path and show it blocked. | “Incomplete human approvals are a hard control, not a suggestion.” |
-| 10. Close | “After confirmation, the platform completes the governed lifecycle.” | Show generation, Sign, obligations, and returned state. | “The result is end-to-end orchestration with human authority and an auditable trace.” |
+| 8. Workspace | “The operator should not have to chase six systems.” | Show the Box package and Contract Copilot together in React. | “The unified view preserves each system's authority while reducing clicks.” |
+| 9. Guardrail | “Autonomy stops at legal approval and signature.” | Show the Copilot decline an approval or signature request and name the human owner. | “The refusal is in the agent's instructions; there is no signature path in this build to block.” |
+| 10. Close | “The governed lifecycle completes, and stops where it should.” | Generate the counter-position memo, then show signature refused on an unapproved contract. | “Generation is automatic; sending for signature is not. Obligations remain unbuilt.” |
 
 Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies structured commercial context and Salesforce-native capabilities; Box governs content; Databricks supplies analytics, not authority; humans approve concessions, signatures, and final obligations.
 
@@ -92,8 +90,6 @@ Box screenshots below come from the shared Box surface capture set; the React sc
 ### Unified React workspace
 
 ![Northstar React workspace](../../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png)
-
-![React domain-expert review queue](../../../../output/screenshots/cross-platform-agentic-orchestration/clm-react-redline-reviews.png)
 
 ### Shared governed Box context
 
@@ -123,7 +119,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 ### Component and authority contract
 
-- Box governs the contract package, versions, metadata, tasks, Doc Gen, Sign, and audit history.
+- Box governs the contract package, versions, metadata, tasks, the approved clause library Hub, Doc Gen, Sign, and audit history.
 - Salesforce `CLM_Contract__c` governs structured commercial context and Box references.
 - Salesforce intake is designed around a `Contract_ID__c` external-ID upsert followed by lookup so retries cannot create duplicate records. The live Box Automate workflow currently performs a plain record create instead, which is not idempotent; restore the upsert before making a duplicate-safety claim.
 - Agentforce may retrieve, summarize, compare, explain, recommend, draft, and route. It cannot approve a legal position or authorize signature.

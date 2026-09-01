@@ -1,149 +1,171 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useState } from "react";
+import { ArrowLeft } from "lucide-react";
+import BoxAnnotations from "box-annotations";
 import { IntlProvider } from "react-intl";
-import { Eye, LockKeyhole, Upload } from "lucide-react";
-import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
-import ContentUploader from "box-ui-elements/es/elements/content-uploader";
-import "box-ui-elements/dist/explorer.css";
-import "box-ui-elements/dist/uploader.css";
-import { BoxDocumentPreview } from "./BoxDocumentPreview";
-import { listBoxFolderItems, type BoxFolderItem } from "../lib/box";
+import { MemoryRouter } from "react-router-dom";
+import "box-ui-elements/dist/preview.css";
+import type { BoxFolderItem } from "../lib/box";
+import { installBoxPreview } from "../lib/boxPreviewRuntime";
+import { BoxDocumentTable } from "./BoxDocumentTable";
+
+// Before ContentPreview mounts, so it finds the library already there and never reaches
+// for the CDN script the site's CSP blocks.
+installBoxPreview();
 
 /**
- * Box UI Elements mounted on the same downscoped token the preview uses.
- *
- * These are the npm React components rather than the prebuilt standalone bundles.
- * The standalone builds embed their own React, which would run a second React
- * instance alongside the app's; importing keeps one React and lets Vite code-split.
- *
- * Both elements are bounded by the token, not by these props: the token is scoped to
- * one folder and to base_explorer,item_preview,item_read,item_upload, so the browser
- * cannot reach content outside the governed workspace even if a prop is wrong.
+ * Several megabytes on its own, and only needed once a document is opened, so it stays
+ * behind its own chunk.
  */
-export function BoxElements({ folderId, token }: { folderId: string; token: string }) {
-  const [uploaderOpen, setUploaderOpen] = useState(false);
-  // Remount the explorer after an upload so the new item appears without a reload.
-  const [refreshKey, setRefreshKey] = useState(0);
+const ContentPreview = lazy(() =>
+  import("box-ui-elements/es/elements/content-preview").then((module) => ({
+    default: module.default,
+  })),
+);
+
+/**
+ * ContentPreview expects a BoxAnnotations instance and does not build one itself.
+ * Constructed once at module scope: it is stateful, and a per-render instance would
+ * drop the annotator between previews.
+ */
+const boxAnnotations = new BoxAnnotations({});
+
+/**
+ * Only the stylesheet, not the library.
+ *
+ * The renderer itself is bundled from npm (see `boxPreviewRuntime`) at 3.85.0, so
+ * `loadScript` never runs. `loadStylesheet` has no such guard and always appends a
+ * `<link>` at this version, and style-src does allow the Box CDN -- but the CDN's newest
+ * published release is 3.83.0 (3.84.0 and 3.85.0 both 404 there, even though npm ships
+ * them and the package README documents those URLs). Pinning to what the CDN actually
+ * serves keeps that link from 404ing; the matching 3.85.0 stylesheet is bundled too, so
+ * preview is still styled if the CDN is unreachable.
+ */
+const PREVIEW_STYLESHEET_VERSION = "3.83.0";
+
+/** How long to wait for the renderer before saying so rather than showing a blank frame. */
+const PREVIEW_LOAD_TIMEOUT_MS = 15000;
+
+/**
+ * Whether Box Content Preview actually reached the page.
+ *
+ * ContentPreview waits for `global.Box.Preview` forever and renders an empty frame if it
+ * never appears, reporting nothing. `installBoxPreview` seeds it from the bundle, so this
+ * should not fire -- but a silent blank panel is the one failure mode this component has
+ * already produced three different ways, and it is worth naming rather than staring at.
+ */
+function usePreviewLibrary(): "loading" | "ready" | "blocked" {
+  const [state, setState] = useState<"loading" | "ready" | "blocked">("loading");
+
+  useEffect(() => {
+    const previewGlobal = () =>
+      (globalThis as { Box?: { Preview?: unknown } }).Box?.Preview !== undefined;
+    // Polled rather than checked once up front: the script may already be cached from an
+    // earlier preview, and the poll covers that case on its first tick.
+    const poll = setInterval(() => {
+      if (previewGlobal()) {
+        setState("ready");
+        clearInterval(poll);
+      }
+    }, 250);
+    const giveUp = setTimeout(() => {
+      clearInterval(poll);
+      setState((current) => (current === "ready" ? current : "blocked"));
+    }, PREVIEW_LOAD_TIMEOUT_MS);
+    return () => {
+      clearInterval(poll);
+      clearTimeout(giveUp);
+    };
+  }, []);
+
+  return state;
+}
+
+/**
+ * The Box workspace: the folder's documents, and the one being read.
+ *
+ * Content Explorer is deliberately not used here. It renders in its small/touch layout in
+ * this embedding whatever the container width, and its ItemList only opens a file when
+ * `!isTouch`, so a click on a file never reached preview. Listing the folder ourselves and
+ * mounting ContentPreview directly is the pattern the qualitypilot workspace uses, and it
+ * puts the file activation in our hands.
+ *
+ * The token bounds all of it: it is downscoped to this one folder.
+ */
+export function BoxElements({
+  folderId,
+  token,
+  files,
+}: {
+  folderId: string;
+  token: string;
+  files: BoxFolderItem[];
+}) {
   const [selected, setSelected] = useState<BoxFolderItem | null>(null);
-  const [folderInView, setFolderInView] = useState(folderId);
-  const [previewable, setPreviewable] = useState<BoxFolderItem[]>([]);
 
   /**
-   * Track the files in whichever folder the explorer is showing, so the picker offers
-   * the documents the user is actually looking at.
+   * Preview gets the token as a function, not the string.
    *
-   * The picker exists because ContentExplorer will not surrender a file click on its
-   * own terms. Its ItemList only calls onItemClick for a file when `canPreview` is on,
-   * and turning that on also mounts its preview dialog, which has no library to load
-   * here and fails to a "Sad Box Cloud" modal. There is no prop that separates the two,
-   * so the trigger lives outside the explorer.
+   * ContentPreview forwards whatever it is given straight through as `annotatorToken`,
+   * and Box Content Preview 3.x rejects anything that is not a function --
+   * `if (annotatorToken !== undefined && typeof annotatorToken !== "function") throw new
+   * Error("Bad annotatorToken!")`. That throw aborts the whole viewer, so a string token
+   * renders an empty frame with no visible error. Memoized so preview is not torn down
+   * and re-initialized on every render.
    */
-  useEffect(() => {
-    let active = true;
-    listBoxFolderItems(folderInView, token).then((items) => {
-      if (active) setPreviewable(items);
-    });
-    return () => {
-      active = false;
-    };
-  }, [folderInView, token, refreshKey]);
+  const tokenProvider = useCallback(() => token, [token]);
+  const library = usePreviewLibrary();
 
   if (!token || !folderId) {
     return null;
   }
 
   return (
-    // box-ui-elements components read from react-intl context and throw
-    // "Could not find required `intl` object" without a provider above them. Empty
-    // messages fall back to each component's defaultMessage, which is English.
+    // box-ui-elements reads from react-intl context and throws "Could not find required
+    // `intl` object" without a provider above it.
     <IntlProvider locale="en" messages={{}}>
-    <section className="box-elements" data-testid="box-elements">
-      {/* No heading here: BoxWorkspace already renders the folder header above. */}
-      <div className="box-elements-toolbar">
-        {previewable.length > 0 ? (
-          <label className="box-preview-picker">
-            <Eye size={15} />
-            <span className="visually-hidden">Preview a document</span>
-            <select
-              value={selected?.id || ""}
-              onChange={(event) => {
-                const file = previewable.find((item) => item.id === event.target.value);
-                setSelected(file || null);
-              }}
-              data-testid="box-preview-picker"
-            >
-              <option value="">Preview a document…</option>
-              {previewable.map((file) => (
-                <option key={file.id} value={file.id}>
-                  {file.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
-
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => setUploaderOpen((open) => !open)}
-          data-testid="box-uploader-toggle"
-        >
-          <Upload size={15} /> {uploaderOpen ? "Close uploader" : "Add documents"}
-        </button>
-      </div>
-
-      {selected ? (
-        <BoxDocumentPreview
-          key={selected.id}
-          fileId={selected.id}
-          fileName={selected.name}
-          token={token}
-          onClose={() => setSelected(null)}
-        />
-      ) : null}
-
-      {uploaderOpen ? (
-        <div className="box-element-host" data-testid="box-content-uploader">
-          <ContentUploader
-            token={token}
-            rootFolderId={folderId}
-            onComplete={() => {
-              setRefreshKey((key) => key + 1);
-              setUploaderOpen(false);
-            }}
-            onClose={() => setUploaderOpen(false)}
-          />
-        </div>
-      ) : null}
-
-      <div className="box-element-host" data-testid="box-content-explorer">
-        <ContentExplorer
-          key={refreshKey}
-          token={token}
-          rootFolderId={folderId}
-          // Must stay off. It loads Box Content Preview from cdn01.boxcdn.net, which the
-          // Experience Cloud CSP blocks under script-src -- the wall cf3b54a hit -- and
-          // the dialog then renders a "Sad Box Cloud" error over the workspace.
-          canPreview={false}
-          // Follow the explorer so the picker lists the folder on screen.
-          onNavigate={(item) => {
-            setFolderInView(item.id);
-            // A preview from the previous folder should not outlive the navigation.
-            setSelected(null);
-          }}
-          canUpload
-          canCreateNewFolder={false}
-          canDelete={false}
-          canRename={false}
-          canShare={false}
-          canDownload={false}
-        />
-      </div>
-
-      <div className="secure-note">
-        <LockKeyhole size={15} /> Browser source contains no Box client secret; the token is
-        scoped to this folder.
-      </div>
-    </section>
+      <section className="box-elements" data-testid="box-elements">
+        {selected ? (
+          <div className="box-preview-pane" data-testid="box-preview-pane">
+            <div className="box-preview-bar">
+              <button type="button" className="secondary-button" onClick={() => setSelected(null)}>
+                <ArrowLeft size={15} /> All documents
+              </button>
+              <span className="box-preview-name">{selected.name}</span>
+            </div>
+            <div className="box-element-host">
+              {library === "blocked" ? (
+                <div className="workspace-state" data-testid="box-preview-blocked">
+                  Box Content Preview did not initialize. The renderer is bundled with
+                  {" "}this app, so this is not the CDN or the page CSP — check the console.
+                </div>
+              ) : null}
+              <Suspense fallback={<div className="workspace-state">Loading preview…</div>}>
+                {/*
+                  The annotations layer is wrapped in react-router's withRouter and throws
+                  "You should not use <withRouter(WithAnnotations(Component))/> outside a
+                  <Router>" without routing context above it. box-ui-elements supplies one
+                  only when a sidebar is mounted, which this view does not use, so the
+                  preview provides its own. Memory history, not browser history: the
+                  workspace owns the URL and preview must not push to it.
+                */}
+                <MemoryRouter>
+                  <ContentPreview
+                    token={tokenProvider}
+                    fileId={selected.id}
+                    boxAnnotations={boxAnnotations}
+                    previewLibraryVersion={PREVIEW_STYLESHEET_VERSION}
+                    hasHeader={false}
+                  />
+                </MemoryRouter>
+              </Suspense>
+            </div>
+          </div>
+        ) : (
+          <div className="box-table-host">
+            <BoxDocumentTable files={files} onSelect={setSelected} />
+          </div>
+        )}
+      </section>
     </IntlProvider>
   );
 }

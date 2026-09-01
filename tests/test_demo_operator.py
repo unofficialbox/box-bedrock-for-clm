@@ -138,7 +138,12 @@ class DemoOperatorTests(unittest.TestCase):
         self.assertEqual(network.findtext("m:picassoSite", namespaces=namespace), "CLM_Experience1")
         self.assertEqual(site.findtext("m:active", namespaces=namespace), "true")
         self.assertEqual(experience_config.findtext("m:space", namespaces=namespace), "site/CLM_Experience1")
-        self.assertEqual(experience_content["contentBody"]["authenticationType"], "AUTHENTICATED")
+        # Public access enabled deliberately: it is what the working reference org uses,
+        # and Lightning Out could not load its iframe without it.
+        self.assertEqual(
+            experience_content["contentBody"]["authenticationType"],
+            "AUTHENTICATED_WITH_PUBLIC_ACCESS_ENABLED",
+        )
         self.assertEqual(experience_content["contentBody"]["appSpace"], "c__clmreactapp")
 
     def test_salesforce_deploy_duplicate_permission_set_assignment_is_tolerated(self):

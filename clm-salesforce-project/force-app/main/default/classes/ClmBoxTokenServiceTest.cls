@@ -52,15 +52,35 @@ private class ClmBoxTokenServiceTest {
     }
 
     private static void call(String folderId) {
+        callWith(folderId, null);
+    }
+
+    private static void callWith(String folderId, String recordId) {
         RestRequest request = new RestRequest();
         request.requestURI = '/services/apexrest/clm/box-token';
         request.httpMethod = 'GET';
         if (folderId != null) {
             request.addParameter('folderId', folderId);
         }
+        if (recordId != null) {
+            request.addParameter('recordId', recordId);
+        }
         RestContext.request = request;
         RestContext.response = new RestResponse();
         ClmBoxTokenService.getDownscopedToken();
+    }
+
+    /** A record-to-folder association as the Box for Salesforce package stores it. */
+    private static Id mapRecordToFolder(String folderId) {
+        CLM_Contract__c contract = new CLM_Contract__c(Name = 'Northstar MSA');
+        insert contract;
+        insert new box__FRUP__c(
+            box__Record_ID__c = contract.Id,
+            box__Record_ID_Indexed__c = contract.Id,
+            box__Object_Name__c = 'CLM_Contract__c',
+            box__Folder_ID__c = folderId
+        );
+        return contract.Id;
     }
 
     private static Map<String, Object> body() {
@@ -85,8 +105,14 @@ private class ClmBoxTokenServiceTest {
         String scope = (String) payload.get('scope');
         System.assert(scope.contains('item_preview') && scope.contains('item_upload'),
             'The workspace needs preview and upload scopes for the embedded Box elements');
-        System.assert(!scope.contains('item_delete') && !scope.contains('item_share'),
-            'Delete and share must stay out of a browser token');
+        // The workspace offers delete, rename and share, so the token has to honour them:
+        // a control that is shown but unscoped fails at the point of use instead of being
+        // absent. The token is still bound to one folder, so this widens what may be done
+        // inside that folder and nothing outside it.
+        System.assert(scope.contains('item_delete') && scope.contains('item_share'),
+            'The enabled Box controls need delete and share, or they fail when used');
+        System.assert(!scope.contains('root_readwrite') && !scope.contains('manage_'),
+            'A browser token must never carry enterprise-wide or management scopes');
         // Box rejects a comma separated list as one unsupported scope name, and only
         // when more than one scope is requested -- each value is valid on its own.
         System.assert(!scope.contains(','),
@@ -256,5 +282,94 @@ private class ClmBoxTokenServiceTest {
 
         System.assertEquals(500, RestContext.response.statusCode, 'A record with no subject must fail closed');
         System.assertEquals('box_not_configured', body().get('error'));
+    }
+
+    @IsTest
+    static void resolvesTheFolderFromTheBoxRecordMapping() {
+        configure(null);
+        Id recordId = mapRecordToFolder(FOLDER_ID);
+        BoxMock mock = okMock();
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        callWith(null, recordId);
+        Test.stopTest();
+
+        System.assertEquals(200, RestContext.response.statusCode, 'A mapped record must mint a token');
+        System.assertEquals(FOLDER_ID, body().get('folderId'),
+            'The folder must come from the Box mapping, not from the caller');
+        System.assert(mock.bodies[1].contains(EncodingUtil.urlEncode(FOLDER_ID, 'UTF-8')),
+            'The downscope resource must name the mapped folder');
+    }
+
+    @IsTest
+    static void reportsARecordWithNoBoxFolderRatherThanProvisioningOne() {
+        // Provisioning writes the association, and Apex refuses a callout after DML, so
+        // it cannot happen here. The client calls ClmBoxFolderService and retries.
+        configure(null);
+        CLM_Contract__c contract = new CLM_Contract__c(Name = 'Unmapped');
+        insert contract;
+
+        Test.startTest();
+        callWith(null, contract.Id);
+        Test.stopTest();
+
+        System.assertEquals(404, RestContext.response.statusCode, 'An unmapped record must not mint a token');
+        System.assertEquals('no_box_folder_mapping', body().get('error'));
+    }
+
+    @IsTest
+    static void rejectsARecordIdThatIsNotAnId() {
+        configure(null);
+
+        Test.startTest();
+        callWith(null, 'demo-workspace');
+        Test.stopTest();
+
+        System.assertEquals(400, RestContext.response.statusCode, 'A malformed record id must fail before any callout');
+        System.assertEquals('invalid_record_id', body().get('error'));
+    }
+
+    @IsTest
+    static void doesNotApplyTheAllowlistToAFolderReachedThroughARecord() {
+        // The allowlist bounds what a caller may name. A record's own folder is chosen by
+        // the record, and the package provisions folders that no list could enumerate in
+        // advance, so the list must not gate that path.
+        configure('999');
+        Id recordId = mapRecordToFolder(FOLDER_ID);
+        Test.setMock(HttpCalloutMock.class, okMock());
+
+        Test.startTest();
+        callWith(null, recordId);
+        Test.stopTest();
+
+        System.assertEquals(200, RestContext.response.statusCode,
+            'A record-resolved folder is bounded by the record, not the allowlist');
+        System.assertEquals(FOLDER_ID, body().get('folderId'));
+    }
+
+    @IsTest
+    static void stillAppliesTheAllowlistToACallerSuppliedFolder() {
+        configure('999');
+
+        Test.startTest();
+        call(FOLDER_ID);
+        Test.stopTest();
+
+        System.assertEquals(403, RestContext.response.statusCode,
+            'A folder named by the caller must still be checked against the allowlist');
+        System.assertEquals('folder_not_allowed', body().get('error'));
+    }
+
+    @IsTest
+    static void reportsWhenNeitherRecordNorFolderIsGiven() {
+        configure(null);
+
+        Test.startTest();
+        callWith(null, null);
+        Test.stopTest();
+
+        System.assertEquals(400, RestContext.response.statusCode);
+        System.assertEquals('missing_folder_id', body().get('error'));
     }
 }

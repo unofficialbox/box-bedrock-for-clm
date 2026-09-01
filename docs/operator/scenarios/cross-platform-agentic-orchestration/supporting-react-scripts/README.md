@@ -4,9 +4,8 @@ These scripts present the React portion of Cross-Platform Agentic Orchestration 
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|
-| [Executive walkthrough](01-executive-walkthrough.md) | 10-12 minutes | Executives, business sponsors, first meetings | Show the value and human-control model quickly |
-| [Legal operations walkthrough](02-legal-operations-walkthrough.md) | 30-35 minutes | Legal Ops, Sales Ops, Finance, Privacy, Security | Demonstrate the complete contract-review and approval workflow |
-| [Technical validation](03-technical-validation.md) | 20-30 minutes | Architects, Salesforce teams, security, developers | Prove runtime boundaries, token handling, actions, and guardrails |
+| [Executive walkthrough](01-executive-walkthrough.md) | 5-6 minutes | Executives, business sponsors, first meetings | Read customer paper against the governed clause library, and show the counterparty boundary |
+| [Technical validation](03-technical-validation.md) | 15-20 minutes | Architects, Salesforce teams, security, developers | Prove credential, CSP, sharing, and MCP boundaries -- and name the one that is not enforceable |
 | [Box metadata entry-point variation](04-box-metadata-automate-entry.md) | 5-7 minutes | Any audience | Start with a contract uploaded to `01 - Intake` and `clmContract` metadata applied, then Automate enrichment, human validation, and HTTPS Connector record creation |
 
 Supporting artifacts:
@@ -20,8 +19,8 @@ Supporting artifacts:
 
 | Layer | Responsibility |
 |---|---|
-| React UI Bundle | Contract context, governed Box content, cited findings, expert queues, and Agentforce conversation |
-| Box | Files, versions, metadata, review tasks, Doc Gen, Sign, and audit history |
+| React UI Bundle | The counterparty's surface: their contracts, governed Box content, and the Copilot |
+| Box | Files, versions, metadata, the approved clause library Hub, and audit history |
 | Salesforce | `CLM_Contract__c` structured context and approval state |
 | Agentforce | Cited retrieval, comparison, explanation, draft preparation, and confirmed actions |
 | Human reviewers | Legal positions, commercial concessions, task completion, generation, and signature authorization |
@@ -34,7 +33,7 @@ Supporting artifacts:
 4. Confirm the application resolves `recordId`, `contractId`, and `folderId` without browser secrets.
 5. Confirm material answers cite Box files and approval state matches human-owned tasks.
 6. Confirm one open task is reused per contract, redline file, and review domain.
-7. Confirm document generation requires presenter confirmation and signature remains blocked while reviews are incomplete.
+7. Doc Gen generates into the contract's own folder; Box Sign only ever *prepares* a request and refuses an unapproved contract. Never describe a signature request as sent.
 8. Keep managed AgentCore and Databricks claims outside these supporting scripts; the parent scenario owns that evidence.
 
 ## Shared presenter rule

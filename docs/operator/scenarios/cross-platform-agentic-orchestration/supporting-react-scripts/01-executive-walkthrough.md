@@ -1,106 +1,255 @@
-# Executive Demo: Governed Contract Decisions
+# Executive Demo: Reading Customer Paper Against Governed Positions
 
 ## Demo card
 
 | Item | Value |
-|---|---|
-| Duration | 10-12 minutes |
+|---|---:|
+| Duration | 5-6 minutes |
 | Audience | General counsel, CRO, CIO, legal and sales leadership |
-| Scenario | Acme Robotics negotiates a $2.4M ARR MSA package with Northstar Health |
-| Experience | Salesforce Multi-Framework React app with Box content and Agentforce |
-| Core message | AI compresses review time while Box preserves evidence and humans retain decision rights |
+| Scenario | Calder Financial Group sends **its own** MSA template; Acme must decide what to push back on |
+| Internal surface | Claude Desktop over the Salesforce and Box MCP servers |
+| External surface | Experience Cloud site, scoped to one counterparty |
+| Core message | The exposure is not where a diff or a keyword search would look. Only reading the document against a governed clause library finds it. |
+
+## The problem this opens on
+
+Enterprise deals close on the customer's template, not yours. Every negotiated MSA comes back
+with different payment terms, liability caps, renewal notice periods and termination rights.
+That information drives revenue recognition, the renewal motion and risk exposure -- and it
+exists only inside a document, sitting outside the systems and the permissions your agents
+draw from.
+
+## Why this scenario
+
+Acme is on **customer paper**. There is no Acme template to diff against, the document has no
+section called "Limitation of Liability", and a keyword search for that phrase returns nothing.
+The uncapped exposure lives in two places that only mean something when read together --
+Article 19.2 and a sub-clause buried in General Provisions at 22.4. That is the demo: a
+CRM record and a full-text search cannot answer this, and a governed clause library can.
+
+## Scope of this telling
+
+Generation and signature are real here, with one deliberate limit. Box Doc Gen writes the
+counter-position memo into the contract's own folder. Box Sign **prepares** a signature
+request and returns a URL -- it sends nothing, and it refuses outright on a contract that
+has not been approved. Nothing in this script writes back to the contract record; that
+remains unbuilt. Every beat below is verified against the live org and live Box.
 
 ## Pre-demo state
 
-- Prepare a validated intake: a contract uploaded to `01 - Intake` with `clmContract` metadata applied, plus the Salesforce standard REST OAuth 2.0 connection.
-- Open the React workspace with the test contract and generated Box workspace folder.
-- Keep the **Workspace** view selected.
-- Confirm the Northstar banner shows **Critical** risk and **Approval blocked** status.
-- Do not complete any of the three Box review tasks before the demo.
+| Check | How |
+|---|---|
+| Three Calder contracts exist: `CLM-SAMPLE-CAL-2022`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
+| Calder contract has a Box folder with a **direct** collaboration for the configured Box user | `GET /2.0/folders/<id>/collaborations` -- inherited access does not downscope |
+| `clmDocument` metadata applied to the Calder and Northstar documents | Otherwise beat 2's query returns nothing |
+| `CLM_Box_Config__c.Clause_Library_Hub_Id__c` is populated and the Hub holds the `CLM-LIAB-*` clauses | Beat 3 depends on it entirely |
+| Claude Desktop connected to the `CLMContractTools` MCP server, tools listed | `listContracts`, `getContractPackage`, `askContractDocument` |
+| Counterparty user can sign in to the site | See **Known constraints** -- Login As is unavailable for this licence |
+| `CLM_Box_Config__c.Counter_Position_Template_ID__c` names a registered Box Doc Gen template | Beat 5 refuses without it |
+| The demo contract is in **Legal Review** | Beat 5's refusal depends on it |
+
+Open two windows before you start: Claude Desktop on the internal side, a private browser
+window for the counterparty. Do not switch accounts on stage.
 
 ## Script
 
-### Act 0 — Create the contract record (2 minutes)
-
-**Show**
-
-- Open the validated Box intake (a contract in `01 - Intake` with `clmContract` metadata applied).
-- Show the Automate approval gate, then the approved HTTPS branch.
-- Show the newly created Salesforce CLM record and returned record ID.
-- Open React with `recordId`, `contractId`, and `folderId=<returned boxFolderId>`.
-
-**Land**
-
-The structured Salesforce record is created only after a human validates the Extract and Box Agent output. Box remains the source for contract content.
-
-### Act 1 — One contract workspace (2 minutes)
+### Beat 1 — Their paper arrives (45 seconds)
 
 **Say**
 
-> Contract teams should not have to reconstruct deal context from email, CRM notes, and local copies. This workspace combines the commercial context with the governed contract package in Box.
+> Calder sent us their standard form. Their legal team does not accept supplier paper, so
+> this is the document we are negotiating.
 
 **Show**
 
-- Northstar Health MSA, `$2.4M ARR`, 36-month term.
-- The live Box workspace and the MSA, DPA, SOW, and order form.
-- Critical and high-risk labels.
+- The contract's Box folder and `calder-msa-customer-paper-v2.pdf` in the workspace preview.
+- Scroll the contents: Articles 1, 2, 3, 6, 11, 14, 19, 20, 22. **There is no Limitation of Liability section.**
 
 **Land**
 
-Box remains the content system of record. The React app is the work surface, not another document repository.
+One folder per contract, provisioned and governed by Box. The commercial record lives in
+Salesforce; the document never leaves Box.
 
-### Act 2 — Ask Agentforce for a cited briefing (3 minutes)
+### Beat 2 — The portfolio already knows what is risky (45 seconds)
+
+**Say**
+
+> Before anyone reads a page, the content itself has been classified.
+
+**Show**
+
+- One `search_files_metadata` query against the `clmDocument` template, `clauseRisk = Critical`.
+- Two files come back, on **two different papers** -- the Northstar redline and the Calder draft.
+
+**Land**
+
+Box metadata is the retrieval index. This is one query, not a folder listing and nine reads.
+`documentType` makes "find the insurance certificate" deterministic instead of a filename guess.
+
+**Presenter honesty:** this tagging was applied by hand. A metadata cascade policy on the
+contract folder is what makes it survive the next contract, and that is not built yet.
+
+### Beat 3 — Read it against our approved positions (90 seconds)
+
+This is the beat the demo exists for. Run it in Claude Desktop.
 
 **Prompt**
 
-> Summarize the Northstar contract package, identify the three most material risks, and cite the Box source file for each finding.
+> Where is Acme's liability exposure in the Calder agreement, and how does it compare to our
+> approved position? Cite the clause library.
 
 **Expected response**
 
-- Unlimited liability and renewal ambiguity from the MSA redline.
-- PHI and security obligations from the DPA/security exhibit.
-- Net 90 versus expected Net 45 from the order form.
-- File-level citations for every material claim.
+- Exposure at **19.2** -- the indemnities are primary obligations, survive without limit of
+  time, and are expressly *not* subject to any limitation elsewhere in the agreement.
+- Exposure at **22.4** -- "Responsibility for Losses", which states no financial cap applies
+  to the Supplier, and caps Calder's own liability at unpaid invoiced charges.
+- Approved position **CLM-LIAB-001**: aggregate liability capped at 12 months' fees.
+- Approved fallback **CLM-LIAB-002**: 24 months.
+- Uncapped liability is **not an approved position**; deviation is owned by **Commercial Legal**.
 
 **Land**
 
-Agentforce accelerates comprehension without moving the source content into a separate AI platform.
+> A template diff cannot find this -- there is no Acme template to diff against. A keyword
+> search for "limitation of liability" returns nothing, because the phrase does not appear.
+> The document had to be read against a governed library of what we have already approved,
+> and the answer came back with the clause ID and the owner attached.
 
-### Act 3 — Route redlines to the right experts (3 minutes)
+**Then say what it costs.** A redline like this is what holds up signature and pushes a deal
+out of the forecasted quarter. The point is not that the agent found it -- it is that legal
+now has the approved fallback and the named owner in the same answer, which is what removes
+a week of back-and-forth.
 
-**Show**
+Verified live on 2026-09-01: the Hub returns exactly these positions with file-level citations.
 
-- Select **Redline reviews**.
-- Point to the cited differences grouped under Commercial Legal, Finance, and Privacy.
-- Show the named domain expert, Box task ID, confidence, and before/after clause position.
-- Point to **Signature blocked**.
+### Beat 4 — What they agreed the last two times (45 seconds)
+
+The clause library says the position is off-policy. This says something better.
 
 **Prompt**
 
-> Explain why signature is blocked, who owns each decision, and what evidence each reviewer should inspect.
+> Compare clause 22.4 and clause 19.2 across Calder's executed agreements and this draft.
+> What did they actually agree before?
+
+**Expected response**
+
+- **2022** and **2024** both carry a negotiated 22.4: an aggregate cap at **24 months** of
+  charges, with 19.2 making the indemnities subject to that cap except for IP infringement
+  and data-breach claims, which stay uncapped.
+- Both record the departure in a **Schedule 1** of agreed amendments to Calder's own
+  standard form.
+- The **2026** draft restores the unamended house text of both clauses.
 
 **Land**
 
-Agentforce explains and classifies the work. The maintained expert directory controls assignment, uncertain findings go to Legal Operations triage, and only humans complete approvals.
+> Calder is not asking for something new. Their template regressed two positions their own
+> legal team conceded, in writing, twice. That is not a policy argument any more -- it is a
+> course-of-dealing argument, and it is the one that actually moves a negotiation.
 
-### Act 4 — Prepare, do not decide (2 minutes)
+Verified live on 2026-09-01 across all three documents, with per-file citations.
 
-**Say**
+### Beat 5 — Put the position on paper, and stop there (60 seconds)
 
-> Once the reviewers are ready, Agentforce can prepare the approval memo using the governed Box DocGen template. Creating that draft still requires confirmation.
+**Prompt**
+
+> Draft the counter-position memo for this contract.
 
 **Show**
 
-- The generated approval memo Doc Gen template.
-- Explain that Box Sign remains blocked until the live Box tasks are complete.
+- `counter-position-CLM-SAMPLE-CAL-2026.pdf` appearing in the contract's own Box folder.
+- The memo: clause at issue, what their draft says, `CLM-LIAB-001` and the `CLM-LIAB-002`
+  fallback, **Commercial Legal** as the deviation owner, the precedent, the proposed
+  counter-position.
+
+**Land**
+
+> Nothing on that page was typed. The approved position came from the clause library, the
+> precedent from the executed agreements, the contract facts from the Salesforce record. The
+> memo is generated into the folder it belongs to, and it says on its face that it is a
+> draft and approves nothing.
+
+**Then show the boundary.** Ask for it to be sent for signature:
+
+> Contract CLM-SAMPLE-CAL-2026 is Legal Review, not approved for signature. Signature is
+> blocked until the named approver completes their review; I cannot move it forward myself.
+
+That refusal is a state check in Apex, not a prompt instruction. Once the contract *is*
+approved, the action still only *prepares* the request and hands back a URL -- a person
+opens it, sees the signer, and presses send. Verified live in all three states.
+
+### Beat 6 — The same platform, scoped to the other side (60 seconds)
+
+**Say**
+
+> The counterparty gets a view of the same governed content, bounded to what is theirs.
+
+**Show**
+
+- The Experience Cloud site signed in as the Northstar contact.
+- Their four Northstar contracts. No Calder, no Acme-internal record.
+
+**Land**
+
+> Same content, same page, a different person -- and a different result. Nobody configured a
+> view for them. Record access is enforced by a Salesforce sharing set on
+> `Counterparty_Account__c`, the query runs `with sharing`, and the Box token is downscoped
+> to one folder. The analysis from beat 3 -- our positions, our fallbacks, our owner -- never
+> crosses to this side.
+
+**Do not extend this claim to the agent.** The workspace is scoped by the signed-in identity;
+the Copilot is not, and cannot be on this surface. See **Known constraints**.
+
+**Presenter warning:** do not invite the audience to prompt the Copilot here. See
+**Known constraints**.
 
 ## Close
 
-> This is a focused CLM experience: Box governs the contract record, Agentforce helps people understand and prepare the work, and the React app makes the process visible. There is no separate agent runtime, analytics platform, or shadow content store in this variation.
+> Salesforce holds the commercial record. Box governs the content and the approved positions.
+> The internal team works headlessly through MCP, the counterparty works through the portal,
+> and the boundary between them is enforced by the platforms, not by the prompt.
 
 ## Pass criteria
 
-- The audience sees the Salesforce CLM record created from validated intake, then one contract workspace with the live Box package.
-- Agentforce produces source-cited findings.
-- Three named domain experts and their human-owned task queues remain visible.
-- No automated approval or signature action is shown.
+1. The Calder document renders from live Box, and the audience sees no Limitation of Liability heading.
+2. One metadata query returns critical documents across two contracts.
+3. The clause-library answer names 19.2, 22.4, `CLM-LIAB-001`, `CLM-LIAB-002`, and Commercial Legal.
+4. The precedent answer names the 24-month cap in both executed agreements and the reversion in the draft.
+5. The memo is generated into the contract's own folder with no unresolved template tags.
+6. The signature request is refused while the contract is in Legal Review.
+7. The counterparty view shows only that counterparty's contracts.
+
+## Known constraints
+
+Read these before presenting. Each is a real limitation, not a setup error.
+
+- **The Contract Copilot is not identity-scoped.** It is a Service Agent
+  (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its assigned agent user, and its
+  contract argument is filled from the conversation -- so a counterparty can ask it about
+  another company's contract by naming it. The scoping in beat 4 is the *workspace*, not the
+  agent. Keep the Copilot out of the counterparty half of this demo.
+
+  This is a property of the agent type, not of Agentforce. An **Employee Agent** inherits the
+  permissions of the logged-in user and takes no agent user, which is the surface where
+  "same agent, different access" would hold.
+- **Login As is unavailable for the counterparty user.** The Customer Community licence does
+  not offer it, and the org preference is already enabled. Set the user's password by reset
+  and sign in to the site in a private window instead.
+- **Contract folders need a direct Box collaboration.** A freshly provisioned folder inherits
+  access, which is not enough to downscope a token; the workspace falls back to fixtures with
+  an `invalid_resource` error that reads like a scope problem. `ClmBoxFolderService` grants it
+  on provisioning -- verify it for any folder created another way.
+- **The `clmContract` template is not applied to folders**, so contract-level facts are not
+  searchable and beat 2 stays at document level.
+
+## Where this story goes next
+
+The remaining gap is **write-back**: no Apex updates the contract record, so nothing the
+agent learns in beats 3 to 5 lands as structured data on `CLM_Contract__c`. That is what
+would let the record drive the renewal and finance work that comes after signature.
+
+## References
+
+- [Cross-platform agentic orchestration scenario](../README.md)
+- [Salesforce record contract](../../../../use-case-creator/salesforce-record-contract.md)
+- [Operator setup and activation](../../../start-here.md)
+- [Supporting React scripts](README.md)

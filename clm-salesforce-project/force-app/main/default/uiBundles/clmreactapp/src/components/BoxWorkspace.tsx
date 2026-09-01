@@ -1,8 +1,8 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ExternalLink, FileText, FolderOpen, LockKeyhole } from "lucide-react";
+import { ExternalLink, FileText, FolderOpen } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
-import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem } from "../lib/box";
+import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem, type ClmPageContext } from "../lib/box";
 
 /**
  * Loaded lazily to keep box-ui-elements out of the initial bundle. It is several
@@ -13,29 +13,35 @@ const BoxElements = lazy(() =>
   import("./BoxElements").then((module) => ({ default: module.BoxElements })),
 );
 
-export function BoxWorkspace({ folderId }: { folderId: string }) {
+export function BoxWorkspace({ context }: { context: ClmPageContext }) {
   const [token, setToken] = useState("");
-  const [files, setFiles] = useState<BoxFolderItem[]>([]);
+  const [folderId, setFolderId] = useState("");
+  const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   /**
    * Resolve the governed token, then probe the folder.
    *
-   * ContentExplorer fetches its own listing, so this call is a liveness check rather
-   * than the source of what gets rendered: it decides between live Box content and the
-   * synthetic fixtures, and it logs why when Box refuses.
+   * The folder is an output, not an input: with a record id the endpoint reads the Box
+   * for Salesforce association and tells us which folder it minted for. Everything below
+   * uses that answer rather than anything the URL supplied.
+   *
+   * The listing does double duty: it decides between live Box content and the synthetic
+   * fixtures (and logs why when Box refuses), and it is the table the workspace renders,
+   * so the folder is read once rather than once per component.
    */
   useEffect(() => {
     let active = true;
     (async () => {
-      const accessToken = await fetchDownscopedBoxToken(folderId);
+      const granted = await fetchDownscopedBoxToken(context);
       if (!active) return;
-      setToken(accessToken);
-      if (!accessToken) {
+      setToken(granted.accessToken);
+      setFolderId(granted.folderId);
+      if (!granted.accessToken) {
         setLoading(false);
         return;
       }
-      const entries = await listBoxFolderItems(folderId, accessToken);
+      const entries = await listBoxFolderItems(granted.folderId, granted.accessToken);
       if (!active) return;
       setFiles(entries);
       setLoading(false);
@@ -43,20 +49,20 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
     return () => {
       active = false;
     };
-  }, [folderId]);
+  }, [context]);
 
   if (loading) {
     return <div className="workspace-state" data-testid="box-loading">Connecting to the governed Box workspace…</div>;
   }
 
-  if (token && files.length > 0) {
+  // A token plus a listing that came back is live content, even when the folder is empty.
+  // A newly provisioned contract folder has no files yet and is still the real workspace.
+  if (token && files !== null) {
     return (
       <section className="box-live" data-testid="box-preview">
         <div className="box-fallback-head">
           <div>
-            <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
             <h2>{CLM_CONFIG.workspace.name}</h2>
-            <p>Browsed from Box with a short-lived token scoped to this folder.</p>
           </div>
           {CLM_CONFIG.workspace.boxUrl ? (
             <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
@@ -65,7 +71,7 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
           ) : null}
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} />
+          <BoxElements folderId={folderId} token={token} files={files} />
         </Suspense>
       </section>
     );
@@ -105,7 +111,6 @@ export function BoxWorkspace({ folderId }: { folderId: string }) {
           );
         })}
       </div>
-      <div className="secure-note"><LockKeyhole size={15} /> Browser source contains no Box client secret.</div>
     </section>
   );
 }
