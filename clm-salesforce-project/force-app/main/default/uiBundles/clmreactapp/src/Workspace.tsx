@@ -106,7 +106,6 @@ export function Workspace() {
         <div className="banner-metrics">
           <Metric label="Value" value={selected ? formatDealValue(selected.dealValue) : NORTHSTAR_CONTRACT.value} />
           <Metric label="Term" value={selected?.termMonths != null ? `${selected.termMonths} months` : NORTHSTAR_CONTRACT.term} />
-          <Metric label="Risk" value={selected?.riskLevel || NORTHSTAR_CONTRACT.risk} danger />
           <Metric label="Status" value={selected?.status || NORTHSTAR_CONTRACT.status} warning />
         </div>
       </div>

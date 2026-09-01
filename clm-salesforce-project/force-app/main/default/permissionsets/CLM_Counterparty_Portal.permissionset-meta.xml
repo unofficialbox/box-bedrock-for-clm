@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>What a counterparty needs in the Experience Cloud workspace: the counterparty-scoped action and read on the few contract fields it returns. No contract records are shared, so the action&apos;s account filter is the only way any row is reached.</description>
+    <description>Read on the contract fields the counterparty list renders, and nothing more. Risk_Level__c is deliberately absent: it is Acme&apos;s own assessment, not a fact about the contract. Rows are filtered by the sharing set on Counterparty_Account__c.</description>
     <hasActivationRequired>false</hasActivationRequired>
     <label>CLM Counterparty Portal</label>
     <classAccesses>
@@ -29,6 +29,26 @@
     <fieldPermissions>
         <editable>false</editable>
         <field>CLM_Contract__c.Term_Months__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Box_Workspace_Folder_ID__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Contract_Type__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Counterparty__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Deal_Value__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <objectPermissions>

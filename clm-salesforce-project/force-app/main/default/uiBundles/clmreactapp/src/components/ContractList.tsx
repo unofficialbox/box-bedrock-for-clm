@@ -13,7 +13,6 @@ const FIXTURE_ROWS: ClmContractSummary[] = [
     counterparty: NORTHSTAR_CONTRACT.counterparty,
     contractType: NORTHSTAR_CONTRACT.contractType,
     status: NORTHSTAR_CONTRACT.status,
-    riskLevel: NORTHSTAR_CONTRACT.risk,
   },
 ];
 
@@ -100,9 +99,6 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
             </span>
             <span className="contract-meta">
               {contract.dealValue != null ? <span className="contract-value">{formatDealValue(contract.dealValue)}</span> : null}
-              {contract.riskLevel ? (
-                <span className={`risk risk-${contract.riskLevel.toLowerCase()}`}>{contract.riskLevel}</span>
-              ) : null}
               {contract.status ? <span className="status-pill">{contract.status}</span> : null}
             </span>
             <ChevronRight size={16} />

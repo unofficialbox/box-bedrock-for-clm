@@ -46,6 +46,33 @@ describe("Workspace", () => {
     expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
   });
 
+  test("keeps Acme's own risk assessment off the counterparty's screen", async () => {
+    // Risk_Level__c is what Acme thinks of the contract, not a fact about it -- the same
+    // category as the redline queue. It is also why the list went blank for a real
+    // counterparty: the field was in the GraphQL projection but withheld by the permission
+    // set, and UI API rejects the whole query when one selected field is hidden, which
+    // reads as "this counterparty has no contracts".
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => [
+          {
+            recordId: "a01xx0000009abcAAA",
+            contractId: "CLM-1",
+            name: "A Contract",
+            boxFolderId: "1",
+            riskLevel: "Critical",
+          },
+        ],
+      })),
+    );
+    render(<Workspace />);
+    await screen.findByTestId("contract-row");
+    expect(screen.queryByText("Critical")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risk")).not.toBeInTheDocument();
+  });
+
   test("names the contract list as the counterparty's own", () => {
     render(<Workspace />);
     expect(screen.getByRole("button", { name: /Your contracts/ })).toBeVisible();
