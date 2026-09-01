@@ -198,8 +198,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    `lightning/accApi` module, importable only from an LWC running inside Lightning, which
    a UI-bundle React app is not. The agent bundle does declare `contractId`,
    `contractRecordId` and `boxFolderId` as variables — nothing on this side can set them.
-   Hence **"Copy agent context"** in the top bar: the person pastes what the client cannot
-   send. `AgentforcePanel` puts the contract reference in `agentLabel` and
+   `AgentforcePanel` puts the contract reference in `agentLabel` and
    `messageInputPlaceholderText`, which is the only contract awareness available.
 
 
