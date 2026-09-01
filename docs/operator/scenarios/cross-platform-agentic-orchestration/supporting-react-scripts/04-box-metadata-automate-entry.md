@@ -122,7 +122,7 @@ Open React with the Salesforce record context plus the Box folder ID gathered fr
 recordId=<salesforce-record-id>&contractId=<contract-id>&folderId=<generated-workspace-folder-id>
 ```
 
-Then continue with Act 1 of the selected executive, Legal Operations, or technical walkthrough.
+Then continue with the [executive walkthrough](01-executive-walkthrough.md) or the [technical validation](03-technical-validation.md).
 
 ## Pass criteria
 
