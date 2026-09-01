@@ -100,7 +100,6 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
             <>
             <span className="file-icon"><FileText size={18} /></span>
             <span className="file-copy"><strong>{file.label}</strong><small>{file.name}</small></span>
-            <span className={`risk risk-${file.risk.toLowerCase()}`}>{file.risk}</span>
             {href ? <ExternalLink size={15} /> : null}
             </>
           );

@@ -4,7 +4,6 @@ import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { ContractList } from "./components/ContractList";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
-import { NORTHSTAR_CONTRACT } from "./data";
 import { getClmPageContext } from "./lib/box";
 
 /**
@@ -101,14 +100,33 @@ export function Workspace() {
         </nav>
       </header>
 
-      <div className="contract-banner">
-        <div><span className="eyebrow">{selected?.contractId || context.contractId}{workspaceContext.salesforceRecordId ? ` · Salesforce ${workspaceContext.salesforceRecordId}` : ""}</span><h1>{selected?.name || NORTHSTAR_CONTRACT.name}</h1><p>{[selected?.counterparty || NORTHSTAR_CONTRACT.counterparty, selected?.contractType || NORTHSTAR_CONTRACT.contractType].join(" · ")}</p></div>
-        <div className="banner-metrics">
-          <Metric label="Value" value={selected ? formatDealValue(selected.dealValue) : NORTHSTAR_CONTRACT.value} />
-          <Metric label="Term" value={selected?.termMonths != null ? `${selected.termMonths} months` : NORTHSTAR_CONTRACT.term} />
-          <Metric label="Status" value={selected?.status || NORTHSTAR_CONTRACT.status} warning />
+      {/*
+        The banner describes the contract that is open, and nothing else.
+
+        It used to fall back to a fixture whenever none was selected, so the list view was
+        headed by another contract's name, value and term -- and by "Approval blocked",
+        which contradicted the status on the row directly beneath it. A header stating
+        different facts from the list under it is worse than no header.
+
+        The Salesforce record ID came out of the eyebrow at the same time. It is internal
+        plumbing, and this page faces the counterparty.
+      */}
+      {selected ? (
+        <div className="contract-banner">
+          <div>
+            <span className="eyebrow">{selected.contractId}</span>
+            <h1>{selected.name}</h1>
+            <p>{[selected.counterparty, selected.contractType].filter(Boolean).join(" · ")}</p>
+          </div>
+          <div className="banner-metrics">
+            <Metric label="Value" value={formatDealValue(selected.dealValue)} />
+            {selected.termMonths != null ? (
+              <Metric label="Term" value={`${selected.termMonths} months`} />
+            ) : null}
+            {selected.status ? <Metric label="Status" value={selected.status} /> : null}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="content-grid">
         <main>
@@ -124,6 +142,6 @@ export function Workspace() {
   );
 }
 
-function Metric({ label, value, danger, warning }: { label: string; value: string; danger?: boolean; warning?: boolean }) {
-  return <div className="metric"><span>{label}</span><strong className={danger ? "danger" : warning ? "warning" : ""}>{value}</strong></div>;
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="metric"><span>{label}</span><strong>{value}</strong></div>;
 }

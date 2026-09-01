@@ -46,6 +46,26 @@ describe("Workspace", () => {
     expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
   });
 
+  test("shows no contract banner until a contract is open", async () => {
+    // The banner used to fall back to a fixture, so the list was headed by another
+    // contract's name, value and term -- and by "Approval blocked", contradicting the
+    // status on the row beneath it.
+    const { container } = render(<Workspace />);
+    await screen.findByTestId("contracts-view");
+    expect(container.querySelector(".contract-banner")).toBeNull();
+    // The list legitimately shows a status per row; the banner's fixture values are what
+    // must not appear.
+    expect(screen.queryByText(/36 months/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Northstar Health MSA" })).not.toBeInTheDocument();
+  });
+
+  test("never shows the Salesforce record id to a counterparty", async () => {
+    // Internal plumbing. This page faces the counterparty.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-99&folderId=123");
+    render(<Workspace />);
+    expect(screen.queryByText(/Salesforce a01xx0000001234/)).not.toBeInTheDocument();
+  });
+
   test("keeps Acme's own risk assessment off the counterparty's screen", async () => {
     // Risk_Level__c is what Acme thinks of the contract, not a fact about it -- the same
     // category as the redline queue. It is also why the list went blank for a real
@@ -98,11 +118,6 @@ describe("Workspace", () => {
     expect(screen.queryByRole("heading", { name: "CLM contracts" })).not.toBeInTheDocument();
   });
 
-  test("shows the Salesforce record returned by the intake flow", () => {
-    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-99&folderId=123");
-    render(<Workspace />);
-    expect(screen.getByText(/CLM-99 · Salesforce a01xx0000001234/)).toBeVisible();
-  });
 
   test("asks by record so the package resolves or provisions the folder", async () => {
     // The package owns the association and provisions a folder for a record that has
