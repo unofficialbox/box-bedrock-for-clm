@@ -4,7 +4,7 @@ These scripts present the React portion of Cross-Platform Agentic Orchestration 
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|
-| [Executive walkthrough](01-executive-walkthrough.md) | 10-12 minutes | Executives, business sponsors, first meetings | Show the value and human-control model quickly |
+| [Executive walkthrough](01-executive-walkthrough.md) | 3-5 minutes | Executives, business sponsors, first meetings | Read customer paper against the governed clause library, and show the counterparty boundary |
 | [Legal operations walkthrough](02-legal-operations-walkthrough.md) | 30-35 minutes | Legal Ops, Sales Ops, Finance, Privacy, Security | Demonstrate the complete contract-review and approval workflow |
 | [Technical validation](03-technical-validation.md) | 20-30 minutes | Architects, Salesforce teams, security, developers | Prove runtime boundaries, token handling, actions, and guardrails |
 | [Box metadata entry-point variation](04-box-metadata-automate-entry.md) | 5-7 minutes | Any audience | Start with a contract uploaded to `01 - Intake` and `clmContract` metadata applied, then Automate enrichment, human validation, and HTTPS Connector record creation |
@@ -34,7 +34,7 @@ Supporting artifacts:
 4. Confirm the application resolves `recordId`, `contractId`, and `folderId` without browser secrets.
 5. Confirm material answers cite Box files and approval state matches human-owned tasks.
 6. Confirm one open task is reused per contract, redline file, and review domain.
-7. Confirm document generation requires presenter confirmation and signature remains blocked while reviews are incomplete.
+7. Doc Gen and Sign are not wired in this repository. The executive walkthrough omits them; the longer scripts must not claim them as live.
 8. Keep managed AgentCore and Databricks claims outside these supporting scripts; the parent scenario owns that evidence.
 
 ## Shared presenter rule
