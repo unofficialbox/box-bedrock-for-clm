@@ -8,7 +8,19 @@ import { CLM_CONFIG } from "../config";
 import { sfdcEnv } from "../lib/sfdcEnv";
 import { AGENT_PROMPTS } from "../data";
 
-export function AgentforcePanel() {
+/**
+ * The conversation panel.
+ *
+ * `contractId` is the only contract awareness the client allows. ACC has no API for
+ * seeding agent variables or sending an utterance -- `embedAgentforceClient` takes no
+ * context option, the mounted `runtime_copilot-acc-sdk-wrapper` exposes no methods, and
+ * the `open`/`close`/`execute` API is `lightning/accApi`, importable only from an LWC
+ * inside Lightning. The agent declares `contractId`, `contractRecordId` and `boxFolderId`
+ * as variables, but nothing here can set them, which is why the workspace offers "Copy
+ * agent context" for the person to paste. Naming the contract in the label and the input
+ * is what is left.
+ */
+export function AgentforcePanel({ contractId }: { contractId?: string }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const initializedRef = useRef(false);
   const runtime = window.__CLM_RUNTIME_CONFIG__;
@@ -64,7 +76,14 @@ export function AgentforcePanel() {
         // resolves the agent the Agent Builder way, finds nothing, and mounts an empty
         // panel rather than reporting an error.
         ...(fileBased ? { isFileBased: true } : {}),
-        agentLabel: "Contract Copilot",
+        agentLabel: contractId ? `Contract Copilot — ${contractId}` : "Contract Copilot",
+        // Config is read once, at mount: the element carries it as a plain property that
+        // the Lightning Out proxy reads when it hydrates, and a later assignment records
+        // no `_propertyChanged_configuration` and never crosses the frame. So these are
+        // fixed for the life of an embed, and the effect re-runs to change them.
+        messageInputPlaceholderText: contractId
+          ? `Ask about ${contractId}…`
+          : "Ask about this contract…",
         renderingConfig: { mode: "inline", width: "100%", height: "100%", headerEnabled: false },
         /**
          * The conversation renders inside the client's own shadow tree, so page CSS
@@ -106,7 +125,16 @@ export function AgentforcePanel() {
         initializedRef.current = false;
       },
     });
-  }, [agentId, appId, salesforceOrigin, fileBased]);
+
+    // The embed owns an iframe and a Lightning Out application. Emptying the host tears
+    // both down, so re-running for a new contract replaces the conversation rather than
+    // stacking a second one underneath it.
+    const host = hostRef.current;
+    return () => {
+      host.replaceChildren();
+      initializedRef.current = false;
+    };
+  }, [agentId, appId, salesforceOrigin, fileBased, contractId]);
 
   return (
     <aside className="agent-panel" aria-label="Contract Copilot">

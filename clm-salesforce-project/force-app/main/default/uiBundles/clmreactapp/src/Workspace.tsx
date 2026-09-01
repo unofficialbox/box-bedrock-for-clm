@@ -123,7 +123,7 @@ export function Workspace() {
             <Approvals />
           )}
         </main>
-        <AgentforcePanel />
+        <AgentforcePanel contractId={selected?.contractId || context.contractId} />
       </div>
     </div>
   );
