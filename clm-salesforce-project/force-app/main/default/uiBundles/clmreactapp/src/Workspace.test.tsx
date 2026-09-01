@@ -51,6 +51,26 @@ describe("Workspace", () => {
     expect(screen.getByRole("button", { name: /Your contracts/ })).toBeVisible();
   });
 
+  test("does not narrate its own plumbing to a counterparty", async () => {
+    // The heading and blurb faced a developer: "CLM contracts", read "over the GraphQL UI
+    // API", resolving a folder "from the Box for Salesforce record mapping". None of that
+    // means anything to the customer whose contracts these are.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => [
+          { recordId: "a01xx0000009abcAAA", contractId: "CLM-1", name: "A", boxFolderId: "1" },
+        ],
+      })),
+    );
+    render(<Workspace />);
+    await screen.findByTestId("contracts-view");
+    expect(screen.queryByText(/GraphQL UI API/)).not.toBeInTheDocument();
+    expect(screen.queryByText(/record mapping/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "CLM contracts" })).not.toBeInTheDocument();
+  });
+
   test("shows the Salesforce record returned by the intake flow", () => {
     window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-99&folderId=123");
     render(<Workspace />);

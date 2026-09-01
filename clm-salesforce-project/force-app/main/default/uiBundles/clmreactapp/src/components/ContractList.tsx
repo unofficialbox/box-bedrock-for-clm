@@ -60,10 +60,16 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
       <div className="section-heading">
         <div>
           <span className="eyebrow"><FileStack size={15} /> Contract records</span>
-          <h2>CLM contracts</h2>
+          <h2>Your contracts</h2>
           <p>
+            {/*
+              This page faces a counterparty, so it says what they are looking at rather
+              than how it was fetched. Which rows appear is decided by Salesforce sharing
+              for the signed-in user, not by anything here -- an admin sees every contract
+              and a counterparty sees only their own, from the same code.
+            */}
             {live
-              ? `Read from Salesforce over ${source === "graphql" ? "the GraphQL UI API" : "Apex"}. Opening one resolves its Box folder from the Box for Salesforce record mapping.`
+              ? "Contracts your organisation is party to. Open one to read its documents."
               : "Synthetic fixture shown; the live list activates when Salesforce is reachable."}
           </p>
         </div>

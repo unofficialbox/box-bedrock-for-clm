@@ -31,9 +31,8 @@ system:
         welcome: |
             Hi, I'm Contract Copilot.
 
-            Tell me which contract you're working on -- its reference, or paste the
-            workspace context from the button above -- and I can summarize the package
-            with citations, or explain what is blocking execution.
+            Tell me which contract you're asking about -- its reference, or its name --
+            and I can answer from the documents in it, citing the file I read.
         error: "Sorry, something went wrong. Please try again, or continue in the workspace."
 
 config:
