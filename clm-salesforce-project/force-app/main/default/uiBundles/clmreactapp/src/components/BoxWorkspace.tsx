@@ -26,9 +26,9 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
    * for Salesforce association and tells us which folder it minted for. Everything below
    * uses that answer rather than anything the URL supplied.
    *
-   * ContentExplorer fetches its own listing, so this call is a liveness check rather
-   * than the source of what gets rendered: it decides between live Box content and the
-   * synthetic fixtures, and it logs why when Box refuses.
+   * The listing does double duty: it decides between live Box content and the synthetic
+   * fixtures (and logs why when Box refuses), and it is the table the workspace renders,
+   * so the folder is read once rather than once per component.
    */
   useEffect(() => {
     let active = true;
@@ -71,7 +71,7 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
           ) : null}
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} />
+          <BoxElements folderId={folderId} token={token} files={files} />
         </Suspense>
       </section>
     );

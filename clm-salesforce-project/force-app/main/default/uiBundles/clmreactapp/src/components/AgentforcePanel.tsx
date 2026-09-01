@@ -1,7 +1,7 @@
 import { useEffect, useRef } from "react";
 import { Bot, ShieldCheck } from "lucide-react";
 import { embedAgentforceClient } from "@salesforce/agentforce-conversation-client";
-/** The Content Explorer's stack, so the conversation matches the file list. */
+/** Box's own stack, so the conversation matches the file list beside it. */
 const BOX_FONT_STACK = "Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif";
 
 import { CLM_CONFIG } from "../config";
@@ -69,7 +69,7 @@ export function AgentforcePanel() {
         /**
          * The conversation renders inside the client's own shadow tree, so page CSS
          * cannot reach it -- these tokens are the only styling hook. The font stack is
-         * the Content Explorer's, so the two panels read as one interface rather than
+         * Box's own, so the two panels read as one interface rather than
          * two products side by side.
          */
         styleTokens: {

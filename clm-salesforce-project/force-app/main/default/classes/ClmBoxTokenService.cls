@@ -41,8 +41,8 @@ global with sharing class ClmBoxTokenService {
     /**
      * Scopes minted for the browser.
      *
-     * These mirror what the Content Explorer is allowed to offer. A prop on the element
-     * only shows a control; this decides whether Box honours it, so the two have to be
+     * These mirror what the workspace is allowed to offer. A control in the UI only
+     * shows an affordance; this decides whether Box honours it, so the two have to be
      * kept in step -- an enabled control with a missing scope fails at the point of use
      * rather than being hidden.
      *

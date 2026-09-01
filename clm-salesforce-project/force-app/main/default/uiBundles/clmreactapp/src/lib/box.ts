@@ -16,6 +16,10 @@ export interface BoxFolderItem {
   id: string;
   name: string;
   type: string;
+  /** Bytes, for the size column. Absent on items Box does not report it for. */
+  size?: number;
+  modified_at?: string;
+  extension?: string;
 }
 
 /**
@@ -37,7 +41,7 @@ export async function listBoxFolderItems(
 ): Promise<BoxFolderItem[] | null> {
   try {
     const response = await fetch(
-      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type&limit=100`,
+      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type,size,extension,modified_at&limit=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
     if (!response.ok) {

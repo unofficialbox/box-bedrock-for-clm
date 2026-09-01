@@ -72,9 +72,9 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 | `.../permissionsets/CLM_Box_Preview_Guest.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
 | `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and CCG subject + folder allowlist (MT-039) |
 | `.../clmreactapp/src/components/BoxWorkspace.tsx` | Live branch (token + folder listing) with synthetic-fixture fallback; both failure paths log |
-| `.../clmreactapp/src/components/BoxElements.tsx` | Lazy-loaded Content Explorer + Content Uploader; needs a `react-intl` provider |
+| `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
+| `.../clmreactapp/src/components/BoxDocumentTable.tsx` | The file table itself — name, modified, size |
 | `.../clmreactapp/src/components/BoxDocumentPreview.tsx` | Inline document preview: Box's expiring embed URL in an iframe, no preview library |
-| ... opened from the toolbar picker in `BoxElements.tsx` | ContentExplorer will not emit a file click unless its own broken preview is enabled — see thread 3 |
 | `.../cspTrustedSites/CLM_Box_App.cspTrustedSite-meta.xml` | frame-src grant for `*.app.box.com`, without which the preview frame is blank (MT-043) |
 | `.../clmreactapp/vite.live-box.ts` | Dev-only plugin serving a real downscoped token locally (`npm run preview:live`) |
 | `.../clmreactapp/.npmrc` | `legacy-peer-deps=true`, without which `npm ci` cannot reproduce the lockfile — do not delete |
@@ -100,28 +100,67 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    deliberate exposure, tracked as **MT-045**, not a bug to fix. Until it exists the
    dashboard renders its synthetic fixture and says so.
 3. **Folder-id gotcha.** The workspace still defaults to the non-numeric string `demo-workspace` (`src/config.ts`), which the endpoint rejects as `invalid_folder_id` before any Box call. Pass `?folderId=` or rebuild with `VITE_BOX_FOLDER_ID`; locally, `CLM_BOX_FOLDER_ID` for `preview:live`.
-4. **Document preview deliberately avoids the Box Content Preview library.** The npm
-   package `box-content-preview` cannot be used here: it declares peers on React 18 and
-   box-ui-elements 20 (this app is React 19 and 27), requires `box-annotations` which is
-   not installed, and its `dist/lib` is a bundler input with unresolved bare specifiers
-   rather than the standalone artifact the CDN serves — importing it in the browser
-   fails on `box-ui-elements/es/utils/keys`. Self-hosting it is a dead end, the same wall
-   cf3b54a hit from a different side. The workspace requests `expiring_embed_link`
-   instead and frames Box's own rendering, which needs only `item_preview` scope
-   (already granted) and a frame-src trusted site.
+4. **Document preview works, and it is not the Content Explorer.** The workspace lists
+   the governed folder itself (`BoxWorkspace` already fetched that listing to decide live
+   vs fixtures) and renders it as a plain table; clicking a row mounts
+   `box-ui-elements/es/elements/content-preview` on that file id. Verified against live
+   Box on 2026-08-31 through the local harness, in both the dev server and the production
+   bundle: a 7-page redline renders.
 
-   **The trigger cannot live on an explorer row.** `ContentExplorer` delegates rows to
-   `ItemList`, whose handler is `if (type === FOLDER || !isTouch && (type === WEBLINK ||
-   canPreview)) onItemClick(item)` — a file click is emitted only when `canPreview` is
-   on, and turning it on also mounts the built-in preview dialog, which has no library
-   to load and renders a "Sad Box Cloud" error over the workspace. No prop separates
-   the two. So `canPreview` stays `false` and the preview is opened from a picker in the
-   toolbar, fed by `onNavigate` so it lists the folder currently on screen. Folder
-   navigation still works because folders short-circuit that condition — which is why
-   the coupling is easy to miss until a file is clicked against live Box.
+   Four things had to be true at once, and each was independently a blocker:
+   - **`box-annotations` must be installed and an instance passed as `boxAnnotations`.**
+     ContentPreview expects one and does not construct it. Pinned to `5.2.1-beta.18`;
+     `5.3.0` fails the build (`parseMessageMarkdown` is not exported).
+   - **The preview needs a react-router `Router` above it.** The annotations layer is
+     wrapped in `withRouter`, so without one React throws `Invariant failed: You should
+     not use <withRouter(WithAnnotations(Component)) /> outside a <Router>` and the
+     error boundary paints the "Sad Box Cloud". box-ui-elements supplies a router only
+     when a sidebar is mounted, which this view does not use, so `BoxElements` wraps the
+     preview in its own `MemoryRouter` (memory history — the workspace owns the URL).
+     This invariant, not CSP, was the real cause of the long-running preview failure.
+   - **The token must be passed as a function, not a string.** ContentPreview forwards
+     its `token` prop straight through as preview's `annotatorToken`, and Box Content
+     Preview 3.x asserts `typeof annotatorToken === "function"` or throws
+     `Bad annotatorToken!`. That throw aborts the viewer silently: an empty frame, no
+     error UI, nothing in `onError`. `BoxElements` memoizes a `() => token` provider.
+     (3.0.0 has no such assertion, which is why the element's own default appeared to
+     work and every newer version did not.)
+   - **`item_preview` scope** on the downscoped token, and the `CLM_Box_App` frame-src
+     trusted site.
+
+   **Version is pinned to 3.83.0** (`PREVIEW_LIBRARY_VERSION` in `BoxElements.tsx`).
+   box-ui-elements defaults to **3.0.0**, years stale. 3.83.0 is the newest release on
+   `cdn01.boxcdn.net/platform/preview/` — the npm package reaches 3.85.0 and its README
+   documents that exact CDN URL, but 3.84.0 and 3.85.0 both 404 there. The CDN's version
+   list is sparse (3.80–3.82 are absent, 3.83.0 is present), so probe before bumping.
+
+   **It does not work on the Experience Cloud site, and cannot without a CSP change.**
+   ContentPreview loads `preview.js` (and then pdf.js and friends) from
+   `cdn01.boxcdn.net`; the site sends `script-src 'self' … blob: …` and blocks it. The
+   `CLM_Box_CDN` trusted site is deployed and active but cannot help: `CspTrustedSite`
+   has **no script-src directive at all** — verified against both the REST and the
+   Tooling describes at the org's API version, which expose only connect/frame/img/
+   style/font/media. The two ways out are (a) switch the site's Experience Builder
+   security level from Strict CSP to Relaxed CSP, which is what puts trusted sites into
+   `script-src` — a real loosening of a public site, so it is the user's call and is not
+   done; or (b) go back to framing Box's own `expiring_embed_link`, which needs only the
+   frame-src site already in place. Until one is chosen, the workspace says so instead of
+   showing a blank panel: `BoxElements` waits ~15s for `Box.Preview` and then names the
+   blocked script (`data-testid="box-preview-blocked"`). Everything else on the site --
+   folder listing, the table, folder resolution, Agentforce -- works.
+
+   **Content Explorer was dropped for this.** It never emitted a file activation in this
+   embedding: `ItemList` fires only when `type === FOLDER || !isTouch && (type === WEBLINK
+   || canPreview)`, and the element stayed in its small/touch layout regardless of
+   container width, so a file click went nowhere however `canPreview` was set. Folder
+   clicks worked, which is why the coupling was easy to miss until a file was clicked
+   against live Box. Owning the row click removes the guesswork. The npm package
+   `box-content-preview` remains unusable and unused — it declares peers on React 18 and
+   box-ui-elements 20 (this app is React 19 and 27), and its `dist/lib` is a bundler input
+   with unresolved bare specifiers rather than the standalone artifact the CDN serves.
 5. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 6. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
-7. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before PR #37 replaced the hand-rolled file rail and preview mount with Content Explorer. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
+7. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
 8. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
 9. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
 10. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
