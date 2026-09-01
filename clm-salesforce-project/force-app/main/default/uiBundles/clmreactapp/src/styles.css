@@ -155,16 +155,25 @@ button { cursor: pointer; }
 /* Box UI Elements hosts. The elements bring their own styles; these only give them
    a bounded, scrollable box so they do not fight the workspace layout. */
 /* No top margin: the explorer sits directly under the folder header, and a gap here
-   reads as an empty band between the two. */
-.box-elements { display: flex; flex-direction: column; }
+   reads as an empty band between the two. flex: 1 continues the chain from the card, or
+   the section sizes to its content and the explorer stops short of the card's height. */
+.box-elements { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 
 /* Fills the card below the folder header. The card owns the height; a fixed value here
    would fight it and overflow the panel. */
 .box-element-host {
   flex: 1;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   background: var(--surface, #fff);
+}
+
+/* box-ui-elements sizes to its content unless its own wrapper is given a height, so the
+   list stopped short and left the bottom of the card blank. The element scrolls its own
+   list, which is why the host hides overflow rather than adding a second scrollbar. */
+.box-element-host > div,
+.box-element-host .be {
+  height: 100%;
 }
 
 /* box-ui-elements renders a dashed "Logo" placeholder when no logoUrl is supplied.
