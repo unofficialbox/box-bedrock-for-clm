@@ -429,7 +429,13 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    ```
 
    One query, across two contracts on two different papers, replacing a folder listing plus
-   nine Box AI reads. `documentType` (MSA, DPA, SOW, Order Form, Security Exhibit,
+   nine Box AI reads -- **but only when it is scoped**. Metadata search is enterprise-wide, and
+   this enterprise still holds documents from earlier demo environments (`CLM-2026-Northstar1`,
+   `CLM-2026-Northstar - 20260724T121732Z`). Those carry the same file names as the governed
+   copies, different file IDs, and in two cases the `clauseRisk = Critical` tag landed on the
+   stale copy while the governed one went untagged. Unscoped, the query returns four files and
+   two of them are not in a contract folder at all. Pass `ancestor_folder_id` for the CLM Root
+   folder and it returns the two that matter. `documentType` (MSA, DPA, SOW, Order Form, Security Exhibit,
    Insurance, Approval Memo) makes "find the insurance certificate" deterministic instead of
    a filename guess.
 

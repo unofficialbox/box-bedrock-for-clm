@@ -78,8 +78,16 @@ Salesforce; the document never leaves Box.
 
 **Show**
 
-- One `search_files_metadata` query against the `clmDocument` template, `clauseRisk = Critical`.
+- One `search_files_metadata` query against the `clmDocument` template, `clauseRisk = Critical`,
+  **scoped by `ancestor_folder_id` to the CLM Root folder**.
 - Two files come back, on **two different papers** -- the Northstar redline and the Calder draft.
+
+**Scope the query or it is wrong on stage.** Box metadata is enterprise-wide, so an unscoped
+search also returns documents from earlier demo environments -- folders like
+`CLM-2026-Northstar1` that are not governed contract folders at all. Those carry the same
+file names as the current copies but different file IDs, which reads to an audience as the
+wrong account appearing. `ancestor_folder_id` is what makes the query mean "across the
+governed portfolio" rather than "across everything anyone ever uploaded".
 
 **Land**
 
