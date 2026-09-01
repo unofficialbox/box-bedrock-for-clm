@@ -1,10 +1,8 @@
 import { useEffect, useState } from "react";
 import { IntlProvider } from "react-intl";
-import { Eye, LockKeyhole, Upload } from "lucide-react";
+import { Eye } from "lucide-react";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
-import ContentUploader from "box-ui-elements/es/elements/content-uploader";
 import "box-ui-elements/dist/explorer.css";
-import "box-ui-elements/dist/uploader.css";
 import { BoxDocumentPreview } from "./BoxDocumentPreview";
 import { listBoxFolderItems, type BoxFolderItem } from "../lib/box";
 
@@ -20,9 +18,6 @@ import { listBoxFolderItems, type BoxFolderItem } from "../lib/box";
  * cannot reach content outside the governed workspace even if a prop is wrong.
  */
 export function BoxElements({ folderId, token }: { folderId: string; token: string }) {
-  const [uploaderOpen, setUploaderOpen] = useState(false);
-  // Remount the explorer after an upload so the new item appears without a reload.
-  const [refreshKey, setRefreshKey] = useState(0);
   const [selected, setSelected] = useState<BoxFolderItem | null>(null);
   const [folderInView, setFolderInView] = useState(folderId);
   const [previewable, setPreviewable] = useState<BoxFolderItem[]>([]);
@@ -46,7 +41,7 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
     return () => {
       active = false;
     };
-  }, [folderInView, token, refreshKey]);
+  }, [folderInView, token]);
 
   if (!token || !folderId) {
     return null;
@@ -82,14 +77,6 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           </label>
         ) : null}
 
-        <button
-          type="button"
-          className="secondary-button"
-          onClick={() => setUploaderOpen((open) => !open)}
-          data-testid="box-uploader-toggle"
-        >
-          <Upload size={15} /> {uploaderOpen ? "Close uploader" : "Add documents"}
-        </button>
       </div>
 
       {selected ? (
@@ -102,23 +89,8 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
         />
       ) : null}
 
-      {uploaderOpen ? (
-        <div className="box-element-host" data-testid="box-content-uploader">
-          <ContentUploader
-            token={token}
-            rootFolderId={folderId}
-            onComplete={() => {
-              setRefreshKey((key) => key + 1);
-              setUploaderOpen(false);
-            }}
-            onClose={() => setUploaderOpen(false)}
-          />
-        </div>
-      ) : null}
-
       <div className="box-element-host" data-testid="box-content-explorer">
         <ContentExplorer
-          key={refreshKey}
           token={token}
           rootFolderId={folderId}
           // Must stay off. It loads Box Content Preview from cdn01.boxcdn.net, which the
@@ -138,11 +110,6 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           canShare={false}
           canDownload={false}
         />
-      </div>
-
-      <div className="secure-note">
-        <LockKeyhole size={15} /> Browser source contains no Box client secret; the token is
-        scoped to this folder.
       </div>
     </section>
     </IntlProvider>

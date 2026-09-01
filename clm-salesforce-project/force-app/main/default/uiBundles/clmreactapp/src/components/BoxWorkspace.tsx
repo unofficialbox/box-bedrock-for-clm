@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
-import { ExternalLink, FileText, FolderOpen, LockKeyhole } from "lucide-react";
+import { ExternalLink, FileText, FolderOpen } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
 import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem, type ClmPageContext } from "../lib/box";
@@ -113,7 +113,6 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
           );
         })}
       </div>
-      <div className="secure-note"><LockKeyhole size={15} /> Browser source contains no Box client secret.</div>
     </section>
   );
 }
