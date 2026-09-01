@@ -105,8 +105,14 @@ private class ClmBoxTokenServiceTest {
         String scope = (String) payload.get('scope');
         System.assert(scope.contains('item_preview') && scope.contains('item_upload'),
             'The workspace needs preview and upload scopes for the embedded Box elements');
-        System.assert(!scope.contains('item_delete') && !scope.contains('item_share'),
-            'Delete and share must stay out of a browser token');
+        // The workspace offers delete, rename and share, so the token has to honour them:
+        // a control that is shown but unscoped fails at the point of use instead of being
+        // absent. The token is still bound to one folder, so this widens what may be done
+        // inside that folder and nothing outside it.
+        System.assert(scope.contains('item_delete') && scope.contains('item_share'),
+            'The enabled Box controls need delete and share, or they fail when used');
+        System.assert(!scope.contains('root_readwrite') && !scope.contains('manage_'),
+            'A browser token must never carry enterprise-wide or management scopes');
         // Box rejects a comma separated list as one unsupported scope name, and only
         // when more than one scope is requested -- each value is valid on its own.
         System.assert(!scope.contains(','),

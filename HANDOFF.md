@@ -202,6 +202,43 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    send. `AgentforcePanel` puts the contract reference in `agentLabel` and
    `messageInputPlaceholderText`, which is the only contract awareness available.
 
+
+   **The agent now has actions, which it previously did not.** Its Agent Script carried
+   instructions and nothing else, so it could only promise to "gather the details" and
+   then answer from nothing -- a conversation would loop through several turns of
+   clarifying questions and never retrieve a thing. Two actions fix that, on the
+   `contract_review` start agent and a `document_answers` subagent:
+   - `get_contract_package` -> `apex://ClmContractPackage`. Resolves a contract from the
+     reference a person typed (or its name, or a record id), finds the governed Box folder,
+     and lists every document **with its Box file ID**. Nothing else supplies those ids,
+     and the Box AI action addresses a file by id, so without this the agent had no way to
+     read anything.
+   - `ask_box_ai` -> `apex://box__BoxAIAskByItemId`, the Box for Salesforce managed-package
+     invocable. No custom Box AI code is needed.
+
+   Two Agent Script details cost a compile cycle each and are easy to get wrong:
+   `subagents:` is not a field on `start_agent` -- a subagent is a top-level block that
+   also declares its own `actions:`, and routing between them is
+   `@utils.transition to @subagent.<name>`. And `with x = ...` (a literal `...`) is what
+   lets the model fill an argument from the conversation; binding it to a variable instead
+   ignores the reference the person just typed. `@utils.setVariables` is how a reference
+   gets captured into a variable in the first place.
+
+   `ClmContractPackage` lists through `box.Toolkit.getFolderContents(folderId)`, which
+   returns `box.Folder` with `List<box.Entry>` and needs no `commitChanges()`. The Toolkit
+   already holds the org's Box credentials, so the action needs no token grant and no named
+   credential of its own. It reads `box__FRUP__c` with SOQL rather than using the Toolkit's
+   folder lookup, because the provisioning call beside that one commits DML and Apex forbids
+   a callout after DML.
+
+   Both legs were verified against the live org and live Box on 2026-09-01:
+   `CLM-SAMPLE-NST-2024` returned all nine documents with their Box file IDs, and
+   `box__BoxAIAskByItemId` on the insurance certificate returned the real coverages, limits
+   and expiry dates. **The chat itself could not be driven from here** -- the ACC composer
+   sits behind a closed shadow root, absent from the accessibility tree, and neither the
+   in-app browser nor Claude-in-Chrome can land a keystroke in it; `sf agent preview` needs
+   a TTY and crashes rendering (`Invalid count value: -2`). Whether the agent *chooses* to
+   call the actions still needs a human to send one message.
    **Client config is read once, at mount.** The SDK assigns it as a plain property that
    the Lightning Out proxy reads when it hydrates; a later `element.configuration = …`
    records no `_propertyChanged_configuration` and never crosses the frame. So the effect

@@ -66,7 +66,11 @@ private class ClmContractListServiceTest {
         System.assertEquals(
             new Set<String>{
                 'recordId', 'contractId', 'name', 'counterparty',
-                'contractType', 'status', 'riskLevel', 'dealValue', 'termMonths'
+                'contractType', 'status', 'riskLevel', 'dealValue', 'termMonths',
+                // The dashboard deep-links a contract straight to its Box folder, so the
+                // id travels with the row. It names a folder and grants nothing: reaching
+                // that folder still requires a token the endpoint mints per record.
+                'boxFolderId'
             },
             row.keySet(),
             'The projection changed; confirm every field here is safe to publish'

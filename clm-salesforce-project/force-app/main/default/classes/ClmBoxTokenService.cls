@@ -33,8 +33,6 @@
 @RestResource(urlMapping='/clm/box-token/*')
 global with sharing class ClmBoxTokenService {
 
-    @TestVisible
-    private static final String TOKEN_ENDPOINT = 'callout:CLM_Box/oauth2/token';
     private static final String TOKEN_EXCHANGE_GRANT = 'urn:ietf:params:oauth:grant-type:token-exchange';
     private static final String ACCESS_TOKEN_TYPE = 'urn:ietf:params:oauth:token-type:access_token';
 
@@ -55,10 +53,6 @@ global with sharing class ClmBoxTokenService {
      */
     private static final String DOWNSCOPE_SCOPE =
         'base_explorer item_preview item_read item_upload item_download item_delete item_rename item_share';
-
-    /** Reuse the parent token across requests so each preview costs one Box call, not two. */
-    private static final String CACHE_KEY_PREFIX = 'ClmBoxParentToken';
-    private static final Integer CACHE_SAFETY_MARGIN_SECONDS = 300;
 
     global class TokenResponse {
         global String accessToken;
@@ -134,7 +128,8 @@ global with sharing class ClmBoxTokenService {
         }
 
         try {
-            String parentToken = grantParentToken(config);
+            // Shared with the agent actions, which need the same grant against the same app.
+            String parentToken = ClmBoxAuth.parentToken();
             if (String.isBlank(parentToken)) {
                 fail(response, 500, 'box_auth_failed', 'Box did not return a parent access token.');
                 return;
@@ -201,36 +196,6 @@ global with sharing class ClmBoxTokenService {
         return false;
     }
 
-    /** Cached parent token for the configured subject, falling back to a fresh grant. */
-    private static String grantParentToken(CLM_Box_Config__c config) {
-        Boolean asUser = String.isNotBlank(config.Box_User_Id__c);
-        String subjectType = asUser ? 'user' : 'enterprise';
-        String subjectId = asUser ? config.Box_User_Id__c : config.Enterprise_Id__c;
-        // Key by subject: switching subject type must not serve the previous token.
-        String cacheKey = CACHE_KEY_PREFIX + subjectType + subjectId;
-
-        String cached = cacheGet(cacheKey);
-        if (String.isNotBlank(cached)) {
-            return cached;
-        }
-        HttpResponse res = post(
-            'grant_type=client_credentials'
-            // Merge fields are substituted by Salesforce and must not be encoded here.
-            + '&client_id={!$Credential.CLM_Box.ClientId}'
-            + '&client_secret={!$Credential.CLM_Box.ClientSecret}'
-            + '&box_subject_type=' + subjectType
-            + '&box_subject_id=' + EncodingUtil.urlEncode(subjectId, 'UTF-8')
-        );
-        if (res.getStatusCode() != 200) {
-            return null;
-        }
-        Map<String, Object> body = (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-        String token = (String) body.get('access_token');
-        Integer expiresIn = body.get('expires_in') == null ? 0 : Integer.valueOf(body.get('expires_in'));
-        cachePut(cacheKey, token, expiresIn);
-        return token;
-    }
-
     /** Exchange the parent token for one limited to preview scopes on a single folder. */
     private static TokenResponse downscope(String parentToken, String folderId) {
         HttpResponse res = post(
@@ -257,37 +222,7 @@ global with sharing class ClmBoxTokenService {
     }
 
     private static HttpResponse post(String body) {
-        HttpRequest req = new HttpRequest();
-        req.setEndpoint(TOKEN_ENDPOINT);
-        req.setMethod('POST');
-        req.setHeader('Content-Type', 'application/x-www-form-urlencoded');
-        req.setTimeout(20000);
-        req.setBody(body);
-        return new Http().send(req);
-    }
-
-    /** Org cache is optional: without a partition these are no-ops, not failures. */
-    private static String cacheGet(String cacheKey) {
-        try {
-            return (String) Cache.Org.get(cacheKey);
-        } catch (Exception e) {
-            return null;
-        }
-    }
-
-    private static void cachePut(String cacheKey, String token, Integer expiresIn) {
-        if (String.isBlank(token)) {
-            return;
-        }
-        Integer ttl = expiresIn - CACHE_SAFETY_MARGIN_SECONDS;
-        if (ttl < 60) {
-            return;
-        }
-        try {
-            Cache.Org.put(cacheKey, token, Math.min(ttl, 28800));
-        } catch (Exception e) {
-            // No partition allocated; every request simply re-grants.
-        }
+        return ClmBoxAuth.post(body);
     }
 
     /**
