@@ -24,12 +24,13 @@ export interface ClmContractSummary {
 }
 
 /**
- * Empty on any failure, the same contract the Box calls keep: the dashboard falls back
- * to the synthetic fixture rather than rendering an error, so the demo still runs with
- * no org behind it. The cause is logged, because an empty list and a broken endpoint
- * otherwise look identical.
+ * Null when the endpoint could not be reached, so the dashboard can fall back to its
+ * synthetic fixture and still demo with no org behind it. An empty array means the org
+ * genuinely has no contracts, which is a valid state and not a failure -- an org that has
+ * not been seeded yet should say so rather than show a fixture and claim Salesforce is
+ * unreachable.
  */
-export async function fetchClmContracts(): Promise<ClmContractSummary[]> {
+export async function fetchClmContracts(): Promise<ClmContractSummary[] | null> {
   try {
     const response = await fetch(apexRestUrl("/services/apexrest/clm/contracts"), {
       headers: { Accept: "application/json" },
@@ -39,13 +40,13 @@ export async function fetchClmContracts(): Promise<ClmContractSummary[]> {
         `[CLM] Contract list returned ${response.status}; falling back to fixtures.`,
         await response.text().catch(() => "")
       );
-      return [];
+      return null;
     }
     const result = (await response.json()) as ClmContractSummary[];
-    return Array.isArray(result) ? result.filter((row) => row && row.recordId) : [];
+    return Array.isArray(result) ? result.filter((row) => row && row.recordId) : null;
   } catch (error) {
     console.warn("[CLM] Contract list unreachable; falling back to fixtures.", error);
-    return [];
+    return null;
   }
 }
 

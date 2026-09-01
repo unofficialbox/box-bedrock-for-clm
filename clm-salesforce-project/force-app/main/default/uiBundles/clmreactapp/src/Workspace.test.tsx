@@ -116,4 +116,15 @@ describe("Workspace", () => {
     expect(params.get("recordId")).toBe("a01xx0000009abcAAA");
     expect(params.get("contractId")).toBe("CLM-2026-0017");
   });
+
+  test("an org with no contracts says so instead of showing a fixture", async () => {
+    // An empty list is a real answer. Showing the fixture here would claim Salesforce is
+    // unreachable when it answered perfectly well.
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => [] })));
+
+    render(<Workspace />);
+    expect(await screen.findByTestId("contracts-empty")).toBeVisible();
+    expect(screen.queryByTestId("contracts-fixture-note")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("contract-row")).not.toBeInTheDocument();
+  });
 });

@@ -36,11 +36,14 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
     let active = true;
     (async () => {
       const viaGraphql = await fetchContractsViaGraphql();
-      const rows = viaGraphql ?? (await fetchClmContracts());
+      const viaApex = viaGraphql === null ? await fetchClmContracts() : null;
+      const rows = viaGraphql ?? viaApex;
       if (!active) return;
-      setSource(rows.length === 0 ? "fixture" : viaGraphql ? "graphql" : "apex");
-      setLive(rows.length > 0);
-      setContracts(rows.length > 0 ? rows : FIXTURE_ROWS);
+      // Null from both means nothing answered, so the fixture stands in. An empty array
+      // is an org with no contracts yet -- a real answer, and shown as one.
+      setSource(rows === null ? "fixture" : viaGraphql ? "graphql" : "apex");
+      setLive(rows !== null);
+      setContracts(rows ?? FIXTURE_ROWS);
       setLoading(false);
     })();
     return () => {
@@ -65,6 +68,12 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
           </p>
         </div>
       </div>
+
+      {live && contracts.length === 0 ? (
+        <div className="workspace-state" data-testid="contracts-empty">
+          No contract records yet. Creating one in Salesforce brings it here.
+        </div>
+      ) : null}
 
       <div className="contract-rows">
         {contracts.map((contract, index) => (
