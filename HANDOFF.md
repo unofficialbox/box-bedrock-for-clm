@@ -313,12 +313,45 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    through the endpoint, then mint a workspace token, with no manual Box step in between.
    Both succeeded.
 
-7. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
-8. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
-9. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
-10. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
-11. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
-12. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
+7. **The internal persona reaches Salesforce over MCP, and the metadata is half-undocumented.**
+   `McpServerDefinition:CLMContractTools` exposes the two governed actions --
+   `ClmContractPackage` and `ClmBoxAskDocument` -- as MCP tools, so Claude Desktop reads
+   contract content through the same Apex the Experience Cloud agent uses. The Box
+   credential never leaves Apex: a client holding an MCP token holds no Box token.
+
+   Hosted MCP Servers are GA (April 2026). `McpServerDefinition` is **not in the Metadata
+   API Developer Guide** -- no reference page, no field table -- so the shape below came
+   from a deployed example and two org errors:
+   - An Apex tool is `aa:apex-<ClassName>` with `apiSource` `API_CATALOG` and `operation`
+     set to the **class** name. It is not `apex://ClassName`, which is what the agent
+     authoring bundle uses for the very same classes.
+   - `description` and `descriptionOverride` cap at **255 characters**.
+   - The server's developer name is **alphanumeric only** -- no underscores, 2-40 chars.
+     `CLM_Contract_Tools` is rejected; `CLMContractTools` is not. Every other API name in
+     this repo uses underscores, so this one reads like a typo and is not.
+   - Only `global` methods annotated `@InvocableMethod` can be exposed.
+
+   Activation is not in the metadata. It is a `McpServerAccess` Tooling API record whose
+   `DeveloperName` **must equal the server's**, with `Active = true` and `McpServerId`
+   pointing at the definition. Without it a client authenticates and sees no tools.
+
+   The client side is four metadata types deployed together --
+   `ExternalClientApplication`, `ExtlClntAppOauthSettings`,
+   `ExtlClntAppGlobalOauthSettings`, `ExtlClntAppOauthConfigurablePolicies` -- as
+   `CLM_Claude_MCP`. Scopes are spelled `MCP, RefreshToken` in metadata and shown as
+   `mcp_api` / `refresh_token` in Setup. The callback is Claude's:
+   `https://claude.ai/api/mcp/auth_callback`. `CLM_MCP_Client` is an empty permission set
+   that exists only to gate who may authenticate, since the default is any user in the org.
+
+   **Never retrieve `ExtlClntAppGlobalOauthSettings` into the repo.** A retrieve brings back
+   `consumerKey` and `consumerSecret`; the committed file is authored and holds neither.
+
+8. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
+9. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
+10. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
+11. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
+12. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
+13. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
 
 ## 7. How to verify you're in a good state
 
