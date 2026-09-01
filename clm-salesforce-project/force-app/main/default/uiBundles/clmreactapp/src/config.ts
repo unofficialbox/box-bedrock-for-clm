@@ -20,9 +20,12 @@ export const CLM_CONFIG = {
     docgen: import.meta.env.VITE_BOX_DOCGEN_FOLDER_ID || "",
   },
   agentforce: {
-    // The developer name of the agent, not an org id -- portable across orgs, so it
-    // ships as the default. See aiAuthoringBundles/CLM_Contract_Copilot.
-    agentId: import.meta.env.VITE_AGENTFORCE_AGENT_ID || "CLM_Contract_Copilot",
+    // The agent's 18-digit id, not its developer name. The Agentforce API rejects the
+    // developer name outright -- "CLM_Contract_Copilot is not a valid agent ID" -- so
+    // there is no portable default to ship; the id is per-org and supplied at build time
+    // or through runtime config. Find it with:
+    //   sf data query -q "SELECT Id, DeveloperName FROM BotDefinition"
+    agentId: import.meta.env.VITE_AGENTFORCE_AGENT_ID || "",
     appId: import.meta.env.VITE_AGENTFORCE_APP_ID || "",
     salesforceOrigin: import.meta.env.VITE_SALESFORCE_ORIGIN || "",
     // The shipped agent is defined by an Agent Script authoring bundle, which is what
