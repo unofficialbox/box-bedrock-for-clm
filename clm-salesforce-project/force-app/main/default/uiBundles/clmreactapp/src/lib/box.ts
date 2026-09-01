@@ -20,7 +20,32 @@ export interface BoxFolderItem {
   size?: number;
   modified_at?: string;
   extension?: string;
+  /**
+   * The clmDocument instance, requested inline with the listing.
+   *
+   * Box returns it under the literal key `enterprise` when the field is asked for as
+   * `metadata.enterprise.clmDocument` -- the shorthand for the caller's own enterprise,
+   * which saves shipping an enterprise ID to the browser.
+   */
+  metadata?: { enterprise?: { clmDocument?: { versionStatus?: string } } };
 }
+
+/**
+ * What a counterparty does not get to see.
+ *
+ * A redline is Acme's markup of a document -- what was struck, what was proposed, and by
+ * implication what Acme was willing to accept. The contract folder is downscoped to one
+ * contract, which bounds *which* contract's documents are reachable, but not which
+ * documents within it, so the filter has to happen here.
+ *
+ * Matching on `versionStatus` rather than on the file name is the difference between a
+ * control and a coincidence: a redline named `v5-final.pdf` is still a redline, and a
+ * legitimate document with "redline" in its name is not. Files with no clmDocument
+ * instance are shown -- an untagged upload should be visible rather than silently
+ * disappearing, and the tagging is what governs, so an untagged file is a tagging gap to
+ * fix rather than a document to hide.
+ */
+const WITHHELD_VERSION_STATUS = "Redline";
 
 /**
  * List a folder with the downscoped token.
@@ -41,7 +66,9 @@ export async function listBoxFolderItems(
 ): Promise<BoxFolderItem[] | null> {
   try {
     const response = await fetch(
-      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type,size,extension,modified_at&limit=100`,
+      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items` +
+        `?fields=id,name,type,size,extension,modified_at,` +
+        `${encodeURIComponent("metadata.enterprise.clmDocument")}&limit=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
     if (!response.ok) {
@@ -52,7 +79,11 @@ export async function listBoxFolderItems(
       return null;
     }
     const result = (await response.json()) as { entries?: BoxFolderItem[] };
-    return (result.entries || []).filter((entry) => entry.type === "file");
+    return (result.entries || []).filter(
+      (entry) =>
+        entry.type === "file" &&
+        entry.metadata?.enterprise?.clmDocument?.versionStatus !== WITHHELD_VERSION_STATUS,
+    );
   } catch (error) {
     // A CORS rejection surfaces here as an opaque TypeError with no response to read.
     console.warn("[CLM] Box folder listing threw; check the Box app's CORS domains.", error);

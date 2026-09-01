@@ -1,4 +1,4 @@
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { fetchDownscopedBoxToken, getAgentContextPrompt, getClmPageContext, listBoxFolderItems } from "./box";
 
 describe("CLM page context", () => {
@@ -169,5 +169,55 @@ describe("Downscoped token request", () => {
     expect(await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a01xx0000009abcAAA" }))
       .toEqual({ accessToken: "", folderId: "" });
     expect(calls.some((c) => c.includes("box-folder"))).toBe(false);
+  });
+});
+
+describe("listBoxFolderItems", () => {
+  function listing(entries: unknown[]) {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({ ok: true, json: async () => ({ entries }) })),
+    );
+  }
+
+  test("withholds a redline from the counterparty", async () => {
+    // The downscoped token bounds which contract is reachable, not which documents within
+    // it, so this filter is the only thing keeping Acme's markup off a counterparty's
+    // screen.
+    listing([
+      { id: "1", name: "msa-executed.pdf", type: "file",
+        metadata: { enterprise: { clmDocument: { versionStatus: "Executed" } } } },
+      { id: "2", name: "msa-redline-v4.pdf", type: "file",
+        metadata: { enterprise: { clmDocument: { versionStatus: "Redline" } } } },
+    ]);
+
+    const items = await listBoxFolderItems("123", "token");
+
+    expect(items?.map((i) => i.name)).toEqual(["msa-executed.pdf"]);
+  });
+
+  test("matches on version status, not on the file name", async () => {
+    // A redline called anything is still a redline; a document merely named "redline" is
+    // not one. Filtering on the name would get both backwards.
+    listing([
+      { id: "1", name: "v5-final.pdf", type: "file",
+        metadata: { enterprise: { clmDocument: { versionStatus: "Redline" } } } },
+      { id: "2", name: "redline-policy-summary.pdf", type: "file",
+        metadata: { enterprise: { clmDocument: { versionStatus: "Approved" } } } },
+    ]);
+
+    const items = await listBoxFolderItems("123", "token");
+
+    expect(items?.map((i) => i.name)).toEqual(["redline-policy-summary.pdf"]);
+  });
+
+  test("shows a file that carries no clmDocument instance", async () => {
+    // An untagged upload is a tagging gap to fix, not a document to hide -- vanishing
+    // silently is worse than appearing.
+    listing([{ id: "1", name: "just-uploaded.pdf", type: "file" }]);
+
+    const items = await listBoxFolderItems("123", "token");
+
+    expect(items?.map((i) => i.name)).toEqual(["just-uploaded.pdf"]);
   });
 });
