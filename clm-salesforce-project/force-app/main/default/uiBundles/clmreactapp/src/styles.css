@@ -168,10 +168,11 @@ button { cursor: pointer; }
   background: var(--surface, #fff);
 }
 
-/* box-ui-elements sizes to its content unless its own wrapper is given a height, so the
+/* box-ui-elements sizes to its content unless its own root is given a height, so the
    list stopped short and left the bottom of the card blank. The element scrolls its own
-   list, which is why the host hides overflow rather than adding a second scrollbar. */
-.box-element-host > div,
+   list, which is why the host hides overflow rather than adding a second scrollbar.
+   Scoped to .be: the host's other child is an empty notification viewport, and stretching
+   that to 100% pushed the explorer down behind a tall blank band. */
 .box-element-host .be {
   height: 100%;
 }
