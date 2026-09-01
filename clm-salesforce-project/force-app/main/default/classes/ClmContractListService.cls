@@ -55,7 +55,20 @@ global with sharing class ClmContractListService {
         }
     }
 
-    private without sharing class ContractReader {
+    /**
+     * `with sharing`, deliberately, and it used to be the opposite.
+     *
+     * This endpoint now serves one audience: a counterparty in the Experience Cloud site.
+     * The internal persona reads the pipeline through the MCP server instead. So the right
+     * answer to "which contracts may this caller see" is the platform's -- the
+     * CLM_Counterparty_Access sharing set maps a contract's Counterparty_Account__c to the
+     * signed-in user's Contact.Account, and sharing then filters the query for free.
+     *
+     * While this ran `without sharing` it returned every contract in the org to whoever
+     * asked. On an authenticated counterparty site that means one customer reading the
+     * names, values and risk levels of every other customer's deals.
+     */
+    private with sharing class ContractReader {
         private List<ContractSummary> read() {
             List<ContractSummary> summaries = new List<ContractSummary>();
             for (CLM_Contract__c record : [

@@ -1,16 +1,21 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { ClipboardCheck, FileSignature, FileStack, GitCompareArrows, LayoutDashboard, Sparkles, UserRoundCheck } from "lucide-react";
+import { FileStack, LayoutDashboard } from "lucide-react";
 import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { ContractList } from "./components/ContractList";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
-import { EXPERT_ROUTES, NORTHSTAR_CONTRACT, REDLINE_FINDINGS } from "./data";
-import { getAgentContextPrompt, getClmPageContext } from "./lib/box";
-import { groupRedlineFindings, type RedlineReviewGroup } from "./lib/redlines";
+import { NORTHSTAR_CONTRACT } from "./data";
+import { getClmPageContext } from "./lib/box";
 
-type View = "contracts" | "workspace" | "approvals";
-
-const REDLINE_REVIEW_GROUPS = groupRedlineFindings(REDLINE_FINDINGS, EXPERT_ROUTES);
+/**
+ * This app is the counterparty's surface, and only theirs.
+ *
+ * It used to serve both sides, which is why it carried a redline review queue and a "copy
+ * agent context" button. The internal persona now works headlessly through the MCP server,
+ * so everything here is what an external party may see: their own contracts, the documents
+ * in them, and the Copilot. Anything that reveals Acme's own process does not belong.
+ */
+type View = "contracts" | "workspace";
 
 /**
  * The query string a selected contract should produce.
@@ -37,7 +42,6 @@ export function Workspace() {
    * Without one there is nothing to show yet, and the dashboard is the entry point.
    */
   const [view, setView] = useState<View>(context.salesforceRecordId ? "workspace" : "contracts");
-  const [copied, setCopied] = useState(false);
 
   /**
    * Keep the app in step with the address bar. Without this, Back after opening a
@@ -86,21 +90,15 @@ export function Workspace() {
     };
   }, [context, selected]);
 
-  async function copyAgentContext() {
-    await navigator.clipboard.writeText(getAgentContextPrompt());
-    setCopied(true);
-  }
 
   return (
     <div className="app-shell">
       <header className="topbar">
         <div className="brand"><span className="brand-mark">A</span><span><strong>Acme Contracts</strong><small>Box-powered CLM</small></span></div>
         <nav aria-label="Primary">
-          <button className={view === "contracts" ? "nav-active" : ""} onClick={() => setView("contracts")}><FileStack size={16} /> Contracts</button>
+          <button className={view === "contracts" ? "nav-active" : ""} onClick={() => setView("contracts")}><FileStack size={16} /> Your contracts</button>
           <button className={view === "workspace" ? "nav-active" : ""} onClick={() => setView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
-          <button className={view === "approvals" ? "nav-active" : ""} onClick={() => setView("approvals")}><ClipboardCheck size={16} /> Redline reviews <span className="count">{REDLINE_REVIEW_GROUPS.length}</span></button>
         </nav>
-        <button className="agent-context-button" onClick={copyAgentContext}><Sparkles size={16} /> {copied ? "Context copied" : "Copy agent context"}</button>
       </header>
 
       <div className="contract-banner">
@@ -117,10 +115,8 @@ export function Workspace() {
         <main>
           {view === "contracts" ? (
             <ContractList onSelect={openContract} />
-          ) : view === "workspace" ? (
-            <BoxWorkspace context={workspaceContext} />
           ) : (
-            <Approvals />
+            <BoxWorkspace context={workspaceContext} />
           )}
         </main>
         <AgentforcePanel contractId={selected?.contractId || context.contractId} />
@@ -131,52 +127,4 @@ export function Workspace() {
 
 function Metric({ label, value, danger, warning }: { label: string; value: string; danger?: boolean; warning?: boolean }) {
   return <div className="metric"><span>{label}</span><strong className={danger ? "danger" : warning ? "warning" : ""}>{value}</strong></div>;
-}
-
-function Approvals() {
-  return (
-    <section className="approvals-card" data-testid="approvals-view">
-      <div className="section-heading"><div><span className="eyebrow"><GitCompareArrows size={15} /> Redline finding router</span><h2>Domain expert review</h2><p>Differences are cited, risk-scored, and consolidated into one human-owned Box task per domain.</p></div><span className="blocked-pill"><FileSignature size={14} /> Signature blocked</span></div>
-      <div className="review-summary" aria-label="Redline review summary">
-        <div><strong>{REDLINE_FINDINGS.length}</strong><span>cited findings</span></div>
-        <div><strong>{REDLINE_REVIEW_GROUPS.length}</strong><span>expert domains</span></div>
-        <div><strong>100%</strong><span>human owned</span></div>
-      </div>
-      <div className="approval-list">
-        {REDLINE_REVIEW_GROUPS.map((group) => <RedlineReview key={group.domain} group={group} />)}
-      </div>
-    </section>
-  );
-}
-
-function RedlineReview({ group }: { group: RedlineReviewGroup }) {
-  const confidence = Math.round(group.minimumConfidence * 100);
-
-  return (
-    <article className="review-group">
-      <div className="review-group-head">
-        <div className="approval-role"><UserRoundCheck size={18} /></div>
-        <div className="expert-copy">
-          <span>{group.domain}</span>
-          <strong>{group.expert.expertName}</strong>
-          <small>{group.expert.expertTitle} · Box task {group.expert.boxTaskId}</small>
-        </div>
-        <div className="review-badges">
-          <span className={`risk risk-${group.highestRisk.toLowerCase()}`}>{group.highestRisk}</span>
-          <span className="pending-pill">Pending</span>
-        </div>
-      </div>
-      <div className="finding-list">
-        {group.findings.map((finding) => (
-          <div className="finding-row" key={finding.id}>
-            <div className="finding-meta"><span>{finding.id}</span><span>{finding.changeType}</span><span>{finding.section}</span></div>
-            <strong>{finding.summary}</strong>
-            <div className="redline-copy"><del>{finding.proposedText}</del><ins>{finding.approvedPosition}</ins></div>
-            <small>{finding.sourceCitation} · {finding.fallbackClauseId}</small>
-          </div>
-        ))}
-      </div>
-      <div className="routing-note"><span>Lowest classification confidence: {confidence}%</span><span>Task assignee: {group.expert.boxAssigneeLogin}</span></div>
-    </article>
-  );
 }

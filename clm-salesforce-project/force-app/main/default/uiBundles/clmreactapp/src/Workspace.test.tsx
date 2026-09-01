@@ -34,19 +34,21 @@ describe("Workspace", () => {
     expect(screen.queryByTestId("contracts-view")).not.toBeInTheDocument();
   });
 
-  test("groups cited redline findings by human expert and never presents an automated approval control", () => {
+  test("shows a counterparty nothing of Acme's own review process", () => {
+    // This app is the counterparty's surface now; the internal persona works through the
+    // MCP server. The redline review queue named Acme's own reviewers and told the customer
+    // which of their asks was blocking signature, and "Copy agent context" was a workaround
+    // for a limitation they should never meet. Neither belongs in front of a counterparty.
     render(<Workspace />);
-    fireEvent.click(screen.getByRole("button", { name: /Redline reviews/ }));
-    expect(screen.getByTestId("approvals-view")).toBeVisible();
-    expect(screen.getByText("Jordan Lee")).toBeVisible();
-    expect(screen.getByText("Priya Shah")).toBeVisible();
-    expect(screen.getByText("Elena Torres")).toBeVisible();
-    expect(screen.getByText("Counterparty removed the aggregate liability cap.")).toBeVisible();
-    expect(screen.getByText(/Task assignee: configured Commercial Legal reviewer/)).toBeVisible();
-    expect(screen.getByText(/Task assignee: configured Finance reviewer/)).toBeVisible();
-    expect(screen.getByText(/Task assignee: configured Privacy reviewer/)).toBeVisible();
-    expect(screen.getByText("Signature blocked")).toBeVisible();
-    expect(screen.queryByRole("button", { name: /approve/i })).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Redline reviews/ })).not.toBeInTheDocument();
+    expect(screen.queryByTestId("approvals-view")).not.toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: /Copy agent context/ })).not.toBeInTheDocument();
+    expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
+  });
+
+  test("names the contract list as the counterparty's own", () => {
+    render(<Workspace />);
+    expect(screen.getByRole("button", { name: /Your contracts/ })).toBeVisible();
   });
 
   test("shows the Salesforce record returned by the intake flow", () => {
