@@ -378,12 +378,55 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    folder is what would give every document its contract's facts by inheritance, and that
    is the piece that turns a portfolio question into a single query.
 
-9. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
-10. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
-11. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
-12. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
-13. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
-14. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
+9. **The external persona cannot be scoped through the agent, only through the UI.** The
+   Experience Cloud workspace and the Contract Copilot are governed differently, and the
+   difference is not a choice:
+
+   - The **workspace** runs as the signed-in Experience Cloud user, so identity is
+     available. `ClmCounterpartyContracts` resolves that user's Contact, takes its Account,
+     and returns only contracts whose `Counterparty_Account__c` matches. It has no usable
+     reference input: naming somebody else's contract returns a refusal that does not even
+     leak the contract's name.
+   - The **ACC agent** runs as its own user -- `access.default_agent_user` in the authoring
+     bundle -- not as the person typing. That is not a guess: the agent's actions returned
+     "could not find that contract" until `CLM_Contract_Agent` granted **the agent user**
+     View All. Had they run as the signed-in admin they would have worked immediately.
+
+   So an identity-scoped action is useless inside the agent: `UserInfo.getUserId()` is the
+   agent, whose Contact is null. And the agent's `get_contract_package` binding is
+   `with inputContract = ...`, meaning the model fills it from the conversation. **A
+   counterparty in the portal can therefore ask the Copilot about another company's
+   contract by naming it.** The downscoped Box token bounds the workspace UI to one folder;
+   it does not bound the agent, which reaches Box through Apex under the app's credentials.
+
+   This is the ACC context limitation from thread 5 wearing a different hat: the client
+   cannot pass identity any more than it can pass a record. Until it can, the external agent
+   is demo-grade and should be described that way. The workspace itself is defensible.
+
+   `Counterparty_Account__c` is the anchor rather than the `Counterparty__c` text, which
+   holds both "Northstar Health" and "Northstar Health System" for one customer -- matching
+   on it would show a counterparty half their contracts.
+
+   **Record visibility still needs a sharing set.** `CLM_Counterparty_Portal` grants object
+   read and the class, deliberately not `viewAllRecords` -- a Customer Community user with
+   View All could query every contract straight through the REST API with their own session,
+   which is the hole this class exists to close. A Customer Community licence reaches its own
+   account's rows through a **sharing set** on `CLM_Contract__c` keyed to
+   `Counterparty_Account__c`, configured under Digital Experiences settings. Without it the
+   action returns "no contracts on file" for a real portal user. The tests pin the bound
+   account rather than granting View All, because a test that grants the permission the
+   class exists to avoid proves nothing.
+
+   Dana Whitfield (`dana.whitfield@northstarhealth.clm.demo`, Customer Community User on
+   Northstar Health) exists for this. Creating her needed
+   `CommunitiesSettings.enableOotbProfExtUserOpsEnable`, which was off.
+
+10. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
+11. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
+12. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
+13. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
+14. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
+15. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
 
 ## 7. How to verify you're in a good state
 
