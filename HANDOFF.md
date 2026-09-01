@@ -277,12 +277,40 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    republishing appeared to change nothing there for so long.
 
    Both Apex legs were also verified directly against the live org and live Box:
-6. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
-7. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
-8. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
-9. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
-10. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
-11. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
+6. **A Box folder needs a *direct* collaboration before it can be downscoped.** Inherited
+   access is not enough, and the failure is badly disguised: `GET /2.0/folders/<id>`
+   returns 200 with `permissions.can_upload = true`, and the token exchange still comes
+   back `{"error":"invalid_resource"}`. Reading that error you will look at scopes, at the
+   enterprise, at token caching -- all of which are fine.
+
+   The tell is `GET /2.0/folders/<id>/collaborations`. A folder that downscopes has the
+   configured Box user (`CLM_Box_Config__c.Box_User_Id__c`) listed on it *directly*; one
+   that does not, does not. Northstar's folder carried `385982796:editor` from a manual
+   grant made months ago. Calder's, freshly provisioned by
+   `box.Toolkit.createFolderForRecordId`, carried only the owner's own collaboration and
+   inherited the rest -- and no amount of collaborating the parent `CLM Root` changes it.
+
+   **This affects every contract whose folder the package provisions.** The workspace
+   requests `item_upload item_delete item_rename item_share`, so the token mint fails
+   outright and the panel falls back to fixtures. It has gone unnoticed only because the
+   demo has always pointed at Northstar. Until `ClmBoxFolderService` grants the
+   collaboration itself, provisioning a contract folder is a two-step operation:
+
+   ```
+   POST /2.0/collaborations
+   {"item":{"id":"<folderId>","type":"folder"},
+    "accessible_by":{"id":"<Box_User_Id__c>","type":"user"},"role":"editor"}
+   ```
+
+   The parent token can make that call -- verified on 2026-09-01, HTTP 201 -- so the fix
+   is a few lines beside the `createFolderForRecordId` call rather than an admin task.
+
+7. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
+8. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
+9. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
+10. **`production-custom-ui-requirements.md` predates the scenario reduction.** It still frames Mode A (Box-centric) and Mode B (cross-platform) as parallel runtime modes. Treat it as a requirements wish-list, not a description of what exists.
+11. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
+12. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
 
 ## 7. How to verify you're in a good state
 
