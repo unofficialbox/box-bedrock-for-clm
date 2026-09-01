@@ -4,6 +4,16 @@
     <masterLabel>CLM Contract Tools</masterLabel>
     <tools>
         <apiDefinition>
+            <apiIdentifier>aa:apex-ClmContractList</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>ClmContractList</operation>
+        </apiDefinition>
+        <descriptionOverride>Lists CLM contracts with reference, counterparty, status, risk and value, optionally filtered by status or counterparty. Use this to answer a portfolio question, then take each reference to the contract package.</descriptionOverride>
+        <toolName>listContracts</toolName>
+        <toolTitle>List CLM Contracts</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
             <apiIdentifier>aa:apex-ClmContractPackage</apiIdentifier>
             <apiSource>API_CATALOG</apiSource>
             <operation>ClmContractPackage</operation>
