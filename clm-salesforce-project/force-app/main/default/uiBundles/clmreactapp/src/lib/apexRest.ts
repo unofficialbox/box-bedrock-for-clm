@@ -1,22 +1,23 @@
+import { sfdcEnv } from "./sfdcEnv";
+
 /**
  * Build the URL for an Apex REST endpoint.
  *
- * On an Experience Cloud site the call has to go through the site's path prefix --
- * `/clm/services/apexrest/...` rather than `/services/apexrest/...`. The bare path
- * targets the org's REST API, which does not accept a site session and answers:
+ * A UI bundle reaches Apex through `SFDC_ENV.apiPath` -- "/clm/sf/api" on this site --
+ * not through the bare path and not through the site prefix. Both of those were tried
+ * against a signed-in session and neither works:
  *
- *   [{"message":"This session is not valid for use with the REST API",
- *     "errorCode":"INVALID_SESSION_ID"}]
+ *   /services/apexrest/...        401 INVALID_SESSION_ID, a site session is not an API session
+ *   /clm/services/apexrest/...    200 with the SPA shell, because an app-container site
+ *                                 serves the React app for every path under its prefix
  *
- * The guest user does not hit this, which is what makes it easy to miss: anonymously the
- * bare path resolves and the endpoint replies normally, and the 401 only appears once
- * someone signs in.
+ * The second is the dangerous one: it succeeds, so the caller fails parsing HTML as JSON
+ * rather than seeing an error.
  *
- * Salesforce injects SFDC_ENV.basePath on a site. Off-platform -- a standalone build, a
- * test, the local harness -- there is no prefix and the bare path is correct.
+ * Off-platform -- a standalone build, a test, the local harness -- there is no apiPath
+ * and the bare path is what the harness serves.
  */
 export function apexRestUrl(path: string): string {
-  const basePath = (globalThis as { SFDC_ENV?: { basePath?: string } }).SFDC_ENV?.basePath;
-  const prefix = basePath ? basePath.replace(/\/+$/, "") : "";
-  return `${prefix}${path}`;
+  const apiPath = sfdcEnv()?.apiPath;
+  return apiPath ? `${apiPath.replace(/\/+$/, "")}${path}` : path;
 }

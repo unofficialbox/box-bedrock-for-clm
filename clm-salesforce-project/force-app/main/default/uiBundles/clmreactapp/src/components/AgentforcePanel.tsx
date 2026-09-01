@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { Bot, ShieldCheck } from "lucide-react";
 import { embedAgentforceClient } from "@salesforce/agentforce-conversation-client";
 import { CLM_CONFIG } from "../config";
+import { sfdcEnv } from "../lib/sfdcEnv";
 import { AGENT_PROMPTS } from "../data";
 
 export function AgentforcePanel() {
@@ -12,9 +13,8 @@ export function AgentforcePanel() {
   const appId = runtime?.agentforceAppId || CLM_CONFIG.agentforce.appId;
   const fileBased = CLM_CONFIG.agentforce.fileBased;
 
-  // Salesforce injects SFDC_ENV into a UI bundle at runtime. origin and basePath are the
-  // two things the conversation client cannot work out for itself.
-  const sfdcEnv = (globalThis as { SFDC_ENV?: { origin?: string; basePath?: string } }).SFDC_ENV;
+  // Salesforce injects SFDC_ENV into a UI bundle at runtime.
+  const env = sfdcEnv();
   /**
    * The current origin is a fallback only when SFDC_ENV proves we are on-platform. An
    * Experience site sets basePath but leaves origin undefined, so without this the panel
@@ -22,18 +22,23 @@ export function AgentforcePanel() {
    * standalone build, a test, the local harness -- there is no org behind the page, and
    * defaulting to the current origin would attempt an embed that cannot work.
    */
+  /**
+   * The org's Lightning origin, from SFDC_ENV.orgUrl.
+   *
+   * Not the site origin. An app-container Experience site serves the React app for every
+   * path beneath its prefix, so Lightning Out asking the site for /clm/lightning-out gets
+   * the SPA shell back, fails to start, and retries -- a console loop that creates no
+   * iframe. sitePrefix still tells it which site context to run in.
+   */
   const salesforceOrigin =
-    runtime?.salesforceOrigin ||
-    sfdcEnv?.origin ||
-    CLM_CONFIG.agentforce.salesforceOrigin ||
-    (sfdcEnv ? window.location.origin : "");
+    runtime?.salesforceOrigin || env?.orgUrl || CLM_CONFIG.agentforce.salesforceOrigin;
 
   /**
    * An Experience Cloud site is served under a path prefix -- this one is /clm -- and the
    * client builds its endpoints from it. Without a prefix it calls the wrong paths on a
    * site and the panel stays empty, so this is not optional once the app leaves Lightning.
    */
-  const sitePrefix = sfdcEnv?.basePath ? sfdcEnv.basePath.replace(/\/+$/, "") : undefined;
+  const sitePrefix = env?.basePath ? env.basePath.replace(/\/+$/, "") : undefined;
 
   useEffect(() => {
     // appId is optional: it is a Lightning Out 2.0 app id, and the client only needs one
