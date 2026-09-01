@@ -102,6 +102,43 @@ public with sharing class ClmContractPackage {
         return result;
     }
 
+    /**
+     * The Box file IDs that belong to a contract, or null when the contract or its folder
+     * could not be resolved.
+     *
+     * Exposed so that asking Box AI about a document can be bounded to the contract the
+     * caller named. Without that bound an MCP client can hand any Box file ID to the ask
+     * action and have it read, which is a wider reach than any single contract implies.
+     */
+    public static Set<String> documentIdsFor(String reference) {
+        if (String.isBlank(reference)) {
+            return null;
+        }
+        CLM_Contract__c contract = new ContractLookup().byReference(reference.trim());
+        if (contract == null) {
+            return null;
+        }
+        String folderId = new FolderMapping().forRecord(contract.Id);
+        if (String.isBlank(folderId)) {
+            folderId = contract.Box_Workspace_Folder_ID__c;
+        }
+        if (String.isBlank(folderId)) {
+            return null;
+        }
+        List<String> lines = listFiles(folderId);
+        if (lines == null) {
+            return null;
+        }
+        Set<String> ids = new Set<String>();
+        for (String line : lines) {
+            // "- name.pdf (Box file ID 123)" -- the id is the last token before the paren.
+            Integer marker = line.lastIndexOf('Box file ID ');
+            if (marker < 0) continue;
+            ids.add(line.substring(marker + 'Box file ID '.length()).replace(')', '').trim());
+        }
+        return ids;
+    }
+
     private static String describe(CLM_Contract__c contract) {
         List<String> parts = new List<String>{ 'Contract ' + contract.Contract_ID__c + ' -- ' + contract.Name };
         if (String.isNotBlank(contract.Counterparty__c)) parts.add('Counterparty: ' + contract.Counterparty__c);

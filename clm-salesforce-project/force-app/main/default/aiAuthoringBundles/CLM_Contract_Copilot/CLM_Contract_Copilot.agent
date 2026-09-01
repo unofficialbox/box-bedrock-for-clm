@@ -141,6 +141,7 @@ subagent document_answers:
             ask_box_ai: @actions.ask_box_ai
                 description: "Ask Box AI about one document, by a Box file ID from the package listing."
                 available when @variables.contractPackageLoaded == True
+                with contractReference = @variables.contractId
                 with itemId = ...
                 with prompt = ...
 
@@ -190,6 +191,11 @@ subagent document_answers:
             include_in_progress_indicator: True
             progress_indicator_message: "Reading the document in Box..."
             inputs:
+                contractReference: string
+                    description: "The contract the document belongs to. A file outside that contract is refused, so this must match the contract get_contract_package was called with."
+                    label: "Contract Reference"
+                    is_required: True
+                    complex_data_type_name: "lightning__textType"
                 itemId: string
                     description: "A Box file ID copied from the get_contract_package listing. Never invent one and never ask the person for one."
                     label: "Item ID"

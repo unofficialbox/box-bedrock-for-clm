@@ -18,9 +18,14 @@ public with sharing class ClmBoxAskDocument {
 
     public class Request {
         @InvocableVariable(
-            label='Box item ID'
-            description='The Box file ID to ask about, taken from the contract package listing, or a Box Hub ID.'
+            label='Contract reference'
+            description='The contract whose document is being read, for example CLM-2026-0017. Required: a document is only readable in the context of the contract it belongs to.'
             required=true
+        )
+        public String contractReference;
+        @InvocableVariable(
+            label='Box item ID'
+            description='The Box file ID to ask about, taken from that contract\'s package listing. Ignored when itemType is hub, because the clause library is configuration rather than a caller argument.'
         )
         public String itemId;
         @InvocableVariable(
@@ -55,6 +60,64 @@ public with sharing class ClmBoxAskDocument {
         return results;
     }
 
+    /** What this request is allowed to read, or why it is not. */
+    private class Scope {
+        private String itemId;
+        private String itemType;
+        private String refusal;
+    }
+
+    /**
+     * Bounds a request to the contract it names.
+     *
+     * Two different reads, two different bounds. A document must belong to the folder of
+     * the contract the caller named: without that check the action will read any Box file
+     * ID handed to it, which is a far wider reach than "ask about this contract" implies,
+     * and an MCP client is exactly the kind of caller that would stumble into it. The
+     * clause library is the other case -- it is org policy rather than contract content,
+     * so its Hub comes from configuration and the caller does not get to name which
+     * playbook to consult.
+     */
+    private static Scope resolveScope(Request req) {
+        Scope scope = new Scope();
+        scope.itemType = itemType(req.itemType);
+
+        if (scope.itemType == 'hubs') {
+            CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
+            String hubId = config == null ? null : config.Clause_Library_Hub_Id__c;
+            if (String.isBlank(hubId)) {
+                scope.refusal = 'No approved clause library is configured, so there is no playbook to read.';
+                return scope;
+            }
+            scope.itemId = hubId;
+            return scope;
+        }
+
+        if (String.isBlank(req.itemId)) {
+            scope.refusal = 'I need a Box file ID from the contract package before I can read a document.';
+            return scope;
+        }
+        if (String.isBlank(req.contractReference)) {
+            scope.refusal = 'I need to know which contract that document belongs to before I can read it.';
+            return scope;
+        }
+
+        Set<String> allowed = ClmContractPackage.documentIdsFor(req.contractReference);
+        if (allowed == null) {
+            scope.refusal = 'I could not resolve the documents for "' + req.contractReference.trim()
+                + '", so I cannot confirm that file belongs to it.';
+            return scope;
+        }
+        String requested = req.itemId.trim();
+        if (!allowed.contains(requested)) {
+            scope.refusal = 'That file is not in the Box folder for ' + req.contractReference.trim()
+                + '. Read it through the contract package it does belong to.';
+            return scope;
+        }
+        scope.itemId = requested;
+        return scope;
+    }
+
     /**
      * The Box item type, defaulting to a single document.
      *
@@ -75,8 +138,14 @@ public with sharing class ClmBoxAskDocument {
         Result result = new Result();
         result.answered = false;
 
-        if (req == null || String.isBlank(req.itemId) || String.isBlank(req.prompt)) {
-            result.answer = 'I need both a Box file ID and a question before I can read a document.';
+        if (req == null || String.isBlank(req.prompt)) {
+            result.answer = 'I need a question before I can read anything.';
+            return result;
+        }
+
+        Scope scope = resolveScope(req);
+        if (scope.refusal != null) {
+            result.answer = scope.refusal;
             return result;
         }
 
@@ -87,8 +156,8 @@ public with sharing class ClmBoxAskDocument {
         }
 
         Map<String, Object> item = new Map<String, Object>{
-            'id' => req.itemId.trim(),
-            'type' => itemType(req.itemType)
+            'id' => scope.itemId,
+            'type' => scope.itemType
         };
         String body = JSON.serialize(new Map<String, Object>{
             'mode' => 'single_item_qa',

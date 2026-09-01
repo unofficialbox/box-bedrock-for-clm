@@ -18,7 +18,7 @@
             <apiSource>API_CATALOG</apiSource>
             <operation>ClmBoxAskDocument</operation>
         </apiDefinition>
-        <descriptionOverride>Asks Box AI about one contract document by its Box file ID, or across a Box Hub such as the approved clause library by passing its Hub ID with itemType hub. The answer quotes that content.</descriptionOverride>
+        <descriptionOverride>Asks Box AI about one document of a named contract, by a Box file ID from that contract&apos;s package. A file outside that contract is refused. With itemType hub it reads the approved clause library instead.</descriptionOverride>
         <toolName>askContractDocument</toolName>
         <toolTitle>Ask Box AI About a Contract Document</toolTitle>
     </tools>

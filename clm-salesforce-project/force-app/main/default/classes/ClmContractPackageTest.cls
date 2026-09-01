@@ -118,4 +118,42 @@ private class ClmContractPackageTest {
         System.assertEquals(false, result.outputFound);
         System.assert(result.outputSummary.contains('which contract'), result.outputSummary);
     }
+
+    @IsTest
+    static void documentIdsAreEmptyRatherThanNullForAKnownContract() {
+        // The distinction the ask action depends on: a contract it can resolve returns a
+        // set (possibly empty), and one it cannot returns null. Null means "I could not
+        // confirm what belongs to this contract", which must never be read as "nothing
+        // belongs to it, so allow the file".
+        contract();
+
+        Test.startTest();
+        Set<String> ids = ClmContractPackage.documentIdsFor('CLM-2026-0017');
+        Test.stopTest();
+
+        System.assertNotEquals(null, ids, 'A resolvable contract must not look unresolvable');
+        System.assertEquals(0, ids.size(), 'The Toolkit returns no documents in a test context');
+    }
+
+    @IsTest
+    static void documentIdsAreNullWhenTheContractCannotBeResolved() {
+        Test.startTest();
+        Set<String> missing = ClmContractPackage.documentIdsFor('CLM-DOES-NOT-EXIST');
+        Set<String> blank = ClmContractPackage.documentIdsFor('');
+        Test.stopTest();
+
+        System.assertEquals(null, missing);
+        System.assertEquals(null, blank);
+    }
+
+    @IsTest
+    static void documentIdsAreNullWhenTheContractHasNoFolder() {
+        insert new CLM_Contract__c(Name = 'No folder yet', Contract_ID__c = 'CLM-NO-FOLDER-2');
+
+        Test.startTest();
+        Set<String> ids = ClmContractPackage.documentIdsFor('CLM-NO-FOLDER-2');
+        Test.stopTest();
+
+        System.assertEquals(null, ids, 'No folder means nothing can be confirmed as in scope');
+    }
 }

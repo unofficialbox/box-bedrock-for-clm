@@ -40,95 +40,79 @@ private class ClmBoxAskDocumentTest {
     }
 
     private static ClmBoxAskDocument.Result run(String itemId, String prompt, String itemType) {
+        return run(itemId, prompt, itemType, 'CLM-2026-0017');
+    }
+
+    private static ClmBoxAskDocument.Result run(String itemId, String prompt, String itemType, String contractRef) {
         ClmBoxAskDocument.Request request = new ClmBoxAskDocument.Request();
         request.itemId = itemId;
         request.prompt = prompt;
         request.itemType = itemType;
+        request.contractReference = contractRef;
         return ClmBoxAskDocument.ask(new List<ClmBoxAskDocument.Request>{ request })[0];
     }
 
     @IsTest
-    static void returnsTheAnswerBoxAiGrounded() {
+    static void refusesAFileThatDoesNotBelongToTheNamedContract() {
+        // The bound that matters: without it the action reads any Box file ID it is given,
+        // which is a wider reach than "ask about this contract" implies. The Toolkit
+        // returns no documents in a test context, so nothing can be confirmed as in scope.
         configure();
-        Test.setMock(HttpCalloutMock.class, new BoxMock(200,
-            '{"answer":"Commercial General Liability $2,000,000, expires 2027-06-30.","completion_reason":"done"}'));
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"answer":"should not be reached"}'));
 
         Test.startTest();
-        ClmBoxAskDocument.Result result = run('2438685827262', 'List every coverage with its limit and expiry.');
-        Test.stopTest();
-
-        System.assertEquals(true, result.answered);
-        System.assert(result.answer.contains('2,000,000'), result.answer);
-    }
-
-    @IsTest
-    static void reportsARefusalWithoutInventingContent() {
-        // A refused read must not look like an answer. The agent is instructed never to
-        // state a figure that did not come back from here, so this text has to make it
-        // obvious that nothing came back.
-        configure();
-        Test.setMock(HttpCalloutMock.class, new BoxMock(403, '{"code":"access_denied"}'));
-
-        Test.startTest();
-        ClmBoxAskDocument.Result result = run('2438685827262', 'What are the limits?');
+        ClmBoxAskDocument.Result result = run('2438685827262', 'What are the limits?', 'file', 'CLM-2026-0017');
         Test.stopTest();
 
         System.assertEquals(false, result.answered);
-        System.assert(result.answer.contains('403'), result.answer);
-        System.assert(result.answer.contains('Do not guess'), result.answer);
+        System.assert(result.answer.contains('could not resolve') || result.answer.contains('not in the Box folder'),
+            result.answer);
     }
 
     @IsTest
-    static void refusesWithoutAFileIdOrAPrompt() {
+    static void refusesWhenNoContractIsNamed() {
+        configure();
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"answer":"should not be reached"}'));
+
         Test.startTest();
-        ClmBoxAskDocument.Result missingId = run('', 'What are the limits?');
-        ClmBoxAskDocument.Result missingPrompt = run('123', '');
+        ClmBoxAskDocument.Result result = run('2438685827262', 'What are the limits?', 'file', null);
         Test.stopTest();
 
-        System.assertEquals(false, missingId.answered);
-        System.assertEquals(false, missingPrompt.answered);
+        System.assertEquals(false, result.answered);
+        System.assert(result.answer.contains('which contract'), result.answer);
     }
 
     @IsTest
-    static void asksAHubAsHubsBecauseTheSingularIsRejected() {
-        // Box spells it `hubs` in items[].type and 400s on `hub`, naming only the schema
-        // path -- so the singular is normalized rather than passed through. This is the
-        // whole reason the clause library is reachable at all.
-        configure();
+    static void readsTheConfiguredClauseLibraryRatherThanTheOneAsked() {
+        // The playbook is org policy, not a caller argument. Whatever Hub id arrives, the
+        // configured one is used -- an agent may consult the library, not choose it.
+        insert new CLM_Box_Config__c(
+            SetupOwnerId = UserInfo.getOrganizationId(),
+            Box_User_Id__c = '385982796',
+            Clause_Library_Hub_Id__c = '1347399857');
         BoxMock mock = new BoxMock(200, '{"answer":"CLM-LIAB-001 caps liability at 12 months of fees."}');
         Test.setMock(HttpCalloutMock.class, mock);
 
         Test.startTest();
-        ClmBoxAskDocument.Result result = run('1347399857', 'What is the approved cap?', 'hub');
+        ClmBoxAskDocument.Result result = run('999999999', 'What is the approved cap?', 'hub', null);
         Test.stopTest();
 
         System.assertEquals(true, result.answered);
-        System.assert(mock.sentBody.contains('"type":"hubs"'), mock.sentBody);
+        System.assert(mock.sentBody.contains('1347399857'), mock.sentBody);
+        System.assert(!mock.sentBody.contains('999999999'), 'The caller must not choose the playbook: ' + mock.sentBody);
     }
 
     @IsTest
-    static void defaultsToASingleFile() {
+    static void saysSoWhenNoClauseLibraryIsConfigured() {
         configure();
-        BoxMock mock = new BoxMock(200, '{"answer":"Coverage expires 2027-06-30."}');
-        Test.setMock(HttpCalloutMock.class, mock);
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"answer":"x"}'));
 
         Test.startTest();
-        run('2438685827262', 'When does coverage end?');
-        Test.stopTest();
-
-        System.assert(mock.sentBody.contains('"type":"file"'), mock.sentBody);
-    }
-
-    @IsTest
-    static void saysSoWhenBoxAiAnswersWithNothing() {
-        configure();
-        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"answer":""}'));
-
-        Test.startTest();
-        ClmBoxAskDocument.Result result = run('2438685827262', 'What are the limits?');
+        ClmBoxAskDocument.Result result = run('1347399857', 'What is the approved cap?', 'hub', null);
         Test.stopTest();
 
         System.assertEquals(false, result.answered);
-        System.assert(result.answer.contains('returned nothing'), result.answer);
+        System.assert(result.answer.contains('No approved clause library'), result.answer);
     }
+
 }
