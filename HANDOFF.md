@@ -107,7 +107,8 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    Box on 2026-08-31 through the local harness, in both the dev server and the production
    bundle: a 7-page redline renders.
 
-   Four things had to be true at once, and each was independently a blocker:
+   Four things had to be true at once before it rendered at all, each independently a
+   blocker:
    - **`box-annotations` must be installed and an instance passed as `boxAnnotations`.**
      ContentPreview expects one and does not construct it. Pinned to `5.2.1-beta.18`;
      `5.3.0` fails the build (`parseMessageMarkdown` is not exported).
@@ -134,20 +135,49 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    documents that exact CDN URL, but 3.84.0 and 3.85.0 both 404 there. The CDN's version
    list is sparse (3.80–3.82 are absent, 3.83.0 is present), so probe before bumping.
 
-   **It does not work on the Experience Cloud site, and cannot without a CSP change.**
-   ContentPreview loads `preview.js` (and then pdf.js and friends) from
-   `cdn01.boxcdn.net`; the site sends `script-src 'self' … blob: …` and blocks it. The
-   `CLM_Box_CDN` trusted site is deployed and active but cannot help: `CspTrustedSite`
-   has **no script-src directive at all** — verified against both the REST and the
-   Tooling describes at the org's API version, which expose only connect/frame/img/
-   style/font/media. The two ways out are (a) switch the site's Experience Builder
-   security level from Strict CSP to Relaxed CSP, which is what puts trusted sites into
-   `script-src` — a real loosening of a public site, so it is the user's call and is not
-   done; or (b) go back to framing Box's own `expiring_embed_link`, which needs only the
-   frame-src site already in place. Until one is chosen, the workspace says so instead of
-   showing a blank panel: `BoxElements` waits ~15s for `Box.Preview` and then names the
-   blocked script (`data-testid="box-preview-blocked"`). Everything else on the site --
-   folder listing, the table, folder resolution, Agentforce -- works.
+   **The renderer is bundled from npm, not fetched from the Box CDN.** ContentPreview
+   normally injects `<script src="cdn01.boxcdn.net/platform/preview/<version>/en-US/
+   preview.js">`. On an Experience Cloud site that script never loads: the page sends
+   `script-src 'self' …` and `CspTrustedSite` has **no script-src directive at all** --
+   verified against both the REST and Tooling describes at the org's API version, which
+   expose only connect/frame/img/style/font/media. That asymmetry is visible in the live
+   header: the Box trusted sites reach style-src, media-src, font-src, connect-src and
+   frame-src, and only script-src is missing them. There is also no security-level switch
+   to flip -- this is an app-container React site, and the org refuses to open it in
+   Experience Builder ("You can't edit this site in Experience Builder because it's based
+   on the React framework"), which is where the Strict/Relaxed CSP setting lives.
+
+   So `box-content-preview@3.85.0` is a dependency and the bundler puts it on the page.
+   `src/lib/boxPreviewRuntime.ts` owns that seam:
+   - It assigns `global.Box.Preview` **unconditionally**. Importing the package already
+     registers the plain `Preview` there as a side effect, so a "only if missing" guard
+     silently keeps that one and drops everything below.
+   - It installs a `BundledPreview` subclass rather than passing props, because a bundled
+     copy cannot infer two things and one of them cannot travel as a prop. `location:
+     { staticBaseURI }` is the package's documented npm-consumer hook -- without it
+     preview requests `undefinedexif/exif.min.js` -- but `location` is also the prop
+     react-router's `withRouter` injects into the annotations wrapper, which overwrites
+     it before ContentPreview ever sees it. `pdfjs: { workerSrc }` rides along.
+   - `vite.box-preview-assets.ts` serves the side-car assets from `assets/box-preview/`:
+     copied into `dist` on build, served out of `node_modules` in dev and `vite preview`.
+     Only `exif/` is copied. pdf.js is bundled into the npm build (unlike the CDN build,
+     which pulls it from `third-party/doc/`), and the rest are for viewers this workspace
+     does not use -- `third-party/` is 20MB of Shaka players and 3D geometry, `cmaps/` is
+     1.6MB of CJK encodings across ~330 files that would become ~330 more components on
+     every UI bundle deploy. A CJK PDF would lose its glyph mapping; nothing else does.
+   - `previewLibraryVersion` now selects **only the stylesheet**. `loadScript` is
+     short-circuited but `loadStylesheet` has no such guard and always appends a `<link>`,
+     and style-src does allow the Box CDN. It is pinned to 3.83.0 because that is the
+     newest release the CDN actually serves; the matching 3.85.0 stylesheet is bundled
+     too, so preview stays styled if the CDN is unreachable.
+
+   **One trusted site had to be added.** `CLM_Box_Content_Delivery`
+   (`https://*.boxcloud.com`, connect-src) -- preview fetches the file bytes from a
+   per-request `dl.boxcloud.com` host, and only `public.boxcloud.com` is allowed by
+   default, so the renderer would load and then fail on connect-src.
+
+   Verified on the deployed site on 2026-08-31: a 7-page redline renders, zero requests
+   to `cdn01.boxcdn.net` for script, and no failed resource requests.
 
    **Content Explorer was dropped for this.** It never emitted a file activation in this
    embedding: `ItemList` fires only when `type === FOLDER || !isTouch && (type === WEBLINK

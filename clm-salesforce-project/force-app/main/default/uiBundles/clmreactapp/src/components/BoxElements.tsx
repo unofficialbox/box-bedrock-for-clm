@@ -5,7 +5,12 @@ import { IntlProvider } from "react-intl";
 import { MemoryRouter } from "react-router-dom";
 import "box-ui-elements/dist/preview.css";
 import type { BoxFolderItem } from "../lib/box";
+import { installBoxPreview } from "../lib/boxPreviewRuntime";
 import { BoxDocumentTable } from "./BoxDocumentTable";
+
+// Before ContentPreview mounts, so it finds the library already there and never reaches
+// for the CDN script the site's CSP blocks.
+installBoxPreview();
 
 /**
  * Several megabytes on its own, and only needed once a document is opened, so it stays
@@ -25,26 +30,28 @@ const ContentPreview = lazy(() =>
 const boxAnnotations = new BoxAnnotations({});
 
 /**
- * box-ui-elements defaults to Box Content Preview 3.0.0, years behind the renderer Box
- * actually ships. 3.83.0 is the newest release published to the CDN: the npm package
- * reaches 3.85.0 and its README even documents that CDN URL, but
- * `platform/preview/3.85.0/en-US/preview.js` returns 404 (as does 3.84.0) -- npm and the
- * CDN publish on different cadences, so the ceiling here is what the CDN serves.
+ * Only the stylesheet, not the library.
+ *
+ * The renderer itself is bundled from npm (see `boxPreviewRuntime`) at 3.85.0, so
+ * `loadScript` never runs. `loadStylesheet` has no such guard and always appends a
+ * `<link>` at this version, and style-src does allow the Box CDN -- but the CDN's newest
+ * published release is 3.83.0 (3.84.0 and 3.85.0 both 404 there, even though npm ships
+ * them and the package README documents those URLs). Pinning to what the CDN actually
+ * serves keeps that link from 404ing; the matching 3.85.0 stylesheet is bundled too, so
+ * preview is still styled if the CDN is unreachable.
  */
-const PREVIEW_LIBRARY_VERSION = "3.83.0";
+const PREVIEW_STYLESHEET_VERSION = "3.83.0";
 
-/** How long to wait for the CDN script before saying so rather than showing a blank frame. */
+/** How long to wait for the renderer before saying so rather than showing a blank frame. */
 const PREVIEW_LOAD_TIMEOUT_MS = 15000;
 
 /**
  * Whether Box Content Preview actually reached the page.
  *
- * ContentPreview loads `preview.js` from the Box CDN and then waits for `Box.Preview`
- * forever; if the script never arrives it renders an empty frame and reports nothing.
- * On an Experience Cloud site that is the normal outcome -- the site's CSP allows
- * `script-src 'self'` and Salesforce's CSP Trusted Sites cannot extend script-src (the
- * object has no such directive at all) -- so the failure is worth naming rather than
- * leaving as a blank panel.
+ * ContentPreview waits for `global.Box.Preview` forever and renders an empty frame if it
+ * never appears, reporting nothing. `installBoxPreview` seeds it from the bundle, so this
+ * should not fire -- but a silent blank panel is the one failure mode this component has
+ * already produced three different ways, and it is worth naming rather than staring at.
  */
 function usePreviewLibrary(): "loading" | "ready" | "blocked" {
   const [state, setState] = useState<"loading" | "ready" | "blocked">("loading");
@@ -128,9 +135,8 @@ export function BoxElements({
             <div className="box-element-host">
               {library === "blocked" ? (
                 <div className="workspace-state" data-testid="box-preview-blocked">
-                  Box Content Preview {PREVIEW_LIBRARY_VERSION} could not load from
-                  {" "}cdn01.boxcdn.net. On an Experience Cloud site this is the page CSP:
-                  {" "}script-src allows only 'self', and CSP Trusted Sites cannot extend it.
+                  Box Content Preview did not initialize. The renderer is bundled with
+                  {" "}this app, so this is not the CDN or the page CSP — check the console.
                 </div>
               ) : null}
               <Suspense fallback={<div className="workspace-state">Loading preview…</div>}>
@@ -147,7 +153,7 @@ export function BoxElements({
                     token={tokenProvider}
                     fileId={selected.id}
                     boxAnnotations={boxAnnotations}
-                    previewLibraryVersion={PREVIEW_LIBRARY_VERSION}
+                    previewLibraryVersion={PREVIEW_STYLESHEET_VERSION}
                     hasHeader={false}
                   />
                 </MemoryRouter>
