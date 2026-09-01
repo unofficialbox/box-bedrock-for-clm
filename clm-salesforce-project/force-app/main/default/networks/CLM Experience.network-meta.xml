@@ -35,6 +35,12 @@
     <headlessRegistrationTemplate>unfiled$public/CommunityHeadlessRegistrationTemplate</headlessRegistrationTemplate>
     <networkMemberGroups>
         <profile>admin</profile>
+        <!--
+          Without this a counterparty cannot log in at all: the user is valid and active,
+          the sharing set grants them records, and the site simply does not count them as a
+          member. The failure looks like bad credentials rather than missing membership.
+        -->
+        <profile>Customer Community User</profile>
     </networkMemberGroups>
     <networkPageOverrides>
         <changePasswordPageOverrideSetting>Standard</changePasswordPageOverrideSetting>

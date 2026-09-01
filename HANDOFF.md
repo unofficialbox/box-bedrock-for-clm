@@ -430,8 +430,19 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    class exists to avoid proves nothing.
 
    Dana Whitfield (`dana.whitfield@northstarhealth.clm.demo`, Customer Community User on
-   Northstar Health) exists for this. Creating her needed
-   `CommunitiesSettings.enableOotbProfExtUserOpsEnable`, which was off.
+   Northstar Health) exists for this. Two org-level gates had to open before she was usable,
+   and neither announces itself:
+
+   - `CommunitiesSettings.enableOotbProfExtUserOpsEnable` was off, so creating a user on a
+     standard external profile failed outright.
+   - The site's `networkMemberGroups` listed only the `admin` profile, so she could not log
+     in even though the user was valid and active and the sharing set already granted her
+     records. **A non-member's login failure looks like bad credentials**, which sends you
+     hunting for a password problem that does not exist. `Customer Community User` is now a
+     member group; confirm with a `NetworkMember` query rather than by trying to log in.
+
+   To see the site as her, use **Log in as** from her user record in Setup. She has no
+   password, and setting one is not needed to test.
 
 10. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 11. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
