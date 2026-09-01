@@ -8,6 +8,8 @@ private class ClmBoxAskDocumentTest {
     private class BoxMock implements HttpCalloutMock {
         private Integer askStatus;
         private String askBody;
+        /** The body Box was actually sent, so a test can assert on the item type. */
+        private String sentBody;
 
         private BoxMock(Integer askStatus, String askBody) {
             this.askStatus = askStatus;
@@ -22,6 +24,7 @@ private class ClmBoxAskDocumentTest {
                 response.setBody('{"access_' + 'token":"' + PARENT_TOKEN + '","expires_in":3600}');
                 return response;
             }
+            sentBody = request.getBody();
             response.setStatusCode(askStatus);
             response.setBody(askBody);
             return response;
@@ -33,9 +36,14 @@ private class ClmBoxAskDocumentTest {
     }
 
     private static ClmBoxAskDocument.Result run(String itemId, String prompt) {
+        return run(itemId, prompt, null);
+    }
+
+    private static ClmBoxAskDocument.Result run(String itemId, String prompt, String itemType) {
         ClmBoxAskDocument.Request request = new ClmBoxAskDocument.Request();
         request.itemId = itemId;
         request.prompt = prompt;
+        request.itemType = itemType;
         return ClmBoxAskDocument.ask(new List<ClmBoxAskDocument.Request>{ request })[0];
     }
 
@@ -79,6 +87,36 @@ private class ClmBoxAskDocumentTest {
 
         System.assertEquals(false, missingId.answered);
         System.assertEquals(false, missingPrompt.answered);
+    }
+
+    @IsTest
+    static void asksAHubAsHubsBecauseTheSingularIsRejected() {
+        // Box spells it `hubs` in items[].type and 400s on `hub`, naming only the schema
+        // path -- so the singular is normalized rather than passed through. This is the
+        // whole reason the clause library is reachable at all.
+        configure();
+        BoxMock mock = new BoxMock(200, '{"answer":"CLM-LIAB-001 caps liability at 12 months of fees."}');
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        ClmBoxAskDocument.Result result = run('1347399857', 'What is the approved cap?', 'hub');
+        Test.stopTest();
+
+        System.assertEquals(true, result.answered);
+        System.assert(mock.sentBody.contains('"type":"hubs"'), mock.sentBody);
+    }
+
+    @IsTest
+    static void defaultsToASingleFile() {
+        configure();
+        BoxMock mock = new BoxMock(200, '{"answer":"Coverage expires 2027-06-30."}');
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        run('2438685827262', 'When does coverage end?');
+        Test.stopTest();
+
+        System.assert(mock.sentBody.contains('"type":"file"'), mock.sentBody);
     }
 
     @IsTest

@@ -18,11 +18,16 @@ public with sharing class ClmBoxAskDocument {
 
     public class Request {
         @InvocableVariable(
-            label='Box file ID'
-            description='The Box file ID to ask about, taken from the contract package listing.'
+            label='Box item ID'
+            description='The Box file ID to ask about, taken from the contract package listing, or a Box Hub ID.'
             required=true
         )
         public String itemId;
+        @InvocableVariable(
+            label='Box item type'
+            description='"file" for one document, or "hub" to ask across a Box Hub such as the approved clause library. Defaults to file.'
+        )
+        public String itemType;
         @InvocableVariable(
             label='Prompt'
             description='The question to ask about that file.'
@@ -50,6 +55,22 @@ public with sharing class ClmBoxAskDocument {
         return results;
     }
 
+    /**
+     * The Box item type, defaulting to a single document.
+     *
+     * A Hub is how the approved clause library is asked about: one id standing for a
+     * governed set of clauses, with Box AI citing the individual files it drew from.
+     *
+     * Box spells it `hubs`, plural, in `items[].type` -- the singular is rejected by the
+     * enum with a 400, which is an easy hour to lose because the message names the schema
+     * path rather than the accepted values. The singular is normalized here so a caller
+     * who writes the obvious thing gets the working request.
+     */
+    private static String itemType(String requested) {
+        String normalized = String.isBlank(requested) ? 'file' : requested.trim().toLowerCase();
+        return normalized == 'hub' ? 'hubs' : normalized;
+    }
+
     private static Result askOne(Request req) {
         Result result = new Result();
         result.answered = false;
@@ -67,7 +88,7 @@ public with sharing class ClmBoxAskDocument {
 
         Map<String, Object> item = new Map<String, Object>{
             'id' => req.itemId.trim(),
-            'type' => 'file'
+            'type' => itemType(req.itemType)
         };
         String body = JSON.serialize(new Map<String, Object>{
             'mode' => 'single_item_qa',
