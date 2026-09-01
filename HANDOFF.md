@@ -290,6 +290,17 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    `box.Toolkit.createFolderForRecordId`, carried only the owner's own collaboration and
    inherited the rest -- and no amount of collaborating the parent `CLM Root` changes it.
 
+   **It is wider than the downscope, and wider than the REST endpoint.** Seeding the two
+   Calder precedent contracts on 2026-09-01 hit it again from a different direction. Calling
+   `box.Toolkit.createFolderForRecordId` directly -- rather than through
+   `ClmBoxFolderService`, which grants the collaboration -- produced folders that *nothing*
+   else could read: `ClmBoxAuth.parentToken()` returned 404 `not_found` on the files inside,
+   and so did an admin's own Box session. The Toolkit and the CLM Box app authenticate as
+   different Box identities, and only the Toolkit's owns what the Toolkit creates. One
+   `POST /2.0/collaborations` granting `Box_User_Id__c` editor on each folder fixed every
+   symptom at once. If you provision a folder any way other than through
+   `ClmBoxFolderService`, grant that collaboration yourself.
+
    **This affects every contract whose folder the package provisions.** The workspace
    requests `item_upload item_delete item_rename item_share`, so the token mint fails
    outright and the panel falls back to fixtures. It has gone unnoticed only because the
