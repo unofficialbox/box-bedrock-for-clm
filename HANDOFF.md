@@ -563,9 +563,10 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    from. `scripts/generate_docgen_templates.py` authors it; registering it is a
    `POST /2.0/docgen_templates` with the uploaded file id.
 
-   Two identity traps showed up again here. `pushFileToBox` names the Box file from
-   `PathOnClient` **and appends the extension**, so a title ending in `.docx` becomes
-   `.docx.docx`. And the DocGen template folder is owned by the CLM Box app's user while the
+   Two identity traps showed up again here. `pushFileToBox` **appends the extension** to
+   the ContentVersion title, so a title ending in `.docx` becomes `.docx.docx`. Give
+   `sf data create file -t` the bare stem and the name comes out right first time; there is
+   no rename to do afterwards. And the DocGen template folder is owned by the CLM Box app's user while the
    Toolkit writes as the Salesforce Admin Box user, so the upload 404'd until that folder was
    collaborated to the Toolkit's identity -- the mirror image of the gap in item 6.
 
