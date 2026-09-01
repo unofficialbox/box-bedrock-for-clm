@@ -59,6 +59,23 @@ private class ClmContractPackageTest {
     }
 
     @IsTest
+    static void returnsTheResolvedReferenceWhateverTheCallerTyped() {
+        // Whatever downstream stays bounded to this contract -- asking Box AI about one of
+        // its documents -- needs the reference the lookup settled on, not the one that was
+        // typed. Without this the agent bound an empty variable and the ask failed with
+        // REQUIRED_FIELD_MISSING on contractReference.
+        CLM_Contract__c record = contract();
+
+        Test.startTest();
+        ClmContractPackage.Result byName = run('Northstar');
+        ClmContractPackage.Result byId = run(record.Id);
+        Test.stopTest();
+
+        System.assertEquals('CLM-2026-0017', byName.outputContractReference);
+        System.assertEquals('CLM-2026-0017', byId.outputContractReference);
+    }
+
+    @IsTest
     static void findsAContractByRecordId() {
         CLM_Contract__c record = contract();
 

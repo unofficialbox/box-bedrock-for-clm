@@ -290,6 +290,29 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
    Doc Gen and Sign are deliberately **not** on this agent (see item 10).
 
+   **`ask_box_ai` failed with `REQUIRED_FIELD_MISSING: contractReference` until v14.** The
+   trace showed the ask firing with `contractReference: ""`. The binding is
+   `with contractReference = @variables.contractId`, and nothing ever wrote that variable:
+   `get_contract_package` set the record id, the folder and the package, but not the
+   reference, so the ask depended on `capture_contract_reference` having happened to run
+   first. It usually had not.
+
+   The fix is for the action to return what it resolved rather than the agent remembering
+   what was typed. `ClmContractPackage.Result.outputContractReference` carries the canonical
+   reference -- a person can type "Northstar Health System MSA Package" and get back
+   `CLM-2026-0017` -- and both `get_contract_package` bindings now set `@variables.contractId`
+   from it. That also tightens the bound: the ask is scoped to the contract the lookup
+   actually found, not to a string the model produced.
+
+   Two things worth knowing here. An empty string in a `required=true` invocable variable
+   surfaces as a platform `REQUIRED_FIELD_MISSING`, not as an Apex refusal, so the failure
+   never reaches the class's own error handling. And **an action output must be declared in
+   the `.agent` `outputs:` block before any binding may reference it** -- the publish fails
+   with `'outputContractReference' is not a defined output of action`, naming each binding
+   line. That compile check is the only structural verification available: the retrieved
+   `agentGraph` JSON serializes none of the variable bindings, so grepping it for a variable
+   name proves nothing either way.
+
    Both Apex legs were also verified directly against the live org and live Box:
 6. **A Box folder needs a *direct* collaboration before it can be downscoped.** Inherited
    access is not enough, and the failure is badly disguised: `GET /2.0/folders/<id>`
