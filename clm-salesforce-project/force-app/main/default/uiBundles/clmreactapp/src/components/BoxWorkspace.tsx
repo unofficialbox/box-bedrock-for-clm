@@ -62,9 +62,7 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
       <section className="box-live" data-testid="box-preview">
         <div className="box-fallback-head">
           <div>
-            <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
             <h2>{CLM_CONFIG.workspace.name}</h2>
-            <p>Browsed from Box with a short-lived token scoped to this folder.</p>
           </div>
           {CLM_CONFIG.workspace.boxUrl ? (
             <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">

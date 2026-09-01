@@ -34,11 +34,16 @@ export function AgentforcePanel() {
     runtime?.salesforceOrigin || env?.orgUrl || CLM_CONFIG.agentforce.salesforceOrigin;
 
   /**
-   * An Experience Cloud site is served under a path prefix -- this one is /clm -- and the
-   * client builds its endpoints from it. Without a prefix it calls the wrong paths on a
-   * site and the panel stays empty, so this is not optional once the app leaves Lightning.
+   * sitePrefix is deliberately not passed.
+   *
+   * The client treats it and the origin as alternatives. With a prefix it builds
+   * `<origin><sitePrefix>/lightning-out`; without one it builds
+   * `<origin>/lwr/application/amd/0/ai/lightningout%2Fcontainer`. Since the origin here is
+   * the org, passing the prefix asks the org for a site path -- which redirects to the
+   * Lightning home page, so the iframe never loads and the client retries forever.
+   *
+   * The org endpoint is the one that answers; verified by loading it directly.
    */
-  const sitePrefix = env?.basePath ? env.basePath.replace(/\/+$/, "") : undefined;
 
   useEffect(() => {
     // appId is optional: it is a Lightning Out 2.0 app id, and the client only needs one
@@ -50,7 +55,6 @@ export function AgentforcePanel() {
       container: hostRef.current,
       salesforceOrigin,
       ...(appId ? { appId } : {}),
-      ...(sitePrefix ? { sitePrefix } : {}),
       agentforceClientConfig: {
         agentId,
         // Required for an agent defined by an authoring bundle. Without it the client
@@ -78,7 +82,7 @@ export function AgentforcePanel() {
         initializedRef.current = false;
       },
     });
-  }, [agentId, appId, salesforceOrigin, sitePrefix, fileBased]);
+  }, [agentId, appId, salesforceOrigin, fileBased]);
 
   return (
     <aside className="agent-panel" aria-label="Contract Copilot">

@@ -54,30 +54,28 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
     <IntlProvider locale="en" messages={{}}>
     <section className="box-elements" data-testid="box-elements">
       {/* No heading here: BoxWorkspace already renders the folder header above. */}
-      <div className="box-elements-toolbar">
-        {previewable.length > 0 ? (
-          <label className="box-preview-picker">
-            <Eye size={15} />
-            <span className="visually-hidden">Preview a document</span>
-            <select
-              value={selected?.id || ""}
-              onChange={(event) => {
-                const file = previewable.find((item) => item.id === event.target.value);
-                setSelected(file || null);
-              }}
-              data-testid="box-preview-picker"
-            >
-              <option value="">Preview a document…</option>
-              {previewable.map((file) => (
-                <option key={file.id} value={file.id}>
-                  {file.name}
-                </option>
-              ))}
-            </select>
-          </label>
-        ) : null}
+      {previewable.length > 0 ? (
+        <label className="box-preview-picker">
+          <Eye size={15} />
+          <span className="visually-hidden">Preview a document</span>
+          <select
+            value={selected?.id || ""}
+            onChange={(event) => {
+              const file = previewable.find((item) => item.id === event.target.value);
+              setSelected(file || null);
+            }}
+            data-testid="box-preview-picker"
+          >
+            <option value="">Preview a document…</option>
+          {previewable.map((file) => (
+              <option key={file.id} value={file.id}>
+                {file.name}
+              </option>
+            ))}
+          </select>
+        </label>
+      ) : null}
 
-      </div>
 
       {selected ? (
         <BoxDocumentPreview
