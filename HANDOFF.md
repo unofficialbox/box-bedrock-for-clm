@@ -231,26 +231,52 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    folder lookup, because the provisioning call beside that one commits DML and Apex forbids
    a callout after DML.
 
-   Both legs were verified against the live org and live Box on 2026-09-01:
-   `CLM-SAMPLE-NST-2024` returned all nine documents with their Box file IDs, and
-   `box__BoxAIAskByItemId` on the insurance certificate returned the real coverages, limits
-   and expiry dates. **The chat itself could not be driven from here** -- the ACC composer
-   sits behind a closed shadow root, absent from the accessibility tree, and neither the
-   in-app browser nor Claude-in-Chrome can land a keystroke in it; `sf agent preview` needs
-   a TTY and crashes rendering (`Invalid count value: -2`). Whether the agent *chooses* to
-   call the actions still needs a human to send one message.
-   **Client config is read once, at mount.** The SDK assigns it as a plain property that
-   the Lightning Out proxy reads when it hydrates; a later `element.configuration = …`
-   records no `_propertyChanged_configuration` and never crosses the frame. So the effect
-   re-runs on a contract change and tears the embed down first — which also means
-   switching contracts starts a new conversation.
+   **The agent answers end to end, verified in the Agentforce Builder preview on
+   2026-09-01.** "Summarize the insurance certificate for CLM-SAMPLE-NST-2024: dollar
+   amounts and expiration dates" returns the three coverages with their limits and
+   2027-06-30 expiries, citing `northstar-insurance-certificate.pdf`, in one turn. The
+   trace reads Contract Router -> document answers -> get contract package -> ask box ai ->
+   GROUNDED. Test it there (Studio -> Agents -> Contract Copilot -> Preview), not in the
+   workspace: the ACC composer sits behind a closed shadow root and no browser tool can
+   type into it, and `sf agent preview` needs a TTY and crashes rendering.
 
-   **A metadata deploy is not a publish.** `AiAuthoringBundle:CLM_Contract_Copilot` in the
-   org matched this repo byte for byte on 2026-08-31 while the running agent still opened
-   with a welcome naming `CLM-2026-0017`, which this repo's bundle stopped saying. The
-   conversation serves the last *published* version, so the agent needs republishing
-   whenever its bundle changes. Check the live welcome text, not the retrieved metadata.
+   Getting there took five distinct blockers, and only the first is about prompting:
 
+   - **The planner ignored prose ordering.** Told five times to call get_contract_package
+     first, it called ask_box_ai five times instead. What fixed it was
+     `available when @variables.contractPackageLoaded == True` on the ask_box_ai binding --
+     a hard guard, so the wrong order is not offered. Interpolating
+     `{!@variables.contractPackage}` into the instructions actively hurt: the agent read
+     the empty variable as fact and reported "the package has no visible document listing".
+   - **The agent user could not execute the Apex.** `ClmContractPackage` was granted to
+     System Administrator only, so the action was never *offered* to the planner -- it was
+     never attempted and never failed, which reads exactly like the model choosing not to
+     use it. `CLM_Contract_Agent` grants it.
+   - **Then it found no contract.** The agent owns none and CLM_Contract__c is
+     Private/Private, so the read returned nothing and the reply was "I could not find that
+     contract" -- a permission boundary wearing the costume of a bad reference. Fixed with
+     `viewAllRecords` on that one object.
+   - **Then `box__FRUP__c` threw.** Apex raises "sObject type box__FRUP__c is not
+     supported" when the user cannot see a managed-package object. Granted, and the lookup
+     now catches so a gap costs the folder rather than the answer.
+   - **Then Box AI 401'd.** `box__BoxAIAskByItemId` authenticates as the *Salesforce user*,
+     and an agent user has no linked Box account -- an authorization error nobody can act
+     on. Replaced with `ClmBoxAskDocument`, which calls `/2.0/ai/ask` with the same Client
+     Credentials Grant the workspace already uses. That needed two more grants the error
+     messages name precisely: the `CLM_Box-CLM_Box_Principal` external credential, and read
+     on `UserExternalCredential`.
+
+   When an action never appears in the trace at all, suspect permissions before prompting:
+   an unavailable action is invisible, not failed. The Apex debug log on the agent user
+   (`TraceFlag` on 005NS00000ybncIYAQ) named every one of these in a single line.
+
+   **Version 1 is still the Active version**, so the workspace continues to serve the
+   original agent -- the one with no actions and the stale `CLM-2026-0017` welcome. Every
+   publish creates a new numbered bundle (`CLM_Contract_Copilot_N`) and a new project
+   version; none of it reaches the site until a version is activated. That is why
+   republishing appeared to change nothing there for so long.
+
+   Both Apex legs were also verified directly against the live org and live Box:
 6. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 7. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
 8. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.

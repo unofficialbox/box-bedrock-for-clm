@@ -152,8 +152,16 @@ public with sharing class ClmContractPackage {
      * Finds the contract the way a person names one: by reference, by record id, or by
      * the contract's name. The reference is what appears in the workspace and in the
      * conversation, so it is tried first.
+     *
+     * `without sharing` because the agent runs as its own user, which owns no contracts
+     * and is shared none -- CLM_Contract__c is Private/Private. With sharing enforced the
+     * action returned "no matching contract" for every reference, which reads in the
+     * conversation as a bad reference rather than as a permission boundary. The exposure
+     * is bounded by the projection below and by ClmContractPackage having no other entry
+     * point: it returns contract metadata and a document listing, and writes nothing.
+     * This mirrors ClmContractListService, which reads the same object the same way.
      */
-    private with sharing class ContractLookup {
+    private without sharing class ContractLookup {
         private CLM_Contract__c byReference(String reference) {
             List<CLM_Contract__c> found = [
                 SELECT Id, Name, Contract_ID__c, Counterparty__c, Status__c, Risk_Level__c,
@@ -197,15 +205,24 @@ public with sharing class ClmContractPackage {
      */
     private without sharing class FolderMapping {
         private String forRecord(Id recordId) {
-            List<box__FRUP__c> mappings = [
-                SELECT box__Folder_ID__c
-                FROM box__FRUP__c
-                WHERE box__Record_ID__c = :String.valueOf(recordId)
-                AND box__Folder_ID__c != null
-                ORDER BY LastModifiedDate DESC
-                LIMIT 1
-            ];
-            return mappings.isEmpty() ? null : mappings[0].box__Folder_ID__c;
+            try {
+                List<box__FRUP__c> mappings = [
+                    SELECT box__Folder_ID__c
+                    FROM box__FRUP__c
+                    WHERE box__Record_ID__c = :String.valueOf(recordId)
+                    AND box__Folder_ID__c != null
+                    ORDER BY LastModifiedDate DESC
+                    LIMIT 1
+                ];
+                return mappings.isEmpty() ? null : mappings[0].box__Folder_ID__c;
+            } catch (Exception e) {
+                // A caller without access to the managed-package object cannot even name
+                // it: Apex raises "sObject type box__FRUP__c is not supported" rather than
+                // returning nothing. Losing the association costs the folder, and the
+                // contract's own field still carries one -- it must not cost the answer.
+                System.debug(LoggingLevel.WARN, 'CLM Box: association lookup failed: ' + e.getMessage());
+                return null;
+            }
         }
     }
 }

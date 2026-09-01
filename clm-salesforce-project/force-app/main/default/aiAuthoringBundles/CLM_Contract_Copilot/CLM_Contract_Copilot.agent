@@ -67,84 +67,18 @@ variables:
         description: "Whether the contract package has been loaded for the contract under discussion."
         label: "contractPackageLoaded"
 
-start_agent contract_review:
-    description: "Routes a contract manager to the right specialist and answers questions about a CLM contract package, its redlines, and what is blocking execution."
+start_agent contract_router:
+    description: "Route the request to the appropriate subagent. Route to document_answers when the person asks anything about a contract, its documents, its redlines, its terms, or what is blocking it -- including any message naming a contract reference such as CLM-2026-0017. Route to fallback_response otherwise."
     reasoning:
-        instructions: ->
-            | Establish which contract is being discussed, then load its package before answering
-              anything about its content.
-
-              When the person names a contract -- a reference such as CLM-2026-0017, a name such as
-              CLM-2026-Northstar, or a Salesforce record ID -- store it with
-              {!@actions.capture_contract_reference} and then call
-              {!@actions.get_contract_package} with it in the same turn. That action returns the
-              Salesforce record, the governed Box folder, and every document with its Box file ID.
-              Nothing can be read from a document until it has run.
-
-              If any question is about what a document actually says -- amounts, dates, parties,
-              clause text, what is blocking execution -- route to
-              {!@actions.go_to_document_answers}. That is where the documents are read.
-
-              If you do not know which contract, ask for the reference, for example CLM-2026-0017.
-              Never say you are gathering, reviewing, or looking something up unless you are calling
-              an action in that same turn.
-
-              If asked to approve language, complete an approval, or send for signature, decline and
-              explain which named human owns that step.
-
         actions:
-            capture_contract_reference: @utils.setVariables
-                with contractId = ...
-                description: "Store the contract reference the person used, such as CLM-2026-0017 or CLM-2026-Northstar."
-
-            get_contract_package: @actions.get_contract_package
-                description: "Find the contract, its Box folder, and the Box file ID of every document in it. Use this before answering anything about document content."
-                with inputContract = ...
-                set @variables.contractRecordId = @outputs.outputRecordId
-                set @variables.boxFolderId = @outputs.outputFolderId
-                set @variables.contractPackage = @outputs.outputSummary
-                set @variables.contractPackageLoaded = True
-
             go_to_document_answers: @utils.transition to @subagent.document_answers
-                description: "Reads the contract documents through Box AI and answers with the file cited."
+            go_to_fallback_response: @utils.transition to @subagent.fallback_response
 
-    actions:
-        get_contract_package:
-            description: "Finds a CLM contract, its governed Box folder, and every document in that folder with its Box file ID. Call this before answering anything about document content."
-            target: "apex://ClmContractPackage"
-            inputs:
-                inputContract: string
-                    description: "The contract reference the person used, for example CLM-2026-0017, the contract name, or a CLM_Contract__c record ID."
-                    is_required: True
-            outputs:
-                outputSummary: string
-                    description: "The contract record, its Box folder, and each document with its Box file ID."
-                outputRecordId: string
-                    description: "The Salesforce CLM_Contract__c record ID."
-                outputFolderId: string
-                    description: "The governed Box folder ID for this contract."
-                outputFound: boolean
-                    description: "Whether a contract and at least one document were found."
-
-        ask_box_ai:
-            description: "Ask Box AI a question about one contract document, identified by its Box file ID. The answer is grounded in that file."
-            target: "apex://box__BoxAIAskByItemId"
-            inputs:
-                itemId: string
-                    description: "The Box file ID, taken from the contract package listing. Never invent one."
-                    is_required: True
-                prompt: string
-                    description: "The question to ask about that file. Be specific -- name the figures, dates, or clauses wanted."
-                    is_required: True
-                itemType: string
-                    description: "The type of item. Defaults to file."
-                    is_required: False
-            outputs:
-                answer: string
-                    description: "Box AI's answer, grounded in that file."
 
 subagent document_answers:
-    description: "Answers questions about what the contract documents actually say -- amounts, dates, parties, clause text, blockers -- always from Box AI and always citing the file."
+    label: "Document Answers"
+    description: "Answers questions about a CLM contract and what its documents actually say -- amounts, dates, parties, clause text, blockers -- from Box AI, citing the file. Use this for any question naming a contract or asking about contract content."
+
     reasoning:
         instructions: ->
             if @variables.contractPackageLoaded == False and @variables.contractId != "":
@@ -155,41 +89,49 @@ subagent document_answers:
                     set @variables.contractPackage = @outputs.outputSummary
                     set @variables.contractPackageLoaded = True
 
-            | You answer questions about document content, and only from the documents.
+            | Your job is to answer from the contract's documents in a single turn. Do NOT ask for
+              confirmation and do NOT ask a clarifying question you could answer by reading the
+              documents. Execute every step below in this one turn.
 
-              The contract package you have loaded:
-              {!@variables.contractPackage}
+              Never end a turn with a promise. "I will review", "please hold on", "let me retrieve"
+              and anything like them are failures -- the person sees nothing happen and has to ask
+              again. Either you have already called the actions and can answer, or you say the one
+              thing you need. There is no third option.
 
-              Work in this order, within a single turn:
-              1. If that package listing is empty, call {!@actions.get_contract_package} with the
-                 contract reference to get the documents and their Box file IDs. If you do not have
-                 a reference, ask for it -- and ask for nothing else.
-              2. Pick the file whose name matches the question. An insurance question goes to the
-                 insurance certificate, a redline question to the redline, a scope question to the
-                 SOW. Call {!@actions.ask_box_ai} with that Box file ID and a prompt naming exactly
-                 what is wanted.
-              3. Answer with what Box AI returned, naming the file it came from.
+              STEP 1: Call {!@actions.get_contract_package} immediately, with inputContract set to
+              the contract reference in the person's message -- for example CLM-2026-0017 or
+              CLM-SAMPLE-NST-2024. Do this as your very first act, before writing any reply. It
+              returns the Salesforce record, the governed Box folder, and every document with its
+              Box file ID, and it is the only source of Box file IDs. If the message names no
+              contract at all, ask for the reference and nothing else, then stop.
 
-              If the question spans several documents, ask about each and attribute each fact to its
-              file. If a file does not contain the answer, say which file you checked and that it is
-              not there. Never assert a figure, date, or clause that did not come back from
-              {!@actions.ask_box_ai}, and never invent a Box file ID.
+              STEP 2: If the person asked only which documents exist, list the file names from
+              STEP 1 and stop.
 
-              Do not ask a clarifying question you could answer yourself by reading the documents.
-              "All coverages" is the default reading of an insurance question; retrieve first and
-              note any assumption afterwards. Ask only when the answer would change which file you
-              open.
+              STEP 3: Otherwise pick the file whose name matches the question -- an insurance
+              question goes to the insurance certificate, a redline question to the redline, a scope
+              question to the SOW. Call {!@actions.ask_box_ai} with that Box file ID and a prompt
+              naming exactly what is wanted. If the question spans several documents, ask about each.
 
-              Keep answers short and readable aloud. Do not approve language, complete an approval,
-              or send anything for signature.
+              STEP 4: Answer with what Box AI returned and name the file each fact came from. Keep
+              it short and readable aloud.
+
+              Never ask the person for a Box file ID, a file name, or a package listing -- they are
+              looking at a workspace, not at Box internals, and STEP 2 gives you all three. Never
+              state a figure, date, or clause that did not come back from {!@actions.ask_box_ai},
+              and never report that a contract has no documents unless
+              {!@actions.get_contract_package} actually said so.
+
+              Do not approve legal language, complete an approval, or send anything for signature.
+              If asked, decline and say which named human owns that step.
 
         actions:
             capture_contract_reference: @utils.setVariables
+                description: "Store the contract reference for later turns. Never a substitute for get_contract_package, which is what actually retrieves the documents."
                 with contractId = ...
-                description: "Store the contract reference the person used, such as CLM-2026-0017 or CLM-2026-Northstar."
 
             get_contract_package: @actions.get_contract_package
-                description: "Find the contract, its Box folder, and the Box file ID of every document in it. Use this before answering anything about document content."
+                description: "Find the contract, its Box folder, and the Box file ID of every document in it. Always the first action of the turn."
                 with inputContract = ...
                 set @variables.contractRecordId = @outputs.outputRecordId
                 set @variables.boxFolderId = @outputs.outputFolderId
@@ -197,44 +139,96 @@ subagent document_answers:
                 set @variables.contractPackageLoaded = True
 
             ask_box_ai: @actions.ask_box_ai
-                description: "Ask Box AI about one document, by a Box file ID taken from the package listing."
+                description: "Ask Box AI about one document, by a Box file ID from the package listing."
+                available when @variables.contractPackageLoaded == True
                 with itemId = ...
                 with prompt = ...
 
     actions:
         get_contract_package:
-            description: "Finds a CLM contract, its governed Box folder, and every document in that folder with its Box file ID. Call this before answering anything about document content."
+            description: "Finds a CLM contract, its governed Box folder, and every document in that folder with its Box file ID. Nothing else can supply a Box file ID."
+            label: "Get CLM Contract Package"
             target: "apex://ClmContractPackage"
+            include_in_progress_indicator: True
+            progress_indicator_message: "Looking up the contract package in Box..."
             inputs:
                 inputContract: string
                     description: "The contract reference the person used, for example CLM-2026-0017, the contract name, or a CLM_Contract__c record ID."
+                    label: "Contract Reference"
                     is_required: True
+                    complex_data_type_name: "lightning__textType"
             outputs:
                 outputSummary: string
+                    label: "Contract Package"
                     description: "The contract record, its Box folder, and each document with its Box file ID."
+                    complex_data_type_name: "lightning__textType"
+                    is_displayable: False
+                    filter_from_agent: False
                 outputRecordId: string
+                    label: "Salesforce Record ID"
                     description: "The Salesforce CLM_Contract__c record ID."
+                    complex_data_type_name: "lightning__textType"
+                    is_displayable: False
+                    filter_from_agent: False
                 outputFolderId: string
+                    label: "Box Folder ID"
                     description: "The governed Box folder ID for this contract."
+                    complex_data_type_name: "lightning__textType"
+                    is_displayable: False
+                    filter_from_agent: False
                 outputFound: boolean
+                    label: "Documents Found"
                     description: "Whether a contract and at least one document were found."
+                    complex_data_type_name: "lightning__booleanType"
+                    is_displayable: False
+                    filter_from_agent: False
 
         ask_box_ai:
-            description: "Ask Box AI a question about one contract document, identified by its Box file ID. The answer is grounded in that file."
-            target: "apex://box__BoxAIAskByItemId"
+            description: "Ask Box AI about one contract document, identified by its Box file ID from the contract package."
+            label: "Ask Box AI"
+            target: "apex://ClmBoxAskDocument"
+            include_in_progress_indicator: True
+            progress_indicator_message: "Reading the document in Box..."
             inputs:
                 itemId: string
-                    description: "The Box file ID, taken from the contract package listing. Never invent one."
+                    description: "A Box file ID copied from the get_contract_package listing. Never invent one and never ask the person for one."
+                    label: "Item ID"
                     is_required: True
+                    complex_data_type_name: "lightning__textType"
                 prompt: string
-                    description: "The question to ask about that file. Be specific -- name the figures, dates, or clauses wanted."
+                    description: "The question to ask about that file. Name exactly what is wanted -- figures, dates, parties, clause text."
+                    label: "Prompt"
                     is_required: True
-                itemType: string
-                    description: "The type of item. Defaults to file."
-                    is_required: False
+                    complex_data_type_name: "lightning__textType"
             outputs:
                 answer: string
-                    description: "Box AI's answer, grounded in that file."
+                    label: "Answer"
+                    description: "Box AI's answer, grounded in that file, or a plain statement that it could not be read."
+                    complex_data_type_name: "lightning__textType"
+                    is_displayable: False
+                    filter_from_agent: False
+                answered: boolean
+                    label: "Answered"
+                    description: "Whether Box AI actually answered. When false, say so rather than filling the gap."
+                    complex_data_type_name: "lightning__booleanType"
+                    is_displayable: False
+                    filter_from_agent: False
+
+
+subagent fallback_response:
+    label: "Fallback Response"
+    description: "Provides a default reply when the request is not about a contract or its documents."
+
+    reasoning:
+        instructions: ->
+            | Respond with:
+              I can help you with a CLM contract package:
+              - **Summarize a contract** — give me the reference, such as CLM-2026-0017
+              - **Answer from the documents** — amounts, dates, parties, clause text, with the file cited
+              - **Explain what is blocking execution** — and who owns each open finding
+
+              Which contract are you working on?
+
 
 connection customer_web_client:
     adaptive_response_allowed: True
