@@ -346,6 +346,15 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    **Never retrieve `ExtlClntAppGlobalOauthSettings` into the repo.** A retrieve brings back
    `consumerKey` and `consumerSecret`; the committed file is authored and holds neither.
 
+   Two constraints for anyone propagating this: `McpServerDefinition` exists from **API
+   v66.0** and the Metadata Coverage Report marks it **Metadata API and source tracking
+   only** -- not unlocked packages, not 2GP or 1GP, not change sets. It has to be deployed
+   as source. And there is **no named user permission** for hosted MCP; Salesforce's own
+   guidance is to author an empty permission set and use it for pre-authorization, which is
+   what `CLM_MCP_Client` is. The endpoint format is confirmed by the connection-issues
+   page: `.../mcp/v1/custom/<Name>` for a Developer or Enterprise org, and
+   `.../mcp/v1/sandbox/custom/<Name>` for a sandbox or scratch org.
+
 8. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 9. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.
 10. **Workspace screenshots are stale.** `output/screenshots/cross-platform-agentic-orchestration/clm-react-workspace.png` is marked `readiness = "real-demo"` but was captured **2026-07-14**, before the workspace gained its folder table and working Content Preview. `validate_clm.py` checks the manifest structurally and cannot detect this. Recapture per **MT-072**.
