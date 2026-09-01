@@ -4,7 +4,7 @@ These scripts present the React portion of Cross-Platform Agentic Orchestration 
 
 | Script | Duration | Audience | Primary outcome |
 |---|---:|---|---|
-| [Executive walkthrough](01-executive-walkthrough.md) | 3-5 minutes | Executives, business sponsors, first meetings | Read customer paper against the governed clause library, and show the counterparty boundary |
+| [Executive walkthrough](01-executive-walkthrough.md) | 5-6 minutes | Executives, business sponsors, first meetings | Read customer paper against the governed clause library, and show the counterparty boundary |
 | [Technical validation](03-technical-validation.md) | 15-20 minutes | Architects, Salesforce teams, security, developers | Prove credential, CSP, sharing, and MCP boundaries -- and name the one that is not enforceable |
 | [Box metadata entry-point variation](04-box-metadata-automate-entry.md) | 5-7 minutes | Any audience | Start with a contract uploaded to `01 - Intake` and `clmContract` metadata applied, then Automate enrichment, human validation, and HTTPS Connector record creation |
 
@@ -33,7 +33,7 @@ Supporting artifacts:
 4. Confirm the application resolves `recordId`, `contractId`, and `folderId` without browser secrets.
 5. Confirm material answers cite Box files and approval state matches human-owned tasks.
 6. Confirm one open task is reused per contract, redline file, and review domain.
-7. Doc Gen and Sign are not wired in this repository. The executive walkthrough omits them; the longer scripts must not claim them as live.
+7. Doc Gen generates into the contract's own folder; Box Sign only ever *prepares* a request and refuses an unapproved contract. Never describe a signature request as sent.
 8. Keep managed AgentCore and Databricks claims outside these supporting scripts; the parent scenario owns that evidence.
 
 ## Shared presenter rule

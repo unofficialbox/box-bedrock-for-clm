@@ -83,7 +83,7 @@ def set_table_geometry(table, widths_dxa):
             set_cell_margins(cell)
 
 
-def configure(doc, running_label):
+def configure(doc, running_label, footer_label="Acme Robotics | CLM-2026-Northstar"):
     section = doc.sections[0]
     section.page_width = Inches(8.5)
     section.page_height = Inches(11)
@@ -122,7 +122,7 @@ def configure(doc, running_label):
     set_font(header.add_run(running_label), 9, True, GRAY)
     footer = section.footer.paragraphs[0]
     footer.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-    set_font(footer.add_run("Acme Robotics | CLM-2026-Northstar"), 8, False, GRAY)
+    set_font(footer.add_run(footer_label), 8, False, GRAY)
 
 
 def add_title(doc, kicker, title, subtitle):
@@ -292,10 +292,61 @@ def msa_redline():
     return doc
 
 
+def counter_position():
+    """The document Acme sends back when the deal is on the customer's paper.
+
+    Generating "the agreement" is the wrong artifact here -- the agreement is Calder's, and
+    Acme is not going to redraft it. What Acme produces is a position: which clause is out of
+    policy, what the approved fallback text is, who owns the deviation, and what the
+    counterparty already agreed to the last two times. Every one of those already exists as
+    governed content -- the clause library Hub supplies the fallback and its owner, the prior
+    executed agreements supply the precedent -- so this template is the place they are
+    assembled, not the place they are invented.
+    """
+    doc = Document()
+    configure(doc, "CLM Counter-Position", "Acme Robotics | {{contract.id}}")
+    add_title(
+        doc,
+        "Negotiation position",
+        "Counter-Position Memo",
+        "Prepared from the approved clause library and prior executed agreements",
+    )
+    add_key_values(doc, [
+        ("Contract ID", "{{contract.id}}"),
+        ("Counterparty", "{{contract.counterparty}}"),
+        ("Their paper", "{{contract.paperReference}}"),
+        ("Deal value", "{{contract.dealValue}}"),
+        ("Status", "{{contract.status}}"),
+        ("Prepared", "{{memo.preparedOn}}"),
+    ])
+    add_section_text(doc, "The clause at issue", "{{position.clauseAtIssue}}")
+    add_section_text(doc, "What their draft says", "{{position.theirPosition}}")
+    add_key_values(doc, [
+        ("Approved position", "{{position.approvedClauseId}} - {{position.approvedPosition}}"),
+        ("Approved fallback", "{{position.fallbackClauseId}} - {{position.fallbackPosition}}"),
+        ("Deviation owner", "{{position.owner}}"),
+        ("Risk", "{{position.risk}}"),
+    ])
+    add_section_text(doc, "What they agreed before", "{{precedent.summary}}")
+    add_section_text(doc, "Proposed counter-position", "{{position.counterProposal}}")
+    add_key_values(doc, [
+        ("Prepared by", "{{memo.preparedBy}}"),
+        ("Requires approval from", "{{position.owner}}"),
+    ])
+    add_section_text(
+        doc,
+        "Note",
+        "This memo is a draft prepared for review. It is not an approval, and it does not "
+        "authorise signature. {{position.owner}} owns the decision on this deviation.",
+    )
+    return doc
+
+
 def main():
     OUTPUT.mkdir(parents=True, exist_ok=True)
     templates = {
         "clm-approval-memo-template.docx": approval_memo(),
+        "clm-counter-position-template.docx": counter_position(),
         "clm-order-summary-template.docx": order_summary(),
         "clm-renewal-notice-template.docx": renewal_notice(),
         "northstar-msa-2026-redline.docx": msa_redline(),

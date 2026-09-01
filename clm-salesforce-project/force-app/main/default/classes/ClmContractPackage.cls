@@ -102,6 +102,36 @@ public with sharing class ClmContractPackage {
         return result;
     }
 
+    /** A contract and the Box folder that holds it, or nulls when either is unresolved. */
+    public class Located {
+        public CLM_Contract__c contract;
+        public String folderId;
+    }
+
+    /**
+     * Resolves a reference to the contract record and its governed folder.
+     *
+     * Exposed because generating a document and sending one for signature both need the
+     * same two facts this class already knows how to find, and neither should re-implement
+     * the reference-or-name-or-id lookup or the FRUP-then-denormalised-field fallback.
+     * Unlike `get`, this makes no Box callout: the caller is about to make its own.
+     */
+    public static Located locate(String reference) {
+        Located found = new Located();
+        if (String.isBlank(reference)) {
+            return found;
+        }
+        found.contract = new ContractLookup().byReference(reference.trim());
+        if (found.contract == null) {
+            return found;
+        }
+        String folderId = new FolderMapping().forRecord(found.contract.Id);
+        found.folderId = String.isNotBlank(folderId)
+            ? folderId
+            : found.contract.Box_Workspace_Folder_ID__c;
+        return found;
+    }
+
     /**
      * The Box file IDs that belong to a contract, or null when the contract or its folder
      * could not be resolved.
@@ -110,7 +140,21 @@ public with sharing class ClmContractPackage {
      * caller named. Without that bound an MCP client can hand any Box file ID to the ask
      * action and have it read, which is a wider reach than any single contract implies.
      */
+    /**
+     * Stands in for the Box listing in tests.
+     *
+     * The Toolkit returns nothing in a test context, so every caller that bounds itself
+     * with this method can only ever be tested on its refusal path. That leaves the branch
+     * that actually reaches Box -- the one worth covering -- unexercised. Mirrors the
+     * override on ClmCounterpartyContracts.
+     */
+    @TestVisible
+    private static Set<String> documentIdsOverride;
+
     public static Set<String> documentIdsFor(String reference) {
+        if (documentIdsOverride != null) {
+            return documentIdsOverride;
+        }
         if (String.isBlank(reference)) {
             return null;
         }
@@ -202,7 +246,7 @@ public with sharing class ClmContractPackage {
         private CLM_Contract__c byReference(String reference) {
             List<CLM_Contract__c> found = [
                 SELECT Id, Name, Contract_ID__c, Counterparty__c, Status__c, Risk_Level__c,
-                       Box_Workspace_Folder_ID__c
+                       Deal_Value__c, Box_Workspace_Folder_ID__c
                 FROM CLM_Contract__c
                 WHERE Contract_ID__c = :reference
                 LIMIT 1
@@ -213,7 +257,7 @@ public with sharing class ClmContractPackage {
             if (reference instanceof Id) {
                 found = [
                     SELECT Id, Name, Contract_ID__c, Counterparty__c, Status__c, Risk_Level__c,
-                           Box_Workspace_Folder_ID__c
+                           Deal_Value__c, Box_Workspace_Folder_ID__c
                     FROM CLM_Contract__c
                     WHERE Id = :reference
                     LIMIT 1
@@ -225,7 +269,7 @@ public with sharing class ClmContractPackage {
             String pattern = '%' + reference + '%';
             found = [
                 SELECT Id, Name, Contract_ID__c, Counterparty__c, Status__c, Risk_Level__c,
-                       Box_Workspace_Folder_ID__c
+                       Deal_Value__c, Box_Workspace_Folder_ID__c
                 FROM CLM_Contract__c
                 WHERE Name LIKE :pattern OR Contract_ID__c LIKE :pattern
                 ORDER BY LastModifiedDate DESC

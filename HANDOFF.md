@@ -475,6 +475,50 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 14. **Sibling-repo propagation is deferred to separate sessions.** The plan: propagate CLM's Tier-1 cleanup (gitignore hardening, validate-robustness set comparisons, doc/persona alignment) to the other demos. Siblings stay pure JSON (BCL is opt-in). Copy-paste, self-contained per-repo prompts already exist at the **workspace root**: `../propagation-prompts/*.md` (one per repo + `README.md` index), with background in `../BCL-CLEANUP-PROPAGATION.md`. DAM is greenfield (not git-init'd) and needs a scope decision first. Don't start propagation unless the user asks.
 15. **No live-org state in commits.** Any request touching the org (deploy static resources, run seeders, send a signature) needs explicit approval + confirmed target and is the user's call to fire.
 
+10. **Doc Gen and Sign are wired, and Sign is deliberately incomplete.**
+   `ClmGenerateCounterProposal` posts to `/2.0/docgen_batches`; `ClmSendForSignature` posts to
+   `/2.0/sign_requests`. Both go through `ClmBoxAuth`, so an MCP client still holds no Box
+   token. Both are on the MCP server and **neither is on the ACC agent** -- that surface is
+   the counterparty's, and it has no business drafting Acme's position or touching signature.
+
+   On customer paper the artifact is a **counter-position memo**, not "the agreement". Acme
+   is not redrafting Calder's paper; it is stating which clause is out of policy, what the
+   approved fallback is, who owns the deviation and what the counterparty already agreed to.
+   Authority is split on purpose: contract facts come from the record so a caller cannot
+   misattribute a memo, and the analysis comes from the caller because the caller just read
+   the Hub and the precedents.
+
+   **Sign prepares and does not send.** `is_document_preparation_needed` is what makes this
+   real rather than a promise: Box returns a `prepare_url`, no mail leaves, and a human
+   places the fields and presses send. On top of that it refuses unless `Status__c` is
+   Approved or Signature, and bounds the file to the named contract the same way reading one
+   is bounded. All three states verified live on 2026-09-01: Legal Review refused before any
+   Box call, Approved prepared with nothing sent, and a file from another contract's folder
+   refused even when the contract was approved.
+
+   Four things cost a cycle each and are worth knowing:
+   - **Doc Gen is a versioned API.** `box-version: 2025.0` is required; the wrong value 400s
+     naming the versions it accepts, and Sign wants 2024.0 or no header at all.
+   - **Doc Gen is asynchronous.** A 202 means the batch was accepted, not that the file
+     exists. `GET /2.0/docgen_batch_jobs/<id>` reports `completed` and the output file id.
+   - **Apex annotation attributes are space-separated.** `@InvocableVariable(label='x',
+     required=true)` is a parse error with a cascade of misleading messages; drop the comma.
+   - **`documentIdsFor` returns nothing in a test context**, because the Toolkit does. Every
+     caller that bounds itself with it can only be tested on its refusal path, so
+     `ClmContractPackage.documentIdsOverride` is `@TestVisible` for the success path.
+
+   The template lives in Box and its id is configuration --
+   `CLM_Box_Config__c.Counter_Position_Template_ID__c` -- for the same reason the clause
+   library Hub is: the agent may generate the memo, it may not choose what the org generates
+   from. `scripts/generate_docgen_templates.py` authors it; registering it is a
+   `POST /2.0/docgen_templates` with the uploaded file id.
+
+   Two identity traps showed up again here. `pushFileToBox` names the Box file from
+   `PathOnClient` **and appends the extension**, so a title ending in `.docx` becomes
+   `.docx.docx`. And the DocGen template folder is owned by the CLM Box app's user while the
+   Toolkit writes as the Salesforce Admin Box user, so the upload 404'd until that folder was
+   collaborated to the Toolkit's identity -- the mirror image of the gap in item 6.
+
 ## 7. How to verify you're in a good state
 
 ```bash

@@ -77,7 +77,7 @@ AgentCore/Strands owns planning and specialist delegation. Box governs content, 
 | 6. Intelligence | “Portfolio history can inform—but not decide—the negotiation.” | Show Databricks outcome and cycle-time context. | “Analytics never overwrites authoritative contract state.” |
 | 8. Workspace | “The operator should not have to chase six systems.” | Show the Box package and Contract Copilot together in React. | “The unified view preserves each system's authority while reducing clicks.” |
 | 9. Guardrail | “Autonomy stops at legal approval and signature.” | Show the Copilot decline an approval or signature request and name the human owner. | “The refusal is in the agent's instructions; there is no signature path in this build to block.” |
-| 10. Close | “The governed lifecycle continues past this build.” | Return to the contract record and its Box package. | “Doc Gen, Sign, and obligations are Box capabilities this repository does not wire; do not demonstrate them.” |
+| 10. Close | “The governed lifecycle completes, and stops where it should.” | Generate the counter-position memo, then show signature refused on an unapproved contract. | “Generation is automatic; sending for signature is not. Obligations remain unbuilt.” |
 
 Required language: AgentCore/Strands coordinates; Salesforce Agentforce supplies structured commercial context and Salesforce-native capabilities; Box governs content; Databricks supplies analytics, not authority; humans approve concessions, signatures, and final obligations.
 
@@ -111,7 +111,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 |---|---|---|
 | Experience | Salesforce Multi-Framework React CLM workspace | **Local deterministic fixture**; deploy and validate per environment |
 | Salesforce Agentforce | `CLM_Contract__c`, Contract Copilot, approval context | **Portable specification**; configure and validate per environment |
-| Box | Apps, content, metadata, tasks, Hub | **Portable specification** with real reference screenshots. Doc Gen and Sign are **not wired** in this repository |
+| Box | Apps, content, metadata, tasks, Hub, Doc Gen, Sign | **Portable specification** with real reference screenshots |
 | Orchestration | Amazon Bedrock AgentCore supervisor and Strands specialists | **Local deterministic fixture** trace plus portable contracts |
 | Analytics | Databricks historical outcomes and cycle-time benchmarks | **Local deterministic fixture** dataset and tool contract |
 | Controls | Citations, deterministic expert directory, human approvals, signature block | **Portable specification** |
@@ -119,7 +119,7 @@ Optional offline presentation: [self-contained visual gallery](../../../../outpu
 
 ### Component and authority contract
 
-- Box governs the contract package, versions, metadata, tasks, the approved clause library Hub, and audit history. Doc Gen and Sign are real Box capabilities that this repository does not implement.
+- Box governs the contract package, versions, metadata, tasks, the approved clause library Hub, Doc Gen, Sign, and audit history.
 - Salesforce `CLM_Contract__c` governs structured commercial context and Box references.
 - Salesforce intake is designed around a `Contract_ID__c` external-ID upsert followed by lookup so retries cannot create duplicate records. The live Box Automate workflow currently performs a plain record create instead, which is not idempotent; restore the upsert before making a duplicate-safety claim.
 - Agentforce may retrieve, summarize, compare, explain, recommend, draft, and route. It cannot approve a legal position or authorize signature.

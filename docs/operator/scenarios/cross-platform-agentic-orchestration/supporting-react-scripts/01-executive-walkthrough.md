@@ -4,7 +4,7 @@
 
 | Item | Value |
 |---|---:|
-| Duration | 4-5 minutes |
+| Duration | 5-6 minutes |
 | Audience | General counsel, CRO, CIO, legal and sales leadership |
 | Scenario | Calder Financial Group sends **its own** MSA template; Acme must decide what to push back on |
 | Internal surface | Claude Desktop over the Salesforce and Box MCP servers |
@@ -29,10 +29,11 @@ CRM record and a full-text search cannot answer this, and a governed clause libr
 
 ## Scope of this telling
 
-Generation and signature are **not** in this script. Both are real Box capabilities and
-neither is wired in this repository -- `VITE_BOX_DOCGEN_FOLDER_ID` and
-`VITE_BOX_SIGNATURE_FOLDER_ID` are empty configuration, and no Apex writes back to the
-contract record. Do not narrate them as live. The four beats below are all verified.
+Generation and signature are real here, with one deliberate limit. Box Doc Gen writes the
+counter-position memo into the contract's own folder. Box Sign **prepares** a signature
+request and returns a URL -- it sends nothing, and it refuses outright on a contract that
+has not been approved. Nothing in this script writes back to the contract record; that
+remains unbuilt. Every beat below is verified against the live org and live Box.
 
 ## Pre-demo state
 
@@ -44,6 +45,8 @@ contract record. Do not narrate them as live. The four beats below are all verif
 | `CLM_Box_Config__c.Clause_Library_Hub_Id__c` is populated and the Hub holds the `CLM-LIAB-*` clauses | Beat 3 depends on it entirely |
 | Claude Desktop connected to the `CLMContractTools` MCP server, tools listed | `listContracts`, `getContractPackage`, `askContractDocument` |
 | Counterparty user can sign in to the site | See **Known constraints** -- Login As is unavailable for this licence |
+| `CLM_Box_Config__c.Counter_Position_Template_ID__c` names a registered Box Doc Gen template | Beat 5 refuses without it |
+| The demo contract is in **Legal Review** | Beat 5's refusal depends on it |
 
 Open two windows before you start: Claude Desktop on the internal side, a private browser
 window for the counterparty. Do not switch accounts on stage.
@@ -145,7 +148,36 @@ The clause library says the position is off-policy. This says something better.
 
 Verified live on 2026-09-01 across all three documents, with per-file citations.
 
-### Beat 5 — The same platform, scoped to the other side (60 seconds)
+### Beat 5 — Put the position on paper, and stop there (60 seconds)
+
+**Prompt**
+
+> Draft the counter-position memo for this contract.
+
+**Show**
+
+- `counter-position-CLM-SAMPLE-CAL-2026.pdf` appearing in the contract's own Box folder.
+- The memo: clause at issue, what their draft says, `CLM-LIAB-001` and the `CLM-LIAB-002`
+  fallback, **Commercial Legal** as the deviation owner, the precedent, the proposed
+  counter-position.
+
+**Land**
+
+> Nothing on that page was typed. The approved position came from the clause library, the
+> precedent from the executed agreements, the contract facts from the Salesforce record. The
+> memo is generated into the folder it belongs to, and it says on its face that it is a
+> draft and approves nothing.
+
+**Then show the boundary.** Ask for it to be sent for signature:
+
+> Contract CLM-SAMPLE-CAL-2026 is Legal Review, not approved for signature. Signature is
+> blocked until the named approver completes their review; I cannot move it forward myself.
+
+That refusal is a state check in Apex, not a prompt instruction. Once the contract *is*
+approved, the action still only *prepares* the request and hands back a URL -- a person
+opens it, sees the signer, and presses send. Verified live in all three states.
+
+### Beat 6 — The same platform, scoped to the other side (60 seconds)
 
 **Say**
 
@@ -182,8 +214,9 @@ the Copilot is not, and cannot be on this surface. See **Known constraints**.
 2. One metadata query returns critical documents across two contracts.
 3. The clause-library answer names 19.2, 22.4, `CLM-LIAB-001`, `CLM-LIAB-002`, and Commercial Legal.
 4. The precedent answer names the 24-month cap in both executed agreements and the reversion in the draft.
-5. The counterparty view shows only that counterparty's contracts.
-6. No generation and no signature is shown or claimed.
+5. The memo is generated into the contract's own folder with no unresolved template tags.
+6. The signature request is refused while the contract is in Legal Review.
+7. The counterparty view shows only that counterparty's contracts.
 
 ## Known constraints
 
@@ -210,11 +243,9 @@ Read these before presenting. Each is a real limitation, not a setup error.
 
 ## Where this story goes next
 
-One build would add a beat:
-
-| Build | Beat it unlocks |
-|---|---|
-| Wire Box Doc Gen and Box Sign | *Respond and execute.* On customer paper the honest generation is the counter-position drawn from the approved fallback -- `CLM-LIAB-002` is already that text -- not "generate the agreement". |
+The remaining gap is **write-back**: no Apex updates the contract record, so nothing the
+agent learns in beats 3 to 5 lands as structured data on `CLM_Contract__c`. That is what
+would let the record drive the renewal and finance work that comes after signature.
 
 ## References
 

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <McpServerDefinition xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>The same two governed Apex actions the Experience Cloud workspace agent uses: resolve a contract and its Box documents, then ask Box AI about one. Box credentials stay in Apex, so a client reads contract content without ever holding a Box token.</description>
+    <description>Governed Apex over the CLM portfolio: list contracts, resolve one and its Box documents, ask Box AI, draft a counter-position memo, prepare a signature request. Box credentials stay in Apex, so a client never holds a Box token.</description>
     <masterLabel>CLM Contract Tools</masterLabel>
     <tools>
         <apiDefinition>
@@ -31,5 +31,25 @@
         <descriptionOverride>Asks Box AI about one document of a named contract, by a Box file ID from that contract&apos;s package. A file outside that contract is refused. With itemType hub it reads the approved clause library instead.</descriptionOverride>
         <toolName>askContractDocument</toolName>
         <toolTitle>Ask Box AI About a Contract Document</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-ClmGenerateCounterProposal</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>ClmGenerateCounterProposal</operation>
+        </apiDefinition>
+        <descriptionOverride>Generates the counter-position memo for a contract into its own Box folder, from the clause at issue, the approved fallback and the precedent the caller cites. Contract facts come from the record. The memo is a draft and approves nothing.</descriptionOverride>
+        <toolName>generateCounterPosition</toolName>
+        <toolTitle>Generate a CLM Counter-Position Memo</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
+            <apiIdentifier>aa:apex-ClmSendForSignature</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>ClmSendForSignature</operation>
+        </apiDefinition>
+        <descriptionOverride>Prepares a Box Sign request for one document of an approved contract and returns a URL for a human to review and send. It sends nothing. A contract that is not approved, or a file outside it, is refused.</descriptionOverride>
+        <toolName>prepareSignatureRequest</toolName>
+        <toolTitle>Prepare a Box Sign Request</toolTitle>
     </tools>
 </McpServerDefinition>
