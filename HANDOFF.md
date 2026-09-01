@@ -270,11 +270,25 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    an unavailable action is invisible, not failed. The Apex debug log on the agent user
    (`TraceFlag` on 005NS00000ybncIYAQ) named every one of these in a single line.
 
-   **Version 1 is still the Active version**, so the workspace continues to serve the
-   original agent -- the one with no actions and the stale `CLM-2026-0017` welcome. Every
-   publish creates a new numbered bundle (`CLM_Contract_Copilot_N`) and a new project
-   version; none of it reaches the site until a version is activated. That is why
-   republishing appeared to change nothing there for so long.
+   **v13 is the Active version as of 2026-09-01** and carries both actions plus the
+   corrected greeting. Every publish creates a new numbered bundle
+   (`CLM_Contract_Copilot_N`) and a new version, and **none of it reaches the site until a
+   version is activated** -- which is why republishing appeared to change nothing for so
+   long. The two commands are:
+
+   ```
+   sf agent publish authoring-bundle -o <org> -n CLM_Contract_Copilot
+   sf agent activate -o <org> -n CLM_Contract_Copilot --version <n>
+   ```
+
+   Publish deploys the authoring bundle first, then retrieves the generated artifacts back
+   into the project. Those land in `bots/` and `genAiPlannerBundles/`, both **gitignored**:
+   they are outputs of the `.agent` source, so a publish leaves the working tree clean and
+   there is nothing to commit. Check what actually shipped by reading the numbered planner
+   bundle, not the botVersion file -- the Apex targets are in the planner, and a botVersion
+   with no `apex://` in it is normal rather than a failed publish.
+
+   Doc Gen and Sign are deliberately **not** on this agent (see item 10).
 
    Both Apex legs were also verified directly against the live org and live Box:
 6. **A Box folder needs a *direct* collaboration before it can be downscoped.** Inherited
