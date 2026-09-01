@@ -297,16 +297,29 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    reference, so the ask depended on `capture_contract_reference` having happened to run
    first. It usually had not.
 
-   The fix is for the action to return what it resolved rather than the agent remembering
-   what was typed. `ClmContractPackage.Result.outputContractReference` carries the canonical
-   reference -- a person can type "Northstar Health System MSA Package" and get back
-   `CLM-2026-0017` -- and both `get_contract_package` bindings now set `@variables.contractId`
-   from it. That also tightens the bound: the ask is scoped to the contract the lookup
-   actually found, not to a string the model produced.
+   Writing the variable was not enough. `ClmContractPackage` now returns
+   `outputContractReference` -- the canonical reference, so "Northstar Health System MSA
+   Package" comes back as `CLM-2026-0017` -- and both `get_contract_package` bindings set
+   `@variables.contractId` from it. That shipped as v14 and the ask still arrived empty.
 
-   Two things worth knowing here. An empty string in a `required=true` invocable variable
-   surfaces as a platform `REQUIRED_FIELD_MISSING`, not as an Apex refusal, so the failure
-   never reaches the class's own error handling. And **an action output must be declared in
+   **The binding itself was the problem.** `with contractReference = @variables.contractId`
+   overrides the model: whatever that variable holds is what the action gets, and an unset
+   variable is an empty string, so `is_required: True` cannot help -- the planner was never
+   being asked to supply the value. v15 makes it `with contractReference = ...` like the file
+   id and the prompt beside it, so the model fills it from the package listing it just read.
+
+   **That does not loosen the bound, because the bound was never the binding.**
+   `ClmBoxAskDocument.resolveScope` checks that `itemId` appears in
+   `documentIdsFor(contractReference)`; a caller that names one contract and passes another's
+   file is refused whatever wrote the reference. Two tests now hold that line directly rather
+   than passing because the lookup was unresolvable in a test context.
+
+   Two things worth knowing here. An empty string in a required invocable variable surfaces
+   as a platform `REQUIRED_FIELD_MISSING` and a 500, not as an Apex refusal, so the failure
+   never reaches the class's own error handling and the agent gets nothing it can act on.
+   Requiredness is enforced from the `.agent` action's `is_required: True`, not from the
+   Apex annotation -- the published input schema still lists the field as required after
+   `required=true` is removed from `@InvocableVariable`. And **an action output must be declared in
    the `.agent` `outputs:` block before any binding may reference it** -- the publish fails
    with `'outputContractReference' is not a defined output of action`, naming each binding
    line. That compile check is the only structural verification available: the retrieved

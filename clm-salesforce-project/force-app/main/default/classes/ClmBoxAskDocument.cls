@@ -19,8 +19,7 @@ public with sharing class ClmBoxAskDocument {
     public class Request {
         @InvocableVariable(
             label='Contract reference'
-            description='The contract whose document is being read, for example CLM-2026-0017. Required: a document is only readable in the context of the contract it belongs to.'
-            required=true
+            description='The contract whose document is being read, for example CLM-2026-0017. A document is only readable in the context of the contract it belongs to, so this is effectively required -- but it is not declared required, deliberately. A required invocable variable that arrives empty is rejected by the platform with REQUIRED_FIELD_MISSING and a 500 before this class runs, which tells the caller nothing it can act on. Left optional, the refusal below names what is missing and the agent can call again with it.'
         )
         public String contractReference;
         @InvocableVariable(
