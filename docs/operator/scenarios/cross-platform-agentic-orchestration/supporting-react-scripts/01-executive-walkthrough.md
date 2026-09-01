@@ -11,6 +11,14 @@
 | External surface | Experience Cloud site, scoped to one counterparty |
 | Core message | The exposure is not where a diff or a keyword search would look. Only reading the document against a governed clause library finds it. |
 
+## The problem this opens on
+
+Enterprise deals close on the customer's template, not yours. Every negotiated MSA comes back
+with different payment terms, liability caps, renewal notice periods and termination rights.
+That information drives revenue recognition, the renewal motion and risk exposure -- and it
+exists only inside a document, sitting outside the systems and the permissions your agents
+draw from.
+
 ## Why this scenario
 
 Acme is on **customer paper**. There is no Acme template to diff against, the document has no
@@ -103,6 +111,11 @@ This is the beat the demo exists for. Run it in Claude Desktop.
 > The document had to be read against a governed library of what we have already approved,
 > and the answer came back with the clause ID and the owner attached.
 
+**Then say what it costs.** A redline like this is what holds up signature and pushes a deal
+out of the forecasted quarter. The point is not that the agent found it -- it is that legal
+now has the approved fallback and the named owner in the same answer, which is what removes
+a week of back-and-forth.
+
 Verified live on 2026-09-01: the Hub returns exactly these positions with file-level citations.
 
 ### Beat 4 — The same platform, scoped to the other side (60 seconds)
@@ -118,9 +131,14 @@ Verified live on 2026-09-01: the Hub returns exactly these positions with file-l
 
 **Land**
 
-Record access is enforced by a Salesforce sharing set on `Counterparty_Account__c`, and the
-Box token is downscoped to one folder. The analysis from beat 3 -- our positions, our
-fallbacks, our owner -- never crosses to this side.
+> Same content, same page, a different person -- and a different result. Nobody configured a
+> view for them. Record access is enforced by a Salesforce sharing set on
+> `Counterparty_Account__c`, the query runs `with sharing`, and the Box token is downscoped
+> to one folder. The analysis from beat 3 -- our positions, our fallbacks, our owner -- never
+> crosses to this side.
+
+**Do not extend this claim to the agent.** The workspace is scoped by the signed-in identity;
+the Copilot is not, and cannot be on this surface. See **Known constraints**.
 
 **Presenter warning:** do not invite the audience to prompt the Copilot here. See
 **Known constraints**.
@@ -156,6 +174,16 @@ Read these before presenting. Each is a real limitation, not a setup error.
   on provisioning -- verify it for any folder created another way.
 - **The `clmContract` template is not applied to folders**, so contract-level facts are not
   searchable and beat 2 stays at document level.
+
+## Where this story goes next
+
+Three builds would each add a beat, in descending order of value:
+
+| Build | Beat it unlocks |
+|---|---|
+| Seed prior executed contracts for the same counterparty | *Precedent.* "They accepted the 24-month cap on the original deal and the last renewal" turns a policy finding into negotiating leverage. |
+| Per-user Box OAuth (MT-040) plus the managed-package Box AI invocable | *The agent goes silent.* Box permissions travel into the agent, so the same question returns a cited answer for the deal team and nothing for anyone else. This is the strongest available close and it is not buildable on the current credential model. |
+| Wire Box Doc Gen and Box Sign | *Respond and execute.* On customer paper the honest generation is the counter-position drawn from the approved fallback -- `CLM-LIAB-002` is already that text -- not "generate the agreement". |
 
 ## References
 
