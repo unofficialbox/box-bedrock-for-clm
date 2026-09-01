@@ -302,8 +302,16 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
     "accessible_by":{"id":"<Box_User_Id__c>","type":"user"},"role":"editor"}
    ```
 
-   The parent token can make that call -- verified on 2026-09-01, HTTP 201 -- so the fix
-   is a few lines beside the `createFolderForRecordId` call rather than an admin task.
+   **Fixed on 2026-09-01.** `ClmBoxFolderService.grantWorkspaceAccess` now makes that call
+   immediately after `createFolderForRecordId`, and deliberately *before* the `finally`
+   block runs `commitChanges()`: the Toolkit has only staged the association at that point,
+   so a callout is still legal, and would not be once the DML has run. A 409 is treated as
+   success -- the grant is already there. With no `Box_User_Id__c` configured the grant is
+   skipped, because an enterprise subject already owns what it creates.
+
+   End-to-end check, on a contract created for the purpose and then deleted: provision
+   through the endpoint, then mint a workspace token, with no manual Box step in between.
+   Both succeeded.
 
 7. **One dependency concession.** `clmreactapp/.npmrc` sets `legacy-peer-deps=true`. `box-ui-elements@27` pins `@box/activity-feed@^2.3.12`, but `activity-feed@2.4.2` declares peer `@box/user-selector@^3.0.0` while the tree resolves `2.2.23`. The committed lockfile already encodes that resolution, so without the `.npmrc` a clean `npm ci` fails ERESOLVE and four validation checks go red. It changes no resolved version. (The two *vendoring* concessions this section used to record — the `vendor` secret-scan exemption and the eslint ignore — were retired when the vendored preview was removed.)
 8. **Generate/sign tail is spec-only.** `config/box/automate-workflows.bcl` (see the note near line 44) states orders 8–10 (Human Confirmation → Generate Document → Request Signature) are **added to the design, not built or verified in the live Automate workflow**. No live signer email is stored. `clm-salesforce-project/scripts/seed-clm-contract-files.apex` (per-record Box file uploads) exists but has **not been run against the `agentforce` org** — the user runs live seed/upload/deploy themselves.

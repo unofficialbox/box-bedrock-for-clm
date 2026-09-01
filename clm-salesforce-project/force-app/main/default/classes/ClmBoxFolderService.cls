@@ -12,6 +12,9 @@
  * for it. `optCreateRootFolder` is true so the object's root folder is provisioned on the
  * first contract rather than failing.
  *
+ * It then collaborates the configured Box user onto the new folder, because a folder the
+ * package provisions is otherwise unreachable by the workspace. See `grantWorkspaceAccess`.
+ *
  * POST rather than GET: this creates something.
  */
 @RestResource(urlMapping='/clm/box-folder/*')
@@ -67,7 +70,12 @@ global with sharing class ClmBoxFolderService {
                 if (String.isBlank(folderId)) {
                     System.debug(LoggingLevel.WARN,
                         'CLM Box: could not provision a folder for ' + recordId + ': ' + toolkit.mostRecentError);
+                    return folderId;
                 }
+                // Before the finally block commits: the Toolkit has only staged the
+                // association so far, so a callout is still legal here and will not be
+                // once commitChanges has run.
+                grantWorkspaceAccess(folderId);
                 return folderId;
             } catch (Exception e) {
                 System.debug(LoggingLevel.WARN, 'CLM Box: provisioning threw: ' + e.getMessage());
@@ -81,6 +89,59 @@ global with sharing class ClmBoxFolderService {
                     System.debug(LoggingLevel.WARN, 'CLM Box: commitChanges failed: ' + commitError.getMessage());
                 }
             }
+        }
+    }
+
+    /**
+     * Collaborate the configured Box user onto a folder the package just created.
+     *
+     * Without this the workspace cannot open the contract at all. Box refuses to downscope
+     * a token to a folder the subject is not *directly* collaborated on -- inherited access
+     * through a parent is not enough -- and the refusal is well disguised: the folder reads
+     * back over the API with `permissions.can_upload = true`, and the token exchange still
+     * answers `invalid_resource`. Nothing in that error points at collaborations.
+     *
+     * So every folder the package provisions needs this grant, or its contract silently
+     * falls back to synthetic fixtures. Northstar only ever worked because someone made the
+     * same grant by hand.
+     *
+     * Failure is logged, not raised: the folder exists and the association is real either
+     * way, and the token endpoint reports the downscope problem in its own terms. A 409
+     * means the collaboration is already there, which is success for our purposes.
+     */
+    @TestVisible
+    private static void grantWorkspaceAccess(String folderId) {
+        CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
+        String boxUserId = config == null ? null : config.Box_User_Id__c;
+        if (String.isBlank(boxUserId)) {
+            // An enterprise subject is the service account the package already creates as.
+            return;
+        }
+        String token = ClmBoxAuth.parentToken();
+        if (String.isBlank(token)) {
+            System.debug(LoggingLevel.WARN, 'CLM Box: no token to collaborate ' + folderId);
+            return;
+        }
+        try {
+            HttpRequest req = new HttpRequest();
+            req.setEndpoint('callout:CLM_Box/2.0/collaborations');
+            req.setMethod('POST');
+            req.setHeader('Authorization', 'Bearer ' + token);
+            req.setHeader('Content-Type', 'application/json');
+            req.setTimeout(30000);
+            req.setBody(JSON.serialize(new Map<String, Object>{
+                'item' => new Map<String, Object>{ 'id' => folderId, 'type' => 'folder' },
+                'accessible_by' => new Map<String, Object>{ 'id' => boxUserId, 'type' => 'user' },
+                'role' => 'editor'
+            }));
+            HttpResponse res = new Http().send(req);
+            Integer status = res.getStatusCode();
+            if (status != 201 && status != 409) {
+                System.debug(LoggingLevel.WARN, 'CLM Box: collaboration on ' + folderId
+                    + ' returned ' + status + ' ' + res.getBody());
+            }
+        } catch (Exception e) {
+            System.debug(LoggingLevel.WARN, 'CLM Box: collaboration threw: ' + e.getMessage());
         }
     }
 
