@@ -161,10 +161,15 @@ the Copilot is not, and cannot be on this surface. See **Known constraints**.
 
 Read these before presenting. Each is a real limitation, not a setup error.
 
-- **The Contract Copilot cannot be identity-scoped.** It runs as the default agent user, and
-  its contract argument is filled from the conversation, so a counterparty can ask it about
+- **The Contract Copilot is not identity-scoped.** It is a Service Agent
+  (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its assigned agent user, and its
+  contract argument is filled from the conversation -- so a counterparty can ask it about
   another company's contract by naming it. The scoping in beat 4 is the *workspace*, not the
   agent. Keep the Copilot out of the counterparty half of this demo.
+
+  This is a property of the agent type, not of Agentforce. An **Employee Agent** inherits the
+  permissions of the logged-in user and takes no agent user, which is the surface where
+  "same agent, different access" would hold.
 - **Login As is unavailable for the counterparty user.** The Customer Community licence does
   not offer it, and the org preference is already enabled. Set the user's password by reset
   and sign in to the site in a private window instead.
@@ -177,12 +182,11 @@ Read these before presenting. Each is a real limitation, not a setup error.
 
 ## Where this story goes next
 
-Three builds would each add a beat, in descending order of value:
+Two builds would each add a beat, in descending order of value:
 
 | Build | Beat it unlocks |
 |---|---|
 | Seed prior executed contracts for the same counterparty | *Precedent.* "They accepted the 24-month cap on the original deal and the last renewal" turns a policy finding into negotiating leverage. |
-| Per-user Box OAuth (MT-040) plus the managed-package Box AI invocable | *The agent goes silent.* Box permissions travel into the agent, so the same question returns a cited answer for the deal team and nothing for anyone else. This is the strongest available close and it is not buildable on the current credential model. |
 | Wire Box Doc Gen and Box Sign | *Respond and execute.* On customer paper the honest generation is the counter-position drawn from the approved fallback -- `CLM-LIAB-002` is already that text -- not "generate the agreement". |
 
 ## References

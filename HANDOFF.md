@@ -378,7 +378,8 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    folder is what would give every document its contract's facts by inheritance, and that
    is the piece that turns a portfolio question into a single query.
 
-9. **The external persona cannot be scoped through the agent, only through the UI.** The
+9. **The external persona is not scoped through the agent, only through the UI -- and the
+   reason is the agent type.** The
    Experience Cloud workspace and the Contract Copilot are governed differently, and the
    difference is not a choice:
 
@@ -391,6 +392,18 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
      bundle -- not as the person typing. That is not a guess: the agent's actions returned
      "could not find that contract" until `CLM_Contract_Agent` granted **the agent user**
      View All. Had they run as the signed-in admin they would have worked immediately.
+
+     The org names the type: `BotDefinition.Type = ExternalCopilot`,
+     `AgentType = EinsteinServiceAgent`, `BotUserId = 005NS00000ybncIYAQ`. A **Service Agent**
+     runs as that bot user. An **Employee Agent** does the opposite -- it inherits the
+     permissions of the logged-in user, and its `default_agent_user` is optional. So this is a
+     property of the agent type, not a limit of Agentforce, and an internal Employee Agent is
+     the surface on which "same agent, different access" would hold.
+
+     One edge is **untested**: what a Service Agent does for an *authenticated* Experience
+     Cloud user on the live site. The evidence above comes from the Agentforce Builder
+     preview, where there is no site user at all. There are claims that an authenticated
+     session changes the effective permissions; do not repeat them until this repo tests it.
 
    So an identity-scoped action is useless inside the agent: `UserInfo.getUserId()` is the
    agent, whose Contact is null. And the agent's `get_contract_package` binding is

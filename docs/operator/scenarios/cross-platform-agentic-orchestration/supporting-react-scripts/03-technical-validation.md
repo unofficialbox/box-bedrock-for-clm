@@ -158,20 +158,34 @@ Show both. The second is the honest half.
 
   The counterparty reads their own contracts and has no access to the others.
 
-**The agent is not bounded, and cannot be.**
+**The agent is not bounded, because of what kind of agent it is.**
 
-- The ACC agent runs as `access.default_agent_user`, not the signed-in person, so
-  `UserInfo.getUserId()` returns the agent and its Contact is null. An identity-scoped action
-  is useless inside it.
+- The Copilot is a Service Agent -- `BotDefinition.Type = ExternalCopilot`,
+  `AgentType = EinsteinServiceAgent` -- and a Service Agent runs as the agent user named in
+  `BotUserId`, not as the signed-in person. So `UserInfo.getUserId()` returns the agent, its
+  Contact is null, and an identity-scoped action is useless inside it. The org confirms the
+  binding directly:
+
+  ```sql
+  SELECT DeveloperName, Type, BotUserId, BotUser.Name FROM BotDefinition
+  ```
+
+- **An Employee Agent behaves the other way.** It inherits the permissions of the logged-in
+  user and its `default_agent_user` is optional. The limitation below is a property of the
+  agent type, not of Agentforce.
 - `get_contract_package` binds `with inputContract = ...`, meaning the model fills it from the
   conversation. **A counterparty can therefore ask the Copilot about another company's
   contract by naming it.**
 - The downscoped Box token bounds the workspace UI. It does not bound the agent, which reaches
   Box through Apex under the app's own credentials.
 
-State this plainly to a security audience. It is a real limitation of the ACC surface, not a
-configuration gap, and the executive script keeps the Copilot out of the counterparty demo
-because of it.
+State this plainly to a security audience, and state its edges honestly. What is verified is
+that this agent runs as its bot user: its actions failed until that user was granted access,
+observed in the Agentforce Builder preview. What is **not** verified is how a Service Agent
+behaves for an authenticated Experience Cloud user on the live site -- there are claims that
+an authenticated session changes the effective permissions, and this repository has not
+tested it. Until it does, the executive script keeps the Copilot out of the counterparty
+demo.
 
 ### Act 6 — The MCP boundary (2 minutes)
 
