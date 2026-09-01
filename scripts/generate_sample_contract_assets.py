@@ -636,6 +636,153 @@ def write_csv():
         writer.writerows(rows)
 
 
+def build_calder_executed(
+    year,
+    template_rev,
+    signed_on,
+    charges,
+    cap_months,
+    prior_year=None,
+):
+    """A prior Calder agreement, executed, on Calder's own paper.
+
+    These two documents exist to make one point that a single contract cannot make: the
+    2026 draft is not asking Acme for something new. It is asking for two positions Calder
+    already conceded, in writing, twice.
+
+    Both prior agreements carry a negotiated 22.4 -- an aggregate cap at twenty-four months
+    of charges -- and a negotiated 19.2 that subjects the indemnities to that cap except for
+    IP infringement and data breach. Template rev.3, the one in front of Acme now, silently
+    restores the unamended house text of both clauses. So the finding is not "this is off
+    policy"; it is "your own template dropped two amendments you agreed to", which is a
+    different and much better conversation to hand to legal.
+
+    The clause numbers are deliberately identical across all three documents, so the reader
+    can put 22.4 beside 22.4 and see it.
+    """
+    path = PDF_OUT / f"calder-msa-{year}-executed.pdf"
+    renewal = prior_year is not None
+    story = doc_header(
+        f"Master Agreement for Supplier Services - Executed {year}"
+        + (" (Renewal)" if renewal else ""),
+        f"Calder Financial Group plc and Acme Robotics, Inc. | "
+        f"Calder Legal Template {template_rev} | CLM-{year}-Calder",
+    )
+    story += [
+        p(
+            f"THIS MASTER AGREEMENT FOR SUPPLIER SERVICES was made on {signed_on} BETWEEN "
+            f"Calder Financial Group plc (the <b>Company</b>) and Acme Robotics, Inc. (the "
+            f"<b>Supplier</b>). This Agreement was executed by the parties and performed to "
+            f"its term."
+            + (
+                f" It renewed and superseded the agreement executed in {prior_year}, "
+                f"carrying forward the amendments recorded in Schedule 1 of that agreement."
+                if renewal
+                else ""
+            )
+        ),
+        p(
+            "<i>Drafted on the Company's standard form. The amendments at Article 19 and "
+            "clause 22.4 below were agreed with Company Legal during negotiation and are "
+            "recorded in Schedule 1.</i>"
+        ),
+        section("ARTICLE 2 - APPOINTMENT AND TERM"),
+        p(
+            "2.2 This Agreement commenced on the date above and continued for twenty-four "
+            "months. The Company was entitled to extend for successive twelve-month periods "
+            "on written notice."
+        ),
+        section("ARTICLE 6 - CHARGES AND PAYMENT"),
+        p(
+            f"6.1 The Company paid the charges set out in each Statement of Work within "
+            f"sixty days of receipt of a valid and undisputed invoice. Aggregate charges "
+            f"for the term were {charges}."
+        ),
+        p(
+            "6.2 The Company's right of set-off was limited, <b>as amended</b>, to sums due "
+            "and payable under this Agreement only."
+        ),
+        section("ARTICLE 19 - INDEMNITIES"),
+        p(
+            "19.1 The Supplier indemnified the Company against Losses arising out of any "
+            "breach of this Agreement by the Supplier, any negligence or wilful misconduct "
+            "of its personnel, any claim that the Deliverables infringed a third party's "
+            "intellectual property rights, and any security incident affecting Company Data "
+            "in the Supplier's control."
+        ),
+        p(
+            "19.2 <b>As amended.</b> The indemnities in clause 19.1 are <b>subject to the "
+            "financial cap in clause 22.4</b>, save that the cap does not apply to "
+            "sub-clauses 19.1(c) (intellectual property infringement) and 19.1(d) (security "
+            "incident affecting Company Data), which remain uncapped."
+        ),
+        PageBreak(),
+        section("ARTICLE 22 - GENERAL PROVISIONS"),
+        p(
+            "22.4 <b>Responsibility for Losses. As amended.</b> Each party is responsible "
+            "for the Losses it causes. The Supplier's aggregate responsibility to the "
+            f"Company under or in connection with this Agreement <b>shall not exceed the "
+            f"charges paid or payable in the {cap_months} months preceding the event giving "
+            f"rise to the claim</b>. Neither party is responsible to the other for loss of "
+            "profit, loss of revenue, loss of anticipated savings or reputational harm, "
+            "whether direct or indirect. This clause does not limit liability for fraud, or "
+            "for the uncapped sub-clauses identified in clause 19.2."
+        ),
+        p(
+            "22.5 <b>Governing law.</b> England and Wales, exclusive jurisdiction of the "
+            "courts of England and Wales."
+        ),
+        section("SCHEDULE 1 - AGREED AMENDMENTS TO THE COMPANY STANDARD FORM"),
+        p(
+            "The following departures from the Company's standard form were agreed by "
+            "Company Legal and applied to the executed text above.",
+            "Small",
+        ),
+        table(
+            [
+                ["Clause", "Standard form", "As executed"],
+                [
+                    "19.2",
+                    "Indemnities not subject to any limitation elsewhere",
+                    f"Subject to the 22.4 cap, except IP and data-breach claims",
+                ],
+                [
+                    "22.4",
+                    "No financial cap on Supplier responsibility",
+                    f"Aggregate cap at {cap_months} months of charges",
+                ],
+                [
+                    "6.2",
+                    "Set-off against any sum owed by Supplier or its affiliates",
+                    "Set-off limited to sums due under this Agreement",
+                ],
+            ],
+            widths=[0.8 * inch, 2.9 * inch, 2.8 * inch],
+        ),
+        section("SIGNATURES"),
+        p(f"Executed by the parties on {signed_on}.", "Small"),
+        table(
+            [
+                ["CALDER FINANCIAL GROUP PLC", "ACME ROBOTICS, INC."],
+                ["By: /s/ Priya Raghunathan", "By: /s/ Elena Martinez"],
+                ["Name: Priya Raghunathan", "Name: Elena Martinez"],
+                ["Title: Group General Counsel", "Title: Chief Revenue Officer"],
+                [f"Date: {signed_on}", f"Date: {signed_on}"],
+            ],
+            widths=[3.45 * inch, 3.45 * inch],
+        ),
+        Spacer(1, 0.2 * inch),
+        p(
+            "This synthetic executed agreement is designed for contract-lifecycle "
+            "demonstrations. Names, terms, and provisions are fictional and are not legal "
+            "advice.",
+            "Small",
+        ),
+    ]
+    make_doc(path).build(story)
+    return path
+
+
 def main():
     build_msa()
     build_realistic_msa()
@@ -647,6 +794,10 @@ def main():
     build_security_exhibit()
     build_insurance()
     build_calder_customer_paper()
+    build_calder_executed(2022, "MA-2021 rev.1", "14 March 2022", "GBP 1,400,000", 24)
+    build_calder_executed(
+        2024, "MA-2024 rev.2", "9 May 2024", "GBP 1,850,000", 24, prior_year=2022
+    )
     write_json()
     write_csv()
     print(f"Wrote PDFs to {PDF_OUT}")

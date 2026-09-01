@@ -4,7 +4,7 @@
 
 | Item | Value |
 |---|---:|
-| Duration | 3-5 minutes |
+| Duration | 4-5 minutes |
 | Audience | General counsel, CRO, CIO, legal and sales leadership |
 | Scenario | Calder Financial Group sends **its own** MSA template; Acme must decide what to push back on |
 | Internal surface | Claude Desktop over the Salesforce and Box MCP servers |
@@ -38,6 +38,7 @@ contract record. Do not narrate them as live. The four beats below are all verif
 
 | Check | How |
 |---|---|
+| Three Calder contracts exist: `CLM-SAMPLE-CAL-2022`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
 | Calder contract has a Box folder with a **direct** collaboration for the configured Box user | `GET /2.0/folders/<id>/collaborations` -- inherited access does not downscope |
 | `clmDocument` metadata applied to the Calder and Northstar documents | Otherwise beat 2's query returns nothing |
 | `CLM_Box_Config__c.Clause_Library_Hub_Id__c` is populated and the Hub holds the `CLM-LIAB-*` clauses | Beat 3 depends on it entirely |
@@ -118,7 +119,33 @@ a week of back-and-forth.
 
 Verified live on 2026-09-01: the Hub returns exactly these positions with file-level citations.
 
-### Beat 4 — The same platform, scoped to the other side (60 seconds)
+### Beat 4 — What they agreed the last two times (45 seconds)
+
+The clause library says the position is off-policy. This says something better.
+
+**Prompt**
+
+> Compare clause 22.4 and clause 19.2 across Calder's executed agreements and this draft.
+> What did they actually agree before?
+
+**Expected response**
+
+- **2022** and **2024** both carry a negotiated 22.4: an aggregate cap at **24 months** of
+  charges, with 19.2 making the indemnities subject to that cap except for IP infringement
+  and data-breach claims, which stay uncapped.
+- Both record the departure in a **Schedule 1** of agreed amendments to Calder's own
+  standard form.
+- The **2026** draft restores the unamended house text of both clauses.
+
+**Land**
+
+> Calder is not asking for something new. Their template regressed two positions their own
+> legal team conceded, in writing, twice. That is not a policy argument any more -- it is a
+> course-of-dealing argument, and it is the one that actually moves a negotiation.
+
+Verified live on 2026-09-01 across all three documents, with per-file citations.
+
+### Beat 5 — The same platform, scoped to the other side (60 seconds)
 
 **Say**
 
@@ -154,8 +181,9 @@ the Copilot is not, and cannot be on this surface. See **Known constraints**.
 1. The Calder document renders from live Box, and the audience sees no Limitation of Liability heading.
 2. One metadata query returns critical documents across two contracts.
 3. The clause-library answer names 19.2, 22.4, `CLM-LIAB-001`, `CLM-LIAB-002`, and Commercial Legal.
-4. The counterparty view shows only that counterparty's contracts.
-5. No generation and no signature is shown or claimed.
+4. The precedent answer names the 24-month cap in both executed agreements and the reversion in the draft.
+5. The counterparty view shows only that counterparty's contracts.
+6. No generation and no signature is shown or claimed.
 
 ## Known constraints
 
@@ -182,11 +210,10 @@ Read these before presenting. Each is a real limitation, not a setup error.
 
 ## Where this story goes next
 
-Two builds would each add a beat, in descending order of value:
+One build would add a beat:
 
 | Build | Beat it unlocks |
 |---|---|
-| Seed prior executed contracts for the same counterparty | *Precedent.* "They accepted the 24-month cap on the original deal and the last renewal" turns a policy finding into negotiating leverage. |
 | Wire Box Doc Gen and Box Sign | *Respond and execute.* On customer paper the honest generation is the counter-position drawn from the approved fallback -- `CLM-LIAB-002` is already that text -- not "generate the agreement". |
 
 ## References
