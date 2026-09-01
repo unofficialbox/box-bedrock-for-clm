@@ -33,13 +33,13 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
           <ContentExplorer
             token={token}
             rootFolderId={folderId}
-            // Off, and not by preference. The element's preview loads Box Content Preview
-            // from cdn01.boxcdn.net, and an Experience Cloud site cannot allow that:
-            // script-src is 'self' plus a Salesforce allowlist, and CspTrustedSite has no
-            // script-src field to widen it -- the object has no such column at all.
-            // Enabled, clicking a file throws "Invariant failed" inside box-ui-elements
-            // and the panel renders "We're sorry, something went wrong".
-            canPreview={false}
+            // On by request, and known to fail on this surface: the element's preview
+            // loads Box Content Preview from cdn01.boxcdn.net, which an Experience Cloud
+            // site cannot allow -- script-src is 'self' plus a Salesforce allowlist, and
+            // CspTrustedSite has no script-src field to widen it. Clicking a file throws
+            // "Invariant failed" inside box-ui-elements and renders "We're sorry,
+            // something went wrong" where the preview should be.
+            canPreview
             canUpload
             canCreateNewFolder
             canDelete

@@ -1,6 +1,9 @@
 import { useEffect, useRef } from "react";
 import { Bot, ShieldCheck } from "lucide-react";
 import { embedAgentforceClient } from "@salesforce/agentforce-conversation-client";
+/** The Content Explorer's stack, so the conversation matches the file list. */
+const BOX_FONT_STACK = "Lato, 'Helvetica Neue', Helvetica, Arial, sans-serif";
+
 import { CLM_CONFIG } from "../config";
 import { sfdcEnv } from "../lib/sfdcEnv";
 import { AGENT_PROMPTS } from "../data";
@@ -63,6 +66,12 @@ export function AgentforcePanel() {
         ...(fileBased ? { isFileBased: true } : {}),
         agentLabel: "Contract Copilot",
         renderingConfig: { mode: "inline", width: "100%", height: "100%", headerEnabled: false },
+        /**
+         * The conversation renders inside the client's own shadow tree, so page CSS
+         * cannot reach it -- these tokens are the only styling hook. The font stack is
+         * the Content Explorer's, so the two panels read as one interface rather than
+         * two products side by side.
+         */
         styleTokens: {
           headerBlockBackground: "#071b33",
           containerBackground: "#f8fafc",
@@ -70,6 +79,21 @@ export function AgentforcePanel() {
           messageBlockOutboundTextColor: "#ffffff",
           messageBlockInboundBackgroundColor: "#e9f1ff",
           inboundMessageTextColor: "#071b33",
+
+          headerBlockFontFamily: BOX_FONT_STACK,
+          headerBlockFontSize: "14px",
+          welcomeBlockFontFamily: BOX_FONT_STACK,
+          welcomeBlockFontSize: "13px",
+          welcomeBlockLineHeight: "1.5",
+          messageBlockFontSize: "13px",
+          messageBlockLineHeight: "1.5",
+
+          // A single-line input by default; it grows only as far as this.
+          messageInputFontSize: "13px",
+          messageInputLineHeight: "1.4",
+          messageInputMaxHeight: "72px",
+          messageInputPadding: "8px 10px",
+          messageInputTextPadding: "6px 8px",
         },
       },
       onReady: () => {
