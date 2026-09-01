@@ -407,7 +407,19 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    holds both "Northstar Health" and "Northstar Health System" for one customer -- matching
    on it would show a counterparty half their contracts.
 
-   **Record visibility still needs a sharing set.** `CLM_Counterparty_Portal` grants object
+   **Record visibility comes from a sharing set, and it is deployed.**
+   `CLM_Counterparty_Access` maps `CLM_Contract__c.Counterparty_Account__c` to the signed-in
+   user's `Contact.Account` with Read for the Customer Community User profile. Verified on
+   2026-09-01 via `UserRecordAccess` for Dana: read on all four Northstar contracts, no
+   access to Calder or Acme Cloudworks. That boundary is the platform's, not the Apex
+   filter's -- which means it holds even if someone queries the object directly.
+
+   Two things to know when checking this. `CLM_Contract__Share` shows **zero rows** for a
+   community user: sharing sets compute access rather than materialise share records, so an
+   empty share table is a false negative. `UserRecordAccess` is the honest check. And the
+   sharing set's `description` caps at 255 characters, like most of this metadata.
+
+   **The permission set still withholds `viewAllRecords`.** `CLM_Counterparty_Portal` grants object
    read and the class, deliberately not `viewAllRecords` -- a Customer Community user with
    View All could query every contract straight through the REST API with their own session,
    which is the hole this class exists to close. A Customer Community licence reaches its own
