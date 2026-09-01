@@ -1,4 +1,5 @@
 import { IntlProvider } from "react-intl";
+import BoxAnnotations from "box-annotations";
 import ContentExplorer from "box-ui-elements/es/elements/content-explorer";
 import "box-ui-elements/dist/explorer.css";
 
@@ -17,6 +18,16 @@ import "box-ui-elements/dist/explorer.css";
  * scoped to one folder and to the scopes ClmBoxTokenService requests. A prop enables a
  * control; the scope decides whether Box honours it.
  */
+/**
+ * ContentPreview expects a BoxAnnotations instance and does not construct one, so preview
+ * silently does nothing without it. ContentExplorer forwards contentPreviewProps straight
+ * to the preview element, which is how it reaches there.
+ *
+ * Built once at module scope rather than per render: it is stateful, and a fresh instance
+ * on every render would discard the annotator between previews.
+ */
+const boxAnnotations = new BoxAnnotations({});
+
 export function BoxElements({ folderId, token }: { folderId: string; token: string }) {
   if (!token || !folderId) {
     return null;
@@ -40,6 +51,7 @@ export function BoxElements({ folderId, token }: { folderId: string; token: stri
             // "Invariant failed" inside box-ui-elements and renders "We're sorry,
             // something went wrong" where the preview should be.
             canPreview
+            contentPreviewProps={{ boxAnnotations }}
             canUpload
             canCreateNewFolder
             canDelete

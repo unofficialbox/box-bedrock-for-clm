@@ -25,6 +25,11 @@ declare module "box-ui-elements/es/elements/content-explorer" {
     canPreview?: boolean;
     /** Fires with the folder the explorer navigated into. */
     onNavigate?: (item: BoxItem) => void;
+    /**
+     * Forwarded verbatim to the ContentPreview element. It is how a BoxAnnotations
+     * instance reaches preview, which does not build one itself.
+     */
+    contentPreviewProps?: Record<string, unknown>;
     onUpload?: (items: BoxItem[]) => void;
     language?: string;
   }
@@ -58,3 +63,10 @@ declare module "box-ui-elements/es/elements/content-uploader" {
 
 declare module "box-ui-elements/dist/explorer.css";
 declare module "box-ui-elements/dist/uploader.css";
+
+/** box-annotations ships no types; the app only ever constructs it. */
+declare module "box-annotations" {
+  export default class BoxAnnotations {
+    constructor(options?: Record<string, unknown>);
+  }
+}
