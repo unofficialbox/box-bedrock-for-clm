@@ -11,6 +11,10 @@
         <apexClass>ClmContractListService</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>ClmWhoAmI</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>CLM_Contract__c.Box_Workspace_Folder_ID__c</field>

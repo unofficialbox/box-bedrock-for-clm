@@ -5,10 +5,16 @@ import { PortfolioCharts } from "./PortfolioCharts";
 import { DataError } from "./DataError";
 import { ContractsSkeleton } from "./WorkspaceSkeleton";
 import { formatDate } from "../lib/documents";
-import { CLM_CONFIG } from "../config";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 
-export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSummary) => void }) {
+export function ContractList({
+  onSelect,
+  signInUrl,
+}: {
+  onSelect: (contract: ClmContractSummary) => void;
+  /** Supplied by the identity endpoint; the path is not derivable in the browser. */
+  signInUrl?: string;
+}) {
   const [contracts, setContracts] = useState<ClmContractSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -65,7 +71,7 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
       <DataError
         title="Sign in to see your contracts"
         detail="Your session has ended. Signing in again brings back the contracts your organisation is party to."
-        signInUrl={CLM_CONFIG.site.loginUrl}
+        signInUrl={signInUrl}
         onRetry={retry}
         testId="contracts-signed-out"
       />

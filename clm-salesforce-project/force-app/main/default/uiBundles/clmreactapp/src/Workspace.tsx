@@ -5,6 +5,8 @@ import { DocumentTimeline } from "./components/DocumentTimeline";
 import { UploadDialog } from "./components/UploadDialog";
 import { WorkspaceMetrics } from "./components/WorkspaceMetrics";
 import { ContractList } from "./components/ContractList";
+import { ProfileMenu } from "./components/ProfileMenu";
+import { fetchIdentity, type ClmIdentity } from "./lib/identity";
 import type { BoxFolderItem } from "./lib/box";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
 import { getClmPageContext } from "./lib/box";
@@ -72,6 +74,8 @@ export function Workspace() {
   const [box, setBox] = useState<{ token: string; folderId: string } | null>(null);
   /** Set when Box cannot be read at all, so nothing derived from the listing is drawn. */
   const [boxError, setBoxError] = useState("");
+  /** Who is signed in. Null until the answer arrives; nothing is drawn before then. */
+  const [identity, setIdentity] = useState<ClmIdentity | null>(null);
   const [uploading, setUploading] = useState(false);
   /** Bumped on upload close so the folder is listed again and the new file appears. */
   const [reloadKey, setReloadKey] = useState(0);
@@ -98,6 +102,17 @@ export function Workspace() {
     }
     window.addEventListener("popstate", syncToUrl);
     return () => window.removeEventListener("popstate", syncToUrl);
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    (async () => {
+      const who = await fetchIdentity();
+      if (active && who.ok) setIdentity(who.value);
+    })();
+    return () => {
+      active = false;
+    };
   }, []);
 
   const openContract = useCallback((contract: ClmContractSummary) => {
@@ -153,6 +168,7 @@ export function Workspace() {
           <button className={view === "contracts" ? "nav-active" : ""} onClick={() => showView("contracts")}><FileStack size={16} /> Your contracts</button>
           <button className={view === "workspace" ? "nav-active" : ""} onClick={() => showView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
         </nav>
+        <ProfileMenu identity={identity} />
       </header>
 
       {/*
@@ -192,7 +208,7 @@ export function Workspace() {
       <div className={`content-grid${view === "workspace" && !boxError ? " content-grid-aside" : ""}`}>
         <main>
           {view === "contracts" ? (
-            <ContractList onSelect={openContract} />
+            <ContractList onSelect={openContract} signInUrl={identity?.loginUrl} />
           ) : (
             <BoxWorkspace
               context={workspaceContext}

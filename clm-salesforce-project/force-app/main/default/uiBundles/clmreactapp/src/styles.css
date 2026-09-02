@@ -229,6 +229,25 @@ button { cursor: pointer; }
   .skeleton-bar, .skeleton-icon { animation: none; }
 }
 
+/* Who is signed in, in the top right. The scoping is this app's claim; naming the reader
+   and their account is what makes it evidence rather than an assertion. */
+.profile { position: relative; margin-left: auto; }
+.profile-button { display: flex; align-items: center; gap: 10px; padding: 6px 10px 6px 6px; border: 1px solid transparent; border-radius: 999px; background: transparent; color: inherit; cursor: pointer; font: inherit; }
+.profile-button:hover { background: rgba(255, 255, 255, .08); }
+.profile-button:focus-visible { outline: 2px solid #7fb2ff; outline-offset: 1px; }
+.profile-avatar { display: grid; place-items: center; width: 32px; height: 32px; flex: none; border-radius: 50%; background: #2f6fd0; color: white; font-size: 12px; font-weight: 750; letter-spacing: .02em; }
+.profile-copy { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.25; }
+.profile-copy strong { font-size: 13px; font-weight: 650; }
+.profile-copy small { color: #9db4d2; font-size: 11px; }
+.profile-sheet { position: absolute; top: calc(100% + 8px); right: 0; z-index: 40; min-width: 220px; padding: 6px; border: 1px solid #e0e6ee; border-radius: 10px; background: white; box-shadow: 0 14px 34px rgba(16, 26, 40, .22); }
+.profile-sheet-head { display: flex; flex-direction: column; gap: 2px; padding: 10px 12px; border-bottom: 1px solid #eef1f5; color: #1d2733; }
+.profile-sheet-head strong { font-size: 13px; }
+.profile-sheet-head small { color: #6a7686; font-size: 11px; }
+.profile-sheet-item { display: flex; align-items: center; gap: 9px; margin-top: 4px; padding: 10px 12px; border-radius: 7px; color: #1d2733; font-size: 13px; text-decoration: none; }
+.profile-sheet-item:hover { background: #f2f6fb; }
+.signin-button { display: inline-flex; align-items: center; gap: 7px; margin-left: auto; padding: 8px 14px; border-radius: 8px; background: white; color: #14314f; font-size: 13px; font-weight: 650; text-decoration: none; }
+.profile-signed-out { margin-left: auto; color: #9db4d2; font-size: 12px; }
+
 /* Lazy chunks are megabytes, so these fallbacks are on screen for a real moment. Each one
    holds the shape of what replaces it. */
 .skeleton-preview { padding: 22px; display: flex; justify-content: center; }
