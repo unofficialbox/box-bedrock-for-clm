@@ -9,34 +9,19 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "html" / "06-contract-lifecycle-readiness-marketecture.html"
+OUTPUT = ROOT / "output" / "html" / "05-contract-lifecycle-readiness-marketecture.html"
 BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 STAGES = (
     ("01", "Contract Intake", "Capture the request, establish ownership, and create the governed contract workspace.", "Intake begins when contract metadata is applied in Box; Box Automate starts the governed process."),
     ("02", "Classification & Enrichment", "Extract terms, apply metadata, and connect commercial context.", "Extracted values are validated before governed metadata and commercial records are updated."),
     ("03", "Clause & Redline Analysis", "Compare approved language, explain deviations, and route domain exceptions.", "Cited differences are mapped to Legal, Finance, Privacy, Security, or another named domain expert."),
-    ("04", "Cross-Source Commercial Validation", "Reconcile contract terms with governed business and analytical context.", "Box content, Salesforce context, and Databricks signals are compared without changing system authority."),
+    ("04", "Cross-Source Commercial Validation", "Reconcile contract terms with governed business and analytical context.", "Box content and Salesforce context are compared without changing system authority."),
     ("05", "Human Decision Gate", "Legal, Finance, Privacy, Security, and business owners assess material findings.", "Named reviewers approve, reject, or request changes before any consequential downstream action."),
     ("06", "Approved Execution & Lifecycle Management", "Execute approved actions and manage obligations, renewals, and governed records.", "Approved workflows update lifecycle state, preserve decision evidence, and initiate controlled execution."),
 )
 
 LANES = (
-    {
-        "brand": "agentcore",
-        "name": "Amazon Bedrock AgentCore",
-        "class": "agentcore",
-        "summary": "Governed orchestration, specialist coordination, tool use, guardrails, traceability, and human routing.",
-        "technical": "Strands agents run through AgentCore with allowlisted Box, Salesforce REST, and Databricks tools; traces and policy decisions are retained.",
-        "cells": (
-            ("Orchestrate intake", "Interpret request context and prepare bounded work."),
-            ("Coordinate enrichment", "Delegate extraction, classification, and completeness checks."),
-            ("Direct specialist review", "Coordinate clause, redline, and domain analysis."),
-            ("Reconcile evidence", "Compare permitted content, business, and analytical context."),
-            ("Prepare decisions", "Summarize cited findings for accountable reviewers."),
-            ("Coordinate approved action", "Record decisions, invoke allowlisted tools, and trace outcomes."),
-        ),
-    },
     {
         "brand": "salesforce",
         "name": "Salesforce Agentforce",
@@ -65,21 +50,6 @@ LANES = (
             ("Source traceability", "Governed contract references and review materials."),
             ("Human review", "Versioned content, tasks, comments, and decision evidence."),
             ("Controlled agreement", "Executed agreement, obligations, retention, and audit history."),
-        ),
-    },
-    {
-        "brand": "databricks",
-        "name": "Databricks",
-        "class": "databricks",
-        "summary": "Governed commercial analytics: portfolio patterns, cycle time, risk trends, comparable outcomes, and performance.",
-        "technical": "Curated Delta tables expose bounded cohort and trend signals; analytical outputs remain advisory until human review.",
-        "cells": (
-            ("Portfolio context", "Contract cohort and historical baseline availability."),
-            ("Data standardization", "Structured terms mapped to governed definitions."),
-            ("Risk patterns", "Comparable deviations, outcomes, and cycle-time signals."),
-            ("Commercial validation", "Portfolio comparisons, value, risk, and performance."),
-            ("Reviewer context", "Bounded analytical evidence for material findings."),
-            ("Lifecycle intelligence", "Obligation, renewal, risk, and performance measurement."),
         ),
     },
 )
@@ -113,13 +83,7 @@ def lane_markup(logos: dict[str, str]) -> str:
             f'<div class="lane-cell"><strong>{html.escape(title)}</strong><span>{html.escape(copy)}</span></div>'
             for title, copy in lane["cells"]
         )
-        if lane["brand"] == "agentcore":
-            logo = (
-                f'<span class="aws-pair"><img data-brand-logo="aws" src="{logos["aws"]}" alt="AWS">'
-                f'<img data-brand-logo="agentcore" src="{logos["agentcore"]}" alt="Amazon Bedrock AgentCore"></span>'
-            )
-        else:
-            logo = f'<img data-brand-logo="{lane["brand"]}" src="{logos[lane["brand"]]}" alt="{html.escape(lane["name"])}">'
+        logo = f'<img data-brand-logo="{lane["brand"]}" src="{logos[lane["brand"]]}" alt="{html.escape(lane["name"])}">'
         rows.append(
             f'''<article class="lane {lane['class']}">
               <div class="lane-heading"><div class="logo-tile">{logo}</div><div><h3>{html.escape(lane['name'])}</h3><p>{html.escape(lane['summary'])}</p><p class="technical-note lane-technical">{html.escape(lane['technical'])}</p></div></div>
@@ -138,11 +102,8 @@ def outcome_markup() -> str:
 
 def build() -> Path:
     logos = {
-        "aws": asset_data_uri("aws-cloud-logo-dark.svg", "image/svg+xml"),
-        "agentcore": asset_data_uri("amazon-bedrock-agentcore.svg", "image/svg+xml"),
         "box": asset_data_uri("box-logo-blue.svg", "image/svg+xml"),
         "salesforce": asset_data_uri("salesforce-logo-cropped.png", "image/png"),
-        "databricks": asset_data_uri("databricks-primary-lockup-full-color.png", "image/png"),
     }
     document = f'''<!doctype html>
 <html lang="en">
@@ -152,11 +113,11 @@ def build() -> Path:
   <meta name="description" content="AI-assisted contract lifecycle marketecture showing persistent platform contributions and human decision authority.">
   <title>Acme CLM · Contract Lifecycle Readiness</title>
   <style>
-    :root {{ --ink:#0b1f4d; --muted:#506181; --line:#cbd5e1; --paper:#fff; --wash:#f8fbff; --box:#0061d5; --salesforce:#00a1e0; --aws:#ff9900; --databricks:#ff3621; --success:#177245; }}
+    :root {{ --ink:#0b1f4d; --muted:#506181; --line:#cbd5e1; --paper:#fff; --wash:#f8fbff; --box:#0061d5; --salesforce:#00a1e0; --success:#177245; }}
     * {{ box-sizing:border-box; }}
     html,body {{ margin:0; background:#eef3f9; }}
     body {{ color:var(--ink); font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; }}
-    .page {{ width:1920px; min-height:1080px; margin:0 auto; padding:54px 62px 38px; background:radial-gradient(circle at 90% 5%,rgba(0,161,224,.08),transparent 22%),radial-gradient(circle at 6% 92%,rgba(255,153,0,.06),transparent 20%),var(--paper); }}
+    .page {{ width:1920px; min-height:1080px; margin:0 auto; padding:54px 62px 38px; background:radial-gradient(circle at 90% 5%,rgba(0,161,224,.08),transparent 22%),var(--paper); }}
     .top {{ display:flex; align-items:end; justify-content:space-between; gap:32px; border-bottom:1px solid var(--line); padding-bottom:26px; }}
     h1 {{ margin:0; font-size:52px; letter-spacing:-2.1px; line-height:1; }}
     .subtitle {{ margin:12px 0 0; color:var(--muted); font-size:22px; font-weight:650; }}
@@ -164,7 +125,7 @@ def build() -> Path:
     .view-control {{ padding:11px 16px; color:var(--ink); border:1px solid #9bb1cf; border-radius:999px; background:#fff; cursor:pointer; font:700 15px/1 Inter,ui-sans-serif,system-ui,sans-serif; white-space:nowrap; }}
     .view-control:hover {{ border-color:var(--ink); background:#f6f9fd; }}
     .view-control[aria-pressed="true"] {{ border-color:var(--ink); background:#f1f6fc; box-shadow:inset 0 0 0 1px var(--ink); }}
-    .principle {{ display:grid; grid-template-columns:46px 1fr; gap:16px; align-items:center; margin:24px 0 22px; padding:16px 20px; border-left:5px solid var(--aws); background:linear-gradient(90deg,#fffaf1,#fff 76%); }}
+    .principle {{ display:grid; grid-template-columns:46px 1fr; gap:16px; align-items:center; margin:24px 0 22px; padding:16px 20px; border-left:5px solid var(--box); background:linear-gradient(90deg,#fffaf1,#fff 76%); }}
     .principle-icon {{ display:grid; place-items:center; width:40px; height:40px; color:#fff; border-radius:50%; background:var(--ink); font-size:23px; }}
     .principle strong {{ font-size:18px; }} .principle span {{ color:var(--muted); font-size:16px; }}
     .lifecycle {{ display:grid; grid-template-columns:repeat(6,1fr); gap:12px; margin-bottom:18px; }}
@@ -184,11 +145,8 @@ def build() -> Path:
     .lane-heading {{ display:flex; align-items:center; gap:14px; padding:14px 16px; border-right:1px solid color-mix(in srgb,var(--lane-color) 36%,white); }}
     .logo-tile {{ width:54px; height:54px; display:grid; place-items:center; flex:0 0 auto; overflow:hidden; border:1px solid #dce5f1; border-radius:11px; background:#fff; }}
     .logo-tile img {{ display:block; max-width:44px; max-height:34px; object-fit:contain; }}
-    .aws-pair {{ display:flex; align-items:center; justify-content:center; gap:2px; }}
-    .aws-pair img[data-brand-logo="aws"],.aws-pair img[data-brand-logo="agentcore"] {{ width:22px; height:22px; }}
     .logo-tile img[data-brand-logo="salesforce"] {{ width:46px; height:34px; }}
     .logo-tile img[data-brand-logo="box"] {{ width:44px; }}
-    .logo-tile img[data-brand-logo="databricks"] {{ width:47px; max-height:30px; }}
     .lane-heading h3 {{ margin:0; font-size:17px; line-height:1.12; letter-spacing:-.25px; }}
     .lane-heading p {{ margin:5px 0 0; color:var(--muted); font-size:12.5px; line-height:1.26; }}
     .lane-heading .lane-technical {{ font-size:11px; }}
@@ -196,8 +154,7 @@ def build() -> Path:
     .lane-cell:last-child {{ border-right:0; }}
     .lane-cell::before {{ content:""; position:absolute; top:0; left:50%; height:10px; border-left:2px dotted var(--lane-color); }}
     .lane-cell strong {{ display:block; color:var(--ink); font-size:13.5px; line-height:1.18; }}
-    .lane-cell span {{ display:block; margin-top:5px; color:var(--muted); font-size:12px; line-height:1.24; }}
-    .agentcore {{ --lane-color:var(--aws); order:1; }} .salesforce {{ --lane-color:var(--salesforce); order:2; }} .box {{ --lane-color:var(--box); order:3; }} .databricks {{ --lane-color:var(--databricks); order:4; }}
+    .lane-cell span {{ display:block; margin-top:5px; color:var(--muted); font-size:12px; line-height:1.24; }} .salesforce {{ --lane-color:var(--salesforce); order:2; }} .box {{ --lane-color:var(--box); order:3; }}
     .capabilities {{ display:grid; grid-template-columns:1.1fr repeat(4,1fr); gap:0; margin-top:22px; overflow:hidden; border:1px solid var(--line); border-radius:14px; }}
     .capabilities h2,.capability {{ margin:0; padding:18px 20px; }}
     .capabilities h2 {{ color:#fff; background:var(--ink); font-size:16px; line-height:1.25; }}
@@ -215,11 +172,11 @@ def build() -> Path:
     <header class="top"><div><h1>AI-Assisted Contract Lifecycle Management</h1><p class="subtitle">Contract Lifecycle Management (CLM)</p></div>
       <div class="view-toggle" role="group" aria-label="Detail level"><button class="view-control" type="button" data-view="compact" aria-pressed="true">Overview</button><button class="view-control" type="button" data-view="detail" aria-pressed="false">Detail</button></div>
     </header>
-    <section class="principle" aria-label="Architecture principle"><div class="principle-icon">↔</div><div><strong>One end-to-end lifecycle. Persistent platform responsibilities.</strong><br><span>Every platform contributes across the contract lifecycle; Amazon Bedrock AgentCore coordinates governed work across the entire flow.</span></div></section>
+    <section class="principle" aria-label="Architecture principle"><div class="principle-icon">↔</div><div><strong>One end-to-end lifecycle. Persistent platform responsibilities.</strong><br><span>Every platform contributes across the contract lifecycle; governed Apex actions are the only path between them.</span></div></section>
     <section class="lifecycle" aria-label="Contract lifecycle">{stage_markup()}</section>
     <section class="matrix" aria-label="Persistent platform responsibilities across the lifecycle"><p class="matrix-title">Persistent platform responsibilities across every lifecycle stage</p>{lane_markup(logos)}</section>
     <section class="capabilities" aria-label="Shared outcomes"><h2>Shared outcomes across the lifecycle</h2>{outcome_markup()}</section>
-    <footer><div class="legend" aria-label="Platform color legend"><span class="legend-item"><i class="dot" style="--dot:var(--aws)"></i>Amazon Bedrock AgentCore</span><span class="legend-item"><i class="dot" style="--dot:var(--salesforce)"></i>Salesforce Agentforce</span><span class="legend-item"><i class="dot" style="--dot:var(--box)"></i>Box</span><span class="legend-item"><i class="dot" style="--dot:var(--databricks)"></i>Databricks</span></div><span>Platform marks are trademarks of their respective owners.</span></footer>
+    <footer><div class="legend" aria-label="Platform color legend"><span class="legend-item"><i class="dot" style="--dot:var(--salesforce)"></i>Salesforce Agentforce</span><span class="legend-item"><i class="dot" style="--dot:var(--box)"></i>Box</span></div><span>Platform marks are trademarks of their respective owners.</span></footer>
   </main>
   <script>
     const controls = [...document.querySelectorAll('[data-view]')];

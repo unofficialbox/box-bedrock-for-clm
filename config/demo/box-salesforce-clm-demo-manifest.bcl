@@ -1,0 +1,73 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-07-23T11:55:20Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "box-salesforce-clm-demo-manifest"
+          "artifact_type" = "config"
+          "created_at" = "2026-07-23T11:55:20Z"
+          "documentation" = {
+            "architectureRendered" = "docs/diagrams/clm-architecture.svg"
+            "architectureSource" = "docs/diagrams/clm-architecture.mmd"
+            "flowRendered" = "docs/diagrams/box-salesforce-clm-flow.svg"
+            "flowSource" = "docs/diagrams/box-salesforce-clm-flow.mmd"
+            "gallery" = "output/html/02-box-salesforce-clm-gallery.html"
+            "guide" = "docs/operator/scenarios/box-salesforce-clm/README.md"
+            "portableGuide" = "output/html/01-box-salesforce-clm-guide.html"
+            "technicalValidation" = "docs/operator/scenarios/box-salesforce-clm/supporting-react-scripts/03-technical-validation.md"
+          }
+          "enterprise_id" = ""
+          "included" = [
+            "Box intake, metadata, Automate enrichment, Hubs, Doc Gen, and Sign surfaces"
+            "Salesforce Agentforce CLM record, Contract Copilot, and Multi-Framework React UI Bundle"
+            "human approval gates"
+          ]
+          "manifestVersion" = "1.0.0"
+          "presenterSurface" = "Salesforce Multi-Framework React"
+          "provider" = "generic"
+          "provider_object_id" = "demo/box-salesforce-clm-demo-manifest"
+          "readiness" = {
+            "agentforce" = "portable-specification-configure-per-environment"
+            "boxSurfaces" = "build-and-validate-per-environment"
+            "reactWorkspace" = "local-tests-and-build-verified-deploy-per-environment"
+            "repositoryState" = "Local deterministic fixture"
+            "salesforceMetadata" = "portable-deployment-provided"
+            "targetState" = "Presenter-ready live"
+          }
+          "scenario" = {
+            "contractId" = "CLM-2026-0017"
+            "id" = "clm-box-salesforce"
+            "name" = "Northstar CLM - Box + Salesforce Contract Lifecycle"
+            "orchestrationModel" = "governed Apex actions shared by an internal agent surface and a scoped counterparty workspace"
+          }
+          "screenshots" = {
+            "scenarioSpecific" = "output/screenshots/box-salesforce-clm/"
+            "sharedBox" = "output/screenshots/box-automate-agentic-orchestration/"
+          }
+        }
+        "metadata" = {
+          "artifactName" = "box-salesforce-clm-demo-manifest"
+          "artifactType" = "config_file"
+          "createdAt" = "2026-07-23T11:55:20Z"
+          "enterpriseId" = ""
+          "provider" = "generic"
+          "providerObjectId" = "demo/box-salesforce-clm-demo-manifest"
+          "scenario" = "box-bedrock-for-clm"
+        }
+        "name" = "config_demo_box-salesforce-clm-demo-manifest"
+        "provider" = "generic"
+        "scenario" = "box-bedrock-for-clm"
+        "terraformType" = "null_resource"
+        "type" = "config_file"
+      }
+    ]
+    "scenario" = "box-bedrock-for-clm"
+    "version" = "1.0"
+  }
+}

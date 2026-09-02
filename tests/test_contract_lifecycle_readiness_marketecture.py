@@ -25,14 +25,14 @@ class ContractLifecycleReadinessMarketectureTest(unittest.TestCase):
         self.assertIn("One end-to-end lifecycle. Persistent platform responsibilities.", source)
         self.assertEqual(source.count('<article class="stage'), 6)
         self.assertEqual(source.count('class="stage-num"'), 6)
-        self.assertEqual(source.count('class="lane '), 4)
+        self.assertEqual(source.count('class="lane '), 2)
         self.assertIn("Human Decision Gate", source)
         self.assertIn("Approved Execution &amp; Lifecycle Management", source)
         self.assertIn("Persistent platform responsibilities across every lifecycle stage", source)
         self.assertNotRegex(source, r'(?:src|href)=["\']https?://')
         self.assertEqual(
             set(re.findall(r'data-brand-logo="([^"]+)"', source)),
-            {"aws", "agentcore", "box", "salesforce", "databricks"},
+            {"box", "salesforce"},
         )
         self.assertIn("@media (max-width:1000px)", source)
         self.assertNotIn("Systems of record below", source)
@@ -40,25 +40,21 @@ class ContractLifecycleReadinessMarketectureTest(unittest.TestCase):
         self.assertIn('data-view="compact" aria-pressed="true">Overview</button>', source)
         self.assertIn('data-view="detail" aria-pressed="false">Detail</button>', source)
         self.assertLess(source.index(">Overview</button>"), source.index(">Detail</button>"))
-        self.assertIn("gap:2px", source)
-        self.assertIn('img[data-brand-logo="agentcore"] { width:22px; height:22px;', source)
-        self.assertEqual(source.count('class="stage-summary"'), 6)
         self.assertEqual(source.count('class="technical-note stage-detail"'), 6)
         self.assertIn("body:not(.compact) .technical-note", source)
         self.assertNotIn("body.compact .stage p", source)
         self.assertNotIn("body.compact .lane-head p", source)
         self.assertNotIn("body.compact .lane-cell span", source)
         self.assertNotIn("body.compact .outcomes p", source)
-        self.assertEqual(source.count('class="technical-note lane-technical"'), 4)
+        self.assertEqual(source.count('class="technical-note lane-technical"'), 2)
         self.assertIn("Standard Salesforce REST upserts", source)
-        self.assertIn("Curated Delta tables", source)
-        self.assertIn("Box content, Salesforce context, and Databricks signals", source)
-        self.assertIn("border-left:5px solid var(--aws)", source)
+        self.assertIn("Box content and Salesforce context", source)
+        self.assertIn("border-left:5px solid var(--box)", source)
         self.assertIn("grid-template-columns:270px repeat(6,1fr)", source)
         self.assertIn("border-left:2px dotted var(--lane-color)", source)
         self.assertIn("grid-template-columns:1.1fr repeat(4,1fr)", source)
         self.assertIn("radial-gradient(circle at 90% 5%", source)
-        for brand_color in ("#ff9900", "#00a1e0", "#0061d5", "#ff3621"):
+        for brand_color in ("#00a1e0", "#0061d5"):
             self.assertIn(brand_color, source)
 
 

@@ -4,9 +4,9 @@ Snapshot of `box-bedrock-for-clm` for an agent picking up this repo cold. Writte
 
 ## 1. What this repo is
 
-A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce + Databricks + Amazon Bedrock AgentCore**. It ships deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter HTML. Nothing here requires a live org to validate — "repository mode" is fully green offline; live presenter-readiness is a separate opt-in gate.
+A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce**. It ships deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter HTML. Nothing here requires a live org to validate — "repository mode" is fully green offline; live presenter-readiness is a separate opt-in gate.
 
-**One scenario** since `62f9678`: **Cross-Platform Agentic Orchestration**. Primary surface is the Salesforce Multi-Framework React app; Amazon Bedrock AgentCore coordinates Box, Agentforce, and Databricks specialists while humans keep decision authority. The standalone Box Automate scenario was removed, but **Box intake stays** — the metadata-triggered Automate entry point is still how a contract reaches the React workspace, so `config/box/*.bcl`, the 04 entry-point module, the shared Box screenshots, and the `CLM_Box_Automate_Integration` permission set are all retained.
+**One scenario** since `62f9678`: **Box + Salesforce Contract Lifecycle**. Primary surface is the Salesforce Multi-Framework React app; governed Apex actions are the only path between Box and Salesforce, and humans keep decision authority. The standalone Box Automate scenario was removed, but **Box intake stays** — the metadata-triggered Automate entry point is still how a contract reaches the React workspace, so `config/box/*.bcl`, the 04 entry-point module, the shared Box screenshots, and the `CLM_Box_Automate_Integration` permission set are all retained.
 
 **Governance invariant:** Box is authoritative for contract *content*; Salesforce `CLM_Contract__c` is authoritative for structured *commercial truth*; the Opportunity is the Box-mapped object. Contract bytes never flow to Salesforce. Human gates precede any generation, signature, or Salesforce write.
 

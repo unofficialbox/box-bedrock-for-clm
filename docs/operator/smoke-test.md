@@ -14,14 +14,11 @@ Use a clearly labeled non-production request. Record new IDs in a run log, not i
 8. Confirm signature remains blocked while a required review is incomplete.
 9. Stop before Doc Gen output creation or Box Sign send unless the owner separately approves that action.
 
-## Additional Cross-Platform Agentic Orchestration gate
+## Additional Box + Salesforce Contract Lifecycle gate
 
 1. Launch the Salesforce React workspace with the new record, contract ID, and Box folder ID.
 2. Confirm only the authorized Box folder loads through downscoped access.
 3. Ask Agentforce for a cited package summary.
-4. Confirm AgentCore/Strands traces specialist selection, tool calls, and the signature-block guardrail.
-5. Confirm Databricks contributes analytical context but does not overwrite authoritative contract state.
-6. Do not claim managed AWS or Databricks deployment if only the local deterministic trace is running.
 
 ## Reset
 

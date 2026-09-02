@@ -31,11 +31,10 @@ class HTMLBrandingTests(unittest.TestCase):
     def test_scenario_guides_embed_the_correct_official_logos(self) -> None:
         module = load_script("build_scenario_guides")
         expected = {
-            "operator-setup": {"box", "salesforce", "databricks"},
-            "cross-platform-agentic-orchestration": {
+            "operator-setup": {"box", "salesforce"},
+            "box-salesforce-clm": {
                 "box",
                 "salesforce",
-                "databricks",
             },
         }
         with tempfile.TemporaryDirectory() as directory:
@@ -49,10 +48,9 @@ class HTMLBrandingTests(unittest.TestCase):
     def test_scenario_galleries_embed_the_correct_official_logos(self) -> None:
         module = load_script("build_clm_experience_gallery")
         expected = {
-            "cross-platform-agentic-orchestration": {
+            "box-salesforce-clm": {
                 "box",
                 "salesforce",
-                "databricks",
             },
         }
         with tempfile.TemporaryDirectory() as directory:

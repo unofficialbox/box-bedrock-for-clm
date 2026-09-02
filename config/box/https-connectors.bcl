@@ -29,7 +29,7 @@ locals {
                 "routeRedlineFindings" = {
                   "endpoint" = "/services/apexrest/clm/redline-routing"
                   "method" = "POST"
-                  "requiredFor" = "Cross-Platform Agentic Orchestration live redline routing"
+                  "requiredFor" = "Box + Salesforce Contract Lifecycle live redline routing"
                   "status" = "not implemented"
                 }
                 "salesforceContractCreate" = {

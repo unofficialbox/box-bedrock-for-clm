@@ -23,7 +23,7 @@ locals {
             }
             {
               "command" = "python3 scripts/demo_operator.py generate-assets"
-              "completeWhen" = "Six PDFs, three Doc Gen templates, JSON/CSV fixtures, and the local AgentCore trace exist."
+              "completeWhen" = "Six PDFs, three Doc Gen templates, and JSON fixtures exist."
               "id" = "generate-assets"
               "owner" = "operator"
               "writesExternalState" = false
@@ -80,7 +80,7 @@ locals {
               "writesExternalState" = false
             }
             {
-              "command" = "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration"
+              "command" = "python3 scripts/demo_operator.py validate --scenario box-salesforce-clm"
               "completeWhen" = "Live Box resources, resolved portable specs, and the Salesforce data model validate."
               "id" = "readiness"
               "owner" = "operator"
@@ -109,17 +109,17 @@ locals {
               "writesExternalState" = false
             }
             {
-              "appliesWhen" = "Presenting managed Cross-Platform Agentic Orchestration rather than local deterministic fixtures"
-              "command" = "python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration"
-              "completeWhen" = "Required Agentforce, AgentCore, Databricks, Box, and Salesforce bindings validate and provider deployment tests are recorded."
-              "guide" = "docs/operator/cross-platform-deployment.md"
+              "appliesWhen" = "Presenting managed Box + Salesforce Contract Lifecycle rather than local deterministic fixtures"
+              "command" = "python3 scripts/demo_operator.py validate --scenario box-salesforce-clm"
+              "completeWhen" = "Required Agentforce, Box, and Salesforce bindings validate and provider deployment tests are recorded."
+              "guide" = "docs/operator/start-here.md"
               "id" = "agentic-readiness"
-              "owner" = "AWS, Databricks, Agentforce, and demo operators"
+              "owner" = "Agentforce and demo operators"
               "writesExternalState" = false
             }
             {
               "completeWhen" = "The presenter completes the selected tell/show/tell script within the allotted time and can identify every simulated or unavailable integration."
-              "guide" = "docs/operator/scenarios/README.md"
+              "guide" = "docs/operator/scenarios/box-salesforce-clm/README.md"
               "id" = "rehearsal"
               "owner" = "presenter"
               "writesExternalState" = false

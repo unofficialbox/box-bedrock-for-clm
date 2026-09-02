@@ -1,0 +1,19 @@
+flowchart LR
+    Event["Customer paper arrives<br/>Box intake or Salesforce record"] --> Folder["Governed contract folder<br/>metadata applied"]
+    Folder --> Internal["Internal reader<br/>MCP or Contract Copilot"]
+    Internal --> Actions["Governed Apex actions"]
+    Actions --> Evidence["Cited findings from Box<br/>files, versions, clause library"]
+    Actions --> Record["CLM record<br/>commercial truth and approval state"]
+    Evidence --> Memo["Counter-position memo<br/>Box Doc Gen"]
+    Record --> Gate{"Contract approved?"}
+    Memo --> Gate
+    Gate -- "No" --> Block["Signature refused<br/>state check in Apex"]
+    Gate -- "Yes" --> Prepare["Box Sign preparation<br/>a person presses send"]
+    Folder --> Counterparty["Counterparty workspace<br/>scoped folder, redlines withheld"]
+
+    classDef agent fill:#eee9ff,stroke:#6b46c1,color:#24134f
+    classDef system fill:#e9f1ff,stroke:#1166e8,color:#071b33
+    classDef human fill:#fff1d6,stroke:#b16a00,color:#522f00
+    class Internal,Actions agent
+    class Event,Folder,Evidence,Record,Memo,Prepare,Counterparty system
+    class Gate,Block human

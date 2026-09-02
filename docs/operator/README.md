@@ -6,7 +6,7 @@ Configure, deploy, validate, rehearse, or reset the CLM demo in a confirmed targ
 
 See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and validation commands.
 
-1. Confirm the repository, selected scenario, exact Box enterprise, Salesforce org, AWS account and region, Databricks workspace, and ignored runtime file.
+1. Confirm the repository, selected scenario, exact Box enterprise, Salesforce org, and ignored runtime filee, and ignored runtime file.
 2. Run `python3 scripts/demo_operator.py status`.
 3. Run `python3 scripts/demo_operator.py doctor --offline --platform box`.
 4. For a one-shot idempotent operator path, run:
@@ -17,10 +17,10 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
 
 5. Follow [Start Here](start-here.md).
 6. Complete [Browser Configuration](browser-configuration.md).
-7. Complete [Cross-Platform Deployment](cross-platform-deployment.md) when that scenario is selected.
+7. Complete [Cross-Platform Deployment](start-here.md) when that scenario is selected.
 8. Complete [Box Preview Setup](box-preview-setup.md) to bring up governed Box content; until it is done the workspace reports that it cannot be opened.
 9. Run the [Smoke Test](smoke-test.md).
-10. Rehearse one [Scenario Guide](scenarios/README.md).
+10. Rehearse the [scenario guide](scenarios/box-salesforce-clm/README.md).
 11. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
 12. Complete [Finalization](final-phase.md) before declaring presenter readiness.
 

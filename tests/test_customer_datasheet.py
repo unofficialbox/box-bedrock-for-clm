@@ -32,17 +32,15 @@ class CustomerDatasheetTests(unittest.TestCase):
         self.assertNotIn("guided, intelligent experience", document)
         self.assertNotIn("trusted content", document)
         self.assertIn("Salesforce Agentforce", document)
-        self.assertIn("AWS Bedrock AgentCore", document)
         self.assertNotIn("Powered by governed agent orchestration", document)
         self.assertNotIn("API", document)
         self.assertNotIn("database", document.lower())
         self.assertGreaterEqual(document.count("data:image/svg+xml;base64,"), 2)
-        self.assertEqual(document.count("data:image/png;base64,"), 1)
+        self.assertEqual(document.count("data:image/png;base64,"), 0)
         self.assertEqual(document.count("data:image/jpeg;base64,"), 1)
         self.assertIn('alt="Box"', document)
         self.assertIn('alt="Salesforce"', document)
-        self.assertIn('alt="Databricks"', document)
-        for brand in ("box", "salesforce", "databricks"):
+        for brand in ("box", "salesforce"):
             self.assertIn(f'data-brand-logo="{brand}"', document)
         self.assertIsNone(re.search(r'(?:src|href)=["\']https?://', document))
 
@@ -51,7 +49,6 @@ class CustomerDatasheetTests(unittest.TestCase):
         for filename in (
             "box-logo-blue.svg",
             "salesforce-logo.jpeg",
-            "databricks-primary-lockup-full-color.png",
         ):
             with self.subTest(filename=filename):
                 self.assertGreater((assets / filename).stat().st_size, 500)

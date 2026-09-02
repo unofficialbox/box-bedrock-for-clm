@@ -73,12 +73,12 @@ class CLMValidationTests(unittest.TestCase):
                         "evidence": "external-run-log-17",
                         "cleanupOwner": "demo-operator",
                     }
-                    for platform in ("Box", "Salesforce", "AgentCore", "Databricks")
+                    for platform in ("Box", "Salesforce")
                 ],
             }
             (runtime / "validation-receipts.json").write_text(json.dumps(receipts), encoding="utf-8")
             detail = validation.check_live_receipts(root, required=True)
-            for platform in ("Box", "Salesforce", "AgentCore", "Databricks"):
+            for platform in ("Box", "Salesforce"):
                 self.assertIn(platform, detail)
                 receipt = next(item for item in receipts["receipts"] if item["platform"] == platform)
                 self.assertEqual("passed", receipt["status"])
@@ -96,13 +96,13 @@ class CLMValidationTests(unittest.TestCase):
                         "platform": platform,
                         "environment": "current-demo",
                         "validatedAt": datetime.now(UTC).isoformat(),
-                        "actionMode": "mock" if platform == "AgentCore" else "live",
+                        "actionMode": "mock" if platform == "Salesforce" else "live",
                         "businessKey": "CLM-2026-0017",
                         "status": "passed",
                         "evidence": "external-run-log-17",
                         "cleanupOwner": "demo-operator",
                     }
-                    for platform in ("Box", "Salesforce", "AgentCore", "Databricks")
+                    for platform in ("Box", "Salesforce")
                 ]
             }
             (runtime / "validation-receipts.json").write_text(json.dumps(receipts), encoding="utf-8")

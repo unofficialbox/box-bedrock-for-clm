@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="title description">
   <title id="title">AI-Assisted Contract Lifecycle Management</title>
-  <desc id="description">A governed contract package is drafted, reviewed, approved, and signed across Box, Salesforce, Databricks, and AWS Bedrock AgentCore, with human decision authority retained.</desc>
+  <desc id="description">A governed contract package is drafted, reviewed, approved, and signed across Box and Salesforce, with human decision authority retained.</desc>
 
   <defs>
     <pattern id="dots" width="26" height="26" patternUnits="userSpaceOnUse">
@@ -57,8 +57,6 @@
     <circle cx="510" cy="268" r="5" fill="#00a1e0"/>
     <text x="523" y="273" fill="#d9e7fb">SALESFORCE</text>
     <circle cx="645" cy="268" r="5" fill="#ff3621"/>
-    <text x="658" y="273" fill="#d9e7fb">DATABRICKS</text>
     <circle cx="790" cy="268" r="5" fill="#ff9900"/>
-    <text x="803" y="273" fill="#d9e7fb">AWS BEDROCK AGENTCORE</text>
   </g>
 </svg>

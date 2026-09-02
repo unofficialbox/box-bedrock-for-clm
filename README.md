@@ -18,7 +18,7 @@ The complete persona index is in [docs/README.md](docs/README.md). AI assistants
 
 | Scenario | Primary surface | Coordination model |
 |---|---|---|
-| [Cross-Platform Agentic Orchestration](docs/operator/scenarios/cross-platform-agentic-orchestration/README.md) | Salesforce Multi-Framework React | Amazon Bedrock AgentCore coordinates Box, Salesforce Agentforce, and Databricks specialists while humans retain decision authority. |
+| [Box + Salesforce Contract Lifecycle](docs/operator/scenarios/box-salesforce-clm/README.md) | Salesforce Multi-Framework React | Governed Apex actions serve an internal agent surface and a scoped counterparty workspace while humans retain decision authority. |
 
 The scenario uses the Northstar contract package and governance model. Box remains authoritative for contract content; Salesforce `CLM_Contract__c` remains authoritative for structured commercial truth.
 
@@ -66,11 +66,11 @@ For a live presenter-readiness decision, create the gitignored `config/runtime/v
 python3 scripts/validate_clm.py --presenter-ready
 ```
 
-This fails closed unless Box, Salesforce, AgentCore, and Databricks have current secret-free passed receipts.
+This fails closed unless Box and Salesforce have current secret-free passed receipts.
 
 ## Presenter output
 
-Start with the [presenter library](output/html/index.html). It routes to every standalone chapter and to the [complete self-contained edition](output/html/07-complete-presenter-edition.html), which embeds all seven chapters and needs no sibling files or network access. The Markdown source remains authoritative; generated HTML is the portable sharing layer.
+Start with the [presenter library](output/html/index.html). It routes to every standalone chapter and to the [complete self-contained edition](output/html/06-complete-presenter-edition.html), which embeds all seven chapters and needs no sibling files or network access. The Markdown source remains authoritative; generated HTML is the portable sharing layer.
 
 ## Source map
 
