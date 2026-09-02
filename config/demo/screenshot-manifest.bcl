@@ -84,13 +84,6 @@ locals {
             }
             {
               "capturedOn" = "2026-07-14"
-              "path" = "output/screenshots/box-salesforce-clm/clm-react-redline-reviews.png"
-              "readiness" = "real-demo"
-              "scenario" = "box-salesforce-clm"
-              "sourceSurface" = "Salesforce Multi-Framework React redline review"
-            }
-            {
-              "capturedOn" = "2026-07-14"
               "path" = "output/screenshots/box-salesforce-clm/clm-react-workspace.png"
               "readiness" = "real-demo"
               "scenario" = "box-salesforce-clm"

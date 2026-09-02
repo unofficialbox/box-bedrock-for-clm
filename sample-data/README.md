@@ -14,7 +14,6 @@ Recommended files:
 | `output/pdf/northstar-insurance-certificate.pdf` | Insurance expiration tracking |
 | `output/json/northstar-clm-records.json` | Mock opportunity/account/quote/approval data |
 | `output/json/clause-playbook.json` | Approved standard and fallback positions |
-| `output/csv/historical-clause-outcomes.csv` | Mock analytics context for analytics agents |
 
 Use the PDFs, Box metadata, structured records, and approved clause Markdown across the scenario packages. These are **Local deterministic fixture** evidence for Box + Salesforce Contract Lifecycle; they are not proof of a **Deployed integration**.
 

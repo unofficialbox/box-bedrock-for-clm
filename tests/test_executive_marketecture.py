@@ -24,7 +24,7 @@ class ExecutiveMarketectureTests(unittest.TestCase):
         self.assertIn("Governed content foundation", document)
         self.assertIn("Salesforce Agentforce", document)
         self.assertNotIn("Optional orchestration", document)
-        self.assertEqual(document.count("data:image/png;base64,"), 8)
+        self.assertEqual(document.count("data:image/png;base64,"), 6)
         self.assertEqual(document.count("data:image/jpeg;base64,"), 1)
         self.assertGreaterEqual(document.count("data:image/svg+xml;base64,"), 1)
         for brand in ("box", "salesforce"):

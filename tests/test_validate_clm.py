@@ -44,7 +44,7 @@ class CLMValidationTests(unittest.TestCase):
 
     def test_manifest_and_screenshot_contract_is_current(self) -> None:
         detail = validation.check_manifests_and_screenshots(ROOT, today=date(2026, 7, 17))
-        self.assertIn("11 current real screenshots", detail)
+        self.assertIn("10 current real screenshots", detail)
 
     def test_reset_and_idempotency_contract_is_present(self) -> None:
         self.assertIn("portable retry", validation.check_reset_and_idempotency_contract())

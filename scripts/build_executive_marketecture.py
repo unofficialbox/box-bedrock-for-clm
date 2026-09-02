@@ -32,12 +32,6 @@ PROOF = (
         "title": "Business context where teams work",
         "copy": "The contract workspace brings governed Box content and Salesforce Agentforce context into one experience.",
     },
-    {
-        "path": SCREENSHOTS / "box-salesforce-clm" / "clm-react-redline-reviews.png",
-        "label": "Decide",
-        "title": "Route exceptions to the right experts",
-        "copy": "Redline differences become cited, domain-specific reviews for Legal, Finance, Privacy, and other owners.",
-    },
 )
 
 
