@@ -8,7 +8,7 @@ from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[1]
-OUTPUT = ROOT / "output" / "html" / "05-customer-solution-datasheet.html"
+OUTPUT = ROOT / "output" / "html" / "04-customer-solution-datasheet.html"
 BRAND_ASSETS = ROOT / "docs" / "design" / "brand-assets"
 
 
@@ -41,9 +41,6 @@ def icon(name: str) -> str:
 def build() -> Path:
     box_logo = asset_data_uri("box-logo-blue.svg", "image/svg+xml")
     salesforce_logo = asset_data_uri("salesforce-logo.jpeg", "image/jpeg")
-    databricks_logo = asset_data_uri(
-        "databricks-primary-lockup-full-color.png", "image/png"
-    )
     document = f'''<!doctype html>
 <html lang="en">
 <head>
@@ -137,7 +134,6 @@ def build() -> Path:
     .system-logo img {{ display: block; max-width: 100%; object-fit: contain; }}
     .box-logo {{ width: 92px; height: 50px; }}
     .salesforce-logo {{ width: 220px; height: 84px; }}
-    .databricks-logo {{ width: 174px; height: auto; }}
     .system-name {{ min-height: 23px; margin: -5px 0 10px; color: var(--ink); font-size: .78rem; font-weight: 740; letter-spacing: .01em; }}
     .system h3 {{ margin: 0; font: 760 1rem/1.3 -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }} .system p {{ margin: 7px 0 0; color: var(--muted); font-size: .82rem; }}
     .example {{ padding: 35px; border: 1px solid #eadfc7; border-radius: var(--radius); background: #fffbf3; }}
@@ -213,8 +209,8 @@ def build() -> Path:
 
     <section class="systems" aria-labelledby="systems-title">
       <h2 class="section-title" id="systems-title">The right context for every decision.</h2>
-      <p class="section-lead">Content, customer context, and analytics come together when the work requires them.</p>
-      <div class="system-grid"><article class="system"><div class="system-logo"><img class="box-logo" data-brand-logo="box" src="{box_logo}" alt="Box"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo"><img class="salesforce-logo" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></div><div class="system-name">Salesforce Agentforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article><article class="system"><div class="system-logo"><img class="databricks-logo" data-brand-logo="databricks" src="{databricks_logo}" alt="Databricks"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Insights and outcomes</h3><p>Business intelligence from governed data.</p></article></div>
+      <p class="section-lead">Content and customer context come together when the work requires them.</p>
+      <div class="system-grid"><article class="system"><div class="system-logo"><img class="box-logo" data-brand-logo="box" src="{box_logo}" alt="Box"></div><div class="system-name" aria-hidden="true">&nbsp;</div><h3>Content and knowledge</h3><p>Secure content, policies, templates, and expertise.</p></article><article class="system"><div class="system-logo"><img class="salesforce-logo" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></div><div class="system-name">Salesforce Agentforce</div><h3>Customers and business process</h3><p>Account context and process across the lifecycle.</p></article></div>
     </section>
 
     <section class="example" aria-labelledby="example-title">
@@ -224,7 +220,7 @@ def build() -> Path:
 
     <section class="proof" aria-label="Solution value"><article class="proof-item">{icon('handoff')}<span><strong>Fewer handoffs</strong><small>Less back-and-forth, more progress.</small></span></article><article class="proof-item">{icon('bolt')}<span><strong>Faster decisions</strong><small>The right information to the right people.</small></span></article><article class="proof-item">{icon('shield')}<span><strong>Consistent governance</strong><small>Policy and controls applied everywhere.</small></span></article><article class="proof-item">{icon('repeat')}<span><strong>Reusable across solutions</strong><small>A foundation that scales with your needs.</small></span></article></section>
   </main>
-  <footer><p>Box&nbsp;&nbsp;•&nbsp;&nbsp;Salesforce Agentforce&nbsp;&nbsp;•&nbsp;&nbsp;Databricks&nbsp;&nbsp;•&nbsp;&nbsp;AWS Bedrock AgentCore</p></footer>
+  <footer><p>Box&nbsp;&nbsp;•&nbsp;&nbsp;Salesforce Agentforce</p></footer>
   <div class="toast" id="toast" role="status" aria-live="polite"></div>
   <script>
     const status = document.getElementById('status');

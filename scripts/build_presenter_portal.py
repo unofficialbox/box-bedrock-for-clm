@@ -32,15 +32,15 @@ PAGES = (
         "Configure, deploy, validate, and rehearse the demo in a new environment.",
     ),
     PresenterPage(
-        "01-cross-platform-agentic-orchestration-guide.html",
-        "Cross-Platform Scenario Guide",
+        "01-box-salesforce-clm-guide.html",
+        "Box + Salesforce Scenario Guide",
         "Scenario",
         "Tell / show / tell",
-        "Present coordinated contract work across Box, Salesforce Agentforce, Databricks, and AgentCore.",
+        "Present governed contract work across Box and Salesforce Agentforce.",
     ),
     PresenterPage(
-        "02-cross-platform-agentic-orchestration-gallery.html",
-        "Cross-Platform Experience Gallery",
+        "02-box-salesforce-clm-gallery.html",
+        "Box + Salesforce Experience Gallery",
         "Scenario",
         "Real demo evidence",
         "Review the application, governed content, contract context, and human-decision experiences.",
@@ -53,21 +53,14 @@ PAGES = (
         "Connect the operating model, platform responsibilities, outcomes, and delivery path.",
     ),
     PresenterPage(
-        "04-agentcore-agent-experience-marketecture.html",
-        "Coordinated Contract Work",
-        "Communicate",
-        "AgentCore experience",
-        "Show how agents, systems, and experts coordinate around governed contract work.",
-    ),
-    PresenterPage(
-        "05-customer-solution-datasheet.html",
+        "04-customer-solution-datasheet.html",
         "Customer Solution Datasheet",
         "Communicate",
         "Customer overview",
         "Share the business problem, solution experience, outcomes, and platform contribution.",
     ),
     PresenterPage(
-        "06-contract-lifecycle-readiness-marketecture.html",
+        "05-contract-lifecycle-readiness-marketecture.html",
         "Contract Lifecycle Readiness",
         "Communicate",
         "Lifecycle view",
@@ -192,10 +185,10 @@ def build_landing(output: Path | None = None) -> Path:
   <div class="brandline"><div class="brand"><span class="brand-mark">CLM</span><span>Acme Contract Operations</span></div><span class="status">Portable presenter library · 7 chapters</span></div>
   <p class="kicker">Start here</p><h1>Choose the right story for the room.</h1>
   <p class="intro">One entry point for environment setup, the complete demo scenario, real experience galleries, and executive-ready solution narratives. Every chapter remains available as its own portable file.</p>
-  <div class="actions"><a class="button primary" href="07-complete-presenter-edition.html">Open the combined edition {ARROW}</a><a class="button secondary" href="#library">Browse individual files</a></div>
+  <div class="actions"><a class="button primary" href="06-complete-presenter-edition.html">Open the combined edition {ARROW}</a><a class="button secondary" href="#library">Browse individual files</a></div>
 </div></header>
 <main id="library" class="shell content">
-  <aside class="combined-callout"><div><h2>Need one file?</h2><p>The combined edition packages all seven chapters into a single self-contained HTML file with chapter navigation, keyboard controls, and no network dependencies.</p></div><a class="button" href="07-complete-presenter-edition.html">Launch combined edition {ARROW}</a></aside>
+  <aside class="combined-callout"><div><h2>Need one file?</h2><p>The combined edition packages all seven chapters into a single self-contained HTML file with chapter navigation, keyboard controls, and no network dependencies.</p></div><a class="button" href="06-complete-presenter-edition.html">Launch combined edition {ARROW}</a></aside>
   {"".join(sections)}
 </main><footer><div class="shell"><span>Acme CLM · Portable specification and local deterministic fixture</span><span>Markdown remains authoritative · HTML is the sharing layer</span></div></footer></body></html>'''
     target.parent.mkdir(parents=True, exist_ok=True)
@@ -228,7 +221,7 @@ def build_combined(source_dir: Path | None = None, output: Path | None = None) -
     """Build one offline file containing all standalone presenter documents."""
 
     source_dir = source_dir or OUTPUT
-    target = output or OUTPUT / "07-complete-presenter-edition.html"
+    target = output or OUTPUT / "06-complete-presenter-edition.html"
     page_data = json.dumps(embedded_pages(source_dir), separators=(",", ":"))
     document = f'''<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">

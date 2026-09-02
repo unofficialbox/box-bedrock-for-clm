@@ -71,7 +71,7 @@ Repository release evidence requires:
 - Python tests pass;
 - no secret, live environment identifier, or machine-specific absolute path is committed.
 
-`python3 scripts/validate_clm.py --presenter-ready` is a separate live gate requiring current secret-free receipts for Box, Salesforce, AgentCore, and Databricks. Repository tests never substitute for those receipts.
+`python3 scripts/validate_clm.py --presenter-ready` is a separate live gate requiring current secret-free receipts for Box and Salesforce. Repository tests never substitute for those receipts.
 
 ## Current maturity boundary
 
@@ -84,8 +84,8 @@ The repository provides **Portable specification** and **Local deterministic fix
 - Box owns governed contract content; Salesforce `CLM_Contract__c` owns structured commercial truth.
 - Standard Salesforce external-ID upsert and lookup is the default intake path. Custom Apex is reserved for genuinely custom multi-record, authorization, routing, lifecycle-event, or downscoped-token behavior.
 - Portable Markdown remains authoritative; self-contained HTML remains a derived sharing layer.
-- Managed AgentCore and Databricks evidence must remain disclosed as local or illustrative until current deployed receipts exist.
+- exist.
 
 ## Forward priority
 
-Run the Cross-Platform Agentic Orchestration path in confirmed target environments and populate `config/runtime/validation-receipts.json`. That is the remaining evidence boundary for full presenter readiness.
+Run the Box + Salesforce Contract Lifecycle path in confirmed target environments and populate `config/runtime/validation-receipts.json`. That is the remaining evidence boundary for full presenter readiness.

@@ -19,7 +19,7 @@ class RepositoryNavigationTests(unittest.TestCase):
             "docs/operator/README.md",
             "docs/use-case-creator/README.md",
             "docs/maintainers/README.md",
-            "docs/operator/scenarios/cross-platform-agentic-orchestration/README.md",
+            "docs/operator/scenarios/box-salesforce-clm/README.md",
         }
         self.assertTrue(expected.issubset(targets), expected - targets)
 
@@ -28,7 +28,7 @@ class RepositoryNavigationTests(unittest.TestCase):
             "clm-template-comparison-and-reconciliation.md",
             "docs/runbooks/03-agentcore-demo.md",
             "docs/runbooks/04-box-agentforce-react-demo.md",
-            "docs/operator/scenarios/cross-platform-agentic-orchestration/"
+            "docs/operator/scenarios/box-salesforce-clm/"
             "supporting-react-scripts/component-manifest.md",
             "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
         ]

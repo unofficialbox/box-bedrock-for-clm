@@ -3,9 +3,9 @@
 ## Design Principles
 
 1. **One content foundation** - Box stores contract documents, signatures, metadata, versions, and audit trail.
-2. **One presenter path** - Cross-Platform Agentic Orchestration presents the React workspace, Databricks, and AgentCore/Strands over the governed Box foundation.
+2. **One presenter path** - Box + Salesforce Contract Lifecycle presents the React workspace and Agentforce over the governed Box foundation.
 3. **Human accountability** - AI drafts, summarizes, compares, extracts, and recommends. Humans approve legal positions, concessions, signatures, and obligations.
-4. **Composable integrations** - Box is the system of record for unstructured content, Salesforce for structured deal data, Databricks for governed analytics context.
+4. **Composable integrations** - Box is the system of record for unstructured content, Salesforce for structured deal data, and each domain system for its own governed analytics context.
 5. **Reusable demo factory** - Domain demos reuse the same abstraction layers, metadata conventions, agent patterns, and handoff workflow.
 
 ---
@@ -50,29 +50,29 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 ---
 
-## Scenario: Cross-Platform Agentic Orchestration
+## Scenario: Box + Salesforce Contract Lifecycle
 
-Supervisor-directed, cross-platform scenario. Status: specification plus local deterministic trace until the managed AWS and Databricks integrations are deployed.
+Two platforms, one set of governed actions between them. Box holds contract content; Salesforce holds structured commercial truth and every path from one to the other.
 
-Rendered diagram: [CLM AgentCore Architecture](../diagrams/clm-agentcore-architecture.svg)
+Rendered diagram: [CLM Architecture](../diagrams/clm-architecture.svg)
 
-Source: [Mermaid diagram](../diagrams/clm-agentcore-architecture.mmd)
+Source: [Mermaid diagram](../diagrams/clm-architecture.mmd)
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
-│                         AWS Bedrock AgentCore                              │
+│                    Salesforce - governed Apex actions                      │
 │                                                                            │
-│  AgentCore Strands Agents                                                │
-│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌───────────────────────┐   │
-│  │ Intake     │ │ Clause     │ │ Approval   │ │ Obligation Monitor    │   │
-│  │ Agent      │ │ Risk Agent │ │ Agent      │ │ Agent                 │   │
-│  └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └───────────┬───────────┘   │
-│        │              │              │                    │               │
-│  ┌─────┴──────────────┴──────────────┴────────────────────┴────────────┐  │
-│  │                 AgentCore Gateway + Strands tool layer                 │  │
-│  │                     Box | Salesforce | Databricks                      │  │
-│  └───────────────────────────────────────────────────────────────────────┘  │
+│  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌───────────────────────┐    │
+│  │ Contract   │ │ Ask a      │ │ Generate   │ │ Prepare signature     │    │
+│  │ package    │ │ document   │ │ memo       │ │ (state-gated)         │    │
+│  └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └───────────┬───────────┘    │
+│        │              │              │                    │                │
+│  ┌─────┴──────────────┴──────────────┴────────────────────┴────────────┐   │
+│  │      Client Credentials Grant - the Box token never leaves Apex     │   │
+│  └─────────────────────────────────────────────────────────────────────┘   │
 └────────────────────────────────────────────────────────────────────────────┘
+        ▲                                                        ▲
+        │ MCP / Agentforce (internal)      downscoped token (counterparty)
 ```
 
 ### System Roles
@@ -81,9 +81,7 @@ Source: [Mermaid diagram](../diagrams/clm-agentcore-architecture.mmd)
 |--------|-----------|----------------|
 | Box | Contracts, redlines, exhibits, signatures, clause library | MCP/API read-write with metadata and events |
 | Salesforce | Opportunity, account, quote, approval state, renewal date | API read-write with event triggers |
-| Databricks | Historical contract outcomes, clause analytics, spend/revenue data | SQL query via governed action groups |
-| AgentCore Memory | Multi-day negotiation state, prior decisions, accepted fallback positions | Session and long-term memory |
-| CloudWatch / audit store | Agent traces, tool calls, evaluation metrics | Append-only observability |
+| Box audit trail | File versions, metadata changes, task and comment history | Append-only observability |
 
 ---
 
@@ -93,11 +91,10 @@ Source: [Mermaid diagram](../diagrams/clm-agentcore-architecture.mmd)
 Box metadata trigger / Salesforce Opportunity Event
         │
         ▼
-AgentCore Strands Intake Agent
+Intake
         │
         ├──► Box: create workspace, apply metadata, collect package
         ├──► Salesforce: read opportunity, quote, account risk
-        ├──► Databricks: retrieve historical clause outcomes
         │
         ▼
 Clause Risk Agent
@@ -126,7 +123,7 @@ Box Sign + Obligation Monitor
 | Content schema | Folder template + metadata templates | Contract workspace, documents, obligations | Asset library, evidence packet, policy, loan docs |
 | Scenario model | Workflow-directed or supervisor-directed agentic orchestration | Box Automate-led path or cross-platform supervisor path | Preserve the same two-track distinction |
 | Agent roles | Intake, classify, risk, approve, monitor | Contract intake, clause risk, approval, obligations | Rename to domain-specific roles |
-| System connectors | Content, CRM, Databricks analytics | Box, Salesforce, Databricks | Box plus domain system and Databricks analytics |
+| System connectors | Content, CRM | Box, Salesforce | Box plus domain systems |
 | Sample data | Synthetic PDFs + JSON records | MSA/DPA/SOW/order form | Domain-specific records and files |
 | Runtime state | Gitignored environment and bootstrap bindings | Box App, metadata, agents | Same portable binding contract |
 
@@ -141,7 +138,6 @@ Box Sign + Obligation Monitor
 | Conflicting CRM and contract values | Block signature and route to sales operations |
 | Approval timeout | Escalate to owner and update dashboard SLA status |
 | Box Sign failure | Retry and create manual signature fallback task |
-| Databricks unavailable | Continue Box/Salesforce review and mark analytics enrichment pending |
 | Agent output conflicts with playbook | Guardrail blocks recommendation and asks for human legal review |
 
 ---
@@ -150,7 +146,7 @@ Box Sign + Obligation Monitor
 
 The metadata-triggered intake that opens the scenario. Automate owns the intake sequence, agents enrich individual steps, humans own approvals; the React workspace opens on the record it creates.
 
-Canonical module: [Entry-Point Variation: Box Metadata Trigger to Salesforce Record](../operator/scenarios/cross-platform-agentic-orchestration/supporting-react-scripts/04-box-metadata-automate-entry.md)
+Canonical module: [Entry-Point Variation: Box Metadata Trigger to Salesforce Record](../operator/scenarios/box-salesforce-clm/supporting-react-scripts/04-box-metadata-automate-entry.md)
 
 Flow: [rendered](../diagrams/clm-box-metadata-automate-entry.svg) · [source](../diagrams/clm-box-metadata-automate-entry.mmd)
 
@@ -164,7 +160,7 @@ Flow: [rendered](../diagrams/clm-box-metadata-automate-entry.svg) · [source](..
 | Routing is deterministic | Domains resolve through `config/clm/expert-routing.json`; low-confidence, unclassified, inaccessible, and unconfigured assignments go to Legal Operations triage. |
 | Tasks are consolidated | The routing action creates or reuses one open task per contract, redline file, and domain. |
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
-| No external agent runtime in intake | Intake itself sends no request to AgentCore, Strands, Databricks, or custom middleware. |
+| No external agent runtime in intake | Intake itself sends no request to an external agent runtime or custom middleware. |
 
 Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.bcl)
 

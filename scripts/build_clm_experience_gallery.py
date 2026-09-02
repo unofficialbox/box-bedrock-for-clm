@@ -89,18 +89,18 @@ for experience in BOX_EXPERIENCES:
     experience["source"] = "box-automate-agentic-orchestration"
 
 for experience in REACT_EXPERIENCES:
-    experience["source"] = "cross-platform-agentic-orchestration"
+    experience["source"] = "box-salesforce-clm"
 
 SCENARIOS = [
     {
         "order": "02",
-        "slug": "cross-platform-agentic-orchestration",
-        "title": "Cross-Platform Agentic Orchestration",
+        "slug": "box-salesforce-clm",
+        "title": "Box + Salesforce Contract Lifecycle",
         "headline": "The complete multi-platform CLM operating model.",
-        "description": "The governed Box journey plus the Salesforce Agentforce experience in the Multi-Framework React workspace. AgentCore, Strands, and Databricks are documented with a local trace until managed deployment is complete.",
-        "status": "Real Box and React screens. No live AWS AgentCore or Databricks screenshots are claimed.",
+        "description": "The governed Box journey plus the Salesforce Agentforce experience in the React workspace.",
+        "status": "Real Box and React screens.",
         "experiences": REACT_EXPERIENCES + BOX_EXPERIENCES,
-        "brands": ("box", "salesforce", "databricks"),
+        "brands": ("box", "salesforce"),
     },
 ]
 
@@ -126,7 +126,6 @@ def brand_logos(names: tuple[str, ...]) -> str:
     assets = {
         "box": ("box-logo-blue.svg", "Box"),
         "salesforce": ("salesforce-logo.jpeg", "Salesforce"),
-        "databricks": ("databricks-primary-lockup-full-color.png", "Databricks"),
     }
     return "".join(
         f'<img class="brand-logo brand-logo-{name}" data-brand-logo="{name}" '
@@ -203,7 +202,6 @@ def build_scenario(scenario: dict[str, object]) -> Path:
     .brand-logos img {{ display: block; width: auto; max-width: 150px; height: 42px; object-fit: contain; border: 0; border-radius: 0; background: transparent; }}
     .brand-logos .brand-logo-box {{ width: 76px; }}
     .brand-logos .brand-logo-salesforce {{ width: 128px; height: 46px; border-radius: 8px; }}
-    .brand-logos .brand-logo-databricks {{ width: 144px; }}
     .status {{ border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; background: var(--panel); backdrop-filter: blur(14px); }}
     .status strong {{ display: block; margin-bottom: 8px; font-size: 1.15rem; }}
     .status span {{ color: var(--muted); }}

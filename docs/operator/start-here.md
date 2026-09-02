@@ -17,7 +17,7 @@ The generated IDs are stored only in `config/runtime/bootstrap-state.json`. The 
 
 ## 1. Scenario
 
-- **Cross-Platform Agentic Orchestration:** Salesforce React workspace with AgentCore/Strands specialist delegation, Agentforce, Box, and Databricks.
+- **Box + Salesforce Contract Lifecycle:** Salesforce React workspace with Agentforce and governed Box content.
 
 Box intake, metadata, and Automate enrichment are the entry-point path into this scenario. Build and rehearse the Box surfaces first; they are the foundation the React workspace opens on.
 
@@ -87,7 +87,7 @@ Otherwise fill only initial values first:
 - `salesforce.myDomainUrl`: your org's My Domain URL.
 - `salesforce.integrationUsername` and `integrationEmail`: the dedicated API-only user's unique username and administrator contact email.
 
-Leave generated IDs out of this file. Leave optional Agentforce, AgentCore, and Databricks values blank until those services are configured.
+Leave generated IDs out of this file. Leave optional Agentforce values blank until those services are configured.
 
 Authenticate the CLIs. For interactive operator access:
 
@@ -108,13 +108,13 @@ python3 scripts/demo_operator.py doctor
 Most common path after config seeding:
 
 ```bash
-python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --dry-run
+python3 scripts/demo_operator.py bootstrap --scenario box-salesforce-clm --dry-run
 ```
 
 When approvals are confirmed:
 
 ```bash
-python3 scripts/demo_operator.py bootstrap --scenario cross-platform-agentic-orchestration --yes
+python3 scripts/demo_operator.py bootstrap --scenario box-salesforce-clm --yes
 ```
 
 The one-shot `bootstrap` command always checks pre-requisites, avoids duplicates, and only creates missing resources.
@@ -171,14 +171,14 @@ Run the final lock-down phase after browser/admin handoff:
 
 ```bash
 python3 scripts/demo_operator.py resolve-config --allow-unresolved
-python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario box-salesforce-clm
 python3 scripts/validate_clm.py
 ```
 
-If you are running Cross-Platform Agentic Orchestration, also run:
+If you are running Box + Salesforce Contract Lifecycle, also run:
 
 ```bash
-python3 scripts/demo_operator.py validate --scenario cross-platform-agentic-orchestration
+python3 scripts/demo_operator.py validate --scenario box-salesforce-clm
 ```
 
 Then run the [integrated smoke test](smoke-test.md). Do not present as ready until that smoke test passes.
@@ -197,7 +197,7 @@ The receipt file is ignored by Git and must not contain credentials.
 
 Use the presenter script inside the scenario guide:
 
-1. [Cross-Platform Agentic Orchestration](scenarios/cross-platform-agentic-orchestration/README.md#4-presenter-script)
+1. [Box + Salesforce Contract Lifecycle](scenarios/box-salesforce-clm/README.md#4-presenter-script)
 
 Each step tells what matters, shows one proof, then explains the outcome. Avoid narrating every click.
 

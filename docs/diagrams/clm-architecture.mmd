@@ -1,0 +1,63 @@
+flowchart TB
+  intake["Contract intake event<br/>Box metadata or Salesforce opportunity"]
+
+  subgraph internal["Internal surface"]
+    mcp["MCP server<br/>Claude Desktop"]
+    copilot["Agentforce Contract Copilot"]
+  end
+
+  subgraph apex["Salesforce Apex - governed actions"]
+    package["Contract package<br/>resolve, list, cite"]
+    ask["Ask a document<br/>Box AI, scoped to one contract"]
+    docgen["Generate counter-position"]
+    sign["Prepare signature<br/>state-gated, never sends"]
+    token["Downscoped Box token<br/>one folder, short lived"]
+  end
+
+  subgraph box["Box - unstructured data"]
+    boxContent["Contracts, redlines, exhibits"]
+    boxMetadata["Metadata templates, versions"]
+    boxSign["Box Sign package"]
+  end
+
+  subgraph salesforce["Salesforce - structured data"]
+    contract["CLM_Contract__c<br/>commercial truth"]
+    approvals["Approval state and tasks"]
+    sharing["Sharing set<br/>counterparty to account"]
+  end
+
+  external["Counterparty workspace<br/>Experience Cloud, React UI bundle"]
+
+  intake --> boxMetadata
+  intake --> contract
+
+  mcp --> package
+  mcp --> ask
+  mcp --> docgen
+  mcp --> sign
+  copilot --> package
+  copilot --> ask
+
+  package <--> contract
+  package <--> boxMetadata
+  ask --> boxContent
+  docgen --> boxContent
+  sign --> boxSign
+  sign -. refuses unless approved .-> approvals
+
+  external --> token
+  token --> boxContent
+  external <--> contract
+  sharing -. bounds .-> external
+
+  classDef agent fill:#e0f2fe,stroke:#0369a1,color:#0f172a
+  classDef action fill:#ede9fe,stroke:#6d28d9,color:#0f172a
+  classDef box fill:#dbeafe,stroke:#1d4ed8,color:#0f172a
+  classDef sf fill:#dcfce7,stroke:#15803d,color:#0f172a
+  classDef control fill:#f1f5f9,stroke:#64748b,color:#0f172a
+
+  class mcp,copilot agent
+  class package,ask,docgen,sign,token action
+  class boxContent,boxMetadata,boxSign box
+  class contract,approvals,sharing sf
+  class intake,external control

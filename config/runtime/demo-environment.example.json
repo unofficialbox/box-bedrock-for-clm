@@ -22,13 +22,5 @@
   "agentforce": {
     "agentId": "",
     "applicationId": ""
-  },
-  "agentcore": {
-    "region": "",
-    "runtimeArn": ""
-  },
-  "databricks": {
-    "workspaceUrl": "",
-    "warehouseId": ""
   }
 }

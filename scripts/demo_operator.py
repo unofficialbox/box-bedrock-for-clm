@@ -27,7 +27,7 @@ DEFAULT_CONFIG = ROOT / "config/runtime/demo-environment.json"
 STATE_PATH = ROOT / "config/runtime/bootstrap-state.json"
 CLI_COMMAND_NAME = "python3 scripts/demo_operator.py"
 SCENARIOS = (
-    "cross-platform-agentic-orchestration",
+    "box-salesforce-clm",
 )
 STATUS_ICONS = {
     "success": "✅",
@@ -84,7 +84,6 @@ PORTABLE_SPECS = [
     "config/box/ai-agent-specs.bcl",
     "config/agentforce/clm-react-agentforce-spec.bcl",
     "config/salesforce/clm-contract-record.bcl",
-    "config/agentcore/agent-handoff-payloads.bcl",
     "config/clm/expert-routing.bcl",
 ]
 UPLOADS = {
@@ -342,10 +341,10 @@ def doctor(config_path: Path, *, offline: bool = False, platform: str = "all") -
 
 def generate_assets(dry_run: bool) -> None:
     print_header("Generate sample and helper artifacts")
-    for script in ["generate_sample_contract_assets.py", "generate_docgen_templates.py", "run_agentcore_mock.py"]:
+    for script in ["generate_sample_contract_assets.py", "generate_docgen_templates.py"]:
         run([sys.executable, str(ROOT / "scripts" / script)], dry_run=dry_run)
     action = "Would generate" if dry_run else "Generated"
-    _status(STATUS_ICONS["success"], f"{action} sample contracts, Doc Gen templates, and the local AgentCore trace.")
+    _status(STATUS_ICONS["success"], f"{action} sample contracts and Doc Gen templates.")
 
 
 def box_template_command(template: dict[str, Any]) -> list[str]:
@@ -871,14 +870,10 @@ def validate(config_path: Path, *, scenario: str, offline: bool = False) -> None
         "salesforce.integrationUsername": config.get("salesforce", {}).get("integrationUsername"),
         "salesforce.integrationEmail": config.get("salesforce", {}).get("integrationEmail"),
     }
-    if scenario == "cross-platform-agentic-orchestration":
+    if scenario == "box-salesforce-clm":
         required.update({
             "agentforce.agentId": config.get("agentforce", {}).get("agentId"),
             "agentforce.applicationId": config.get("agentforce", {}).get("applicationId"),
-            "agentcore.runtimeArn": config.get("agentcore", {}).get("runtimeArn"),
-            "agentcore.region": config.get("agentcore", {}).get("region"),
-            "databricks.workspaceUrl": config.get("databricks", {}).get("workspaceUrl"),
-            "databricks.warehouseId": config.get("databricks", {}).get("warehouseId"),
         })
     missing = [key for key, value in required.items() if not value]
     if missing:
@@ -934,10 +929,10 @@ def parser() -> argparse.ArgumentParser:
         description=__doc__,
         epilog=(
             "Examples:\n"
-            f"  {CLI_COMMAND_NAME} bootstrap --scenario cross-platform-agentic-orchestration --dry-run\n"
-            f"  {CLI_COMMAND_NAME} bootstrap --scenario cross-platform-agentic-orchestration --yes\n"
-            f"  {CLI_COMMAND_NAME} status --scenario cross-platform-agentic-orchestration\n"
-            f"  {CLI_COMMAND_NAME} validate --scenario cross-platform-agentic-orchestration --offline"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-salesforce-clm --dry-run\n"
+            f"  {CLI_COMMAND_NAME} bootstrap --scenario box-salesforce-clm --yes\n"
+            f"  {CLI_COMMAND_NAME} status --scenario box-salesforce-clm\n"
+            f"  {CLI_COMMAND_NAME} validate --scenario box-salesforce-clm --offline"
         ),
     )
     result.add_argument("--config", type=Path, default=DEFAULT_CONFIG)

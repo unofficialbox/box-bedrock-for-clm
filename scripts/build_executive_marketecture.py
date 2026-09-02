@@ -27,13 +27,13 @@ PROOF = (
         "copy": "AI prepares the evidence; named reviewers make the consequential decisions before downstream action.",
     },
     {
-        "path": SCREENSHOTS / "cross-platform-agentic-orchestration" / "clm-react-workspace.png",
+        "path": SCREENSHOTS / "box-salesforce-clm" / "clm-react-workspace.png",
         "label": "Engage",
         "title": "Business context where teams work",
         "copy": "The contract workspace brings governed Box content and Salesforce Agentforce context into one experience.",
     },
     {
-        "path": SCREENSHOTS / "cross-platform-agentic-orchestration" / "clm-react-redline-reviews.png",
+        "path": SCREENSHOTS / "box-salesforce-clm" / "clm-react-redline-reviews.png",
         "label": "Decide",
         "title": "Route exceptions to the right experts",
         "copy": "Redline differences become cited, domain-specific reviews for Legal, Finance, Privacy, and other owners.",
@@ -88,9 +88,6 @@ def proof_cards() -> str:
 def build() -> Path:
     box_logo = asset_data_uri("box-logo-blue.svg", "image/svg+xml")
     salesforce_logo = asset_data_uri("salesforce-logo.jpeg", "image/jpeg")
-    databricks_logo = asset_data_uri(
-        "databricks-primary-lockup-full-color.png", "image/png"
-    )
     document = f'''<!doctype html>
 <html lang="en">
 <head>
@@ -154,10 +151,6 @@ def build() -> Path:
     .section-head {{ display: grid; grid-template-columns: 1.35fr .8fr; gap: 48px; align-items: end; margin-bottom: 34px; }}
     h2 {{ margin: 0; font-size: clamp(2.5rem, 5vw, 4.5rem); line-height: 1; }}
     .section-head p {{ margin: 0; color: var(--muted); }}
-    .orchestrator {{ position: relative; width: min(760px, 100%); margin: 0 auto 48px; padding: 26px 30px; text-align: center; border: 1.5px solid #9b83e7; border-radius: var(--radius); background: var(--violet-soft); box-shadow: 0 12px 32px rgba(93, 66, 176, .09); }}
-    .orchestrator::after {{ content: ""; position: absolute; left: 50%; bottom: -49px; width: 1px; height: 48px; background: #9b83e7; }}
-    .orchestrator .platform-name {{ color: var(--violet); margin-bottom: 8px; }}
-    .orchestrator p:last-child {{ max-width: 610px; margin: 8px auto 0; color: var(--muted); }}
     .platforms {{ position: relative; display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }}
     .platform {{ position: relative; min-height: 310px; padding: 30px; border: 1.5px solid; border-radius: var(--radius); background: #fff; }}
     .platform.core {{ border-color: #6ca8ef; }} .platform.engage {{ border-color: #67babb; }} .platform.analytics {{ border-color: #e4a766; }}
@@ -167,7 +160,6 @@ def build() -> Path:
     .platform-logo img {{ display: block; max-width: 100%; object-fit: contain; }}
     .platform-logo .logo-box {{ width: 90px; height: 50px; }}
     .platform-logo .logo-salesforce {{ width: 190px; height: 72px; border-radius: 10px; }}
-    .platform-logo .logo-databricks {{ width: 170px; height: auto; }}
     .platform.analytics .platform-name {{ color: #a35a08; }}
     .platform h3 {{ margin: 0 0 16px; font-size: 1.02rem; }}
     .platform ul {{ margin: 0; padding-left: 20px; color: var(--muted); }}
@@ -269,12 +261,10 @@ def build() -> Path:
 
     <section class="section" id="architecture">
       <div class="shell">
-        <div class="section-head"><h2>Purpose-built platform roles.</h2><p>AgentCore directs work across the governed content, business context, and analytics platforms required for the target operating model.</p></div>
-        <article class="orchestrator"><p class="platform-name">AWS Bedrock AgentCore</p><h3>Cross-platform traffic director</h3><p>Supervises specialist agents, selects the right tools, maintains negotiation context, applies guardrails, and coordinates work across every system.</p></article>
+        <div class="section-head"><h2>Purpose-built platform roles.</h2><p>Governed actions direct work across the content and business-context platforms required for the target operating model.</p></div>
         <div class="platforms">
           <article class="platform core"><div class="platform-logo"><img class="logo-box" data-brand-logo="box" src="{box_logo}" alt="Box"></div><h3>Governed content foundation</h3><ul><li>Single source of truth for contracts and related content</li><li>Security, classification, retention, legal hold, and audit</li><li>Apps, Forms, Automate, AI, Hubs, Doc Gen, Sign, and collaboration</li></ul></article>
           <article class="platform engage"><div class="platform-logo"><img class="logo-salesforce" data-brand-logo="salesforce" src="{salesforce_logo}" alt="Salesforce"></div><h3>Business context and engagement</h3><ul><li>Contract requests in the flow of work</li><li>Account, opportunity, quote, and approval context</li><li>Agents for routing, grounded insights, and next-best actions</li></ul></article>
-          <article class="platform analytics"><div class="platform-logo"><img class="logo-databricks" data-brand-logo="databricks" src="{databricks_logo}" alt="Databricks"></div><h3>Intelligence and analytics foundation</h3><ul><li>Historical clause, outcome, spend, and revenue context</li><li>Governed enterprise data for specialist agents</li><li>Portfolio analytics, predictive insight, and performance measurement</li></ul></article>
         </div>
         <div class="foundation"><strong>{icon('shield')} Unified governance foundation</strong><span>Identity and access · Policy enforcement · Data protection · Monitoring and audit · Compliance and eDiscovery</span></div>
       </div>
@@ -282,7 +272,7 @@ def build() -> Path:
 
     <section class="section paths" id="adoption">
       <div class="shell">
-        <div class="section-head"><h2>Phased delivery. One target architecture.</h2><p>Sequence delivery to prove value early without changing the destination: AgentCore directing Box, Salesforce Agentforce, and Databricks with human decision boundaries intact.</p></div>
+        <div class="section-head"><h2>Phased delivery. One target architecture.</h2><p>Sequence delivery to prove value early without changing the destination: governed actions across Box and Salesforce Agentforce with human decision boundaries intact.</p></div>
         <div class="path-tabs" role="tablist" aria-label="Delivery phases">
           <button type="button" role="tab" aria-selected="true" aria-controls="path-one" id="tab-one">Establish the foundation</button>
           <button type="button" role="tab" aria-selected="false" aria-controls="path-two" id="tab-two">Scale intelligence</button>
@@ -293,8 +283,8 @@ def build() -> Path:
           <div><p class="label">Business fit</p><p>Fastest route to measurable cycle-time and consistency improvements while establishing the data and governance needed to scale.</p></div>
         </div>
         <div class="path-panel" id="path-two" role="tabpanel" aria-labelledby="tab-two">
-          <div><h3>Supervisor-directed intelligence</h3><p>Activate AgentCore as the traffic director across Box, Salesforce Agentforce, and Databricks specialist capabilities.</p><span class="readiness future">Managed AgentCore and Databricks deployment planned</span></div>
-          <div><p class="label">What teams gain</p><p class="value">Dynamic delegation, cross-system context, historical outcome analytics, deeper risk insight, and portfolio intelligence.</p></div>
+          <div><h3>Portfolio-wide intelligence</h3><p>Extend the governed actions across contract portfolios and business units.</p><span class="readiness future">Planned</span></div>
+          <div><p class="label">What teams gain</p><p class="value">Cross-system context, deeper risk insight, and portfolio intelligence.</p></div>
           <div><p class="label">Business fit</p><p>Scale the target architecture across contract portfolios, business units, and decision patterns after the foundation proves control and value.</p></div>
         </div>
       </div>

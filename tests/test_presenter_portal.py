@@ -32,7 +32,7 @@ class PresenterPortalTests(unittest.TestCase):
         for page in module.PAGES:
             self.assertIn(f'href="{page.filename}"', source)
             self.assertIn(page.title, source)
-        self.assertIn('href="07-complete-presenter-edition.html"', source)
+        self.assertIn('href="06-complete-presenter-edition.html"', source)
         self.assertEqual(source.count('class="card '), len(module.PAGES))
         self.assertNotRegex(source, r'(?:src|href)=["\']https?://')
 

@@ -183,7 +183,7 @@ class DemoOperatorTests(unittest.TestCase):
         args = demo_operator.parser().parse_args([
             "bootstrap",
             "--yes",
-            "--scenario", "cross-platform-agentic-orchestration",
+            "--scenario", "box-salesforce-clm",
             "--dry-run",
         ])
         self.assertEqual(args.command, "bootstrap")
@@ -214,7 +214,7 @@ class DemoOperatorTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             path = self.write_config(directory, box={"parentFolderId": "123", "enterpriseId": "456"})
             with self.assertRaisesRegex(demo_operator.OperatorError, "appUrl"):
-                demo_operator.validate(path, scenario="cross-platform-agentic-orchestration", offline=True)
+                demo_operator.validate(path, scenario="box-salesforce-clm", offline=True)
 
     def test_resolve_value_reports_and_replaces_bindings(self):
         unresolved = set()
@@ -263,7 +263,7 @@ class DemoOperatorTests(unittest.TestCase):
                 with self.assertRaisesRegex(demo_operator.OperatorError, "Add --yes"):
                     demo_operator.provision(
                         config_path,
-                        scenario="cross-platform-agentic-orchestration",
+                        scenario="box-salesforce-clm",
                         dry_run=False,
                         allow_unresolved=True,
                         skip_validate=True,
@@ -282,7 +282,7 @@ class DemoOperatorTests(unittest.TestCase):
                 with redirect_stdout(io.StringIO()):
                     demo_operator.provision(
                         config_path,
-                        scenario="cross-platform-agentic-orchestration",
+                        scenario="box-salesforce-clm",
                         dry_run=True,
                         allow_unresolved=True,
                         skip_validate=True,

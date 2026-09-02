@@ -21,15 +21,13 @@ class ExecutiveMarketectureTests(unittest.TestCase):
             output = module.build()
             document = output.read_text(encoding="utf-8")
 
-        self.assertIn("Cross-platform traffic director", document)
-        self.assertIn("AWS Bedrock AgentCore", document)
+        self.assertIn("Governed content foundation", document)
         self.assertIn("Salesforce Agentforce", document)
-        self.assertIn("Databricks", document)
         self.assertNotIn("Optional orchestration", document)
-        self.assertEqual(document.count("data:image/png;base64,"), 9)
+        self.assertEqual(document.count("data:image/png;base64,"), 8)
         self.assertEqual(document.count("data:image/jpeg;base64,"), 1)
         self.assertGreaterEqual(document.count("data:image/svg+xml;base64,"), 1)
-        for brand in ("box", "salesforce", "databricks"):
+        for brand in ("box", "salesforce"):
             self.assertIn(f'data-brand-logo="{brand}"', document)
         self.assertIsNone(re.search(r'(?:src|href)=["\']https?://', document))
 

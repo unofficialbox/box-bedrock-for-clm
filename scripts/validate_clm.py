@@ -42,23 +42,21 @@ MAX_TEXT_BYTES = 5_000_000
 # Canonical contracts, kept as named sets so checks compare membership instead of
 # asserting bare counts (which silently pass when the wrong item is added/removed).
 EXPECTED_SCENARIOS = {
-    "cross-platform-agentic-orchestration",
+    "box-salesforce-clm",
 }
 DETERMINISTIC_DATA_FIXTURES = (
     "json/northstar-clm-records.json",
     "json/clause-playbook.json",
-    "csv/historical-clause-outcomes.csv",
 )
 EXPECTED_PRESENTERS = {
     "index.html",
     "00-operator-setup-guide.html",
-    "01-cross-platform-agentic-orchestration-guide.html",
-    "02-cross-platform-agentic-orchestration-gallery.html",
+    "01-box-salesforce-clm-guide.html",
+    "02-box-salesforce-clm-gallery.html",
     "03-executive-marketecture.html",
-    "04-agentcore-agent-experience-marketecture.html",
-    "05-customer-solution-datasheet.html",
-    "06-contract-lifecycle-readiness-marketecture.html",
-    "07-complete-presenter-edition.html",
+    "04-customer-solution-datasheet.html",
+    "05-contract-lifecycle-readiness-marketecture.html",
+    "06-complete-presenter-edition.html",
 }
 RUNTIME_ID_SUFFIXES = {".md", ".json", ".py", ".ts", ".tsx", ".js", ".xml", ".sh", ".yml", ".yaml", ".toml", ".env", ".properties"}
 SECRET_ASSIGNMENT = re.compile(
@@ -239,22 +237,6 @@ def load_script(name: str, root: Path = ROOT):
     return module
 
 
-def normalized_trace(path: Path) -> dict:
-    data = json.loads(path.read_text(encoding="utf-8"))
-
-    def remove_timestamps(value):
-        if isinstance(value, dict):
-            return {
-                key: remove_timestamps(item)
-                for key, item in value.items()
-                if key not in {"generatedAt", "timestamp"}
-            }
-        if isinstance(value, list):
-            return [remove_timestamps(item) for item in value]
-        return value
-
-    return remove_timestamps(data)
-
 
 def docx_semantic_archive(path: Path) -> dict[str, bytes]:
     with zipfile.ZipFile(path) as archive:
@@ -308,17 +290,6 @@ def check_generated_fixtures(root: Path = ROOT) -> str:
                 f"unexpected={sorted(generated_pdfs - committed_pdfs)}"
             )
 
-        trace_runs: list[Path] = []
-        for index in range(2):
-            module = load_script("run_agentcore_mock", root)
-            module.OUT = temporary / f"trace-{index}"
-            module.OUT.mkdir(parents=True, exist_ok=True)
-            module.main(use_runtime=False)
-            trace_runs.append(module.OUT / "northstar-agentcore-trace.json")
-        committed_trace = root / "output" / "agentcore" / "northstar-agentcore-trace.json"
-        if normalized_trace(trace_runs[0]) != normalized_trace(trace_runs[1]) or normalized_trace(trace_runs[0]) != normalized_trace(committed_trace):
-            raise ValidationError("AgentCore trace differs beyond the generated timestamp")
-
         docgen_runs: list[Path] = []
         for index in range(2):
             module = load_script("generate_docgen_templates", root)
@@ -355,9 +326,8 @@ def check_generated_presenters(root: Path = ROOT) -> str:
         module.build()
         for name, filename in (
             ("build_executive_marketecture", "03-executive-marketecture.html"),
-            ("build_agentcore_primary_marketecture", "04-agentcore-agent-experience-marketecture.html"),
-            ("build_customer_datasheet", "05-customer-solution-datasheet.html"),
-            ("build_contract_lifecycle_readiness_marketecture", "06-contract-lifecycle-readiness-marketecture.html"),
+            ("build_customer_datasheet", "04-customer-solution-datasheet.html"),
+            ("build_contract_lifecycle_readiness_marketecture", "05-contract-lifecycle-readiness-marketecture.html"),
         ):
             module = load_script(name, root)
             module.OUTPUT = output / filename
@@ -547,10 +517,10 @@ def check_live_receipts(root: Path = ROOT, *, required: bool) -> str:
         for receipt in receipts
         if receipt.get("status") == "passed" and receipt.get("actionMode") == "live"
     }
-    expected = {"Box", "Salesforce", "AgentCore", "Databricks"}
+    expected = {"Box", "Salesforce"}
     if platforms != expected:
         raise ValidationError(f"Live receipt coverage is incomplete: expected={sorted(expected)} actual={sorted(platforms)}")
-    return "Box, Salesforce, AgentCore, and Databricks receipts"
+    return "Box and Salesforce receipts"
 
 
 def check_react_script(script: str, root: Path = ROOT) -> str:

@@ -27,22 +27,21 @@ SCENARIOS = (
         "sources": [
             ROOT / "docs" / "operator" / "start-here.md",
             ROOT / "docs" / "operator" / "browser-configuration.md",
-            ROOT / "docs" / "operator" / "cross-platform-deployment.md",
             ROOT / "docs" / "operator" / "smoke-test.md",
         ],
         "accent": "#f4c86a",
         "accent_2": "#5a95ff",
         "label": "Fresh-environment setup for human and AI-assisted operators",
-        "brands": ("box", "salesforce", "databricks"),
+        "brands": ("box", "salesforce"),
     },
     {
         "order": "01",
-        "slug": "cross-platform-agentic-orchestration",
-        "source": ROOT / "docs" / "operator" / "scenarios" / "cross-platform-agentic-orchestration" / "README.md",
+        "slug": "box-salesforce-clm",
+        "source": ROOT / "docs" / "operator" / "scenarios" / "box-salesforce-clm" / "README.md",
         "accent": "#a98bff",
         "accent_2": "#5aaeff",
         "label": "Supervisor-led, multi-platform orchestration",
-        "brands": ("box", "salesforce", "databricks"),
+        "brands": ("box", "salesforce"),
     },
 )
 
@@ -71,7 +70,6 @@ def brand_logos(names: tuple[str, ...]) -> str:
     assets = {
         "box": ("box-logo-blue.svg", "Box"),
         "salesforce": ("salesforce-logo.jpeg", "Salesforce"),
-        "databricks": ("databricks-primary-lockup-full-color.png", "Databricks"),
     }
     return "".join(
         f'<img class="brand-logo brand-logo-{name}" data-brand-logo="{name}" '
@@ -424,7 +422,6 @@ def stylesheet(accent: str, accent_2: str) -> str:
     .platform-logos img {{ display: block; max-width: 148px; height: 42px; object-fit: contain; border-radius: 0; background: transparent; }}
     .platform-logos .brand-logo-box {{ width: 76px; }}
     .platform-logos .brand-logo-salesforce {{ width: 128px; height: 46px; border-radius: 8px; }}
-    .platform-logos .brand-logo-databricks {{ width: 142px; }}
     .print-button {{
       border: 1px solid var(--line);
       border-radius: 999px;
