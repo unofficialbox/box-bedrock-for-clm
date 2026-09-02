@@ -2,6 +2,9 @@
 
 # Contract Lifecycle Management Demo
 
+> **Presenting?** Open **[`DEMO-RUN-SHEET.html`](DEMO-RUN-SHEET.html)** — the six-beat run sheet:
+> preflight checks, every prompt as copy-paste, and what each beat should return.
+
 This repository contains a mature Contract Lifecycle Management demo with a cross-platform orchestration scenario, deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter output.
 
 ## Choose one path
