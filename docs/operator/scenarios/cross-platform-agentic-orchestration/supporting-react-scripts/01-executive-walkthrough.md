@@ -39,7 +39,7 @@ remains unbuilt. Every beat below is verified against the live org and live Box.
 
 | Check | How |
 |---|---|
-| Three Calder contracts exist: `CLM-SAMPLE-CAL-2022`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
+| Three Calder contracts exist: `CLM-2022-0873`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
 | Calder contract has a Box folder with a **direct** collaboration for the configured Box user | `GET /2.0/folders/<id>/collaborations` -- inherited access does not downscope |
 | `clmDocument` metadata applied to the Calder and Northstar documents | Otherwise beat 2's query returns nothing |
 | `CLM_Box_Config__c.Clause_Library_Hub_Id__c` is populated and the Hub holds the `CLM-LIAB-*` clauses | Beat 3 depends on it entirely |
@@ -164,7 +164,7 @@ Verified live on 2026-09-01 across all three documents, with per-file citations.
 
 **Show**
 
-- `counter-position-CLM-SAMPLE-CAL-2026.pdf` appearing in the contract's own Box folder.
+- `counter-position-CLM-2026-0104.pdf` appearing in the contract's own Box folder.
 - The memo: clause at issue, what their draft says, `CLM-LIAB-001` and the `CLM-LIAB-002`
   fallback, **Commercial Legal** as the deviation owner, the precedent, the proposed
   counter-position.
@@ -178,7 +178,7 @@ Verified live on 2026-09-01 across all three documents, with per-file citations.
 
 **Then show the boundary.** Ask for it to be sent for signature:
 
-> Contract CLM-SAMPLE-CAL-2026 is Legal Review, not approved for signature. Signature is
+> Contract CLM-2026-0104 is Legal Review, not approved for signature. Signature is
 > blocked until the named approver completes their review; I cannot move it forward myself.
 
 That refusal is a state check in Apex, not a prompt instruction. Once the contract *is*

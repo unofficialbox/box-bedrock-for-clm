@@ -8,7 +8,7 @@
  * distinct from "the folder is empty".
  *
  * The listing itself was verified against the live org and live Box on 2026-09-01:
- * `CLM-SAMPLE-NST-2024` returned all nine documents with their Box file IDs, and
+ * `CLM-2024-0311` returned all nine documents with their Box file IDs, and
  * `box__BoxAIAskByItemId` answered from the insurance certificate with real figures.
  */
 @IsTest

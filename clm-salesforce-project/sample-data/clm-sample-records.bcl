@@ -46,7 +46,7 @@ locals {
             {
               "businessOwner" = "Northstar Master Contract Owner"
               "contractFile" = "northstar-msa-2026-redline.docx"
-              "contractId" = "CLM-SAMPLE-NST-001"
+              "contractId" = "CLM-2026-0042"
               "contractType" = "MSA Package"
               "counterparty" = "Northstar Health"
               "counterpartyAccount" = "Northstar Health"
@@ -67,7 +67,7 @@ locals {
             {
               "businessOwner" = "Northstar Master Contract Owner"
               "contractFile" = "northstar-msa-2024-executed.pdf"
-              "contractId" = "CLM-SAMPLE-NST-2024"
+              "contractId" = "CLM-2024-0311"
               "contractType" = "MSA Package"
               "counterparty" = "Northstar Health"
               "counterpartyAccount" = "Northstar Health"
@@ -88,7 +88,7 @@ locals {
             {
               "businessOwner" = "Northstar Master Contract Owner"
               "contractFile" = "northstar-msa-2025-executed.pdf"
-              "contractId" = "CLM-SAMPLE-NST-2025"
+              "contractId" = "CLM-2025-0148"
               "contractType" = "MSA Package"
               "counterparty" = "Northstar Health"
               "counterpartyAccount" = "Northstar Health"
@@ -108,7 +108,7 @@ locals {
             }
             {
               "businessOwner" = "Acme Cloud Contract Owner"
-              "contractId" = "CLM-SAMPLE-ACM-001"
+              "contractId" = "CLM-2026-0088"
               "contractType" = "SOW"
               "counterparty" = "Acme Cloudworks"
               "counterpartyAccount" = "Acme Cloudworks"

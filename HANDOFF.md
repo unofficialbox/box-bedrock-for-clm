@@ -232,7 +232,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    a callout after DML.
 
    **The agent answers end to end, verified in the Agentforce Builder preview on
-   2026-09-01.** "Summarize the insurance certificate for CLM-SAMPLE-NST-2024: dollar
+   2026-09-01.** "Summarize the insurance certificate for CLM-2024-0311: dollar
    amounts and expiration dates" returns the three coverages with their limits and
    2027-06-30 expiries, citing `northstar-insurance-certificate.pdf`, in one turn. The
    trace reads Contract Router -> document answers -> get contract package -> ask box ai ->
@@ -594,7 +594,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    (fixture data). One missing mapping, three symptoms. It now has a provisioned folder
    carrying the seven documents of the 2026 negotiation. The 2024 and 2025 executed MSAs are
    deliberately *not* in it: they belong to their own contracts, and copying them would
-   repeat the shape `CLM-SAMPLE-NST-2024`'s folder already has, where one folder holds every
+   repeat the shape `CLM-2024-0311`'s folder already has, where one folder holds every
    Northstar document regardless of which contract it belongs to.
 
    That folder is now the better demonstration of the filter, because the same folder answers

@@ -12,9 +12,9 @@
  * Uploads run asynchronously in Queueables.
  */
 Map<String, String> fileByContract = new Map<String, String>{
-    'CLM-SAMPLE-NST-2024' => 'Clm_Sample_Msa_2024_Executed:northstar-msa-2024-executed.pdf',
-    'CLM-SAMPLE-NST-2025' => 'Clm_Sample_Msa_2025_Executed:northstar-msa-2025-executed.pdf',
-    'CLM-SAMPLE-NST-001'  => 'Clm_Sample_Msa_2026_Redline:northstar-msa-2026-redline.docx'
+    'CLM-2024-0311' => 'Clm_Sample_Msa_2024_Executed:northstar-msa-2024-executed.pdf',
+    'CLM-2025-0148' => 'Clm_Sample_Msa_2025_Executed:northstar-msa-2025-executed.pdf',
+    'CLM-2026-0042'  => 'Clm_Sample_Msa_2026_Redline:northstar-msa-2026-redline.docx'
 };
 
 // Upload into the contract's Opportunity Box folder (Opportunity is the Box-mapped object).

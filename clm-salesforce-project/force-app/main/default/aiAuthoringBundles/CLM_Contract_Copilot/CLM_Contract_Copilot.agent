@@ -100,7 +100,7 @@ subagent document_answers:
 
               STEP 1: Call {!@actions.get_contract_package} immediately, with inputContract set to
               the contract reference in the person's message -- for example CLM-2026-0017 or
-              CLM-SAMPLE-NST-2024. Do this as your very first act, before writing any reply. It
+              CLM-2024-0311. Do this as your very first act, before writing any reply. It
               returns the Salesforce record, the governed Box folder, and every document with its
               Box file ID, and it is the only source of Box file IDs. If the message names no
               contract at all, ask for the reference and nothing else, then stop.
