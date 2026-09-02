@@ -70,6 +70,41 @@ private class ClmBoxAskDocumentTest {
     }
 
     @IsTest
+    static void refusesAFileFromAnotherContractEvenWhenTheReferenceResolves() {
+        // The reference is now filled by the model rather than read from a variable, so
+        // this check is the only thing standing between "ask about this contract" and
+        // "read any Box file". It has to refuse on the file, not merely on an unresolvable
+        // contract -- so the package here resolves, and returns a different file.
+        configure();
+        ClmContractPackage.documentIdsOverride = new Set<String>{ '111111111' };
+        BoxMock mock = new BoxMock(200, '{"answer":"should not be reached"}');
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        ClmBoxAskDocument.Result result = run('222222222', 'What are the limits?', 'file', 'CLM-2026-0017');
+        Test.stopTest();
+
+        System.assertEquals(false, result.answered);
+        System.assert(result.answer.contains('not in the Box folder'), result.answer);
+        System.assertEquals(null, mock.sentBody, 'An out-of-scope file must never reach Box AI.');
+    }
+
+    @IsTest
+    static void answersAFileThatDoesBelongToTheNamedContract() {
+        configure();
+        ClmContractPackage.documentIdsOverride = new Set<String>{ '222222222' };
+        BoxMock mock = new BoxMock(200, '{"answer":"Three coverages, expiring 2027-06-30."}');
+        Test.setMock(HttpCalloutMock.class, mock);
+
+        Test.startTest();
+        ClmBoxAskDocument.Result result = run('222222222', 'What are the limits?', 'file', 'CLM-2026-0017');
+        Test.stopTest();
+
+        System.assertEquals(true, result.answered, result.answer);
+        System.assert(mock.sentBody.contains('222222222'), mock.sentBody);
+    }
+
+    @IsTest
     static void refusesWhenNoContractIsNamed() {
         configure();
         Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"answer":"should not be reached"}'));

@@ -4,6 +4,14 @@ import type { ClmContractSummary } from "./contracts";
 /**
  * Read contracts through the GraphQL UI API instead of custom Apex.
  *
+ * The projection deliberately omits Risk_Level__c. It is Acme's own assessment of a
+ * contract rather than a fact about it, and this page faces the counterparty -- the same
+ * reason the redline queue went. Leaving it out of the query is what lets the permission
+ * set withhold the field: UI API rejects the *whole* query when any selected field is
+ * hidden, so selecting a field the reader cannot see returns nothing at all rather than a
+ * row with one blank column. That failure is silent and looks exactly like "this
+ * counterparty has no contracts".
+ *
  * This is the pattern the official React-on-Platform recipes use
  * (trailheadapps/multiframework-recipes). It runs as the logged-in user, so sharing and
  * field-level security are enforced by the platform rather than by a hand-written
@@ -25,11 +33,12 @@ const GET_CLM_CONTRACTS = gql`
               Name { value }
               Contract_ID__c { value }
               Counterparty__c { value }
+              Counterparty_Entity__c { value }
               Contract_Type__c { value }
               Status__c { value }
-              Risk_Level__c { value }
               Deal_Value__c { value }
               Term_Months__c { value }
+              End_Date__c { value }
               Box_Workspace_Folder_ID__c { value }
             }
           }
@@ -48,11 +57,12 @@ interface ContractNode {
   Name?: FieldValue<string>;
   Contract_ID__c?: FieldValue<string>;
   Counterparty__c?: FieldValue<string>;
+  Counterparty_Entity__c?: FieldValue<string>;
   Contract_Type__c?: FieldValue<string>;
   Status__c?: FieldValue<string>;
-  Risk_Level__c?: FieldValue<string>;
   Deal_Value__c?: FieldValue<number>;
   Term_Months__c?: FieldValue<number>;
+  End_Date__c?: FieldValue<string>;
   Box_Workspace_Folder_ID__c?: FieldValue<string>;
 }
 
@@ -91,11 +101,12 @@ export async function fetchContractsViaGraphql(): Promise<ClmContractSummary[] |
         name: node.Name?.value ?? undefined,
         contractId: node.Contract_ID__c?.value ?? undefined,
         counterparty: node.Counterparty__c?.value ?? undefined,
+        counterpartyEntity: node.Counterparty_Entity__c?.value ?? undefined,
         contractType: node.Contract_Type__c?.value ?? undefined,
         status: node.Status__c?.value ?? undefined,
-        riskLevel: node.Risk_Level__c?.value ?? undefined,
         dealValue: node.Deal_Value__c?.value ?? undefined,
         termMonths: node.Term_Months__c?.value ?? undefined,
+        endDate: node.End_Date__c?.value ?? undefined,
         boxFolderId: node.Box_Workspace_Folder_ID__c?.value ?? undefined,
       }];
     });

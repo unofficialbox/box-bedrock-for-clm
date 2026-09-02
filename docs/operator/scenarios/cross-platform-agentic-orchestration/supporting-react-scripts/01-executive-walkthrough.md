@@ -39,7 +39,7 @@ remains unbuilt. Every beat below is verified against the live org and live Box.
 
 | Check | How |
 |---|---|
-| Three Calder contracts exist: `CLM-SAMPLE-CAL-2022`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
+| Three Calder contracts exist: `CLM-2022-0873`, `-2024` (both Executed) and `-2026` (Legal Review) | Beat 4 needs the two executed ones |
 | Calder contract has a Box folder with a **direct** collaboration for the configured Box user | `GET /2.0/folders/<id>/collaborations` -- inherited access does not downscope |
 | `clmDocument` metadata applied to the Calder and Northstar documents | Otherwise beat 2's query returns nothing |
 | `CLM_Box_Config__c.Clause_Library_Hub_Id__c` is populated and the Hub holds the `CLM-LIAB-*` clauses | Beat 3 depends on it entirely |
@@ -78,8 +78,16 @@ Salesforce; the document never leaves Box.
 
 **Show**
 
-- One `search_files_metadata` query against the `clmDocument` template, `clauseRisk = Critical`.
+- One `search_files_metadata` query against the `clmDocument` template, `clauseRisk = Critical`,
+  **scoped by `ancestor_folder_id` to the CLM Root folder**.
 - Two files come back, on **two different papers** -- the Northstar redline and the Calder draft.
+
+**Scope the query or it is wrong on stage.** Box metadata is enterprise-wide, so an unscoped
+search also returns documents from earlier demo environments -- folders like
+`CLM-2026-Northstar1` that are not governed contract folders at all. Those carry the same
+file names as the current copies but different file IDs, which reads to an audience as the
+wrong account appearing. `ancestor_folder_id` is what makes the query mean "across the
+governed portfolio" rather than "across everything anyone ever uploaded".
 
 **Land**
 
@@ -156,7 +164,7 @@ Verified live on 2026-09-01 across all three documents, with per-file citations.
 
 **Show**
 
-- `counter-position-CLM-SAMPLE-CAL-2026.pdf` appearing in the contract's own Box folder.
+- `counter-position-CLM-2026-0104.pdf` appearing in the contract's own Box folder.
 - The memo: clause at issue, what their draft says, `CLM-LIAB-001` and the `CLM-LIAB-002`
   fallback, **Commercial Legal** as the deviation owner, the precedent, the proposed
   counter-position.
@@ -170,7 +178,7 @@ Verified live on 2026-09-01 across all three documents, with per-file citations.
 
 **Then show the boundary.** Ask for it to be sent for signature:
 
-> Contract CLM-SAMPLE-CAL-2026 is Legal Review, not approved for signature. Signature is
+> Contract CLM-2026-0104 is Legal Review, not approved for signature. Signature is
 > blocked until the named approver completes their review; I cannot move it forward myself.
 
 That refusal is a state check in Apex, not a prompt instruction. Once the contract *is*
@@ -196,11 +204,10 @@ opens it, sees the signer, and presses send. Verified live in all three states.
 > to one folder. The analysis from beat 3 -- our positions, our fallbacks, our owner -- never
 > crosses to this side.
 
-**Do not extend this claim to the agent.** The workspace is scoped by the signed-in identity;
-the Copilot is not, and cannot be on this surface. See **Known constraints**.
-
-**Presenter warning:** do not invite the audience to prompt the Copilot here. See
-**Known constraints**.
+**There is no agent on this page, and that is the point to make.** Everything a
+counterparty would ask one -- is it signed, what did we agree, what do you need from me --
+is already on the screen. What an agent could reach that they cannot -- the redlines, the
+approved clause library, our fallback positions -- is the reason it is not here.
 
 ## Close
 
@@ -222,21 +229,22 @@ the Copilot is not, and cannot be on this surface. See **Known constraints**.
 
 Read these before presenting. Each is a real limitation, not a setup error.
 
-- **The Contract Copilot is not identity-scoped.** It is a Service Agent
-  (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its assigned agent user, and its
-  contract argument is filled from the conversation -- so a counterparty can ask it about
-  another company's contract by naming it. The scoping in beat 4 is the *workspace*, not the
-  agent. Keep the Copilot out of the counterparty half of this demo.
+- **The counterparty app carries no agent, and that was a decision.** The Copilot it used to
+  host is a Service Agent (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its
+  assigned agent user rather than as the person signed in, and takes the contract it answers
+  about from the conversation. None of the page's scoping reached it: it could read a redline
+  the page withholds, and the clause library holding Acme's negotiating positions. Nothing a
+  counterparty would ask it is absent from the page.
 
   This is a property of the agent type, not of Agentforce. An **Employee Agent** inherits the
-  permissions of the logged-in user and takes no agent user, which is the surface where
-  "same agent, different access" would hold.
+  permissions of the logged-in user and takes no agent user, which is the surface on which a
+  conversational beat is worth building.
 - **Login As is unavailable for the counterparty user.** The Customer Community licence does
   not offer it, and the org preference is already enabled. Set the user's password by reset
   and sign in to the site in a private window instead.
 - **Contract folders need a direct Box collaboration.** A freshly provisioned folder inherits
-  access, which is not enough to downscope a token; the workspace falls back to fixtures with
-  an `invalid_resource` error that reads like a scope problem. `ClmBoxFolderService` grants it
+  access, which is not enough to downscope a token; the workspace reports an
+  `invalid_resource` error that reads like a scope problem. `ClmBoxFolderService` grants it
   on provisioning -- verify it for any folder created another way.
 - **The `clmContract` template is not applied to folders**, so contract-level facts are not
   searchable and beat 2 stays at document level.

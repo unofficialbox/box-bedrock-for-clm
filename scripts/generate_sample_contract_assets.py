@@ -783,6 +783,151 @@ def build_calder_executed(
     return path
 
 
+def build_calder_sow(year, sow_ref, charges, services, po_number):
+    """A Statement of Work under the Calder master agreement.
+
+    On the Company's form, like everything else in this deal, and deliberately consistent
+    with the master: sixty-day payment at 6.1, the purchase-order condition that sends an
+    invoice back unpaid, and the twenty-four month price freeze at 6.3. The SOW is where a
+    reader checks whether the commercial terms match the record, so those three have to be
+    the same numbers the MSA uses.
+    """
+    path = PDF_OUT / f"calder-sow-{year}.pdf"
+    story = doc_header(
+        f"Statement of Work {sow_ref}",
+        f"Calder Financial Group plc and Acme Robotics, Inc. | Under the Master Agreement for Supplier Services | CLM-{year}-Calder",
+    )
+    story += [
+        p(f"This Statement of Work is entered into under, and is governed by, the Master Agreement for Supplier Services between the parties. Capitalised terms have the meaning given in that Agreement. Where this Statement of Work conflicts with the Agreement, the Agreement prevails."),
+        section("1. SERVICES"),
+        p(services),
+        section("2. TERM"),
+        p(f"This Statement of Work commences on execution and continues for twenty-four months unless terminated in accordance with the Agreement."),
+        section("3. CHARGES"),
+        table(
+            [
+                ["Item", "Basis", "Amount"],
+                ["Platform subscription", "Annual, in advance", charges],
+                ["Implementation services", "Fixed price, on milestone", "As set out in Schedule 1"],
+                ["Support", "Included", "Nil"],
+            ],
+            widths=[2.3 * inch, 2.3 * inch, 2.3 * inch],
+        ),
+        p(f"3.1 Invoices must quote purchase order number <b>{po_number}</b>. Invoices without a valid purchase order number will be returned unpaid, in accordance with clause 6.1 of the Agreement."),
+        p("3.2 The Company shall pay valid and undisputed invoices within sixty days of receipt."),
+        p("3.3 Charges are fixed for the first twenty-four months. Thereafter any increase requires ninety days' notice and shall not exceed the lesser of CPI and three per cent per annum."),
+        section("4. SERVICE LEVELS"),
+        table(
+            [
+                ["Measure", "Target", "Measurement window"],
+                ["Platform availability", "99.5% excluding planned maintenance", "Calendar month"],
+                ["Priority 1 response", "Within 1 hour", "24x7"],
+                ["Priority 2 response", "Within 4 business hours", "Business hours"],
+            ],
+            widths=[2.3 * inch, 2.6 * inch, 2.0 * inch],
+        ),
+        section("5. COMPANY DEPENDENCIES"),
+        p("The Company shall provide timely access to nominated personnel, test environments and data necessary for the Supplier to perform. Delay attributable to a Company dependency does not constitute Supplier non-performance for the purposes of clause 22.4 of the Agreement."),
+        section("6. GOVERNANCE"),
+        p("The parties shall hold a monthly service review and a quarterly commercial review. The Supplier shall report against the service levels above at each service review."),
+        Spacer(1, 0.2 * inch),
+        p("This synthetic statement of work is designed for contract-lifecycle demonstrations. Names, terms, and provisions are fictional and are not legal advice.", "Small"),
+    ]
+    make_doc(path).build(story)
+    return path
+
+
+def build_calder_dpa():
+    """Calder's data processing schedule for the 2026 negotiation.
+
+    Written to sit under the customer paper rather than beside it: it points back at
+    Article 14 for the security measures and at Article 11 for regulator access, so a
+    reader following the liability question through the package finds the same
+    twenty-four-hour notification obligation stated twice and can see it is not a drafting
+    accident.
+    """
+    path = PDF_OUT / "calder-dpa-2026.pdf"
+    story = doc_header(
+        "Data Processing Schedule",
+        "Calder Financial Group plc and Acme Robotics, Inc. | Schedule 4 to the Master Agreement | CLM-2026-Calder",
+    )
+    story += [
+        p("This Schedule forms part of the Master Agreement for Supplier Services. The Company is the controller and the Supplier is the processor in respect of Company Data processed under the Agreement."),
+        section("1. SUBJECT MATTER AND DURATION"),
+        p("The Supplier processes Company Data for the term of the Agreement and for no longer than is necessary to provide the Services, subject to the return and destruction obligation at clause 14.2 of the Agreement."),
+        section("2. NATURE AND PURPOSE"),
+        table(
+            [
+                ["Category", "Detail"],
+                ["Data subjects", "Company employees, contractors, and customers of the Company"],
+                ["Personal data", "Name, business contact details, role, system identifiers, transaction records"],
+                ["Special categories", "None permitted without the Company's prior written consent"],
+                ["Processing", "Hosting, analysis, support, and reporting in connection with the Services"],
+            ],
+            widths=[1.6 * inch, 5.0 * inch],
+        ),
+        section("3. SECURITY MEASURES"),
+        p("The Supplier shall implement technical and organisational measures no less protective than the Company's Information Security Standard, as required by clause 14.1 of the Agreement. Measures include encryption in transit and at rest, least-privilege access control, logging and monitoring, vulnerability management, and annual independent penetration testing."),
+        section("4. PERSONAL DATA BREACH"),
+        p("The Supplier shall notify the Company of any actual or suspected personal data breach <b>within twenty-four hours</b> of becoming aware of it, and shall provide the information the Company reasonably requires to meet its own regulatory notification deadlines. This mirrors, and does not replace, the incident notification obligation at clause 14.1."),
+        section("5. SUB-PROCESSORS"),
+        p("The Supplier shall not appoint a sub-processor without the Company's prior written consent, and remains fully liable for the acts and omissions of any approved sub-processor, consistent with clause 11.2 of the Agreement."),
+        section("6. AUDIT AND REGULATOR ACCESS"),
+        p("The Supplier shall make available the information necessary to demonstrate compliance with this Schedule and shall permit audits by the Company and by each Regulator, on the access terms set out at clause 11.1 of the Agreement."),
+        section("7. INTERNATIONAL TRANSFERS"),
+        p("The Supplier shall not transfer Company Data outside the United Kingdom or the European Economic Area without the Company's prior written consent and an approved transfer mechanism."),
+        Spacer(1, 0.2 * inch),
+        p("This synthetic data processing schedule is designed for contract-lifecycle demonstrations. Names, terms, and provisions are fictional and are not legal advice.", "Small"),
+    ]
+    make_doc(path).build(story)
+    return path
+
+
+def build_calder_security_standard():
+    """The Company's Information Security Standard.
+
+    Article 3.2 and clause 14.1 of the customer paper both bind Acme to this document
+    without reproducing any of it, which is exactly how customer paper works: the
+    obligation is a reference, and the reference is where the actual requirements live.
+    Putting it in the folder is what lets someone answer "what did we actually sign up to"
+    rather than "the MSA says we comply with their standard".
+    """
+    path = PDF_OUT / "calder-supplier-security-standard.pdf"
+    story = doc_header(
+        "Information Security Standard for Suppliers",
+        "Calder Financial Group plc | Third Party Security Standard TPS-2024 rev.2 | Referenced at Articles 3.2 and 14.1",
+    )
+    story += [
+        p("This Standard applies to every supplier processing Company Data or connecting to Company systems. Compliance is a contractual obligation under the Master Agreement for Supplier Services. Deviations require a documented exception approved by the Company's Chief Information Security Officer."),
+        section("1. ACCESS CONTROL"),
+        p("Multi-factor authentication for all administrative and remote access. Access reviewed quarterly and revoked within twenty-four hours of a leaver event. No shared accounts. Privileged access recorded and session-logged."),
+        section("2. ENCRYPTION"),
+        p("Company Data encrypted in transit using TLS 1.2 or above, and at rest using AES-256 or an equivalent approved algorithm. Key management documented and keys rotated at least annually."),
+        section("3. VULNERABILITY AND PATCH MANAGEMENT"),
+        table(
+            [
+                ["Severity", "Remediation window"],
+                ["Critical", "72 hours"],
+                ["High", "14 days"],
+                ["Medium", "60 days"],
+            ],
+            widths=[2.2 * inch, 4.4 * inch],
+        ),
+        section("4. INCIDENT MANAGEMENT"),
+        p("The supplier shall notify the Company of any actual or suspected security incident affecting Company Data <b>within twenty-four hours</b> of becoming aware of it, and shall provide a written root cause analysis within ten business days of closure."),
+        section("5. RESILIENCE"),
+        p("Documented business continuity and disaster recovery plans, tested at least annually, with a recovery time objective of four hours and a recovery point objective of fifteen minutes for services supporting a material outsourcing."),
+        section("6. ASSURANCE"),
+        p("Annual independent penetration test, with the summary report provided to the Company on request. Current ISO/IEC 27001 certification or an equivalent recognised by the Company. Annual completion of the Company's third party security questionnaire."),
+        section("7. PERSONNEL"),
+        p("Background screening for all personnel with access to Company Data, to the standard applicable in the relevant jurisdiction, and annual security awareness training."),
+        Spacer(1, 0.2 * inch),
+        p("This synthetic security standard is designed for contract-lifecycle demonstrations. Names, terms, and provisions are fictional and are not legal advice.", "Small"),
+    ]
+    make_doc(path).build(story)
+    return path
+
+
 def main():
     build_msa()
     build_realistic_msa()
@@ -798,6 +943,11 @@ def main():
     build_calder_executed(
         2024, "MA-2024 rev.2", "9 May 2024", "GBP 1,850,000", 24, prior_year=2022
     )
+    build_calder_sow(2022, "SOW-CAL-001", "GBP 1,400,000", "Supplier shall provide the Robotics Operations Console and associated support to the Company's operations function.", "PO-CAL-88214")
+    build_calder_sow(2024, "SOW-CAL-002", "GBP 1,850,000", "Supplier shall provide the Robotics Operations Console, Workflow Analytics, and associated support across the Company's operations and risk functions.", "PO-CAL-93307")
+    build_calder_sow(2026, "SOW-CAL-003", "GBP 2,100,000", "Supplier shall provide the Robotics Operations Console, Workflow Analytics, and Regulatory Reporting Extract across the Company's operations, risk, and compliance functions.", "PO-CAL-10442")
+    build_calder_dpa()
+    build_calder_security_standard()
     write_json()
     write_csv()
     print(f"Wrote PDFs to {PDF_OUT}")

@@ -12,15 +12,15 @@ npm install
 npm run dev
 ```
 
-The local experience uses synthetic Northstar data and a safe Box fallback. It contains no credentials.
+A local run has no Apex endpoint behind it, so both panels report that they could not be loaded. It contains no credentials.
 
-The fallback contains no tenant hostname, Box IDs, task IDs, or usernames. Supply new-environment bindings at build time when needed:
+The bundle contains no tenant hostname, Box IDs, task IDs, or usernames. Supply new-environment bindings at build time when needed:
 
 - `VITE_BOX_HOSTNAME`, `VITE_BOX_FOLDER_ID`, and the optional `VITE_BOX_*_FOLDER_ID` values;
 - `VITE_BOX_APP_URL` and `VITE_BOX_FORM_URL`;
 - `VITE_AGENTFORCE_AGENT_ID`, `VITE_AGENTFORCE_APP_ID`, and `VITE_SALESFORCE_ORIGIN`.
 
-The Salesforce page must pass `recordId`, `contractId`, and `folderId` in its launch context. Without a downscoped Box token, the fallback deliberately shows inert synthetic file rows rather than links to another tenant.
+The Salesforce page must pass `recordId`, `contractId`, and `folderId` in its launch context. Without a downscoped Box token the workspace fails loudly, naming the refusal, rather than standing in synthetic rows that read as live content.
 
 ## Verification
 

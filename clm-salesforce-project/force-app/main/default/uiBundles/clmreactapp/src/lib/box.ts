@@ -1,12 +1,11 @@
 import { CLM_CONFIG } from "../config";
 import { apexRestUrl } from "./apexRest";
+import { describeError, failed, firstLine, type Loaded } from "./loaded";
 
 declare global {
   interface Window {
     __CLM_RUNTIME_CONFIG__?: {
       boxAccessToken?: string;
-      agentforceAgentId?: string;
-      agentforceAppId?: string;
       salesforceOrigin?: string;
     };
   }
@@ -19,44 +18,84 @@ export interface BoxFolderItem {
   /** Bytes, for the size column. Absent on items Box does not report it for. */
   size?: number;
   modified_at?: string;
+  /**
+   * When the document itself was last changed, as opposed to when it was uploaded here.
+   * Box keeps the two separate, and this is the one a reader means by "last modified".
+   */
+  content_modified_at?: string;
+  modified_by?: { name?: string };
   extension?: string;
+  /**
+   * The clmDocument instance, requested inline with the listing.
+   *
+   * Box returns it under the literal key `enterprise` when the field is asked for as
+   * `metadata.enterprise.clmDocument` -- the shorthand for the caller's own enterprise,
+   * which saves shipping an enterprise ID to the browser.
+   */
+  metadata?: { enterprise?: { clmDocument?: { versionStatus?: string; documentType?: string } } };
 }
+
+/**
+ * What a counterparty does not get to see.
+ *
+ * A redline is Acme's markup of a document -- what was struck, what was proposed, and by
+ * implication what Acme was willing to accept. The contract folder is downscoped to one
+ * contract, which bounds *which* contract's documents are reachable, but not which
+ * documents within it, so the filter has to happen here.
+ *
+ * Matching on `versionStatus` rather than on the file name is the difference between a
+ * control and a coincidence: a redline named `v5-final.pdf` is still a redline, and a
+ * legitimate document with "redline" in its name is not. Files with no clmDocument
+ * instance are shown -- an untagged upload should be visible rather than silently
+ * disappearing, and the tagging is what governs, so an untagged file is a tagging gap to
+ * fix rather than a document to hide.
+ */
+const WITHHELD_VERSION_STATUS = "Redline";
 
 /**
  * List a folder with the downscoped token.
  *
- * Null means the listing failed and the caller should fall back; an empty array means the
- * folder is genuinely empty, which a freshly provisioned contract folder always is. The
- * two must stay distinct -- conflating them renders fixtures over a working workspace and
- * makes a healthy empty folder look like a broken connection.
+ * An empty array means the folder is genuinely empty, which a freshly provisioned
+ * contract folder always is. That is a different answer from a listing that failed, and
+ * the two must stay distinct -- conflating them makes a healthy empty folder look broken,
+ * and used to make a broken one look healthy.
  *
- * The failure is logged because the fallback is otherwise indistinguishable from a
- * working demo with no files: the page renders fixtures and says nothing. A CORS
- * rejection is the usual cause, and Box reports it in the body as
- * cors_origin_not_whitelisted with the offending origin.
+ * A CORS rejection is the usual failure and Box reports it in the body as
+ * cors_origin_not_whitelisted with the offending origin, so the body is carried into the
+ * message rather than left in a console nobody has open.
  */
 export async function listBoxFolderItems(
   folderId: string,
   accessToken: string,
-): Promise<BoxFolderItem[] | null> {
+): Promise<Loaded<BoxFolderItem[]>> {
   try {
     const response = await fetch(
-      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items?fields=id,name,type,size,extension,modified_at&limit=100`,
+      `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items` +
+        `?fields=id,name,type,size,extension,modified_at,content_modified_at,modified_by,` +
+        `${encodeURIComponent("metadata.enterprise.clmDocument")}&limit=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );
     if (!response.ok) {
-      console.warn(
-        `[CLM] Box folder listing failed (${response.status}); falling back to fixtures.`,
-        await response.text().catch(() => "")
+      const detail = firstLine(await response.text().catch(() => ""));
+      return failed(
+        `Box returned ${response.status} listing folder ${folderId}.${detail ? ` ${detail}` : ""}`,
       );
-      return null;
     }
     const result = (await response.json()) as { entries?: BoxFolderItem[] };
-    return (result.entries || []).filter((entry) => entry.type === "file");
+    return {
+      ok: true,
+      value: (result.entries || []).filter(
+        (entry) =>
+          entry.type === "file" &&
+          entry.metadata?.enterprise?.clmDocument?.versionStatus !== WITHHELD_VERSION_STATUS,
+      ),
+    };
   } catch (error) {
     // A CORS rejection surfaces here as an opaque TypeError with no response to read.
-    console.warn("[CLM] Box folder listing threw; check the Box app's CORS domains.", error);
-    return null;
+    return failed(
+      `Box could not be reached to list folder ${folderId}. Check the Box app's CORS ` +
+        `domains. ${describeError(error)}`,
+    );
   }
 }
 
@@ -82,8 +121,6 @@ export interface BoxWorkspaceToken {
   folderId: string;
 }
 
-const NO_TOKEN: BoxWorkspaceToken = { accessToken: "", folderId: "" };
-
 /**
  * Ask Salesforce for a folder-scoped Box token.
  *
@@ -92,15 +129,17 @@ const NO_TOKEN: BoxWorkspaceToken = { accessToken: "", folderId: "" };
  * never has to know a Box folder id and one cannot be supplied from the URL. The folder
  * comes back in the response because the caller does not know it up front.
  *
- * `folderId` remains for pages with no record context and for the local harness. It is
- * the reason a page opened without either still shows fixtures rather than failing: the
- * default `demo-workspace` is not numeric and the endpoint rejects it outright.
+ * `folderId` remains for pages with no record context and for the local harness. Opened
+ * with neither, the default `demo-workspace` is not numeric and the endpoint rejects it
+ * -- which is now a visible failure rather than the quiet trigger for a fixture.
  */
 export async function fetchDownscopedBoxToken(
   context: { folderId: string; salesforceRecordId?: string },
-): Promise<BoxWorkspaceToken> {
+): Promise<Loaded<BoxWorkspaceToken>> {
   const injectedToken = window.__CLM_RUNTIME_CONFIG__?.boxAccessToken;
-  if (injectedToken) return { accessToken: injectedToken, folderId: context.folderId };
+  if (injectedToken) {
+    return { ok: true, value: { accessToken: injectedToken, folderId: context.folderId } };
+  }
 
   const recordId = context.salesforceRecordId;
   const query = recordId
@@ -119,16 +158,20 @@ export async function fetchDownscopedBoxToken(
         granted = await requestToken(query, context.folderId);
       }
     }
-    return granted.accessToken ? { accessToken: granted.accessToken, folderId: granted.folderId } : NO_TOKEN;
+    if (!granted.accessToken) {
+      return failed(granted.error || "Salesforce returned no Box token for this contract.");
+    }
+    return { ok: true, value: { accessToken: granted.accessToken, folderId: granted.folderId } };
   } catch (error) {
-    console.warn("[CLM] Token endpoint unreachable; falling back to fixtures.", error);
-    return NO_TOKEN;
+    return failed(`The Box token endpoint could not be reached. ${describeError(error)}`);
   }
 }
 
 interface TokenAttempt extends BoxWorkspaceToken {
   /** The record has no Box folder yet, so provisioning it is worth a try. */
   needsFolder: boolean;
+  /** Why no token came back, ready to render. Empty when one did. */
+  error: string;
 }
 
 async function requestToken(query: string, requestedFolderId: string): Promise<TokenAttempt> {
@@ -137,8 +180,14 @@ async function requestToken(query: string, requestedFolderId: string): Promise<T
   });
   if (!response.ok) {
     const detail = await response.text().catch(() => "");
-    console.warn(`[CLM] Token endpoint returned ${response.status}.`, detail);
-    return { ...NO_TOKEN, needsFolder: detail.includes("no_box_folder_mapping") };
+    return {
+      accessToken: "",
+      folderId: "",
+      needsFolder: detail.includes("no_box_folder_mapping"),
+      error: `Salesforce returned ${response.status} for the Box token.${
+        firstLine(detail) ? ` ${firstLine(detail)}` : ""
+      }`,
+    };
   }
   const result = (await response.json()) as { accessToken?: string; folderId?: string };
   return {
@@ -147,13 +196,14 @@ async function requestToken(query: string, requestedFolderId: string): Promise<T
     // place the answer exists.
     folderId: result.folderId || requestedFolderId,
     needsFolder: false,
+    error: result.accessToken ? "" : "Salesforce answered the token request without a token.",
   };
 }
 
 /**
  * Ask the Box for Salesforce package to create this record's workspace folder. Returns
- * false rather than throwing, so a workspace that cannot be provisioned falls back to
- * fixtures like every other Box failure here.
+ * false rather than throwing; the caller retries the token request either way, and the
+ * refusal that follows is what the reader is shown.
  */
 async function provisionBoxFolder(recordId: string): Promise<boolean> {
   try {

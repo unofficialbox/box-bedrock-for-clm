@@ -172,10 +172,10 @@ for (CLM_Contract__c contract : [
     SELECT Id, Contract_ID__c
     FROM CLM_Contract__c
     WHERE Contract_ID__c IN :new List<String>{
-        'CLM-SAMPLE-NST-001',
-        'CLM-SAMPLE-NST-2024',
-        'CLM-SAMPLE-NST-2025',
-        'CLM-SAMPLE-ACM-001'
+        'CLM-2026-0042',
+        'CLM-2024-0311',
+        'CLM-2025-0148',
+        'CLM-2026-0088'
     }
 ]) {
     contractsByContractId.put(contract.Contract_ID__c, contract);
@@ -186,9 +186,9 @@ Integer contractsUpdated = 0;
 List<CLM_Contract__c> contractsToInsert = new List<CLM_Contract__c>();
 List<CLM_Contract__c> contractsToUpdate = new List<CLM_Contract__c>();
 
-CLM_Contract__c northContract = contractsByContractId.get('CLM-SAMPLE-NST-001');
+CLM_Contract__c northContract = contractsByContractId.get('CLM-2026-0042');
 if (northContract == null) {
-    northContract = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-NST-001');
+    northContract = new CLM_Contract__c(Contract_ID__c = 'CLM-2026-0042');
     contractsToInsert.add(northContract);
 } else {
     contractsToUpdate.add(northContract);
@@ -212,9 +212,9 @@ northContract.Risk_Level__c = 'Medium';
 northContract.Special_Terms_Risk_Notes__c = 'Sample contract record for demo use only.';
 
 // Prior-year executed Northstar MSAs (contract history for the same customer).
-CLM_Contract__c northContract2024 = contractsByContractId.get('CLM-SAMPLE-NST-2024');
+CLM_Contract__c northContract2024 = contractsByContractId.get('CLM-2024-0311');
 if (northContract2024 == null) {
-    northContract2024 = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-NST-2024');
+    northContract2024 = new CLM_Contract__c(Contract_ID__c = 'CLM-2024-0311');
     contractsToInsert.add(northContract2024);
 } else {
     contractsToUpdate.add(northContract2024);
@@ -237,9 +237,9 @@ northContract2024.Record_Source__c = 'Manual';
 northContract2024.Risk_Level__c = 'Low';
 northContract2024.Special_Terms_Risk_Notes__c = 'Executed prior-year MSA; retained for demo contract history.';
 
-CLM_Contract__c northContract2025 = contractsByContractId.get('CLM-SAMPLE-NST-2025');
+CLM_Contract__c northContract2025 = contractsByContractId.get('CLM-2025-0148');
 if (northContract2025 == null) {
-    northContract2025 = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-NST-2025');
+    northContract2025 = new CLM_Contract__c(Contract_ID__c = 'CLM-2025-0148');
     contractsToInsert.add(northContract2025);
 } else {
     contractsToUpdate.add(northContract2025);
@@ -262,9 +262,9 @@ northContract2025.Record_Source__c = 'Manual';
 northContract2025.Risk_Level__c = 'Low';
 northContract2025.Special_Terms_Risk_Notes__c = 'Executed prior-year MSA; retained for demo contract history.';
 
-CLM_Contract__c acmeContract = contractsByContractId.get('CLM-SAMPLE-ACM-001');
+CLM_Contract__c acmeContract = contractsByContractId.get('CLM-2026-0088');
 if (acmeContract == null) {
-    acmeContract = new CLM_Contract__c(Contract_ID__c = 'CLM-SAMPLE-ACM-001');
+    acmeContract = new CLM_Contract__c(Contract_ID__c = 'CLM-2026-0088');
     contractsToInsert.add(acmeContract);
 } else {
     contractsToUpdate.add(acmeContract);

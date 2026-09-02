@@ -3,8 +3,9 @@
 Configure the governed Box preview in the CLM React workspace: a Box platform app, the
 Salesforce credential that holds it, and the settings that scope it to one folder.
 
-Until this is complete the workspace renders its synthetic file fixtures. That fallback is
-intentional and safe — nothing breaks, you just do not see real Box content.
+Until this is complete the workspace states that it could not be opened, and names the
+reason it was refused. It used to render synthetic file fixtures instead, which made an
+unconfigured environment indistinguishable from a working one.
 
 Related manual tasks: MT-037 through MT-040 in the [Manual-Task Register](manual-task-register.md).
 

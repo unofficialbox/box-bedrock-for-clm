@@ -37,6 +37,18 @@ public with sharing class ClmContractPackage {
         public String outputRecordId;
         @InvocableVariable(label='Box folder ID')
         public String outputFolderId;
+        /**
+         * The reference of the contract this actually resolved to.
+         *
+         * The caller may have typed a name, a record id, or a partial reference, so what
+         * it sent is not necessarily what was found. Anything that has to stay bounded to
+         * the same contract afterwards -- asking Box AI about one of these documents, say
+         * -- needs the resolved reference rather than the typed one, and returning it here
+         * means the agent binds to what the lookup decided instead of to what the model
+         * remembered.
+         */
+        @InvocableVariable(label='Resolved contract reference')
+        public String outputContractReference;
         @InvocableVariable(label='Whether a contract and its documents were found')
         public Boolean outputFound;
     }
@@ -69,6 +81,7 @@ public with sharing class ClmContractPackage {
         }
 
         result.outputRecordId = contract.Id;
+        result.outputContractReference = contract.Contract_ID__c;
         String folderId = new FolderMapping().forRecord(contract.Id);
         if (String.isBlank(folderId)) {
             folderId = contract.Box_Workspace_Folder_ID__c;

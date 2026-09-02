@@ -83,6 +83,7 @@ subagent document_answers:
             if @variables.contractPackageLoaded == False and @variables.contractId != "":
                 run @actions.get_contract_package
                     with inputContract = @variables.contractId
+                    set @variables.contractId = @outputs.outputContractReference
                     set @variables.contractRecordId = @outputs.outputRecordId
                     set @variables.boxFolderId = @outputs.outputFolderId
                     set @variables.contractPackage = @outputs.outputSummary
@@ -99,7 +100,7 @@ subagent document_answers:
 
               STEP 1: Call {!@actions.get_contract_package} immediately, with inputContract set to
               the contract reference in the person's message -- for example CLM-2026-0017 or
-              CLM-SAMPLE-NST-2024. Do this as your very first act, before writing any reply. It
+              CLM-2024-0311. Do this as your very first act, before writing any reply. It
               returns the Salesforce record, the governed Box folder, and every document with its
               Box file ID, and it is the only source of Box file IDs. If the message names no
               contract at all, ask for the reference and nothing else, then stop.
@@ -132,15 +133,16 @@ subagent document_answers:
             get_contract_package: @actions.get_contract_package
                 description: "Find the contract, its Box folder, and the Box file ID of every document in it. Always the first action of the turn."
                 with inputContract = ...
+                set @variables.contractId = @outputs.outputContractReference
                 set @variables.contractRecordId = @outputs.outputRecordId
                 set @variables.boxFolderId = @outputs.outputFolderId
                 set @variables.contractPackage = @outputs.outputSummary
                 set @variables.contractPackageLoaded = True
 
             ask_box_ai: @actions.ask_box_ai
-                description: "Ask Box AI about one document, by a Box file ID from the package listing."
+                description: "Ask Box AI about one document, by a Box file ID from the package listing. Pass the same contract reference the package listing was for."
                 available when @variables.contractPackageLoaded == True
-                with contractReference = @variables.contractId
+                with contractReference = ...
                 with itemId = ...
                 with prompt = ...
 
@@ -161,6 +163,12 @@ subagent document_answers:
                 outputSummary: string
                     label: "Contract Package"
                     description: "The contract record, its Box folder, and each document with its Box file ID."
+                    complex_data_type_name: "lightning__textType"
+                    is_displayable: False
+                    filter_from_agent: False
+                outputContractReference: string
+                    label: "Resolved Contract Reference"
+                    description: "The reference of the contract this resolved to, which may differ from the one the person typed. Anything that must stay bounded to the same contract uses this."
                     complex_data_type_name: "lightning__textType"
                     is_displayable: False
                     filter_from_agent: False

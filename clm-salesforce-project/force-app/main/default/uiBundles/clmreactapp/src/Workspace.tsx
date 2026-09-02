@@ -1,14 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FileStack, LayoutDashboard } from "lucide-react";
-import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
+import { DocumentTimeline } from "./components/DocumentTimeline";
+import { UploadDialog } from "./components/UploadDialog";
+import { WorkspaceMetrics } from "./components/WorkspaceMetrics";
 import { ContractList } from "./components/ContractList";
+import type { BoxFolderItem } from "./lib/box";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
-import { NORTHSTAR_CONTRACT } from "./data";
 import { getClmPageContext } from "./lib/box";
 
 /**
  * This app is the counterparty's surface, and only theirs.
+ *
+ * It carries no agent. The Copilot that used to sit beside this content ran as its own
+ * agent user rather than as the person signed in, and took the contract it answered about
+ * from the conversation -- so the one control on the page that could be asked anything was
+ * the one control none of the scoping reached. Everything a counterparty would ask it
+ * ("is it signed", "what did we agree", "what do you need from me") is already on the page,
+ * and everything it could reach that they cannot -- redlines, the approved clause library,
+ * our fallback positions -- is the reason not to put it here.
  *
  * It used to serve both sides, which is why it carried a redline review queue and a "copy
  * agent context" button. The internal persona now works headlessly through the MCP server,
@@ -37,6 +47,18 @@ export function Workspace() {
   const [context, setContext] = useState(() => getClmPageContext());
   const [selected, setSelected] = useState<ClmContractSummary | null>(null);
   /**
+   * Null until the folder has been listed. An empty array means the folder is genuinely
+   * empty, and the history panel says something different for each.
+   */
+  const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
+  /** The live Box token and folder, once the workspace panel has minted them. */
+  const [box, setBox] = useState<{ token: string; folderId: string } | null>(null);
+  /** Set when Box cannot be read at all, so nothing derived from the listing is drawn. */
+  const [boxError, setBoxError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  /** Bumped on upload close so the folder is listed again and the new file appears. */
+  const [reloadKey, setReloadKey] = useState(0);
+  /**
    * A record in the URL means the page was opened with context -- a Lightning or
    * Experience page bound to one contract -- so it goes straight to that workspace.
    * Without one there is nothing to show yet, and the dashboard is the entry point.
@@ -55,6 +77,7 @@ export function Workspace() {
       const namesAContract = params.has("recordId") || params.has("folderId");
       setContext(getClmPageContext());
       setSelected(null);
+      setFiles(null);
       setView(namesAContract ? "workspace" : "contracts");
     }
     window.addEventListener("popstate", syncToUrl);
@@ -63,6 +86,7 @@ export function Workspace() {
 
   const openContract = useCallback((contract: ClmContractSummary) => {
     const search = contractSearch(contract);
+    setFiles(null);
     window.history.pushState({}, "", search ? `?${search}` : window.location.pathname);
     setSelected(contract);
     setView("workspace");
@@ -101,30 +125,71 @@ export function Workspace() {
         </nav>
       </header>
 
-      <div className="contract-banner">
-        <div><span className="eyebrow">{selected?.contractId || context.contractId}{workspaceContext.salesforceRecordId ? ` · Salesforce ${workspaceContext.salesforceRecordId}` : ""}</span><h1>{selected?.name || NORTHSTAR_CONTRACT.name}</h1><p>{[selected?.counterparty || NORTHSTAR_CONTRACT.counterparty, selected?.contractType || NORTHSTAR_CONTRACT.contractType].join(" · ")}</p></div>
-        <div className="banner-metrics">
-          <Metric label="Value" value={selected ? formatDealValue(selected.dealValue) : NORTHSTAR_CONTRACT.value} />
-          <Metric label="Term" value={selected?.termMonths != null ? `${selected.termMonths} months` : NORTHSTAR_CONTRACT.term} />
-          <Metric label="Risk" value={selected?.riskLevel || NORTHSTAR_CONTRACT.risk} danger />
-          <Metric label="Status" value={selected?.status || NORTHSTAR_CONTRACT.status} warning />
-        </div>
-      </div>
+      {/*
+        The banner describes the contract that is open, and nothing else.
 
-      <div className="content-grid">
+        It used to fall back to a fixture whenever none was selected, so the list view was
+        headed by another contract's name, value and term -- and by "Approval blocked",
+        which contradicted the status on the row directly beneath it. A header stating
+        different facts from the list under it is worse than no header.
+
+        The Salesforce record ID came out of the eyebrow at the same time. It is internal
+        plumbing, and this page faces the counterparty.
+      */}
+      {selected ? (
+        <div className="contract-banner">
+          <div>
+            <span className="eyebrow">{selected.contractId}</span>
+            <h1>{selected.name}</h1>
+            <p>{[selected.counterparty, selected.contractType].filter(Boolean).join(" · ")}</p>
+          </div>
+          <div className="banner-metrics">
+            <Metric label="Value" value={formatDealValue(selected.dealValue)} />
+            {selected.termMonths != null ? (
+              <Metric label="Term" value={`${selected.termMonths} months`} />
+            ) : null}
+            {selected.status ? <Metric label="Status" value={selected.status} /> : null}
+          </div>
+        </div>
+      ) : null}
+
+      {view === "workspace" && !boxError ? (
+        <div className="workspace-metrics-row">
+          <WorkspaceMetrics files={files} />
+        </div>
+      ) : null}
+
+      <div className={`content-grid${view === "workspace" && !boxError ? " content-grid-aside" : ""}`}>
         <main>
           {view === "contracts" ? (
             <ContractList onSelect={openContract} />
           ) : (
-            <BoxWorkspace context={workspaceContext} />
+            <BoxWorkspace
+              context={workspaceContext}
+              onFilesLoaded={setFiles}
+              onBoxReady={setBox}
+              reloadKey={reloadKey}
+              onUpload={() => setUploading(true)}
+              onFailed={setBoxError}
+            />
           )}
         </main>
-        <AgentforcePanel contractId={selected?.contractId || context.contractId} />
+        {view === "workspace" && !boxError ? <DocumentTimeline files={files} /> : null}
       </div>
+      {uploading && box ? (
+        <UploadDialog
+          folderId={box.folderId}
+          tokenProvider={() => box.token}
+          onClose={() => {
+            setUploading(false);
+            setReloadKey((n) => n + 1);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
 
-function Metric({ label, value, danger, warning }: { label: string; value: string; danger?: boolean; warning?: boolean }) {
-  return <div className="metric"><span>{label}</span><strong className={danger ? "danger" : warning ? "warning" : ""}>{value}</strong></div>;
+function Metric({ label, value }: { label: string; value: string }) {
+  return <div className="metric"><span>{label}</span><strong>{value}</strong></div>;
 }

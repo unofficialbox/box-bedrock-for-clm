@@ -1,0 +1,93 @@
+import type { BoxFolderItem } from "./box";
+
+/**
+ * The facts about a document that both the table and the timeline need.
+ *
+ * Kept in one place because the two views must never disagree: a row saying a document was
+ * approved while the timeline beside it says otherwise is worse than either view alone.
+ */
+export interface DocumentFacts {
+  /** When the document itself changed, preferring Box's content date over the upload's. */
+  changedAt?: string;
+  /** Who Box records as having made that change. */
+  changedBy?: string;
+  /** Draft, Redline, Approved, Executed -- whatever the clmDocument instance carries. */
+  status?: string;
+  /** True only when the document has actually been approved, not merely drafted. */
+  approved: boolean;
+}
+
+export function documentFacts(file: BoxFolderItem): DocumentFacts {
+  const clm = file.metadata?.enterprise?.clmDocument;
+  const status = clm?.versionStatus;
+  return {
+    changedAt: file.content_modified_at || file.modified_at,
+    changedBy: file.modified_by?.name,
+    status,
+    approved: status === "Approved" || status === "Executed",
+  };
+}
+
+/** A short, unambiguous date. Returns an em dash rather than "Invalid Date". */
+export function formatDate(iso?: string): string {
+  if (!iso) return "—";
+  const at = new Date(iso);
+  return Number.isNaN(at.getTime())
+    ? "—"
+    : at.toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" });
+}
+
+/**
+ * Documents newest first.
+ *
+ * Sorts a copy: the table renders the folder's own order, and reordering it underneath
+ * would make the two views disagree about which document is which.
+ */
+export function byMostRecent(files: BoxFolderItem[]): BoxFolderItem[] {
+  return [...files].sort((a, b) => {
+    const left = documentFacts(a).changedAt;
+    const right = documentFacts(b).changedAt;
+    if (!left && !right) return 0;
+    if (!left) return 1;
+    if (!right) return -1;
+    return new Date(right).getTime() - new Date(left).getTime();
+  });
+}
+
+export interface DocumentTotals {
+  documents: number;
+  approved: number;
+  /** Anything still a draft or a redline -- work that has not landed yet. */
+  open: number;
+  /** The most recent change across the package, or undefined if nothing carries a date. */
+  lastChangedAt?: string;
+}
+
+export function documentTotals(files: BoxFolderItem[]): DocumentTotals {
+  const facts = files.map(documentFacts);
+  const dates = facts.map((f) => f.changedAt).filter((d): d is string => Boolean(d));
+  return {
+    documents: files.length,
+    approved: facts.filter((f) => f.approved).length,
+    open: facts.filter((f) => !f.approved).length,
+    lastChangedAt: dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0],
+  };
+}
+
+/**
+ * Documents by type, largest first, ties broken on label.
+ *
+ * `documentType` is the clmDocument field, so an untagged file is "Unclassified" rather
+ * than missing -- a package where half the documents quietly do not appear in its own
+ * breakdown is worse than one that admits the gap.
+ */
+export function byDocumentType(files: BoxFolderItem[]): Array<{ label: string; value: number }> {
+  const counts = new Map<string, number>();
+  for (const file of files) {
+    const label = file.metadata?.enterprise?.clmDocument?.documentType?.trim() || "Unclassified";
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}

@@ -32,6 +32,26 @@ declare module "box-ui-elements/es/elements/content-preview" {
   export default ContentPreview;
 }
 
+declare module "box-ui-elements/es/elements/content-uploader" {
+  import type { ComponentType } from "react";
+
+  export interface ContentUploaderProps {
+    /** Same contract as ContentPreview: a provider, not a string. */
+    token: (fileId?: string) => string | Promise<string>;
+    /** Where uploads land. The downscoped token bounds this to one folder regardless. */
+    rootFolderId: string;
+    onClose?: () => void;
+    onComplete?: (files: unknown[]) => void;
+    onUpload?: (file: unknown) => void;
+    onError?: (error: unknown) => void;
+    isFolderUploadEnabled?: boolean;
+    language?: string;
+  }
+
+  const ContentUploader: ComponentType<ContentUploaderProps>;
+  export default ContentUploader;
+}
+
 declare module "box-ui-elements/dist/preview.css";
 
 /** box-annotations ships no types; the app only ever constructs it. */

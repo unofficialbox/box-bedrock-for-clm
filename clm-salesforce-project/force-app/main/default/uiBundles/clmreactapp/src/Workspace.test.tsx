@@ -11,26 +11,39 @@ beforeEach(() => {
 describe("Workspace", () => {
   test("opens on the contract list when the page carries no record context", async () => {
     render(<Workspace />);
-    // Nothing identifies a contract yet, so the dashboard is the entry point.
-    expect(await screen.findByTestId("contracts-view")).toBeVisible();
-    // Salesforce is unreachable here, so the list says so rather than showing empty.
-    expect(screen.getByTestId("contracts-fixture-note")).toBeVisible();
+    // Nothing identifies a contract yet, so the dashboard is the entry point rather than
+    // a workspace. Salesforce is unreachable here, so it says so rather than inventing rows.
+    expect(await screen.findByTestId("contracts-error")).toBeVisible();
+    expect(screen.queryByTestId("box-error")).not.toBeInTheDocument();
   });
 
-  test("opens the workspace for a contract chosen from the list", async () => {
+  test("says why the workspace is unavailable instead of drawing a synthetic one", async () => {
+    // Fixtures used to stand in here, so a workspace that could not authorise looked
+    // identical to one that had -- a demo could run to the end against nothing.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
     render(<Workspace />);
-    fireEvent.click(await screen.findByTestId("contract-row"));
-    expect(screen.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
-    expect(await screen.findByTestId("box-fallback")).toBeVisible();
-    expect(screen.getByTestId("agentforce-placeholder")).toBeVisible();
-    expect(screen.getByText("northstar-msa-redline-v3.pdf")).toBeVisible();
+    const failure = await screen.findByTestId("box-error");
+    expect(failure).toBeVisible();
+    expect(failure).toHaveTextContent(/could not be reached|returned/i);
+    expect(screen.queryByText("northstar-msa-redline-v3.pdf")).not.toBeInTheDocument();
+  });
+
+  test("hides the panels built from the listing when the listing failed", async () => {
+    // The history panel and the metric tiles are derived from the folder listing. Left up
+    // on a failure they sit in a skeleton that will never resolve, which reads as slow
+    // rather than broken.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    render(<Workspace />);
+    await screen.findByTestId("box-error");
+    expect(screen.queryByTestId("timeline-loading")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-metrics")).not.toBeInTheDocument();
   });
 
   test("goes straight to the workspace when the page is opened on a record", async () => {
     // A Lightning or Experience page bound to one contract should not ask again.
     window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
     render(<Workspace />);
-    expect(await screen.findByTestId("box-fallback")).toBeVisible();
+    expect(await screen.findByTestId("box-error")).toBeVisible();
     expect(screen.queryByTestId("contracts-view")).not.toBeInTheDocument();
   });
 
@@ -44,6 +57,77 @@ describe("Workspace", () => {
     expect(screen.queryByTestId("approvals-view")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Copy agent context/ })).not.toBeInTheDocument();
     expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
+  });
+
+  test("the history shows a skeleton while loading, not an empty state", async () => {
+    // "Nothing has been filed against this contract yet" is a claim about the folder. It
+    // must not be made before the folder has been listed, so the panel distinguishes
+    // not-known-yet from known-and-empty.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    // Never resolves: the listing stays in flight for the life of the assertion.
+    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+
+    render(<Workspace />);
+
+    expect(await screen.findByTestId("timeline-loading")).toBeInTheDocument();
+    expect(screen.queryByTestId("timeline-empty")).not.toBeInTheDocument();
+  });
+
+  test("carries no agent on the counterparty's surface", async () => {
+    // The Copilot ran as its own agent user rather than as the person signed in, and took
+    // the contract it answered about from the conversation -- so no scoping on this page
+    // reached it. It could read redlines and the approved clause library, which is exactly
+    // what a counterparty must not get.
+    const { container } = render(<Workspace />);
+    await screen.findByTestId("contracts-error");
+    expect(screen.queryByTestId("agentforce-placeholder")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Contract Copilot/i)).not.toBeInTheDocument();
+    expect(container.querySelector(".agent-panel")).toBeNull();
+  });
+
+  test("shows no contract banner until a contract is open", async () => {
+    // The banner used to fall back to a fixture, so the list was headed by another
+    // contract's name, value and term -- and by "Approval blocked", contradicting the
+    // status on the row beneath it.
+    const { container } = render(<Workspace />);
+    await screen.findByTestId("contracts-error");
+    expect(container.querySelector(".contract-banner")).toBeNull();
+    expect(screen.queryByText(/36 months/)).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Northstar Health MSA" })).not.toBeInTheDocument();
+  });
+
+  test("never shows the Salesforce record id to a counterparty", async () => {
+    // Internal plumbing. This page faces the counterparty.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-99&folderId=123");
+    render(<Workspace />);
+    expect(screen.queryByText(/Salesforce a01xx0000001234/)).not.toBeInTheDocument();
+  });
+
+  test("keeps Acme's own risk assessment off the counterparty's screen", async () => {
+    // Risk_Level__c is what Acme thinks of the contract, not a fact about it -- the same
+    // category as the redline queue. It is also why the list went blank for a real
+    // counterparty: the field was in the GraphQL projection but withheld by the permission
+    // set, and UI API rejects the whole query when one selected field is hidden, which
+    // reads as "this counterparty has no contracts".
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: true,
+        json: async () => [
+          {
+            recordId: "a01xx0000009abcAAA",
+            contractId: "CLM-1",
+            name: "A Contract",
+            boxFolderId: "1",
+            riskLevel: "Critical",
+          },
+        ],
+      })),
+    );
+    render(<Workspace />);
+    await screen.findByTestId("contract-row");
+    expect(screen.queryByText("Critical")).not.toBeInTheDocument();
+    expect(screen.queryByText("Risk")).not.toBeInTheDocument();
   });
 
   test("names the contract list as the counterparty's own", () => {
@@ -71,11 +155,6 @@ describe("Workspace", () => {
     expect(screen.queryByRole("heading", { name: "CLM contracts" })).not.toBeInTheDocument();
   });
 
-  test("shows the Salesforce record returned by the intake flow", () => {
-    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-99&folderId=123");
-    render(<Workspace />);
-    expect(screen.getByText(/CLM-99 · Salesforce a01xx0000001234/)).toBeVisible();
-  });
 
   test("asks by record so the package resolves or provisions the folder", async () => {
     // The package owns the association and provisions a folder for a record that has
@@ -99,9 +178,9 @@ describe("Workspace", () => {
     );
 
     render(<Workspace />);
-    fireEvent.click(await screen.findByTestId("contract-row"));
+    fireEvent.click(await screen.findByTestId("contract-open"));
 
-    await screen.findByTestId("box-fallback");
+    await screen.findByTestId("box-error");
     const tokenCall = urls.find((url) => url.includes("box-token")) || "";
     expect(tokenCall).toContain("recordId=a01xx0000009abcAAA");
     expect(tokenCall).not.toContain("folderId=");
@@ -131,7 +210,7 @@ describe("Workspace", () => {
     render(<Workspace />);
     expect(window.location.search).toBe("");
 
-    fireEvent.click(await screen.findByTestId("contract-row"));
+    fireEvent.click(await screen.findByTestId("contract-open"));
 
     const params = new URLSearchParams(window.location.search);
     expect(params.get("folderId")).toBe("123456789");

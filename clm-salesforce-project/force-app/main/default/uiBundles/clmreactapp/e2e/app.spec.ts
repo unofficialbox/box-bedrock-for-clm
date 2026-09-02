@@ -1,12 +1,18 @@
 import { expect, test } from "@playwright/test";
 
-test("contract workspace exposes the Salesforce record and Box content", async ({ page }) => {
+test("contract workspace reports a failed read, and speaks for no contract it cannot name", async ({ page }) => {
   await page.goto("/?recordId=a01xx0000001234&contractId=CLM-2026-0017&folderId=123");
   await expect(page).toHaveTitle(/Acme Contracts/);
-  await expect(page.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
-  await expect(page.getByText(/Salesforce a01xx0000001234/)).toBeVisible();
-  await expect(page.getByTestId("box-fallback")).toBeVisible();
-  await expect(page.getByTestId("agentforce-placeholder")).toBeVisible();
+  // No org behind the built bundle, so the workspace must say so rather than render the
+  // synthetic folder it used to fall back to.
+  await expect(page.getByTestId("box-error")).toBeVisible();
+  await expect(page.getByTestId("agentforce-placeholder")).toHaveCount(0);
+  // Deep-linked by record, so the app has ids but not the contract's fields. It used to
+  // fill the banner from a fixture, which stated another contract's name, value and term
+  // as if they were this one's -- and put the Salesforce record id in front of a
+  // counterparty.
+  await expect(page.locator(".contract-banner")).toHaveCount(0);
+  await expect(page.getByText(/Salesforce a01xx0000001234/)).toHaveCount(0);
 });
 
 test("shows a counterparty nothing of Acme's own review process", async ({ page }) => {
@@ -18,6 +24,7 @@ test("shows a counterparty nothing of Acme's own review process", async ({ page 
   await expect(page.getByRole("button", { name: /Your contracts/ })).toBeVisible();
   await expect(page.getByRole("button", { name: /Redline reviews/ })).toHaveCount(0);
   await expect(page.getByRole("button", { name: /Copy agent context/ })).toHaveCount(0);
+  await expect(page.getByText(/Contract Copilot/)).toHaveCount(0);
   await expect(page.getByTestId("approvals-view")).toHaveCount(0);
   await expect(page.getByText("Jordan Lee")).toHaveCount(0);
 });

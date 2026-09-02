@@ -38,42 +38,20 @@ button { cursor: pointer; }
 
 /* Two cards side by side. The padding lives on the grid rather than on main, so both
    columns start at the same y; grid's default stretch then gives them the same height. */
-.content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 24px; padding: 24px 28px 34px; align-items: stretch; }
+.content-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px 28px 34px; align-items: stretch; }
 .content-grid main { min-width: 0; display: flex; flex-direction: column; }
 
-/* Matches .box-live exactly -- same border, radius and shadow -- so the two panels read
-   as one pair rather than a card next to a sidebar. */
-.agent-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  border: 1px solid #dce3ec;
-  border-radius: 12px;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 5px 20px rgba(18, 46, 79, .05);
-}
-.agent-heading { height: 56px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e6ee; }
-.agent-title { font-size: 14px; }
-.agent-title { display: flex; align-items: center; gap: 8px; font-weight: 750; }
 .live-pill { padding: 4px 8px; border-radius: 999px; color: #27623b; background: #e7f7ec; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.agent-host { flex: 1; min-height: 0; }
-.agent-placeholder { padding: 24px 22px; color: #44566e; }
-.agent-placeholder strong { display: block; margin: 12px 0 5px; color: #10233f; }
-.agent-placeholder p { margin: 0 0 18px; font-size: 13px; line-height: 1.55; }
-.agent-placeholder ul { margin: 0; padding: 0; list-style: none; }
-.agent-placeholder li { margin-bottom: 10px; padding: 10px 12px; border: 1px solid #e0e7f0; border-radius: 8px; background: #f8fafc; font-size: 12px; line-height: 1.45; }
-.agent-shield { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 11px; color: #1166e8; background: #e8f1ff; }
 
-.box-live, .box-fallback, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
+.box-live, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
 /* Both panels are exactly this tall, so the pair lines up whatever is inside them.
    Their contents scroll rather than stretching the card. */
-.box-live, .box-fallback, .approvals-card, .agent-panel { height: 625px; }
-.box-live, .box-fallback { display: flex; flex-direction: column; }
+.box-live, .approvals-card { height: 625px; }
+.box-live { display: flex; flex-direction: column; }
 .approvals-card { overflow: auto; }
-.box-fallback-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
-.box-live h2, .box-fallback h2, .approvals-card h2 { margin: 6px 0 4px; font-size: 21px; }
-.box-live p, .box-fallback p, .approvals-card p { margin: 0; color: #65768b; font-size: 13px; }
+.panel-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
+.box-live h2, .approvals-card h2 { margin: 6px 0 4px; font-size: 21px; }
+.box-live p, .approvals-card p { margin: 0; color: #65768b; font-size: 13px; }
 .secondary-button { padding: 9px 12px; display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; border: 1px solid #cbd6e3; border-radius: 8px; color: #174f91; text-decoration: none; background: #fff; font-size: 12px; font-weight: 750; }
 .secondary-button:hover { background: #f4f8fd; }
 .file-list { padding: 8px; }
@@ -127,8 +105,6 @@ button { cursor: pointer; }
   .contract-banner { align-items: flex-start; flex-direction: column; }
   .banner-metrics { width: 100%; overflow-x: auto; }
   .content-grid { grid-template-columns: 1fr; }
-  .agent-panel { min-height: 520px; }
-  .agent-host { height: 600px; }
 }
 
 @media (max-width: 620px) {
@@ -138,7 +114,7 @@ button { cursor: pointer; }
   .banner-metrics { display: grid; grid-template-columns: 1fr 1fr; }
   .metric { min-width: 0; }
   .content-grid main { padding: 16px; }
-  .box-fallback-head, .section-heading { align-items: stretch; flex-direction: column; }
+  .panel-head, .section-heading { align-items: stretch; flex-direction: column; }
   .file-row { grid-template-columns: 38px minmax(0, 1fr) auto; }
   .file-row > svg { display: none; }
   .risk { display: none; }
@@ -253,3 +229,183 @@ button { cursor: pointer; }
 .box-preview-pane { display: flex; flex-direction: column; flex: 1; min-height: 0; }
 .box-preview-bar { display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid #e3e9f1; }
 .box-preview-name { font-size: 13px; font-weight: 650; color: #10233f; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+/* ---- Document status, shared by the table cell and the timeline entry so the two
+   views can never describe the same document differently. ---- */
+.doc-status { display: inline-block; font-size: 11px; font-weight: 650; letter-spacing: .02em; padding: 2px 8px; border-radius: 999px; white-space: nowrap; }
+.doc-status-executed { color: #1c5137; background: #e4f4ea; }
+.doc-status-approved { color: #1c5137; background: #e4f4ea; }
+.doc-status-draft { color: #6a4a12; background: #fcf1dc; }
+.doc-status-redline { color: #7d2822; background: #fbe6e3; }
+.doc-status-none { color: #5c6470; background: #eef1f5; }
+
+.cell-stack { display: flex; flex-direction: column; gap: 2px; }
+.cell-stack small { color: #6a7686; font-size: 11.5px; }
+
+/* ---- Document history ---- */
+.content-grid-aside { grid-template-columns: minmax(0, 1fr) 340px; }
+
+.timeline-panel { display: flex; flex-direction: column; min-height: 0; height: 625px; border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; }
+.timeline-head { height: 56px; padding: 0 18px; display: flex; align-items: center; border-bottom: 1px solid #e0e6ee; flex: none; }
+.timeline-title { display: flex; align-items: center; gap: 8px; font-size: 14px; font-weight: 750; }
+
+.timeline { list-style: none; margin: 0; padding: 18px 18px 22px; overflow-y: auto; flex: 1; min-height: 0; }
+.timeline-item { position: relative; padding: 0 0 20px 22px; }
+/* The rail is drawn by the items, so it stops at the last one instead of trailing off. */
+.timeline-item:not(:last-child)::before { content: ""; position: absolute; left: 4px; top: 14px; bottom: 0; width: 1px; background: #dfe5ed; }
+.timeline-item:last-child { padding-bottom: 0; }
+
+.timeline-dot { position: absolute; left: 0; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: white; border: 2px solid #b9c4d2; }
+.timeline-dot-approved { border-color: #2f8757; background: #2f8757; }
+
+.timeline-body { display: flex; flex-direction: column; gap: 3px; }
+.timeline-date { font-size: 11px; font-weight: 650; letter-spacing: .04em; text-transform: uppercase; color: #6a7686; }
+.timeline-name { margin: 0; font-size: 13.5px; font-weight: 600; word-break: break-word; }
+.timeline-meta { margin: 0; font-size: 12px; color: #6a7686; display: flex; align-items: center; flex-wrap: wrap; gap: 4px; }
+
+@media (max-width: 1100px) {
+  .content-grid-aside { grid-template-columns: 1fr; }
+  .timeline-panel { height: auto; max-height: 420px; }
+}
+
+/* ---- Loading skeleton ---- */
+.visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+.skeleton { height: 625px; border: 1px solid #dce3ec; border-radius: 12px; background: white; overflow: hidden; display: flex; flex-direction: column; }
+.skeleton-head { height: 56px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e6ee; flex: none; }
+.skeleton-table { padding: 18px; display: flex; flex-direction: column; gap: 18px; }
+.skeleton-row { display: grid; grid-template-columns: 18px minmax(0, 1fr) 84px 70px; align-items: center; gap: 14px; }
+
+.skeleton-bar { height: 11px; border-radius: 5px; background: #e8ecf2; display: block; }
+.skeleton-bar-title { width: 190px; height: 13px; }
+.skeleton-bar-button { width: 104px; height: 30px; border-radius: 8px; }
+.skeleton-bar-meta { width: 84px; }
+.skeleton-bar-pill { width: 70px; height: 18px; border-radius: 999px; }
+.skeleton-icon { width: 18px; height: 18px; border-radius: 4px; background: #e8ecf2; }
+
+/* One sweep across the panel rather than each bar pulsing on its own clock, which reads
+   as noise. */
+.skeleton-bar, .skeleton-icon { background-image: linear-gradient(90deg, #e8ecf2 0%, #f3f6fa 40%, #e8ecf2 80%); background-size: 320px 100%; background-repeat: no-repeat; animation: skeleton-sweep 1.25s ease-in-out infinite; }
+@keyframes skeleton-sweep { from { background-position: -320px 0; } to { background-position: calc(100% + 320px) 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton-bar, .skeleton-icon { animation: none; }
+}
+
+/* The history skeleton reuses the timeline's own geometry, so the entries do not shift
+   when the real ones replace them. */
+.skeleton-timeline .timeline-dot { border-color: #e0e5ec; background: #e8ecf2; }
+.skeleton-bar-date { width: 62px; height: 9px; }
+.skeleton-bar-name { width: 84%; height: 12px; margin-top: 1px; }
+.skeleton-timeline .skeleton-bar-meta { width: 108px; height: 10px; }
+
+
+/* ---- Modal ---- */
+.clm-modal-backdrop { position: fixed; inset: 0; z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(16, 26, 40, .48); }
+.clm-modal { width: min(720px, 100%); max-height: min(640px, 90vh); display: flex; flex-direction: column; background: white; border-radius: 12px; box-shadow: 0 18px 48px rgba(16, 26, 40, .28); overflow: hidden; }
+.clm-modal:focus { outline: none; }
+.clm-modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-bottom: 1px solid #e0e6ee; flex: none; }
+.clm-modal-head h2 { margin: 0; font-size: 15px; font-weight: 750; }
+.clm-modal-close { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #5c6470; cursor: pointer; }
+.clm-modal-close:hover { background: #eef1f5; color: #1d2733; }
+.clm-modal-close:focus-visible { outline: 2px solid #1166e8; outline-offset: 1px; }
+/* Hugs its content rather than reserving a fixed height: box-ui-elements sizes the
+   uploader itself, and a floor taller than that left a band of empty dialog under the
+   element's own footer. It grows with the upload list and scrolls at the modal's cap. */
+.clm-modal-body { flex: 0 1 auto; overflow: auto; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .clm-modal { animation: clm-modal-rise .16s ease-out; }
+  @keyframes clm-modal-rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+
+/* Two rows: the action, then the pair of panels. Main sits out the first row so the
+   table and the history start on the same line. */
+.content-grid-aside { grid-template-rows: auto minmax(0, 1fr); }
+.content-grid-aside > main { grid-column: 1; grid-row: 2; }
+.content-grid-aside .timeline-panel { grid-column: 2; grid-row: 2; height: auto; min-height: 0; }
+
+.upload-button { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 8px; border: 1px solid #101f33; background: #16233a; color: white; font-size: 13px; font-weight: 650; cursor: pointer; }
+.upload-button:hover { background: #22334f; }
+.upload-button:focus-visible { outline: 2px solid #1166e8; outline-offset: 2px; }
+
+/* ---- Portfolio ----
+   Validated three-slot categorical set (blue, orange, aqua), assigned by position and
+   never cycled; dark is the same three hues re-stepped for the dark surface, not a flip. */
+.viz { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; }
+.portfolio { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .viz { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
+}
+:root[data-theme="dark"] .viz { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
+
+.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
+.stat-tile { display: flex; flex-direction: column; gap: 3px; padding: 15px 17px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
+.stat-label { font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: #6a7686; }
+.stat-value { font-size: 25px; font-weight: 750; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.stat-note { font-size: 12px; color: #6a7686; }
+
+.chart-row { display: grid; grid-template-columns: minmax(0, 288px) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
+.chart-figure { margin: 0; padding: 16px 18px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
+.chart-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
+
+.donut-row { display: flex; align-items: center; flex-wrap: wrap; gap: 14px 18px; }
+.donut { width: 132px; height: 132px; flex: none; }
+.donut-total { text-anchor: middle; font-size: 21px; font-weight: 750; fill: #1d2733; font-variant-numeric: tabular-nums; }
+.donut-total-label { text-anchor: middle; font-size: 9.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; fill: #6a7686; }
+
+.legend { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; flex: 1 1 108px; min-width: 0; }
+.legend li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.legend-swatch { width: 10px; height: 10px; border-radius: 3px; flex: none; }
+.legend-label { color: #3f4a58; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.legend-value { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 13px; }
+.bar-row { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.bar-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.bar-label { color: #3f4a58; min-width: 0; overflow-wrap: anywhere; }
+.bar-track { height: 14px; border-radius: 4px; background: #eef1f5; overflow: hidden; }
+.bar-fill { display: block; height: 100%; border-radius: 4px; background: var(--series-1); }
+.bar-value { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bar-value-critical { color: #c0392b; }
+
+@media (max-width: 940px) {
+  .stat-row { grid-template-columns: 1fr; }
+  .chart-row { grid-template-columns: 1fr; }
+}
+
+.workspace-metrics-row { padding: 24px 28px 0; }
+.workspace-metrics { display: flex; flex-direction: column; gap: 14px; }
+.stat-row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat-value-date { font-size: 18px; }
+.cell-type { color: #3f4a58; white-space: nowrap; }
+@media (max-width: 900px) { .stat-row-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.chart-empty { margin: 0; font-size: 12.5px; color: #6a7686; }
+/* Reserved status colour, used only where the chart's subject is a status. */
+.bar-fill-critical { background: #c0392b; }
+
+.stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+@media (max-width: 1000px) { .workspace-metrics { grid-template-columns: 1fr; } }
+
+.contract-table { margin-top: 4px; }
+.contract-table .box-table-name { text-align: left; }
+.cell-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.head-actions { display: flex; align-items: center; gap: 10px; }
+
+/* Namespaced, all of it. box-ui-elements' preview.css defines its own `.modal-backdrop`
+   at `z-index: -1` and its own `.modal` as a fixed full-screen layer; both are lazy chunks
+   that land in the cascade after this file, at equal specificity, so they won. The dialog
+   was painted behind the page it was covering. Nothing here shares a name with a
+   stylesheet we do not own.
+
+   A failed read, stated plainly. Warning-coloured rather than error-red: the page is
+   working, the data behind one panel is not. */
+.data-error { display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px; border: 1px solid #eddcae; border-left: 4px solid #d99e2b; border-radius: 12px; background: #fdf8ec; }
+.data-error-icon { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 9px; color: #96660f; background: #f7ebcf; }
+.data-error-copy { flex: 1; min-width: 0; }
+.data-error h2 { margin: 2px 0 5px; font-size: 15px; font-weight: 750; color: #6d4c0c; }
+.data-error p { margin: 0; color: #7b6231; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.data-error .secondary-button { flex: none; }

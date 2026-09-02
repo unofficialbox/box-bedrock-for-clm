@@ -8,7 +8,7 @@
  * distinct from "the folder is empty".
  *
  * The listing itself was verified against the live org and live Box on 2026-09-01:
- * `CLM-SAMPLE-NST-2024` returned all nine documents with their Box file IDs, and
+ * `CLM-2024-0311` returned all nine documents with their Box file IDs, and
  * `box__BoxAIAskByItemId` answered from the insurance certificate with real figures.
  */
 @IsTest
@@ -56,6 +56,23 @@ private class ClmContractPackageTest {
         Test.stopTest();
 
         System.assert(result.outputSummary.contains('CLM-2026-0017'), result.outputSummary);
+    }
+
+    @IsTest
+    static void returnsTheResolvedReferenceWhateverTheCallerTyped() {
+        // Whatever downstream stays bounded to this contract -- asking Box AI about one of
+        // its documents -- needs the reference the lookup settled on, not the one that was
+        // typed. Without this the agent bound an empty variable and the ask failed with
+        // REQUIRED_FIELD_MISSING on contractReference.
+        CLM_Contract__c record = contract();
+
+        Test.startTest();
+        ClmContractPackage.Result byName = run('Northstar');
+        ClmContractPackage.Result byId = run(record.Id);
+        Test.stopTest();
+
+        System.assertEquals('CLM-2026-0017', byName.outputContractReference);
+        System.assertEquals('CLM-2026-0017', byId.outputContractReference);
     }
 
     @IsTest

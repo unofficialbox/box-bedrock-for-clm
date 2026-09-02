@@ -36,7 +36,7 @@ A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce + 
 
 ### Wave 2 — making it actually work (PRs #31–#38, 2026-08-28)
 
-Nothing in wave 1 had ever run against Box. Every layer failed, each one masking the next, because the workspace falls back to synthetic fixtures on *any* Box failure — a CORS rejection, a dead endpoint, and a crashed component all rendered the same screen.
+Nothing in wave 1 had ever run against Box. Every layer failed, each one masking the next, because the workspace fell back to synthetic fixtures on *any* Box failure — a CORS rejection, a dead endpoint, and a crashed component all rendered the same screen. (That fallback was removed on 2026-09-01; every failure now names itself.)
 
 - **#31, #32** scripted the `CLM_Box_Config__c` org default (MT-039) and recorded the Multi-Framework feature gate as MT-041.
 - **#33, #35** embedded Content Explorer and Content Uploader, granted the token as a user rather than the service account, and moved credential setup into `configure-clm-box-credential.sh` (MT-038), dropping the Basic username/password.
@@ -71,7 +71,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 | `.../objects/CLM_Box_Config__c/` | `Box_User_Id__c` / `Enterprise_Id__c` + `Allowed_Folder_Ids__c` folder allowlist |
 | `.../permissionsets/CLM_Box_Preview_Guest.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
 | `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and CCG subject + folder allowlist (MT-039) |
-| `.../clmreactapp/src/components/BoxWorkspace.tsx` | Live branch (token + folder listing) with synthetic-fixture fallback; both failure paths log |
+| `.../clmreactapp/src/components/BoxWorkspace.tsx` | Token, then folder listing; either failure renders `DataError` with the reason, and no fixture stands in |
 | `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
 | `.../clmreactapp/src/components/BoxDocumentTable.tsx` | The file table itself — name, modified, size |
 | `.../clmreactapp/src/components/BoxDocumentPreview.tsx` | Inline document preview: Box's expiring embed URL in an iframe, no preview library |
@@ -89,7 +89,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
 ## 6. Open threads / caveats
 
-1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** **MT-043** (the `CLM_Box_App` trusted site that lets the preview iframe render) was deployed to the `agentforce` org on 2026-08-31 and verified: `https://*.app.box.com`, active, frame-src true — the wildcard is accepted, so no tenant subdomain is hardcoded. Any other environment still needs it. Worth noting the org itself confirms the constraint this design works around: querying `IsApplicableToScriptSrc` on `CspTrustedSite` fails with "No such column". `http://localhost:4173` was added to the Box app's CORS domains on 2026-08-31, so the local harness reaches live Box. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing and the workspace silently falls back to fixtures. Check the browser console: both failure paths log now.
+1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** **MT-043** (the `CLM_Box_App` trusted site that lets the preview iframe render) was deployed to the `agentforce` org on 2026-08-31 and verified: `https://*.app.box.com`, active, frame-src true — the wildcard is accepted, so no tenant subdomain is hardcoded. Any other environment still needs it. Worth noting the org itself confirms the constraint this design works around: querying `IsApplicableToScriptSrc` on `CspTrustedSite` fails with "No such column". `http://localhost:4173` was added to the Box app's CORS domains on 2026-08-31, so the local harness reaches live Box. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing, and the workspace now names the rejection on screen rather than standing in fixtures.
 2. **The contract dashboard needs a sharing decision before it shows real data.**
    `ClmContractListService` works — verified as an admin against the org, returning 13
    records through its fixed projection — but `CLM_Contract__c` is Private/Private and
@@ -98,11 +98,11 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    on `CLM_Box_Preview_Guest`; what is missing is a **guest user sharing rule**, and
    creating one makes contract records readable by unauthenticated visitors. That is a
    deliberate exposure, tracked as **MT-045**, not a bug to fix. Until it exists the
-   dashboard renders its synthetic fixture and says so.
+   dashboard reports that the contract list could not be read.
 3. **Folder-id gotcha.** The workspace still defaults to the non-numeric string `demo-workspace` (`src/config.ts`), which the endpoint rejects as `invalid_folder_id` before any Box call. Pass `?folderId=` or rebuild with `VITE_BOX_FOLDER_ID`; locally, `CLM_BOX_FOLDER_ID` for `preview:live`.
 4. **Document preview works, and it is not the Content Explorer.** The workspace lists
-   the governed folder itself (`BoxWorkspace` already fetched that listing to decide live
-   vs fixtures) and renders it as a plain table; clicking a row mounts
+   the governed folder itself (`BoxWorkspace` already fetched that listing to decide
+   whether there is a workspace at all) and renders it as a plain table; clicking a row mounts
    `box-ui-elements/es/elements/content-preview` on that file id. Verified against live
    Box on 2026-08-31 through the local harness, in both the dev server and the production
    bundle: a 7-page redline renders.
@@ -231,7 +231,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    a callout after DML.
 
    **The agent answers end to end, verified in the Agentforce Builder preview on
-   2026-09-01.** "Summarize the insurance certificate for CLM-SAMPLE-NST-2024: dollar
+   2026-09-01.** "Summarize the insurance certificate for CLM-2024-0311: dollar
    amounts and expiration dates" returns the three coverages with their limits and
    2027-06-30 expiries, citing `northstar-insurance-certificate.pdf`, in one turn. The
    trace reads Contract Router -> document answers -> get contract package -> ask box ai ->
@@ -289,6 +289,42 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
    Doc Gen and Sign are deliberately **not** on this agent (see item 10).
 
+   **`ask_box_ai` failed with `REQUIRED_FIELD_MISSING: contractReference` until v14.** The
+   trace showed the ask firing with `contractReference: ""`. The binding is
+   `with contractReference = @variables.contractId`, and nothing ever wrote that variable:
+   `get_contract_package` set the record id, the folder and the package, but not the
+   reference, so the ask depended on `capture_contract_reference` having happened to run
+   first. It usually had not.
+
+   Writing the variable was not enough. `ClmContractPackage` now returns
+   `outputContractReference` -- the canonical reference, so "Northstar Health System MSA
+   Package" comes back as `CLM-2026-0017` -- and both `get_contract_package` bindings set
+   `@variables.contractId` from it. That shipped as v14 and the ask still arrived empty.
+
+   **The binding itself was the problem.** `with contractReference = @variables.contractId`
+   overrides the model: whatever that variable holds is what the action gets, and an unset
+   variable is an empty string, so `is_required: True` cannot help -- the planner was never
+   being asked to supply the value. v15 makes it `with contractReference = ...` like the file
+   id and the prompt beside it, so the model fills it from the package listing it just read.
+
+   **That does not loosen the bound, because the bound was never the binding.**
+   `ClmBoxAskDocument.resolveScope` checks that `itemId` appears in
+   `documentIdsFor(contractReference)`; a caller that names one contract and passes another's
+   file is refused whatever wrote the reference. Two tests now hold that line directly rather
+   than passing because the lookup was unresolvable in a test context.
+
+   Two things worth knowing here. An empty string in a required invocable variable surfaces
+   as a platform `REQUIRED_FIELD_MISSING` and a 500, not as an Apex refusal, so the failure
+   never reaches the class's own error handling and the agent gets nothing it can act on.
+   Requiredness is enforced from the `.agent` action's `is_required: True`, not from the
+   Apex annotation -- the published input schema still lists the field as required after
+   `required=true` is removed from `@InvocableVariable`. And **an action output must be declared in
+   the `.agent` `outputs:` block before any binding may reference it** -- the publish fails
+   with `'outputContractReference' is not a defined output of action`, naming each binding
+   line. That compile check is the only structural verification available: the retrieved
+   `agentGraph` JSON serializes none of the variable bindings, so grepping it for a variable
+   name proves nothing either way.
+
    Both Apex legs were also verified directly against the live org and live Box:
 6. **A Box folder needs a *direct* collaboration before it can be downscoped.** Inherited
    access is not enough, and the failure is badly disguised: `GET /2.0/folders/<id>`
@@ -316,7 +352,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
    **This affects every contract whose folder the package provisions.** The workspace
    requests `item_upload item_delete item_rename item_share`, so the token mint fails
-   outright and the panel falls back to fixtures. It has gone unnoticed only because the
+   outright and the panel reports the refusal. It has gone unnoticed only because the
    demo has always pointed at Northstar. Until `ClmBoxFolderService` grants the
    collaboration itself, provisioning a contract folder is a two-step operation:
 
@@ -392,7 +428,13 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    ```
 
    One query, across two contracts on two different papers, replacing a folder listing plus
-   nine Box AI reads. `documentType` (MSA, DPA, SOW, Order Form, Security Exhibit,
+   nine Box AI reads -- **but only when it is scoped**. Metadata search is enterprise-wide, and
+   this enterprise still holds documents from earlier demo environments (`CLM-2026-Northstar1`,
+   `CLM-2026-Northstar - 20260724T121732Z`). Those carry the same file names as the governed
+   copies, different file IDs, and in two cases the `clauseRisk = Critical` tag landed on the
+   stale copy while the governed one went untagged. Unscoped, the query returns four files and
+   two of them are not in a contract folder at all. Pass `ancestor_folder_id` for the CLM Root
+   folder and it returns the two that matter. `documentType` (MSA, DPA, SOW, Order Form, Security Exhibit,
    Insurance, Approval Memo) makes "find the insurance certificate" deterministic instead of
    a filename guess.
 
@@ -526,11 +568,89 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    from. `scripts/generate_docgen_templates.py` authors it; registering it is a
    `POST /2.0/docgen_templates` with the uploaded file id.
 
-   Two identity traps showed up again here. `pushFileToBox` names the Box file from
-   `PathOnClient` **and appends the extension**, so a title ending in `.docx` becomes
-   `.docx.docx`. And the DocGen template folder is owned by the CLM Box app's user while the
+   Two identity traps showed up again here. `pushFileToBox` **appends the extension** to
+   the ContentVersion title, so a title ending in `.docx` becomes `.docx.docx`. Give
+   `sf data create file -t` the bare stem and the name comes out right first time; there is
+   no rename to do afterwards. And the DocGen template folder is owned by the CLM Box app's user while the
    Toolkit writes as the Salesforce Admin Box user, so the upload 404'd until that folder was
    collaborated to the Toolkit's identity -- the mirror image of the gap in item 6.
+
+11. **The counterparty sees a filtered folder, not a different one.** Two contracts had
+   problems that looked unrelated and were the same problem: a counterparty could read
+   Acme's redlines, and the demo's default contract showed synthetic fixtures.
+
+   `listBoxFolderItems` now asks Box for the `clmDocument` instance inline and withholds
+   anything marked `Redline`. The field is requested as `metadata.enterprise.clmDocument` --
+   the shorthand for the caller's own enterprise, verified against the API -- so no
+   enterprise ID reaches the browser. It matches on `versionStatus`, not the file name,
+   which is the difference between a control and a coincidence: a redline named
+   `v5-final.pdf` is still a redline. Untagged files are shown, because an unclassified
+   upload is a tagging gap to fix rather than a document to hide.
+
+   **`CLM-2026-0017` had no Box folder at all** -- no `box__FRUP__c` row and a null
+   `Box_Workspace_Folder_ID__c` -- which is why it fell back to fixtures, why its documents
+   were not clickable (fallback rows are `div`s, not links), and why risk pills appeared
+   (fixture data). One missing mapping, three symptoms. It now has a provisioned folder
+   carrying the seven documents of the 2026 negotiation. The 2024 and 2025 executed MSAs are
+   deliberately *not* in it: they belong to their own contracts, and copying them would
+   repeat the shape `CLM-2024-0311`'s folder already has, where one folder holds every
+   Northstar document regardless of which contract it belongs to.
+
+   That folder is now the better demonstration of the filter, because the same folder answers
+   differently by audience: the internal package lists seven, the counterparty's workspace
+   lists five. Anywhere else the redlines were only incidentally absent.
+
+   **Provisioning by hand is four steps, and the second is the one people miss:**
+   `box.Toolkit.createFolderForRecordId`, then a `POST /2.0/collaborations` granting
+   `CLM_Box_Config__c.Box_User_Id__c` editor on the new folder (see item 6 -- without it
+   nothing can read the folder, not even the CCG app), then the uploads, then the
+   `clmDocument` metadata. `ClmBoxFolderService` does the first two together; calling the
+   Toolkit directly does not.
+
+    **Getting a counterparty to a Box document took four separate grants, and each one
+    failed differently.** Worth reading as a set, because none of the failures named the
+    thing that was missing:
+
+    - **Field-level security on every field the query selects.** UI API rejects the whole
+      query when one selected field is hidden, so the list came back empty and the app fell
+      back to a fixture -- which happened to be a contract for the same counterparty, so it
+      read as the scoping working.
+    - **`API Enabled`.** Apex REST refuses without it, with a bare 403. The contract list
+      kept working throughout, because GraphQL goes through the site's own bridge.
+    - **Read on `UserExternalCredential`, and the `CLM_Box-CLM_Box_Principal` external
+      credential.** Apex cannot use the org's Client Credentials Grant on a user's behalf
+      unless that user is granted the principal. Missing, the endpoint is reached, runs, and
+      throws `System.CalloutException`, which reaches the browser as `box_request_failed`
+      with nothing to say a permission is involved. `CLM_Box_Preview_Guest` and
+      `CLM_Contract_Agent` both carry the same pair.
+
+    The pattern across all four: a permission gap on this path never says "permission".
+    It says empty, or 403, or CalloutException. When a counterparty surface half-works,
+    compare its permission set against `CLM_Box_Preview_Guest`, which is the one known to
+    reach Box end to end.
+
+    **A counterparty needs `API Enabled` or the Box token endpoint 403s.** This is the
+    subtlest of the counterparty problems because it fails in only one direction. The
+    contract list reads through the GraphQL UI API, which goes through the site's own
+    bridge and needs no such permission, so the list worked. The Box token is minted by
+    Apex REST, and a call to `/services/apexrest` is refused with a bare 403 unless the
+    caller has `API Enabled`, which the Customer Community profile does not grant. The
+    result is a workspace that lists contracts perfectly and then cannot load a single
+    document. It is on `CLM_Counterparty_Portal` now, and it widens nothing: it governs
+    whether the platform answers that user at all, not what it answers with.
+
+12. **The counterparty app carries no agent, and that was a decision.** The Copilot was a
+   Service Agent: it ran as its assigned agent user rather than the person signed in, and
+   took the contract it answered about from the conversation. So the sharing set, the field
+   permissions and the redline filter all bounded the page while the agent sat beside them
+   bounded by none of it -- able to read a redline the page had just withheld, and the clause
+   library holding Acme's negotiating positions. What it offered in exchange was thin: every
+   question a counterparty would ask it is answered by the record already on screen.
+
+   Removed with it: the panel, its styles, the `agentforce` config block, and
+   `getAgentContextPrompt`. Three unit tests and one e2e now assert the absence, so the
+   decision does not drift back. An **Employee Agent** inherits the signed-in user's
+   permissions and is the surface on which a conversational beat would be worth building.
 
 ## 7. How to verify you're in a good state
 
