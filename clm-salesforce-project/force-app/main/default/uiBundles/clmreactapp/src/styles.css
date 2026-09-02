@@ -60,11 +60,6 @@ button { cursor: pointer; }
 .file-copy { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
 .file-copy strong { font-size: 13px; }
 .file-copy small { overflow: hidden; color: #7b899b; font-size: 11px; text-overflow: ellipsis; white-space: nowrap; }
-.risk { padding: 4px 8px; border-radius: 999px; font-size: 10px; font-weight: 800; }
-.risk-critical { color: #a82431; background: #ffe8eb; }
-.risk-high { color: #9b5800; background: #fff0d7; }
-.risk-medium { color: #67570d; background: #fff8cc; }
-.risk-low { color: #27623b; background: #e7f7ec; }
 .secure-note { padding: 11px 18px; display: flex; align-items: center; gap: 7px; color: #66788d; background: #f8fafc; border-top: 1px solid #e5ebf2; font-size: 11px; }
 .workspace-state { padding: 40px; border: 1px solid #dce3ec; border-radius: 12px; color: #61738a; background: white; }
 
@@ -88,7 +83,6 @@ button { cursor: pointer; }
   .panel-head, .section-heading { align-items: stretch; flex-direction: column; }
   .file-row { grid-template-columns: 38px minmax(0, 1fr) auto; }
   .file-row > svg { display: none; }
-  .risk { display: none; }
 }
 
 /* Box UI Elements hosts. The elements bring their own styles; these only give them
