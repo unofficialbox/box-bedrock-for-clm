@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FileStack, LayoutDashboard } from "lucide-react";
 import { BoxWorkspace } from "./components/BoxWorkspace";
+import { DocumentTimeline } from "./components/DocumentTimeline";
 import { ContractList } from "./components/ContractList";
+import type { BoxFolderItem } from "./lib/box";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
 import { getClmPageContext } from "./lib/box";
 
@@ -42,6 +44,7 @@ function contractSearch(contract: ClmContractSummary): string {
 export function Workspace() {
   const [context, setContext] = useState(() => getClmPageContext());
   const [selected, setSelected] = useState<ClmContractSummary | null>(null);
+  const [files, setFiles] = useState<BoxFolderItem[]>([]);
   /**
    * A record in the URL means the page was opened with context -- a Lightning or
    * Experience page bound to one contract -- so it goes straight to that workspace.
@@ -135,14 +138,15 @@ export function Workspace() {
         </div>
       ) : null}
 
-      <div className="content-grid">
+      <div className={`content-grid${view === "workspace" ? " content-grid-aside" : ""}`}>
         <main>
           {view === "contracts" ? (
             <ContractList onSelect={openContract} />
           ) : (
-            <BoxWorkspace context={workspaceContext} />
+            <BoxWorkspace context={workspaceContext} onFilesLoaded={setFiles} />
           )}
         </main>
+        {view === "workspace" ? <DocumentTimeline files={files} /> : null}
       </div>
     </div>
   );

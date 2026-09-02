@@ -17,6 +17,12 @@ export interface BoxFolderItem {
   /** Bytes, for the size column. Absent on items Box does not report it for. */
   size?: number;
   modified_at?: string;
+  /**
+   * When the document itself was last changed, as opposed to when it was uploaded here.
+   * Box keeps the two separate, and this is the one a reader means by "last modified".
+   */
+  content_modified_at?: string;
+  modified_by?: { name?: string };
   extension?: string;
   /**
    * The clmDocument instance, requested inline with the listing.
@@ -65,7 +71,7 @@ export async function listBoxFolderItems(
   try {
     const response = await fetch(
       `https://api.box.com/2.0/folders/${encodeURIComponent(folderId)}/items` +
-        `?fields=id,name,type,size,extension,modified_at,` +
+        `?fields=id,name,type,size,extension,modified_at,content_modified_at,modified_by,` +
         `${encodeURIComponent("metadata.enterprise.clmDocument")}&limit=100`,
       { headers: { Authorization: `Bearer ${accessToken}` } }
     );

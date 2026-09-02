@@ -1,4 +1,5 @@
-import { lazy, Suspense, useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { WorkspaceSkeleton } from "./WorkspaceSkeleton";
 import { ExternalLink, FileText, FolderOpen } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
@@ -13,11 +14,30 @@ const BoxElements = lazy(() =>
   import("./BoxElements").then((module) => ({ default: module.BoxElements })),
 );
 
-export function BoxWorkspace({ context }: { context: ClmPageContext }) {
+export function BoxWorkspace({
+  context,
+  onFilesLoaded,
+}: {
+  context: ClmPageContext;
+  /**
+   * Hands the loaded listing up so the timeline beside this panel is built from the same
+   * array, already filtered. A second fetch could disagree with what the table shows.
+   */
+  onFilesLoaded?: (files: BoxFolderItem[]) => void;
+}) {
   const [token, setToken] = useState("");
   const [folderId, setFolderId] = useState("");
   const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   const [loading, setLoading] = useState(true);
+  /**
+   * Held in a ref, not a dependency. The prop is optional, so a caller passing an inline
+   * function would otherwise change identity every render and refetch the folder in a
+   * loop.
+   */
+  const notifyFiles = useRef(onFilesLoaded);
+  useEffect(() => {
+    notifyFiles.current = onFilesLoaded;
+  }, [onFilesLoaded]);
 
   /**
    * Resolve the governed token, then probe the folder.
@@ -44,6 +64,7 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
       const entries = await listBoxFolderItems(granted.folderId, granted.accessToken);
       if (!active) return;
       setFiles(entries);
+      notifyFiles.current?.(entries || []);
       setLoading(false);
     })();
     return () => {
@@ -52,7 +73,7 @@ export function BoxWorkspace({ context }: { context: ClmPageContext }) {
   }, [context]);
 
   if (loading) {
-    return <div className="workspace-state" data-testid="box-loading">Connecting to the governed Box workspace…</div>;
+    return <WorkspaceSkeleton />;
   }
 
   // A token plus a listing that came back is live content, even when the folder is empty.
