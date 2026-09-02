@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 
 test("contract workspace reports a failed read, and speaks for no contract it cannot name", async ({ page }) => {
   await page.goto("/?recordId=a01xx0000001234&contractId=CLM-2026-0017&folderId=123");
-  await expect(page).toHaveTitle(/Acme Contracts/);
+  await expect(page).toHaveTitle(/Acme Vendor Portal/);
   // No org behind the built bundle, so the workspace must say so rather than render the
   // synthetic folder it used to fall back to.
   await expect(page.getByTestId("box-error")).toBeVisible();

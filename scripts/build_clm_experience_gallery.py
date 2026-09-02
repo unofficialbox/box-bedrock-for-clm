@@ -237,7 +237,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
   <header>
     <div>
       <div class="brand-logos" aria-label="Platforms in this scenario">{brand_logos(tuple(scenario['brands']))}</div>
-      <p class="kicker">Acme Robotics · Visual Gallery · {html.escape(str(scenario['title']))}</p>
+      <p class="kicker">Acme Technologies · Visual Gallery · {html.escape(str(scenario['title']))}</p>
       <h1>{html.escape(str(scenario['headline']))}</h1>
       <p>{html.escape(str(scenario['description']))} Every product image below was captured from the real demo app or live Box tenant—not a documentation site.</p>
     </div>

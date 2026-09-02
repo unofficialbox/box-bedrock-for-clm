@@ -14,7 +14,7 @@ tags: [payment, net-45, approved]
 
 # Standard Payment Terms
 
-Customer will pay undisputed invoiced amounts within forty-five days after the invoice date. Customer must notify Acme Robotics of a good-faith invoice dispute within fifteen days of receipt and timely pay all undisputed amounts. Fees are non-cancellable and non-refundable except as expressly stated in the agreement.
+Customer will pay undisputed invoiced amounts within forty-five days after the invoice date. Customer must notify Acme Technologies of a good-faith invoice dispute within fifteen days of receipt and timely pay all undisputed amounts. Fees are non-cancellable and non-refundable except as expressly stated in the agreement.
 
 ## Use when
 

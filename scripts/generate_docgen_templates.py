@@ -83,7 +83,7 @@ def set_table_geometry(table, widths_dxa):
             set_cell_margins(cell)
 
 
-def configure(doc, running_label, footer_label="Acme Robotics | CLM-2026-Northstar"):
+def configure(doc, running_label, footer_label="Acme Technologies | CLM-2026-Northstar"):
     section = doc.sections[0]
     section.page_width = Inches(8.5)
     section.page_height = Inches(11)
@@ -241,7 +241,7 @@ def msa_redline():
         doc,
         "In negotiation",
         "Master Services Agreement - Redline",
-        "Acme Robotics, Inc. and Northstar Health System | CLM-2026-Northstar | Draft, in redline",
+        "Acme Technologies, Inc. and Northstar Health System | CLM-2026-Northstar | Draft, in redline",
     )
 
     def clause(heading, body, redline):
@@ -304,7 +304,7 @@ def counter_position():
     assembled, not the place they are invented.
     """
     doc = Document()
-    configure(doc, "CLM Counter-Position", "Acme Robotics | {{contract.id}}")
+    configure(doc, "CLM Counter-Position", "Acme Technologies | {{contract.id}}")
     add_title(
         doc,
         "Negotiation position",
@@ -354,7 +354,7 @@ def main():
     for name, document in templates.items():
         document.core_properties.title = name.removesuffix(".docx").replace("-", " ").title()
         document.core_properties.subject = "Box DocGen template for the Northstar CLM demo"
-        document.core_properties.author = "Acme Robotics CLM Demo"
+        document.core_properties.author = "Acme Technologies CLM Demo"
         document.save(OUTPUT / name)
         print(OUTPUT / name)
 
