@@ -3,6 +3,7 @@ import { FileStack } from "lucide-react";
 import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
 import { PortfolioCharts } from "./PortfolioCharts";
 import { DataError } from "./DataError";
+import { ContractsSkeleton } from "./WorkspaceSkeleton";
 import { formatDate } from "../lib/documents";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 
@@ -52,7 +53,7 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
   const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   if (loading) {
-    return <div className="workspace-state" data-testid="contracts-loading">Loading contract records…</div>;
+    return <ContractsSkeleton />;
   }
 
   // Nothing is drawn over a failure. A list of contracts is a claim about what this

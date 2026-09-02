@@ -251,6 +251,20 @@ button { cursor: pointer; }
   .skeleton-bar, .skeleton-icon { animation: none; }
 }
 
+/* The contract list's skeleton borrows the real bands -- tiles, figures, table -- so the
+   page does not rearrange itself when the rows land. */
+.contracts-skeleton { display: flex; flex-direction: column; gap: 14px; }
+.contracts-skeleton .stat-tile { gap: 10px; }
+.skeleton-bar-label { width: 68px; height: 9px; }
+.skeleton-bar-figure { width: 54px; height: 20px; }
+.skeleton-contracts-table { height: auto; }
+.skeleton-donut-row { display: flex; align-items: center; gap: 18px; padding-top: 14px; }
+.skeleton-donut { width: 116px; height: 116px; flex: none; border-radius: 50%; border: 16px solid #e8ecf2; }
+.skeleton-legend { display: flex; flex-direction: column; gap: 10px; }
+.skeleton-bars { display: flex; flex-direction: column; gap: 14px; padding-top: 16px; }
+.skeleton-bar-group { display: flex; flex-direction: column; gap: 6px; }
+.skeleton-bar-track { height: 14px; border-radius: 4px; }
+
 /* The history skeleton reuses the timeline's own geometry, so the entries do not shift
    when the real ones replace them. */
 .skeleton-timeline .timeline-dot { border-color: #e0e5ec; background: #e8ecf2; }
