@@ -172,7 +172,11 @@ export function Workspace() {
       </header>
 
       {/*
-        The banner describes the contract that is open, and nothing else.
+        The banner describes the contract that is open, and only while it is open.
+
+        The selection survives a trip to the list -- that is what lets the Workspace tab
+        return to it -- so the banner has to be gated on the view as well. Without that it
+        headed the list of every contract with the name, value and term of one of them.
 
         It used to fall back to a fixture whenever none was selected, so the list view was
         headed by another contract's name, value and term -- and by "Approval blocked",
@@ -182,7 +186,7 @@ export function Workspace() {
         The Salesforce record ID came out of the eyebrow at the same time. It is internal
         plumbing, and this page faces the counterparty.
       */}
-      {selected ? (
+      {selected && view === "workspace" ? (
         <div className="contract-banner">
           <div>
             <span className="eyebrow">{selected.contractId}</span>
