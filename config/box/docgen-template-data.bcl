@@ -80,11 +80,11 @@ locals {
             "renewal" = {
               "currentTermEndDate" = "2029-07-31"
               "noticeDeadline" = "2029-04-30"
-              "noticeText" = "Acme Robotics provides notice regarding the upcoming renewal of the agreement identified above."
+              "noticeText" = "Acme Technologies provides notice regarding the upcoming renewal of the agreement identified above."
               "requestedAction" = "Please confirm whether the parties will renew, renegotiate, or terminate before the notice deadline."
             }
             "sender" = {
-              "company" = "Acme Robotics, Inc."
+              "company" = "Acme Technologies, Inc."
               "email" = "success@acmerobotics.example"
               "name" = "Customer Success Manager"
               "title" = "Director, Customer Success"

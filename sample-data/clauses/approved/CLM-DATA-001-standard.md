@@ -14,7 +14,7 @@ tags: [privacy, dpa, security, approved]
 
 # Standard Data Processing Position
 
-Before processing personal data, the parties will execute Acme Robotics' approved data processing addendum. Acme Robotics will maintain appropriate technical and organizational measures, process personal data only on documented instructions, and notify Customer without undue delay after confirming a security incident affecting Customer personal data.
+Before processing personal data, the parties will execute Acme Technologies' approved data processing addendum. Acme Technologies will maintain appropriate technical and organizational measures, process personal data only on documented instructions, and notify Customer without undue delay after confirming a security incident affecting Customer personal data.
 
 ## Use when
 

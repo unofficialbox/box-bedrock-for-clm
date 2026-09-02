@@ -183,11 +183,11 @@ def build() -> Path:
       </div>
       <article class="workspace" aria-label="Guided contract approval experience">
         <div class="workspace-head">
-          <div class="file-title"><span class="doc-icon">{icon('document')}</span><span><strong>Master Services Agreement</strong><small>Acme Corporation · Contract · Updated May 8, 2025</small></span></div>
+          <div class="file-title"><span class="doc-icon">{icon('document')}</span><span><strong>Master Services Agreement</strong><small>Acme Technologies, Inc. · Contract · Updated May 8, 2025</small></span></div>
           <span class="status" id="status">Ready for approval</span>
         </div>
         <div class="workspace-body">
-          <section class="summary"><h3>Contract summary</h3><dl class="facts"><div><dt>Counterparty</dt><dd>Acme Corporation</dd></div><div><dt>Contract owner</dt><dd>Jamie Lee</dd></div><div><dt>Effective date</dt><dd>May 8, 2025</dd></div><div><dt>Term</dt><dd>3 years</dd></div><div><dt>Value</dt><dd>$2,450,000</dd></div><div><dt>Renewal date</dt><dd>May 7, 2028</dd></div></dl></section>
+          <section class="summary"><h3>Contract summary</h3><dl class="facts"><div><dt>Counterparty</dt><dd>Acme Technologies, Inc.</dd></div><div><dt>Contract owner</dt><dd>Jamie Lee</dd></div><div><dt>Effective date</dt><dd>May 8, 2025</dd></div><div><dt>Term</dt><dd>3 years</dd></div><div><dt>Value</dt><dd>$2,450,000</dd></div><div><dt>Renewal date</dt><dd>May 7, 2028</dd></div></dl></section>
           <section class="actions"><h3>Recommended next actions</h3><div class="next"><div class="next-row"><span class="mini">{icon('review')}</span><span><strong>Review key clauses</strong><small>Focus on indemnity and liability</small></span><span class="chevron">›</span></div><div class="next-row"><span class="mini">{icon('shield')}</span><span><strong>Confirm compliance</strong><small>Ensure policy and standard alignment</small></span><span class="chevron">›</span></div><div class="next-row"><span class="mini">{icon('handoff')}</span><span><strong>Route for approval</strong><small>Legal, Procurement, Security</small></span><span class="chevron">›</span></div></div></section>
         </div>
         <div class="approval"><div class="reviewer"><span class="avatar">{icon('person')}</span><span><strong>Approval · Priya Shah</strong><small>Legal Counsel · Review and approve to proceed</small></span></div><div class="buttons"><button class="secondary" id="changes" type="button">Request changes</button><button class="primary" id="approve" type="button">Approve</button></div></div>

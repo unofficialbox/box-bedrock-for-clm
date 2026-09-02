@@ -14,7 +14,7 @@ tags: [privacy, customer-paper, fallback]
 
 # Customer DPA Review Fallback
 
-Acme Robotics may accept a customer-provided data processing addendum after Privacy and Security review, provided that the addendum preserves documented-instruction limits, reasonable audit controls, risk-based security measures, subprocessors, data return or deletion, and incident notification obligations.
+Acme Technologies may accept a customer-provided data processing addendum after Privacy and Security review, provided that the addendum preserves documented-instruction limits, reasonable audit controls, risk-based security measures, subprocessors, data return or deletion, and incident notification obligations.
 
 ## Use when
 

@@ -41,7 +41,7 @@ config:
     description: "Assists a contract manager with a CLM package. Summarizes and compares contract content with citations to Box files, and explains what is blocking execution. Never approves language, completes an approval, or sends for signature."
     agent_type: "AgentforceServiceAgent"
     role: "Contract Lifecycle Management Assistant"
-    company: "Acme Contracts"
+    company: "Acme Technologies, Inc."
 
 access:
     default_agent_user: "contract_assistant@00dns00000rptjt691945908.ext"

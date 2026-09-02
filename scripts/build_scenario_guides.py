@@ -573,7 +573,7 @@ def build_scenario(scenario: dict[str, object]) -> Path:
 <body>
   <header class="masthead">
     <div class="shell masthead-inner">
-      <div class="brand"><img data-brand-logo="box" src="{data_uri(BRAND_ASSETS / 'box-logo-blue.svg')}" alt="Box"><span class="brand-label">Acme Robotics · CLM Demo Guide</span></div>
+      <div class="brand"><img data-brand-logo="box" src="{data_uri(BRAND_ASSETS / 'box-logo-blue.svg')}" alt="Box"><span class="brand-label">Acme Technologies · CLM Demo Guide</span></div>
       <button class="print-button" type="button" onclick="window.print()">Print / Save PDF</button>
     </div>
   </header>

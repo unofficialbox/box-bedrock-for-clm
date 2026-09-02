@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import csv
 import json
 from pathlib import Path
 
@@ -24,8 +23,7 @@ from reportlab.platypus import (
 ROOT = Path(__file__).resolve().parents[1]
 PDF_OUT = ROOT / "output" / "pdf"
 JSON_OUT = ROOT / "output" / "json"
-CSV_OUT = ROOT / "output" / "csv"
-for directory in (PDF_OUT, JSON_OUT, CSV_OUT):
+for directory in (PDF_OUT, JSON_OUT):
     directory.mkdir(parents=True, exist_ok=True)
 
 
@@ -150,11 +148,11 @@ def build_msa():
     path = PDF_OUT / "northstar-msa-redline-v3.pdf"
     story = doc_header(
         "Master Services Agreement - Redline v3",
-        "Acme Robotics, Inc. and Northstar Health System | CLM-2026-Northstar",
+        "Acme Technologies, Inc. and Northstar Health System | CLM-2026-Northstar",
     )
     story += [
         section("1. Parties and Scope"),
-        p("This Master Services Agreement governs Acme Robotics implementation, support, and analytics services for Northstar Health System facilities in the United States."),
+        p("This Master Services Agreement governs Acme Technologies implementation, support, and analytics services for Northstar Health System facilities in the United States."),
         section("2. Term and Renewal"),
         p("Initial term is thirty-six months from the effective date. The agreement renews automatically for successive one-year periods unless either party provides notice before expiration. <b>Issue: notice window is not defined.</b>"),
         section("3. Payment"),
@@ -191,10 +189,10 @@ def build_realistic_msa():
     path = PDF_OUT / "northstar-msa-redline-v4.pdf"
     story = doc_header(
         "Master Services Agreement - Negotiated Draft v4",
-        "Acme Robotics, Inc. and Northstar Health System | Effective Date: July 31, 2026 | CLM-2026-Northstar",
+        "Acme Technologies, Inc. and Northstar Health System | Effective Date: July 31, 2026 | CLM-2026-Northstar",
     )
     story += [
-        p("This Master Services Agreement (the <b>Agreement</b>) is entered into as of July 31, 2026 (the <b>Effective Date</b>) by and between Acme Robotics, Inc., a Delaware corporation with offices at 500 Market Street, San Francisco, California 94105 (<b>Acme</b>), and Northstar Health System, a Minnesota nonprofit corporation with offices at 1000 Health Plaza, Minneapolis, Minnesota 55401 (<b>Customer</b>). Acme and Customer may each be a <b>Party</b> and together the <b>Parties</b>."),
+        p("This Master Services Agreement (the <b>Agreement</b>) is entered into as of July 31, 2026 (the <b>Effective Date</b>) by and between Acme Technologies, Inc., a Delaware corporation with offices at 500 Market Street, San Francisco, California 94105 (<b>Acme</b>), and Northstar Health System, a Minnesota nonprofit corporation with offices at 1000 Health Plaza, Minneapolis, Minnesota 55401 (<b>Customer</b>). Acme and Customer may each be a <b>Party</b> and together the <b>Parties</b>."),
         section("RECITALS"),
         p("A. Acme provides hosted robotics operations, workflow analytics, implementation, support, and related professional services. B. Customer operates healthcare facilities and wishes to use the Services for operational workflows. C. The Parties intend that each Order Form and Statement of Work executed under this Agreement will be governed by these terms."),
         section("1. DEFINITIONS"),
@@ -300,7 +298,7 @@ def build_realistic_msa():
         table(
             [
                 ["Commercial Term", "Agreed Draft Value"],
-                ["Services", "Workflow Analytics, Robotics Ops Console, Premium Support"],
+                ["Services", "Workflow Analytics, Operations Console, Premium Support"],
                 ["Subscription term", "36 months"],
                 ["Annual recurring fees", "$2,400,000"],
                 ["Implementation fees", "$325,000 fixed fee"],
@@ -334,10 +332,10 @@ def build_executed_msa(year, effective_date, executed_date, arr, term_months=36)
     path = PDF_OUT / f"northstar-msa-{year}-executed.pdf"
     story = doc_header(
         f"Master Services Agreement - Executed {year}",
-        f"Acme Robotics, Inc. and Northstar Health System | Effective Date: {effective_date} | CLM-{year}-Northstar",
+        f"Acme Technologies, Inc. and Northstar Health System | Effective Date: {effective_date} | CLM-{year}-Northstar",
     )
     story += [
-        p(f"This Master Services Agreement (the <b>Agreement</b>) is entered into as of {effective_date} (the <b>Effective Date</b>) by and between Acme Robotics, Inc., a Delaware corporation (<b>Acme</b>), and Northstar Health System, a Minnesota nonprofit corporation (<b>Customer</b>). This Agreement was executed by the Parties and is in full force and effect."),
+        p(f"This Master Services Agreement (the <b>Agreement</b>) is entered into as of {effective_date} (the <b>Effective Date</b>) by and between Acme Technologies, Inc., a Delaware corporation (<b>Acme</b>), and Northstar Health System, a Minnesota nonprofit corporation (<b>Customer</b>). This Agreement was executed by the Parties and is in full force and effect."),
         section("1. SERVICES AND USE RIGHTS"),
         p("Subject to Customer's payment of applicable fees, Acme grants Customer a limited, non-exclusive, non-transferable right during the subscription term to access and use the Services for Customer's internal business operations."),
         section("2. FEES, INVOICING, AND TAXES"),
@@ -373,7 +371,7 @@ def build_executed_msa(year, effective_date, executed_date, arr, term_months=36)
         table(
             [
                 ["Commercial Term", "Agreed Value"],
-                ["Services", "Workflow Analytics, Robotics Ops Console, Premium Support"],
+                ["Services", "Workflow Analytics, Operations Console, Premium Support"],
                 ["Subscription term", f"{term_months} months"],
                 ["Annual recurring fees", arr],
                 ["Payment terms", "Net 45"],
@@ -431,7 +429,7 @@ def build_sow():
 
 def build_order_form():
     path = PDF_OUT / "northstar-order-form.pdf"
-    story = doc_header("Order Form", "Acme Robotics subscription and services")
+    story = doc_header("Order Form", "Acme Technologies subscription and services")
     story += [
         table(
             [
@@ -439,7 +437,7 @@ def build_order_form():
                 ["Contract ID", "CLM-2026-Northstar"],
                 ["ARR", "$2,400,000"],
                 ["Term", "36 months"],
-                ["Products", "Workflow Analytics, Robotics Ops Console, Premium Support"],
+                ["Products", "Workflow Analytics, Operations Console, Premium Support"],
                 ["Payment Terms", "Net 90"],
                 ["Target Signature Date", "2026-07-31"],
             ],
@@ -504,10 +502,10 @@ def build_calder_customer_paper():
     path = PDF_OUT / "calder-msa-customer-paper-v2.pdf"
     story = doc_header(
         "Master Agreement for Supplier Services",
-        "Calder Financial Group plc and Acme Robotics, Inc. | Calder Legal Template MA-2024 rev.3 | CLM-2026-Calder",
+        "Calder Financial Group plc and Acme Technologies, Inc. | Calder Legal Template MA-2024 rev.3 | CLM-2026-Calder",
     )
     story += [
-        p("THIS MASTER AGREEMENT FOR SUPPLIER SERVICES (this <b>Agreement</b>) is made on 12 August 2026 BETWEEN Calder Financial Group plc, registered in England and Wales, whose registered office is at 40 Bishopsgate, London EC2N 4AJ (the <b>Company</b>), and Acme Robotics, Inc., a Delaware corporation of 500 Market Street, San Francisco, California 94105 (the <b>Supplier</b>)."),
+        p("THIS MASTER AGREEMENT FOR SUPPLIER SERVICES (this <b>Agreement</b>) is made on 12 August 2026 BETWEEN Calder Financial Group plc, registered in England and Wales, whose registered office is at 40 Bishopsgate, London EC2N 4AJ (the <b>Company</b>), and Acme Technologies, Inc., a Delaware corporation of 500 Market Street, San Francisco, California 94105 (the <b>Supplier</b>)."),
         p("<i>Drafted on the Company's standard form. Supplier amendments are shown in the margin and remain subject to Company Legal approval. The Company does not accept supplier paper.</i>"),
         section("ARTICLE 1 - INTERPRETATION"),
         p("1.1 In this Agreement: <b>Deliverables</b> means anything the Supplier is required to provide under a Statement of Work; <b>Company Data</b> means all data provided by or on behalf of the Company or generated by the Services; <b>Losses</b> means all losses, liabilities, damages, costs, claims, demands, fines, penalties and expenses of any kind, whether direct or indirect and whether foreseeable or not; <b>Regulator</b> means any authority with supervisory jurisdiction over the Company."),
@@ -583,7 +581,7 @@ def write_json():
             "amount": 2400000,
             "paymentTerms": "Net 45",
             "closeDate": "2026-07-31",
-            "products": ["Workflow Analytics", "Robotics Ops Console", "Premium Support"],
+            "products": ["Workflow Analytics", "Operations Console", "Premium Support"],
         },
         "approvalMatrix": [
             {"condition": "dealValue > 1000000", "approver": "Finance", "slaHours": 24},
@@ -620,21 +618,6 @@ def write_json():
     (JSON_OUT / "clause-playbook.json").write_text(json.dumps(playbook, indent=2) + "\n", encoding="utf-8")
 
 
-def write_csv():
-    rows = [
-        ["clauseArea", "standardAcceptedPct", "fallbackAcceptedPct", "avgNegotiationDays", "renewalImpact"],
-        ["Limitation of Liability", "71", "24", "5.2", "Medium"],
-        ["Payment Terms", "82", "14", "2.4", "Low"],
-        ["Data Processing", "63", "31", "6.8", "High"],
-        ["SLA Credits", "76", "18", "3.5", "Medium"],
-        ["Termination for Convenience", "68", "21", "4.1", "Medium"],
-    ]
-    with (CSV_OUT / "historical-clause-outcomes.csv").open("w", newline="", encoding="utf-8") as handle:
-        # Force LF: the repository normalizes text to LF via .gitattributes, so a
-        # CRLF write here reads back as drift on any fresh clone.
-        writer = csv.writer(handle, lineterminator="\n")
-        writer.writerows(rows)
-
 
 def build_calder_executed(
     year,
@@ -665,13 +648,13 @@ def build_calder_executed(
     story = doc_header(
         f"Master Agreement for Supplier Services - Executed {year}"
         + (" (Renewal)" if renewal else ""),
-        f"Calder Financial Group plc and Acme Robotics, Inc. | "
+        f"Calder Financial Group plc and Acme Technologies, Inc. | "
         f"Calder Legal Template {template_rev} | CLM-{year}-Calder",
     )
     story += [
         p(
             f"THIS MASTER AGREEMENT FOR SUPPLIER SERVICES was made on {signed_on} BETWEEN "
-            f"Calder Financial Group plc (the <b>Company</b>) and Acme Robotics, Inc. (the "
+            f"Calder Financial Group plc (the <b>Company</b>) and Acme Technologies, Inc. (the "
             f"<b>Supplier</b>). This Agreement was executed by the parties and performed to "
             f"its term."
             + (
@@ -795,7 +778,7 @@ def build_calder_sow(year, sow_ref, charges, services, po_number):
     path = PDF_OUT / f"calder-sow-{year}.pdf"
     story = doc_header(
         f"Statement of Work {sow_ref}",
-        f"Calder Financial Group plc and Acme Robotics, Inc. | Under the Master Agreement for Supplier Services | CLM-{year}-Calder",
+        f"Calder Financial Group plc and Acme Technologies, Inc. | Under the Master Agreement for Supplier Services | CLM-{year}-Calder",
     )
     story += [
         p(f"This Statement of Work is entered into under, and is governed by, the Master Agreement for Supplier Services between the parties. Capitalised terms have the meaning given in that Agreement. Where this Statement of Work conflicts with the Agreement, the Agreement prevails."),
@@ -849,7 +832,7 @@ def build_calder_dpa():
     path = PDF_OUT / "calder-dpa-2026.pdf"
     story = doc_header(
         "Data Processing Schedule",
-        "Calder Financial Group plc and Acme Robotics, Inc. | Schedule 4 to the Master Agreement | CLM-2026-Calder",
+        "Calder Financial Group plc and Acme Technologies, Inc. | Schedule 4 to the Master Agreement | CLM-2026-Calder",
     )
     story += [
         p("This Schedule forms part of the Master Agreement for Supplier Services. The Company is the controller and the Supplier is the processor in respect of Company Data processed under the Agreement."),
@@ -943,16 +926,14 @@ def main():
     build_calder_executed(
         2024, "MA-2024 rev.2", "9 May 2024", "GBP 1,850,000", 24, prior_year=2022
     )
-    build_calder_sow(2022, "SOW-CAL-001", "GBP 1,400,000", "Supplier shall provide the Robotics Operations Console and associated support to the Company's operations function.", "PO-CAL-88214")
-    build_calder_sow(2024, "SOW-CAL-002", "GBP 1,850,000", "Supplier shall provide the Robotics Operations Console, Workflow Analytics, and associated support across the Company's operations and risk functions.", "PO-CAL-93307")
-    build_calder_sow(2026, "SOW-CAL-003", "GBP 2,100,000", "Supplier shall provide the Robotics Operations Console, Workflow Analytics, and Regulatory Reporting Extract across the Company's operations, risk, and compliance functions.", "PO-CAL-10442")
+    build_calder_sow(2022, "SOW-CAL-001", "GBP 1,400,000", "Supplier shall provide the Operations Console and associated support to the Company's operations function.", "PO-CAL-88214")
+    build_calder_sow(2024, "SOW-CAL-002", "GBP 1,850,000", "Supplier shall provide the Operations Console, Workflow Analytics, and associated support across the Company's operations and risk functions.", "PO-CAL-93307")
+    build_calder_sow(2026, "SOW-CAL-003", "GBP 2,100,000", "Supplier shall provide the Operations Console, Workflow Analytics, and Regulatory Reporting Extract across the Company's operations, risk, and compliance functions.", "PO-CAL-10442")
     build_calder_dpa()
     build_calder_security_standard()
     write_json()
-    write_csv()
     print(f"Wrote PDFs to {PDF_OUT}")
     print(f"Wrote JSON to {JSON_OUT}")
-    print(f"Wrote CSV to {CSV_OUT}")
 
 
 if __name__ == "__main__":
