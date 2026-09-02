@@ -53,3 +53,41 @@ export function byMostRecent(files: BoxFolderItem[]): BoxFolderItem[] {
     return new Date(right).getTime() - new Date(left).getTime();
   });
 }
+
+export interface DocumentTotals {
+  documents: number;
+  approved: number;
+  /** Anything still a draft or a redline -- work that has not landed yet. */
+  open: number;
+  /** The most recent change across the package, or undefined if nothing carries a date. */
+  lastChangedAt?: string;
+}
+
+export function documentTotals(files: BoxFolderItem[]): DocumentTotals {
+  const facts = files.map(documentFacts);
+  const dates = facts.map((f) => f.changedAt).filter((d): d is string => Boolean(d));
+  return {
+    documents: files.length,
+    approved: facts.filter((f) => f.approved).length,
+    open: facts.filter((f) => !f.approved).length,
+    lastChangedAt: dates.sort((a, b) => new Date(b).getTime() - new Date(a).getTime())[0],
+  };
+}
+
+/**
+ * Documents by type, largest first, ties broken on label.
+ *
+ * `documentType` is the clmDocument field, so an untagged file is "Unclassified" rather
+ * than missing -- a package where half the documents quietly do not appear in its own
+ * breakdown is worse than one that admits the gap.
+ */
+export function byDocumentType(files: BoxFolderItem[]): Array<{ label: string; value: number }> {
+  const counts = new Map<string, number>();
+  for (const file of files) {
+    const label = file.metadata?.enterprise?.clmDocument?.documentType?.trim() || "Unclassified";
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}

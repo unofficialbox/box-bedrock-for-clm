@@ -31,7 +31,7 @@ export interface BoxFolderItem {
    * `metadata.enterprise.clmDocument` -- the shorthand for the caller's own enterprise,
    * which saves shipping an enterprise ID to the browser.
    */
-  metadata?: { enterprise?: { clmDocument?: { versionStatus?: string } } };
+  metadata?: { enterprise?: { clmDocument?: { versionStatus?: string; documentType?: string } } };
 }
 
 /**

@@ -3,6 +3,7 @@ import { FileStack, LayoutDashboard, Upload } from "lucide-react";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { DocumentTimeline } from "./components/DocumentTimeline";
 import { UploadDialog } from "./components/UploadDialog";
+import { WorkspaceMetrics } from "./components/WorkspaceMetrics";
 import { ContractList } from "./components/ContractList";
 import type { BoxFolderItem } from "./lib/box";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
@@ -147,6 +148,12 @@ export function Workspace() {
             ) : null}
             {selected.status ? <Metric label="Status" value={selected.status} /> : null}
           </div>
+        </div>
+      ) : null}
+
+      {view === "workspace" ? (
+        <div className="workspace-metrics-row">
+          <WorkspaceMetrics files={files} />
         </div>
       ) : null}
 

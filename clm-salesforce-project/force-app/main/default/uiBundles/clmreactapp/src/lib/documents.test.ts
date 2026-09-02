@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { BoxFolderItem } from "./box";
-import { byMostRecent, documentFacts, formatDate } from "./documents";
+import { byDocumentType, byMostRecent, documentFacts, documentTotals, formatDate } from "./documents";
 
 function file(over: Partial<BoxFolderItem> & { id: string }): BoxFolderItem {
   return { name: `${over.id}.pdf`, type: "file", ...over };
@@ -57,5 +57,42 @@ describe("formatDate", () => {
   test("renders an em dash rather than Invalid Date", () => {
     expect(formatDate(undefined)).toBe("—");
     expect(formatDate("not-a-date")).toBe("—");
+  });
+});
+
+describe("documentTotals", () => {
+  test("splits approved from open and reports the latest change", () => {
+    const totals = documentTotals([
+      file({ id: "a", content_modified_at: "2026-06-15T10:20:00Z",
+             metadata: { enterprise: { clmDocument: { versionStatus: "Approved" } } } }),
+      file({ id: "b", content_modified_at: "2026-08-21T15:10:00Z",
+             metadata: { enterprise: { clmDocument: { versionStatus: "Draft" } } } }),
+    ]);
+    expect(totals).toEqual({
+      documents: 2, approved: 1, open: 1, lastChangedAt: "2026-08-21T15:10:00Z",
+    });
+  });
+
+  test("survives a package where nothing carries a date", () => {
+    expect(documentTotals([file({ id: "a" })]).lastChangedAt).toBeUndefined();
+  });
+});
+
+describe("byDocumentType", () => {
+  test("counts by type, largest first, ties on label", () => {
+    expect(
+      byDocumentType([
+        file({ id: "a", metadata: { enterprise: { clmDocument: { documentType: "SOW" } } } }),
+        file({ id: "b", metadata: { enterprise: { clmDocument: { documentType: "MSA" } } } }),
+        file({ id: "c", metadata: { enterprise: { clmDocument: { documentType: "MSA" } } } }),
+      ]),
+    ).toEqual([
+      { label: "MSA", value: 2 },
+      { label: "SOW", value: 1 },
+    ]);
+  });
+
+  test("names an untagged file rather than dropping it from its own breakdown", () => {
+    expect(byDocumentType([file({ id: "a" })])).toEqual([{ label: "Unclassified", value: 1 }]);
   });
 });

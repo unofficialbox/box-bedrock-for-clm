@@ -3,7 +3,7 @@ import {
   byStatus,
   formatCompactValue,
   portfolioTotals,
-  valueByCounterparty,
+  valueBreakdown,
   type Slice,
 } from "../lib/portfolio";
 
@@ -110,12 +110,12 @@ function StatusDonut({ slices }: { slices: Slice[] }) {
  * Bars are labelled at the end rather than against an axis, which keeps the figure
  * readable at the width a sidebar-less card actually gets.
  */
-function ValueBars({ slices }: { slices: Slice[] }) {
+function ValueBars({ title, slices }: { title: string; slices: Slice[] }) {
   const largest = slices.reduce((max, s) => Math.max(max, s.value), 0);
 
   return (
     <figure className="chart-figure">
-      <figcaption className="chart-title">Value by counterparty</figcaption>
+      <figcaption className="chart-title">{title}</figcaption>
       <ul className="bars">
         {slices.map((slice) => (
           <li key={slice.label} className="bar-row">
@@ -141,7 +141,8 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
 
   const totals = portfolioTotals(contracts);
   const statuses = capped(byStatus(contracts));
-  const values = valueByCounterparty(contracts).slice(0, 5);
+  const breakdown = valueBreakdown(contracts);
+  const values = breakdown.slices.slice(0, 6);
 
   return (
     <section className="portfolio" data-testid="portfolio-charts">
@@ -156,7 +157,7 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
       </div>
       <div className="chart-row">
         <StatusDonut slices={statuses} />
-        <ValueBars slices={values} />
+        <ValueBars title={breakdown.title} slices={values} />
       </div>
     </section>
   );

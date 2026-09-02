@@ -368,3 +368,10 @@ button { cursor: pointer; }
   .stat-row { grid-template-columns: 1fr; }
   .chart-row { grid-template-columns: 1fr; }
 }
+
+.workspace-metrics-row { padding: 24px 28px 0; }
+.workspace-metrics { display: flex; flex-direction: column; gap: 14px; }
+.stat-row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.stat-value-date { font-size: 18px; }
+.cell-type { color: #3f4a58; white-space: nowrap; }
+@media (max-width: 900px) { .stat-row-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

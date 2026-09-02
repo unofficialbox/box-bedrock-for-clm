@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { ClmContractSummary } from "./contracts";
-import { byStatus, formatCompactValue, portfolioTotals, valueByCounterparty } from "./portfolio";
+import { byStatus, formatCompactValue, portfolioTotals, valueByCounterparty, valueBreakdown } from "./portfolio";
 
 const c = (over: Partial<ClmContractSummary>): ClmContractSummary => ({ recordId: "r", ...over });
 
@@ -66,5 +66,27 @@ describe("formatCompactValue", () => {
     expect(formatCompactValue(250_000)).toBe("$250K");
     expect(formatCompactValue(0)).toBe("$0");
     expect(formatCompactValue(Number.NaN)).toBe("$0");
+  });
+});
+
+describe("valueBreakdown", () => {
+  test("falls back to per-contract when there is only one counterparty", () => {
+    // A counterparty deals with exactly one organisation, so "by counterparty" is a single
+    // bar with nothing to compare against. Their own contracts are the useful comparison.
+    const result = valueBreakdown([
+      c({ counterparty: "Northstar", contractId: "A", dealValue: 100 }),
+      c({ counterparty: "Northstar", contractId: "B", dealValue: 200 }),
+    ]);
+    expect(result.title).toBe("Value by contract");
+    expect(result.slices.map((s) => s.label)).toEqual(["B", "A"]);
+  });
+
+  test("keeps the portfolio view when counterparties actually differ", () => {
+    const result = valueBreakdown([
+      c({ counterparty: "Northstar", dealValue: 100 }),
+      c({ counterparty: "Calder", dealValue: 200 }),
+    ]);
+    expect(result.title).toBe("Value by counterparty");
+    expect(result.slices.map((s) => s.label)).toEqual(["Calder", "Northstar"]);
   });
 });

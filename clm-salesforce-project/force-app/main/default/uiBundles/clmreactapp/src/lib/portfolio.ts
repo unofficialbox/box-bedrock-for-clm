@@ -71,3 +71,29 @@ export function formatCompactValue(value: number): string {
   if (Math.abs(value) >= 1_000) return `$${Math.round(value / 1_000)}K`;
   return `$${Math.round(value)}`;
 }
+
+/** Total value per contract, largest first. Labelled by reference, which is what the row says. */
+export function valueByContract(contracts: ClmContractSummary[]): Slice[] {
+  return contracts
+    .map((contract) => ({
+      label: contract.contractId || contract.name || contract.recordId,
+      value: contract.dealValue || 0,
+    }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}
+
+/**
+ * The breakdown worth drawing, and what to call it.
+ *
+ * A counterparty sees contracts with exactly one organisation, so "value by counterparty"
+ * is a single bar -- a chart that has nothing to compare. Falling back to per-contract
+ * gives the same reader the comparison they can actually use, and an internal reader with
+ * several counterparties still gets the portfolio view. The chart shows whichever
+ * dimension actually varies.
+ */
+export function valueBreakdown(contracts: ClmContractSummary[]): { title: string; slices: Slice[] } {
+  const byParty = valueByCounterparty(contracts);
+  return byParty.length > 1
+    ? { title: "Value by counterparty", slices: byParty }
+    : { title: "Value by contract", slices: valueByContract(contracts) };
+}

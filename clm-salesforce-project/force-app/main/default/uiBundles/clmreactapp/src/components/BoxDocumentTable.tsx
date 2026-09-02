@@ -38,6 +38,7 @@ export function BoxDocumentTable({
       <thead>
         <tr>
           <th scope="col">Name</th>
+          <th scope="col">Type</th>
           <th scope="col">Last modified</th>
           <th scope="col">Status</th>
           <th scope="col">Size</th>
@@ -56,6 +57,9 @@ export function BoxDocumentTable({
                 <FileText size={16} aria-hidden="true" />
                 <span>{file.name}</span>
               </button>
+            </td>
+            <td className="cell-type">
+              {file.metadata?.enterprise?.clmDocument?.documentType || "—"}
             </td>
             <td>
               <span className="cell-stack">
