@@ -1,4 +1,4 @@
-import { AlertTriangle, RefreshCw } from "lucide-react";
+import { AlertTriangle, LogIn, RefreshCw } from "lucide-react";
 
 /**
  * What the page shows when a remote read fails.
@@ -12,11 +12,14 @@ export function DataError({
   title,
   detail,
   onRetry,
+  signInUrl,
   testId,
 }: {
   title: string;
   detail: string;
   onRetry?: () => void;
+  /** Rendered only when the environment supplies one; the path is site-specific. */
+  signInUrl?: string;
   testId: string;
 }) {
   return (
@@ -26,6 +29,11 @@ export function DataError({
         <h2>{title}</h2>
         <p>{detail}</p>
       </div>
+      {signInUrl ? (
+        <a className="upload-button" href={signInUrl} data-testid="data-error-signin">
+          <LogIn size={15} aria-hidden="true" /> Sign in
+        </a>
+      ) : null}
       {onRetry ? (
         <button type="button" className="secondary-button" onClick={onRetry}>
           <RefreshCw size={15} aria-hidden="true" /> Try again

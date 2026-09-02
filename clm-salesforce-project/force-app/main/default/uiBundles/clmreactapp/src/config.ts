@@ -2,6 +2,14 @@ const boxHostname = (import.meta.env.VITE_BOX_HOSTNAME || "").replace(/^https?:\
 const workspaceFolderId = import.meta.env.VITE_BOX_FOLDER_ID || "demo-workspace";
 
 export const CLM_CONFIG = {
+  site: {
+    /**
+     * Where a signed-out visitor signs in. Site-specific and not derivable: the app path
+     * serves this bundle for every URL beneath it, so `/login` under it renders the app
+     * rather than a sign-in page. Left blank, the signed-out state simply offers no link.
+     */
+    loginUrl: import.meta.env.VITE_CLM_LOGIN_URL || "",
+  },
   workspace: {
     name: "CLM-2026-Northstar",
     folderId: workspaceFolderId,

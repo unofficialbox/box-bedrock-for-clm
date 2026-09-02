@@ -313,3 +313,35 @@ describe("Navigation and the address bar", () => {
     expect(await screen.findByTestId("box-error")).toBeVisible();
   });
 });
+
+describe("Signed out", () => {
+  test("says the session ended rather than claiming the org has no contracts", async () => {
+    // The endpoint used to answer a guest with an empty list, so a visitor whose session
+    // had expired was told "No contract records yet" -- a claim about the org made from a
+    // fact about the visitor.
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async () => ({
+        ok: false,
+        status: 401,
+        text: async () => '{"error":"not_authenticated"}',
+        json: async () => ({}),
+      })),
+    );
+
+    render(<Workspace />);
+
+    expect(await screen.findByTestId("contracts-signed-out")).toBeVisible();
+    expect(screen.queryByTestId("contracts-empty")).not.toBeInTheDocument();
+    expect(screen.queryByText(/No contract records yet/)).not.toBeInTheDocument();
+  });
+
+  test("still says empty when an authenticated reader genuinely has none", async () => {
+    vi.stubGlobal("fetch", vi.fn(async () => ({ ok: true, json: async () => [] })));
+
+    render(<Workspace />);
+
+    expect(await screen.findByTestId("contracts-empty")).toBeVisible();
+    expect(screen.queryByTestId("contracts-signed-out")).not.toBeInTheDocument();
+  });
+});
