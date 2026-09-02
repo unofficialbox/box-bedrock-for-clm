@@ -55,15 +55,14 @@ export function UploadDialog({
   /*
    * Portalled to the body rather than left where it is written.
    *
-   * In the page it sat inside the workspace's own layout and painted underneath the
-   * panels it was supposed to cover -- an ancestor there establishes a stacking context,
-   * so no z-index on the backdrop could lift it out, and `position: fixed` resolved
-   * against that ancestor rather than the viewport, which clipped it as well. The body
-   * is the only parent that guarantees neither.
+   * Not what fixed the layering -- that was a class-name collision with box-ui-elements,
+   * see styles.css -- but the right parent regardless: an ancestor in the workspace layout
+   * establishes a stacking context, and a dialog that has to escape one should not depend
+   * on the page above it never growing another.
    */
   return createPortal(
     <div
-      className="modal-backdrop"
+      className="clm-modal-backdrop"
       data-testid="upload-dialog"
       // The backdrop closes, but only when the backdrop itself is the thing clicked --
       // a click that started inside the dialog and drifted out must not dismiss it.
@@ -72,21 +71,21 @@ export function UploadDialog({
       }}
     >
       <div
-        className="modal"
+        className="clm-modal"
         role="dialog"
         aria-modal="true"
         aria-labelledby="upload-dialog-title"
         tabIndex={-1}
         ref={dialog}
       >
-        <div className="modal-head">
+        <div className="clm-modal-head">
           <h2 id="upload-dialog-title">Add documents</h2>
-          <button type="button" className="modal-close" onClick={onClose} aria-label="Close">
+          <button type="button" className="clm-modal-close" onClick={onClose} aria-label="Close">
             <X size={17} />
           </button>
         </div>
 
-        <div className="modal-body">
+        <div className="clm-modal-body">
           {/*
             Same provider the preview needs: box-ui-elements reads from react-intl context
             and throws "Could not find required `intl` object" without one above it. The
