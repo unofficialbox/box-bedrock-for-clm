@@ -34,7 +34,7 @@ export function PackageProgress({ files }: { files: BoxFolderItem[] }) {
 
   return (
     <figure className="chart-figure package-progress">
-      <figcaption className="chart-title">Package progress</figcaption>
+      <figcaption className="chart-title">Review progress</figcaption>
 
       <p className="package-headline">
         <strong>{totals.approved}</strong> of {totals.documents} approved

@@ -13,37 +13,29 @@ import {
 /**
  * The portfolio at a glance, above the contract list.
  *
- * Three tiles, a donut and a bar. The tiles carry the headlines, which is the honest form
- * for a single number -- a chart of one value is decoration. The donut answers "what state
- * is this portfolio in" and the bar answers "who is it with, and for how much", which are
- * the two questions the list itself cannot answer at a glance.
+ * Three figures, and no tiles above them. The tiles restated the charts beside them: the
+ * contract count is the donut's own centre label, "in flight" is everything the donut does
+ * not colour Executed, and the renewal count is the number of rows in the renewal chart.
+ * Only the portfolio's total value was a fact no figure stated, so it is that figure's
+ * headline now.
  *
  * Colours are the validated three-slot categorical set (blue, orange, aqua), assigned by
  * position and never cycled. Three is also the cap under the all-pairs rule, which is why
  * statuses beyond the third fold into "Other" rather than growing a fourth hue.
  */
 
-function StatTile({ label, value, note }: { label: string; value: string; note?: string }) {
-  return (
-    <div className="stat-tile">
-      <span className="stat-label">{label}</span>
-      <strong className="stat-value">{value}</strong>
-      {note ? <span className="stat-note">{note}</span> : null}
-    </div>
-  );
-}
-
 /**
  * Value by counterparty. One series, so one hue and no legend -- the title names it.
  * Bars are labelled at the end rather than against an axis, which keeps the figure
  * readable at the width a sidebar-less card actually gets.
  */
-function ValueBars({ title, slices }: { title: string; slices: Slice[] }) {
+function ValueBars({ title, headline, slices }: { title: string; headline: string; slices: Slice[] }) {
   const largest = slices.reduce((max, s) => Math.max(max, s.value), 0);
 
   return (
     <figure className="chart-figure">
       <figcaption className="chart-title">{title}</figcaption>
+      <p className="figure-headline">{headline}</p>
       <ul className="bars">
         {slices.map((slice) => (
           <li key={slice.label} className="bar-row">
@@ -124,23 +116,13 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
 
   return (
     <section className="portfolio viz" data-testid="portfolio-charts">
-      <div className="stat-row stat-row-4">
-        <StatTile label="Contracts" value={String(totals.contracts)} />
-        <StatTile label="Total value" value={formatCompactValue(totals.value)} />
-        <StatTile
-          label="In flight"
-          value={String(totals.inFlight)}
-          note="not yet executed"
-        />
-        <StatTile
-          label="Renewals"
-          value={String(renewals.length)}
-          note={`within ${RENEWAL_WINDOW_DAYS} days`}
-        />
-      </div>
       <div className="chart-row">
         <Donut slices={statuses} centreLabel="contracts" title="Contracts by status" />
-        <ValueBars title={breakdown.title} slices={values} />
+        <ValueBars
+          title={breakdown.title}
+          headline={`${formatCompactValue(totals.value)} total`}
+          slices={values}
+        />
         <RenewalHorizon renewals={renewals} windowDays={RENEWAL_WINDOW_DAYS} />
       </div>
     </section>

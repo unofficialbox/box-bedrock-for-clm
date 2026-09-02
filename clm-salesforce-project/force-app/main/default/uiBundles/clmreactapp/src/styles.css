@@ -1,4 +1,6 @@
 :root {
+  --aside-width: 340px;
+  --grid-gap: 24px;
   /* Lato, matching Box's own elements, so the app chrome and the embedded Box and
      Agentforce panels all read as one interface. box-ui-elements loads the face from the
      Box CDN under font-src; the stack falls back for anyone who never renders it. */
@@ -38,7 +40,7 @@ button { cursor: pointer; }
 
 /* Two cards side by side. The padding lives on the grid rather than on main, so both
    columns start at the same y; grid's default stretch then gives them the same height. */
-.content-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px 28px 34px; align-items: stretch; }
+.content-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--grid-gap); padding: 24px 28px 34px; align-items: stretch; }
 .content-grid main { min-width: 0; display: flex; flex-direction: column; }
 
 .box-live { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
@@ -180,7 +182,7 @@ button { cursor: pointer; }
 .cell-stack small { color: #6a7686; font-size: 11.5px; }
 
 /* ---- Document history ---- */
-.content-grid-aside { grid-template-columns: minmax(0, 1fr) 340px; }
+.content-grid-aside { grid-template-columns: minmax(0, 1fr) var(--aside-width); }
 
 .timeline-panel { display: flex; flex-direction: column; min-height: 0; height: 625px; border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; }
 .timeline-head { height: 56px; padding: 0 18px; display: flex; align-items: center; border-bottom: 1px solid #e0e6ee; flex: none; }
@@ -352,6 +354,7 @@ button { cursor: pointer; }
 }
 
 .workspace-metrics-row { padding: 24px 28px 0; }
+.workspace-metrics-row + .content-grid { padding-top: var(--grid-gap); }
 .workspace-metrics { display: flex; flex-direction: column; gap: 14px; }
 .stat-row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .stat-value-date { font-size: 18px; }
@@ -363,7 +366,7 @@ button { cursor: pointer; }
 .bar-fill-critical { background: #c0392b; }
 
 .stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 330px); gap: 14px; align-items: stretch; }
+.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) var(--aside-width); gap: var(--grid-gap); align-items: stretch; }
 @media (max-width: 900px) { .workspace-metrics { grid-template-columns: 1fr; } }
 
 .contract-table { margin-top: 4px; }
@@ -406,8 +409,9 @@ button { cursor: pointer; }
 .progress-fill.doc-status-redline, .progress-legend .doc-status-redline { background: var(--status-redline); }
 .progress-fill.doc-status-none, .progress-legend .doc-status-none { background: var(--status-none); }
 .package-progress { display: flex; flex-direction: column; }
-.package-headline { margin: 14px 0 0; font-size: 27px; font-weight: 700; letter-spacing: -.02em; color: #14213a; font-variant-numeric: tabular-nums; }
+.figure-headline, .package-headline { margin: 14px 0 0; font-size: 27px; font-weight: 700; letter-spacing: -.02em; color: #14213a; font-variant-numeric: tabular-nums; }
 .package-headline strong { font-weight: 700; }
+.figure-headline { margin-bottom: 2px; font-size: 24px; }
 .progress-track { display: flex; gap: 2px; height: 14px; margin: 16px 0 14px; border-radius: 999px; overflow: hidden; background: #eef1f5; }
 .progress-fill { display: block; min-width: 4px; }
 .progress-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
