@@ -298,3 +298,21 @@ button { cursor: pointer; }
 .skeleton-bar-date { width: 62px; height: 9px; }
 .skeleton-bar-name { width: 84%; height: 12px; margin-top: 1px; }
 .skeleton-timeline .skeleton-bar-meta { width: 108px; height: 10px; }
+
+.box-table-actions { display: flex; justify-content: flex-end; padding: 0 0 12px; }
+
+/* ---- Modal ---- */
+.modal-backdrop { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; padding: 24px; background: rgba(16, 26, 40, .48); }
+.modal { width: min(720px, 100%); max-height: min(640px, 90vh); display: flex; flex-direction: column; background: white; border-radius: 12px; box-shadow: 0 18px 48px rgba(16, 26, 40, .28); overflow: hidden; }
+.modal:focus { outline: none; }
+.modal-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 18px; border-bottom: 1px solid #e0e6ee; flex: none; }
+.modal-head h2 { margin: 0; font-size: 15px; font-weight: 750; }
+.modal-close { display: grid; place-items: center; width: 30px; height: 30px; border-radius: 8px; border: 1px solid transparent; background: transparent; color: #5c6470; cursor: pointer; }
+.modal-close:hover { background: #eef1f5; color: #1d2733; }
+.modal-close:focus-visible { outline: 2px solid #1166e8; outline-offset: 1px; }
+.modal-body { flex: 1; min-height: 380px; overflow: auto; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .modal { animation: modal-rise .16s ease-out; }
+  @keyframes modal-rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
+}

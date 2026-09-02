@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Upload } from "lucide-react";
 import BoxAnnotations from "box-annotations";
 import { IntlProvider } from "react-intl";
 import { MemoryRouter } from "react-router-dom";
@@ -7,6 +7,7 @@ import "box-ui-elements/dist/preview.css";
 import type { BoxFolderItem } from "../lib/box";
 import { installBoxPreview } from "../lib/boxPreviewRuntime";
 import { BoxDocumentTable } from "./BoxDocumentTable";
+import { UploadDialog } from "./UploadDialog";
 
 // Before ContentPreview mounts, so it finds the library already there and never reaches
 // for the CDN script the site's CSP blocks.
@@ -95,12 +96,16 @@ export function BoxElements({
   folderId,
   token,
   files,
+  onUploaded,
 }: {
   folderId: string;
   token: string;
   files: BoxFolderItem[];
+  /** Re-lists the folder once an upload finishes, so the new file appears without a reload. */
+  onUploaded?: () => void;
 }) {
   const [selected, setSelected] = useState<BoxFolderItem | null>(null);
+  const [uploading, setUploading] = useState(false);
 
   /**
    * Preview gets the token as a function, not the string.
@@ -162,7 +167,30 @@ export function BoxElements({
           </div>
         ) : (
           <div className="box-table-host">
+            <div className="box-table-actions">
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => setUploading(true)}
+                data-testid="box-upload-open"
+              >
+                <Upload size={15} /> Add documents
+              </button>
+            </div>
             <BoxDocumentTable files={files} onSelect={setSelected} />
+            {uploading ? (
+              <UploadDialog
+                folderId={folderId}
+                tokenProvider={tokenProvider}
+                onClose={() => {
+                  setUploading(false);
+                  // Re-list on the way out rather than per file: ContentUploader fires
+                  // onComplete for each one, and refetching mid-batch would swap the
+                  // listing under an upload still in flight.
+                  onUploaded?.();
+                }}
+              />
+            ) : null}
           </div>
         )}
       </section>

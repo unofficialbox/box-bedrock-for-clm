@@ -29,6 +29,8 @@ export function BoxWorkspace({
   const [folderId, setFolderId] = useState("");
   const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   const [loading, setLoading] = useState(true);
+  /** Bumped after an upload so the listing effect runs again and picks up the new file. */
+  const [reloads, setReloads] = useState(0);
   /**
    * Held in a ref, not a dependency. The prop is optional, so a caller passing an inline
    * function would otherwise change identity every render and refetch the folder in a
@@ -70,7 +72,7 @@ export function BoxWorkspace({
     return () => {
       active = false;
     };
-  }, [context]);
+  }, [context, reloads]);
 
   if (loading) {
     return <WorkspaceSkeleton />;
@@ -92,7 +94,12 @@ export function BoxWorkspace({
           ) : null}
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} files={files} />
+          <BoxElements
+            folderId={folderId}
+            token={token}
+            files={files}
+            onUploaded={() => setReloads((n) => n + 1)}
+          />
         </Suspense>
       </section>
     );
