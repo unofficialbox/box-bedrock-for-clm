@@ -261,9 +261,7 @@ button { cursor: pointer; }
 /* The contract list's skeleton borrows the real bands -- tiles, figures, table -- so the
    page does not rearrange itself when the rows land. */
 .contracts-skeleton { display: flex; flex-direction: column; gap: 14px; }
-.contracts-skeleton .stat-tile { gap: 10px; }
 .skeleton-bar-label { width: 68px; height: 9px; }
-.skeleton-bar-figure { width: 54px; height: 20px; }
 .skeleton-contracts-table { height: auto; }
 .skeleton-donut-row { display: flex; align-items: center; gap: 18px; padding-top: 14px; }
 .skeleton-donut { width: 116px; height: 116px; flex: none; border-radius: 50%; border: 16px solid #e8ecf2; }
@@ -318,12 +316,6 @@ button { cursor: pointer; }
 }
 :root[data-theme="dark"] .viz { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
 
-.stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
-.stat-tile { display: flex; flex-direction: column; gap: 3px; padding: 15px 17px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
-.stat-label { font-size: 11px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: #6a7686; }
-.stat-value { font-size: 25px; font-weight: 750; line-height: 1.15; font-variant-numeric: tabular-nums; }
-.stat-note { font-size: 12px; color: #6a7686; }
-
 .chart-row { display: grid; grid-template-columns: minmax(0, 288px) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .chart-figure { margin: 0; padding: 16px 18px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
 .chart-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
@@ -349,23 +341,18 @@ button { cursor: pointer; }
 .bar-value-critical { color: #c0392b; }
 
 @media (max-width: 940px) {
-  .stat-row { grid-template-columns: 1fr; }
   .chart-row { grid-template-columns: 1fr; }
 }
 
 .workspace-metrics-row { padding: 24px 28px 0; }
 .workspace-metrics-row + .content-grid { padding-top: var(--grid-gap); }
 .workspace-metrics { display: flex; flex-direction: column; gap: 14px; }
-.stat-row-4 { grid-template-columns: repeat(4, minmax(0, 1fr)); }
-.stat-value-date { font-size: 18px; }
 .cell-type { color: #3f4a58; white-space: nowrap; }
-@media (max-width: 900px) { .stat-row-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
 .chart-empty { margin: 0; font-size: 12.5px; color: #6a7686; }
 /* Reserved status colour, used only where the chart's subject is a status. */
 .bar-fill-critical { background: #c0392b; }
 
-.stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) var(--aside-width); gap: var(--grid-gap); align-items: stretch; }
 @media (max-width: 900px) { .workspace-metrics { grid-template-columns: 1fr; } }
 

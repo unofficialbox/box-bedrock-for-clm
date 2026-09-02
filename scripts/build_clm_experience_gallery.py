@@ -77,12 +77,6 @@ REACT_EXPERIENCES = [
         "title": "Northstar Health contract workspace",
         "description": "The running Multi-Framework React demo with live Box file identifiers, contract context, risk signals, and the Salesforce Agentforce copilot rail.",
     },
-    {
-        "file": "clm-react-redline-reviews.png",
-        "eyebrow": "React redline reviews",
-        "title": "Domain expert review queue",
-        "description": "The running demo app groups cited differences into human-owned Commercial Legal, Finance, and Privacy reviews grounded in live Box task identifiers.",
-    },
 ]
 
 for experience in BOX_EXPERIENCES:
