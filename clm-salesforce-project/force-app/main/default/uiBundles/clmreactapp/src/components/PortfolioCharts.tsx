@@ -3,7 +3,9 @@ import {
   byStatus,
   formatCompactValue,
   portfolioTotals,
+  renewalHorizon,
   valueBreakdown,
+  type Renewal,
   type Slice,
 } from "../lib/portfolio";
 
@@ -136,17 +138,63 @@ function ValueBars({ title, slices }: { title: string; slices: Slice[] }) {
   );
 }
 
+/**
+ * The renewal horizon: terms ending inside the window, soonest first.
+ *
+ * A bar per contract, scaled by how much of the window is left, so a term that has already
+ * lapsed reads as full-width rather than disappearing at zero. Lapsed terms carry the
+ * critical status colour with the word "Lapsed" beside them -- status is never colour
+ * alone, and this is the one place in the app where a status reading is what the chart is
+ * actually for.
+ */
+function RenewalHorizon({ renewals, windowDays }: { renewals: Renewal[]; windowDays: number }) {
+  return (
+    <figure className="chart-figure">
+      <figcaption className="chart-title">Renewals in the next {windowDays} days</figcaption>
+      {renewals.length === 0 ? (
+        <p className="chart-empty">No executed contract reaches the end of its term in this window.</p>
+      ) : (
+        <ul className="bars">
+          {renewals.map((renewal) => {
+            const lapsed = renewal.daysRemaining < 0;
+            const used = lapsed ? 1 : 1 - renewal.daysRemaining / windowDays;
+            return (
+              <li key={renewal.label} className="bar-row">
+                <span className="bar-label" title={renewal.label}>{renewal.label}</span>
+                <span className="bar-track">
+                  <span
+                    className={`bar-fill${lapsed ? " bar-fill-critical" : ""}`}
+                    style={{ width: `${Math.max(used * 100, 4)}%` }}
+                  >
+                    <title>{`${renewal.label}: ends ${renewal.endDate}`}</title>
+                  </span>
+                </span>
+                <span className="bar-value">
+                  {lapsed ? "Lapsed" : `${renewal.daysRemaining}d`}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </figure>
+  );
+}
+
+const RENEWAL_WINDOW_DAYS = 90;
+
 export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[] }) {
   if (contracts.length === 0) return null;
 
   const totals = portfolioTotals(contracts);
   const statuses = capped(byStatus(contracts));
   const breakdown = valueBreakdown(contracts);
+  const renewals = renewalHorizon(contracts, RENEWAL_WINDOW_DAYS);
   const values = breakdown.slices.slice(0, 6);
 
   return (
     <section className="portfolio" data-testid="portfolio-charts">
-      <div className="stat-row">
+      <div className="stat-row stat-row-4">
         <StatTile label="Contracts" value={String(totals.contracts)} />
         <StatTile label="Total value" value={formatCompactValue(totals.value)} />
         <StatTile
@@ -154,10 +202,18 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
           value={String(totals.inFlight)}
           note="not yet executed"
         />
+        <StatTile
+          label="Renewals"
+          value={String(renewals.length)}
+          note={`within ${RENEWAL_WINDOW_DAYS} days`}
+        />
       </div>
       <div className="chart-row">
         <StatusDonut slices={statuses} />
         <ValueBars title={breakdown.title} slices={values} />
+      </div>
+      <div className="chart-row chart-row-wide">
+        <RenewalHorizon renewals={renewals} windowDays={RENEWAL_WINDOW_DAYS} />
       </div>
     </section>
   );

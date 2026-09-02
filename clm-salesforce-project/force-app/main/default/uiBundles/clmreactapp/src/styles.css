@@ -375,3 +375,8 @@ button { cursor: pointer; }
 .stat-value-date { font-size: 18px; }
 .cell-type { color: #3f4a58; white-space: nowrap; }
 @media (max-width: 900px) { .stat-row-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.chart-row-wide { grid-template-columns: minmax(0, 1fr); }
+.chart-empty { margin: 0; font-size: 12.5px; color: #6a7686; }
+/* Reserved status colour, used only where the chart's subject is a status. */
+.bar-fill-critical { background: #c0392b; }

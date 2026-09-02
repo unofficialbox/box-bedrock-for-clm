@@ -19,6 +19,8 @@ export interface ClmContractSummary {
   riskLevel?: string;
   dealValue?: number;
   termMonths?: number;
+  /** ISO date the term ends. Absent while a contract is still being negotiated. */
+  endDate?: string;
   /** The Box workspace folder associated with this contract record. */
   boxFolderId?: string;
 }

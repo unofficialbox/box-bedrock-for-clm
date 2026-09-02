@@ -37,6 +37,7 @@ const GET_CLM_CONTRACTS = gql`
               Status__c { value }
               Deal_Value__c { value }
               Term_Months__c { value }
+              End_Date__c { value }
               Box_Workspace_Folder_ID__c { value }
             }
           }
@@ -59,6 +60,7 @@ interface ContractNode {
   Status__c?: FieldValue<string>;
   Deal_Value__c?: FieldValue<number>;
   Term_Months__c?: FieldValue<number>;
+  End_Date__c?: FieldValue<string>;
   Box_Workspace_Folder_ID__c?: FieldValue<string>;
 }
 
@@ -101,6 +103,7 @@ export async function fetchContractsViaGraphql(): Promise<ClmContractSummary[] |
         status: node.Status__c?.value ?? undefined,
         dealValue: node.Deal_Value__c?.value ?? undefined,
         termMonths: node.Term_Months__c?.value ?? undefined,
+        endDate: node.End_Date__c?.value ?? undefined,
         boxFolderId: node.Box_Workspace_Folder_ID__c?.value ?? undefined,
       }];
     });

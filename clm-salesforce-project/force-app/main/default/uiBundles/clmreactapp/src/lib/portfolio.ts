@@ -97,3 +97,50 @@ export function valueBreakdown(contracts: ClmContractSummary[]): { title: string
     ? { title: "Value by counterparty", slices: byParty }
     : { title: "Value by contract", slices: valueByContract(contracts) };
 }
+
+export interface Renewal {
+  label: string;
+  endDate: string;
+  /** Negative once the term has already ended. */
+  daysRemaining: number;
+}
+
+/** Whole days between two dates, ignoring the time of day so "today" is zero, not -1. */
+function daysBetween(from: Date, to: Date): number {
+  const day = 24 * 60 * 60 * 1000;
+  const a = Date.UTC(from.getUTCFullYear(), from.getUTCMonth(), from.getUTCDate());
+  const b = Date.UTC(to.getUTCFullYear(), to.getUTCMonth(), to.getUTCDate());
+  return Math.round((b - a) / day);
+}
+
+/**
+ * Contracts whose term ends within `withinDays`, soonest first.
+ *
+ * Only contracts that carry an end date can appear, which means only executed ones: a
+ * contract still being negotiated has no agreed term, and inventing an expiry for it would
+ * put a renewal date on a deal nobody has signed.
+ *
+ * Terms that have already lapsed are included rather than filtered out. A contract that
+ * ended last month is more urgent than one ending next month, and dropping it would leave
+ * the most exposed part of the portfolio off the chart that exists to show exposure.
+ */
+export function renewalHorizon(
+  contracts: ClmContractSummary[],
+  withinDays = 90,
+  today = new Date(),
+): Renewal[] {
+  return contracts
+    .flatMap((contract) => {
+      if (!contract.endDate) return [];
+      const end = new Date(contract.endDate);
+      if (Number.isNaN(end.getTime())) return [];
+      const daysRemaining = daysBetween(today, end);
+      if (daysRemaining > withinDays) return [];
+      return [{
+        label: contract.contractId || contract.name || contract.recordId,
+        endDate: contract.endDate,
+        daysRemaining,
+      }];
+    })
+    .sort((a, b) => a.daysRemaining - b.daysRemaining);
+}

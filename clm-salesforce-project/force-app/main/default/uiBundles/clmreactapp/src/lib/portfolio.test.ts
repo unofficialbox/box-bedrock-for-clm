@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 import type { ClmContractSummary } from "./contracts";
-import { byStatus, formatCompactValue, portfolioTotals, valueByCounterparty, valueBreakdown } from "./portfolio";
+import { byStatus, formatCompactValue, portfolioTotals, valueByCounterparty, valueBreakdown, renewalHorizon } from "./portfolio";
 
 const c = (over: Partial<ClmContractSummary>): ClmContractSummary => ({ recordId: "r", ...over });
 
@@ -88,5 +88,39 @@ describe("valueBreakdown", () => {
     ]);
     expect(result.title).toBe("Value by counterparty");
     expect(result.slices.map((s) => s.label)).toEqual(["Calder", "Northstar"]);
+  });
+});
+
+describe("renewalHorizon", () => {
+  const today = new Date("2026-09-01T00:00:00Z");
+
+  test("includes terms already lapsed, soonest first", () => {
+    // A contract that ended last month is more exposed than one ending next month.
+    // Filtering it out would drop the worst case from the chart that exists to show it.
+    const horizon = renewalHorizon(
+      [
+        c({ contractId: "ENDS-LATER", endDate: "2026-11-14" }),
+        c({ contractId: "LAPSED", endDate: "2026-05-08" }),
+        c({ contractId: "ENDS-SOON", endDate: "2026-09-30" }),
+      ],
+      90,
+      today,
+    );
+    expect(horizon.map((r) => r.label)).toEqual(["LAPSED", "ENDS-SOON", "ENDS-LATER"]);
+    expect(horizon[0].daysRemaining).toBeLessThan(0);
+  });
+
+  test("excludes terms beyond the window", () => {
+    expect(renewalHorizon([c({ contractId: "FAR", endDate: "2027-07-31" })], 90, today)).toEqual([]);
+  });
+
+  test("ignores contracts with no end date rather than inventing one", () => {
+    // A contract still in negotiation has no agreed term; a renewal date on it would
+    // assert something nobody has signed.
+    expect(renewalHorizon([c({ contractId: "IN-REVIEW", status: "Legal Review" })], 90, today)).toEqual([]);
+  });
+
+  test("counts the last day of the term as zero days remaining, not minus one", () => {
+    expect(renewalHorizon([c({ contractId: "TODAY", endDate: "2026-09-01" })], 90, today)[0].daysRemaining).toBe(0);
   });
 });
