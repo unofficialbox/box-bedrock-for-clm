@@ -76,20 +76,6 @@ export function getClmPageContext(search = window.location.search): ClmPageConte
   };
 }
 
-export function getAgentContextPrompt(search = window.location.search): string {
-  const { contractId, folderId, salesforceRecordId } = getClmPageContext(search);
-  const context = [
-    `Current CLM contract: ${contractId}.`,
-    `Governed Box workspace folder ID: ${folderId}.`,
-  ];
-  if (salesforceRecordId) context.push(`Salesforce CLM record ID: ${salesforceRecordId}.`);
-  context.push(
-    "Use Box as the source of truth. Cite files for every material contract claim.",
-    "Do not approve legal language, complete approval tasks, or send for signature without a named human decision."
-  );
-  return context.join("\n");
-}
-
 export interface BoxWorkspaceToken {
   accessToken: string;
   /** The folder the endpoint actually minted for, which may differ from what was asked. */
