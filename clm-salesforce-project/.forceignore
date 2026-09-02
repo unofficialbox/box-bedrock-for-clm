@@ -7,3 +7,5 @@
 **/uiBundles/**/playwright-report/**
 **/uiBundles/**/test-results/**
 **/uiBundles/**/coverage/**
+**/jsconfig.json
+**/.eslintrc.json
