@@ -24,17 +24,17 @@ button { cursor: pointer; }
 .topbar nav button:hover, .topbar nav .nav-active { color: white; border-bottom-color: #4d9aff; }
 .count { display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; font-size: 11px; color: white; background: #d83a48; }
 
-.contract-banner { padding: 24px 30px; display: flex; align-items: center; justify-content: space-between; gap: 30px; color: white; background: linear-gradient(110deg, #0b294b, #103b68 63%, #0f4a77); box-shadow: inset 0 -1px #214c77; }
-.contract-banner h1 { margin: 5px 0 3px; font-size: 26px; letter-spacing: -0.02em; }
-.contract-banner p { margin: 0; color: #b9cbe0; font-size: 13px; }
+.contract-banner { padding: 26px 30px 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 34px; background: white; border-bottom: 1px solid #e3e9f1; }
+.contract-banner h1 { margin: 6px 0 4px; font-size: 30px; font-weight: 700; letter-spacing: -0.022em; color: #14213a; }
+.contract-banner p { margin: 0; color: #66748a; font-size: 13px; }
 .eyebrow { display: inline-flex; align-items: center; gap: 6px; color: #5684b3; font-size: 11px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
-.contract-banner .eyebrow { color: #83bcff; }
-.banner-metrics { display: flex; gap: 11px; }
-.metric { min-width: 112px; min-height: 58px; padding: 10px 13px; display: flex; flex-direction: column; justify-content: center; border: 1px solid #315777; border-radius: 9px; background: rgba(4, 24, 43, .38); }
-.metric span { margin-bottom: 4px; color: #98b4cf; font-size: 10px; font-weight: 700; text-transform: uppercase; }
-.metric strong { font-size: 13px; }
-.metric .danger { color: #ff9aa3; }
-.metric .warning { color: #ffd487; }
+.contract-banner .eyebrow { color: #5b7ba6; }
+.banner-metrics { display: flex; gap: 30px; padding-bottom: 3px; }
+.metric { display: flex; flex-direction: column; gap: 3px; }
+.metric span { color: #7a8798; font-size: 10.5px; font-weight: 700; letter-spacing: .07em; text-transform: uppercase; }
+.metric strong { font-size: 16px; font-weight: 650; color: #14213a; font-variant-numeric: tabular-nums; }
+.metric .danger { color: #b3261e; }
+.metric .warning { color: #8a5a00; }
 
 /* Two cards side by side. The padding lives on the grid rather than on main, so both
    columns start at the same y; grid's default stretch then gives them the same height. */
@@ -363,8 +363,7 @@ button { cursor: pointer; }
 .bar-fill-critical { background: #c0392b; }
 
 .stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px) minmax(0, 300px); gap: 14px; align-items: start; }
-@media (max-width: 1240px) { .workspace-metrics { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); } }
+.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 330px); gap: 14px; align-items: stretch; }
 @media (max-width: 900px) { .workspace-metrics { grid-template-columns: 1fr; } }
 
 .contract-table { margin-top: 4px; }
@@ -387,3 +386,31 @@ button { cursor: pointer; }
 .data-error h2 { margin: 2px 0 5px; font-size: 15px; font-weight: 750; color: #6d4c0c; }
 .data-error p { margin: 0; color: #7b6231; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
 .data-error .secondary-button { flex: none; }
+
+/* Package progress: a progression read along a line, in the same hues as the status pills
+   in the table beneath it -- but a saturated step of each, because a pill tint behind
+   11px text is invisible as a 12px bar. Segments are ordered by lifecycle, not by size, so
+   the bar fills rightward as work lands instead of reshuffling when a count overtakes
+   another. Executed is its own step rather than sharing approved's green: on a progression
+   the last state has to be distinguishable from the one before it. */
+.viz {
+  --status-draft: #d99e2b;
+  --status-approved: #2f8f5f;
+  --status-executed: #16624a;
+  --status-redline: #c0392b;
+  --status-none: #97a3b4;
+}
+.progress-fill.doc-status-draft, .progress-legend .doc-status-draft { background: var(--status-draft); }
+.progress-fill.doc-status-approved, .progress-legend .doc-status-approved { background: var(--status-approved); }
+.progress-fill.doc-status-executed, .progress-legend .doc-status-executed { background: var(--status-executed); }
+.progress-fill.doc-status-redline, .progress-legend .doc-status-redline { background: var(--status-redline); }
+.progress-fill.doc-status-none, .progress-legend .doc-status-none { background: var(--status-none); }
+.package-progress { display: flex; flex-direction: column; }
+.package-headline { margin: 14px 0 0; font-size: 27px; font-weight: 700; letter-spacing: -.02em; color: #14213a; font-variant-numeric: tabular-nums; }
+.package-headline strong { font-weight: 700; }
+.progress-track { display: flex; gap: 2px; height: 14px; margin: 16px 0 14px; border-radius: 999px; overflow: hidden; background: #eef1f5; }
+.progress-fill { display: block; min-width: 4px; }
+.progress-legend { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px 22px; }
+.progress-legend li { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
+.progress-legend .legend-value { margin-left: 0; }
+.package-caption { margin: auto 0 0; padding-top: 14px; color: #7a8798; font-size: 12px; }
