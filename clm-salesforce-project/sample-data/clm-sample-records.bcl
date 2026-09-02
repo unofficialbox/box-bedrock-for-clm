@@ -107,7 +107,7 @@ locals {
               "termMonths" = 36
             }
             {
-              "businessOwner" = "Acme Cloud Contract Owner"
+              "businessOwner" = "Halcyon Cloud Contract Owner"
               "contractId" = "CLM-2026-0088"
               "contractType" = "SOW"
               "counterparty" = "Halcyon Cloudworks"

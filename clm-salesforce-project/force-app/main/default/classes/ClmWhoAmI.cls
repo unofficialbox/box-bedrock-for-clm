@@ -40,7 +40,7 @@ global with sharing class ClmWhoAmI {
         Identity identity = new Identity();
         identity.isGuest = UserInfo.getUserType() == 'Guest';
         identity.loginUrl = siteUrl(true);
-        identity.logoutUrl = siteUrl(false);
+        identity.logoutUrl = logoutUrl(siteUrl(false), identity.loginUrl);
 
         if (!identity.isGuest) {
             identity.name = UserInfo.getName();
@@ -65,6 +65,25 @@ global with sharing class ClmWhoAmI {
         } catch (Exception ignored) {
             return null;
         }
+    }
+
+    /**
+     * `Network.getLogoutUrl` answers with the community's *custom* logout URL, and a
+     * community that has not configured one returns null -- which is most of them, and was
+     * this one. The default logout lives beside the login page on the site's own path
+     * prefix, so the login URL is the thing that knows where it is.
+     *
+     * Derived only from a URL that ends in `/login`, because appending to anything else
+     * would invent a path. No login URL, no logout button; the menu simply omits it.
+     */
+    private static String logoutUrl(String configured, String loginUrl) {
+        if (String.isNotBlank(configured)) {
+            return configured;
+        }
+        if (String.isBlank(loginUrl) || !loginUrl.endsWith('/login')) {
+            return null;
+        }
+        return loginUrl.removeEnd('/login') + '/secur/logout.jsp';
     }
 
     /**

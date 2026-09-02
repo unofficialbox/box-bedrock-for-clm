@@ -163,7 +163,7 @@ export function Workspace() {
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div className="brand"><span className="brand-mark">A</span><span><strong>Acme Contracts</strong><small>Box-powered CLM</small></span></div>
+        <div className="brand"><span className="brand-mark">A</span><span><strong>Acme Contracts</strong><small>CLM powered by Box and Headless 360</small></span></div>
         <nav aria-label="Primary">
           <button className={view === "contracts" ? "nav-active" : ""} onClick={() => showView("contracts")}><FileStack size={16} /> Your contracts</button>
           <button className={view === "workspace" ? "nav-active" : ""} onClick={() => showView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
