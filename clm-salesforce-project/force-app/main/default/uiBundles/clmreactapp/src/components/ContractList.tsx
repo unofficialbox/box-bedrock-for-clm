@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { ChevronRight, FileStack, ShieldAlert } from "lucide-react";
 import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
+import { PortfolioCharts } from "./PortfolioCharts";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 import { NORTHSTAR_CONTRACT } from "../data";
 
@@ -55,7 +56,11 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
   }
 
   return (
-    <section className="contract-list-card" data-testid="contracts-view" data-source={source}>
+    <>
+      {/* Above the list, because the portfolio question ("what state is all this in") is
+          asked before the record question ("which one do I open"). */}
+      {live ? <PortfolioCharts contracts={contracts} /> : null}
+      <section className="contract-list-card" data-testid="contracts-view" data-source={source}>
       <div className="section-heading">
         <div>
           <span className="eyebrow"><FileStack size={15} /> Contract records</span>
@@ -112,6 +117,7 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
           will fall back to synthetic Box fixtures.
         </div>
       ) : null}
-    </section>
+      </section>
+    </>
   );
 }

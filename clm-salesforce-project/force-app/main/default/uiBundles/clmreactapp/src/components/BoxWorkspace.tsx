@@ -17,6 +17,8 @@ const BoxElements = lazy(() =>
 export function BoxWorkspace({
   context,
   onFilesLoaded,
+  onBoxReady,
+  reloadKey,
 }: {
   context: ClmPageContext;
   /**
@@ -24,13 +26,18 @@ export function BoxWorkspace({
    * array, already filtered. A second fetch could disagree with what the table shows.
    */
   onFilesLoaded?: (files: BoxFolderItem[]) => void;
+  /**
+   * Hands up the minted token and the folder it is bound to, so the workspace can offer
+   * an upload without this panel owning the button. Null while there is no live Box.
+   */
+  onBoxReady?: (box: { token: string; folderId: string } | null) => void;
+  /** Change this to re-list the folder -- after an upload, say. */
+  reloadKey?: number;
 }) {
   const [token, setToken] = useState("");
   const [folderId, setFolderId] = useState("");
   const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   const [loading, setLoading] = useState(true);
-  /** Bumped after an upload so the listing effect runs again and picks up the new file. */
-  const [reloads, setReloads] = useState(0);
   /**
    * Held in a ref, not a dependency. The prop is optional, so a caller passing an inline
    * function would otherwise change identity every render and refetch the folder in a
@@ -40,6 +47,10 @@ export function BoxWorkspace({
   useEffect(() => {
     notifyFiles.current = onFilesLoaded;
   }, [onFilesLoaded]);
+  const notifyBox = useRef(onBoxReady);
+  useEffect(() => {
+    notifyBox.current = onBoxReady;
+  }, [onBoxReady]);
 
   /**
    * Resolve the governed token, then probe the folder.
@@ -67,12 +78,17 @@ export function BoxWorkspace({
       if (!active) return;
       setFiles(entries);
       notifyFiles.current?.(entries || []);
+      notifyBox.current?.(
+        granted.accessToken && granted.folderId
+          ? { token: granted.accessToken, folderId: granted.folderId }
+          : null,
+      );
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, [context, reloads]);
+  }, [context, reloadKey]);
 
   if (loading) {
     return <WorkspaceSkeleton />;
@@ -94,12 +110,7 @@ export function BoxWorkspace({
           ) : null}
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements
-            folderId={folderId}
-            token={token}
-            files={files}
-            onUploaded={() => setReloads((n) => n + 1)}
-          />
+          <BoxElements folderId={folderId} token={token} files={files} />
         </Suspense>
       </section>
     );

@@ -1,7 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FileStack, LayoutDashboard } from "lucide-react";
+import { FileStack, LayoutDashboard, Upload } from "lucide-react";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { DocumentTimeline } from "./components/DocumentTimeline";
+import { UploadDialog } from "./components/UploadDialog";
 import { ContractList } from "./components/ContractList";
 import type { BoxFolderItem } from "./lib/box";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
@@ -49,6 +50,11 @@ export function Workspace() {
    * empty, and the history panel says something different for each.
    */
   const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
+  /** The live Box token and folder, once the workspace panel has minted them. */
+  const [box, setBox] = useState<{ token: string; folderId: string } | null>(null);
+  const [uploading, setUploading] = useState(false);
+  /** Bumped on upload close so the folder is listed again and the new file appears. */
+  const [reloadKey, setReloadKey] = useState(0);
   /**
    * A record in the URL means the page was opened with context -- a Lightning or
    * Experience page bound to one contract -- so it goes straight to that workspace.
@@ -149,11 +155,42 @@ export function Workspace() {
           {view === "contracts" ? (
             <ContractList onSelect={openContract} />
           ) : (
-            <BoxWorkspace context={workspaceContext} onFilesLoaded={setFiles} />
+            <BoxWorkspace
+              context={workspaceContext}
+              onFilesLoaded={setFiles}
+              onBoxReady={setBox}
+              reloadKey={reloadKey}
+            />
           )}
         </main>
-        {view === "workspace" ? <DocumentTimeline files={files} /> : null}
+        {view === "workspace" ? (
+          <div className="workspace-aside">
+            {/* Adding a document is an action on the contract, not on the table, so it
+                sits with the contract's own column rather than inside the file list. */}
+            {box ? (
+              <button
+                type="button"
+                className="primary-button upload-button"
+                onClick={() => setUploading(true)}
+                data-testid="box-upload-open"
+              >
+                <Upload size={15} /> Upload document
+              </button>
+            ) : null}
+            <DocumentTimeline files={files} />
+          </div>
+        ) : null}
       </div>
+      {uploading && box ? (
+        <UploadDialog
+          folderId={box.folderId}
+          tokenProvider={() => box.token}
+          onClose={() => {
+            setUploading(false);
+            setReloadKey((n) => n + 1);
+          }}
+        />
+      ) : null}
     </div>
   );
 }
