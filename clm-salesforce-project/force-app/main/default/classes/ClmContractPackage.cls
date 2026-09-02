@@ -239,7 +239,10 @@ public with sharing class ClmContractPackage {
             if (item.type != 'file') {
                 continue;
             }
-            lines.add('- ' + item.name + ' (id ' + item.id + ')');
+            // A link rather than a bare id. The id is meaningless to a person and gets read
+            // aloud in a demo; as the last segment of a URL it stays machine-usable for the
+            // preview and the ask, and the natural thing to display is now the useful thing.
+            lines.add('- ' + item.name + ' - https://app.box.com/file/' + item.id);
         }
         return lines;
     }
