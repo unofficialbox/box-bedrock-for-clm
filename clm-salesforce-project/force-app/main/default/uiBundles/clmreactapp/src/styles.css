@@ -43,15 +43,15 @@ button { cursor: pointer; }
 
 .live-pill { padding: 4px 8px; border-radius: 999px; color: #27623b; background: #e7f7ec; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 
-.box-live, .box-fallback, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
+.box-live, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
 /* Both panels are exactly this tall, so the pair lines up whatever is inside them.
    Their contents scroll rather than stretching the card. */
-.box-live, .box-fallback, .approvals-card { height: 625px; }
-.box-live, .box-fallback { display: flex; flex-direction: column; }
+.box-live, .approvals-card { height: 625px; }
+.box-live { display: flex; flex-direction: column; }
 .approvals-card { overflow: auto; }
-.box-fallback-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
-.box-live h2, .box-fallback h2, .approvals-card h2 { margin: 6px 0 4px; font-size: 21px; }
-.box-live p, .box-fallback p, .approvals-card p { margin: 0; color: #65768b; font-size: 13px; }
+.panel-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
+.box-live h2, .approvals-card h2 { margin: 6px 0 4px; font-size: 21px; }
+.box-live p, .approvals-card p { margin: 0; color: #65768b; font-size: 13px; }
 .secondary-button { padding: 9px 12px; display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; border: 1px solid #cbd6e3; border-radius: 8px; color: #174f91; text-decoration: none; background: #fff; font-size: 12px; font-weight: 750; }
 .secondary-button:hover { background: #f4f8fd; }
 .file-list { padding: 8px; }
@@ -114,7 +114,7 @@ button { cursor: pointer; }
   .banner-metrics { display: grid; grid-template-columns: 1fr 1fr; }
   .metric { min-width: 0; }
   .content-grid main { padding: 16px; }
-  .box-fallback-head, .section-heading { align-items: stretch; flex-direction: column; }
+  .panel-head, .section-heading { align-items: stretch; flex-direction: column; }
   .file-row { grid-template-columns: 38px minmax(0, 1fr) auto; }
   .file-row > svg { display: none; }
   .risk { display: none; }
@@ -394,3 +394,12 @@ button { cursor: pointer; }
 .cell-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 .head-actions { display: flex; align-items: center; gap: 10px; }
+
+/* A failed read, stated plainly. Warning-coloured rather than error-red: the page is
+   working, the data behind one panel is not. */
+.data-error { display: flex; align-items: flex-start; gap: 14px; padding: 22px 24px; border: 1px solid #eddcae; border-left: 4px solid #d99e2b; border-radius: 12px; background: #fdf8ec; }
+.data-error-icon { display: grid; place-items: center; flex: none; width: 34px; height: 34px; border-radius: 9px; color: #96660f; background: #f7ebcf; }
+.data-error-copy { flex: 1; min-width: 0; }
+.data-error h2 { margin: 2px 0 5px; font-size: 15px; font-weight: 750; color: #6d4c0c; }
+.data-error p { margin: 0; color: #7b6231; font-size: 13px; line-height: 1.55; overflow-wrap: anywhere; }
+.data-error .secondary-button { flex: none; }

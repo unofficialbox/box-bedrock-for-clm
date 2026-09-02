@@ -53,6 +53,8 @@ export function Workspace() {
   const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   /** The live Box token and folder, once the workspace panel has minted them. */
   const [box, setBox] = useState<{ token: string; folderId: string } | null>(null);
+  /** Set when Box cannot be read at all, so nothing derived from the listing is drawn. */
+  const [boxError, setBoxError] = useState("");
   const [uploading, setUploading] = useState(false);
   /** Bumped on upload close so the folder is listed again and the new file appears. */
   const [reloadKey, setReloadKey] = useState(0);
@@ -151,13 +153,13 @@ export function Workspace() {
         </div>
       ) : null}
 
-      {view === "workspace" ? (
+      {view === "workspace" && !boxError ? (
         <div className="workspace-metrics-row">
           <WorkspaceMetrics files={files} />
         </div>
       ) : null}
 
-      <div className={`content-grid${view === "workspace" ? " content-grid-aside" : ""}`}>
+      <div className={`content-grid${view === "workspace" && !boxError ? " content-grid-aside" : ""}`}>
         <main>
           {view === "contracts" ? (
             <ContractList onSelect={openContract} />
@@ -168,10 +170,11 @@ export function Workspace() {
               onBoxReady={setBox}
               reloadKey={reloadKey}
               onUpload={() => setUploading(true)}
+              onFailed={setBoxError}
             />
           )}
         </main>
-        {view === "workspace" ? <DocumentTimeline files={files} /> : null}
+        {view === "workspace" && !boxError ? <DocumentTimeline files={files} /> : null}
       </div>
       {uploading && box ? (
         <UploadDialog

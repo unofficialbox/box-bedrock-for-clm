@@ -1,9 +1,11 @@
 import { expect, test } from "@playwright/test";
 
-test("contract workspace opens on Box content, and speaks for no contract it cannot name", async ({ page }) => {
+test("contract workspace reports a failed read, and speaks for no contract it cannot name", async ({ page }) => {
   await page.goto("/?recordId=a01xx0000001234&contractId=CLM-2026-0017&folderId=123");
   await expect(page).toHaveTitle(/Acme Contracts/);
-  await expect(page.getByTestId("box-fallback")).toBeVisible();
+  // No org behind the built bundle, so the workspace must say so rather than render the
+  // synthetic folder it used to fall back to.
+  await expect(page.getByTestId("box-error")).toBeVisible();
   await expect(page.getByTestId("agentforce-placeholder")).toHaveCount(0);
   // Deep-linked by record, so the app has ids but not the contract's fields. It used to
   // fill the banner from a fixture, which stated another contract's name, value and term

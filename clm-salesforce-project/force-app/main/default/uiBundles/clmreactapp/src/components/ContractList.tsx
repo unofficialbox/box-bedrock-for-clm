@@ -1,28 +1,17 @@
-import { useEffect, useState } from "react";
-import { FileStack, ShieldAlert } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { FileStack } from "lucide-react";
 import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
 import { PortfolioCharts } from "./PortfolioCharts";
+import { DataError } from "./DataError";
 import { formatDate } from "../lib/documents";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
-import { NORTHSTAR_CONTRACT } from "../data";
-
-/** Stands in when no org is behind the page, so the dashboard is never empty. */
-const FIXTURE_ROWS: ClmContractSummary[] = [
-  {
-    recordId: "",
-    contractId: NORTHSTAR_CONTRACT.id,
-    name: NORTHSTAR_CONTRACT.name,
-    counterparty: NORTHSTAR_CONTRACT.counterparty,
-    contractType: NORTHSTAR_CONTRACT.contractType,
-    status: NORTHSTAR_CONTRACT.status,
-  },
-];
 
 export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSummary) => void }) {
   const [contracts, setContracts] = useState<ClmContractSummary[]>([]);
   const [loading, setLoading] = useState(true);
-  const [live, setLive] = useState(false);
-  const [source, setSource] = useState<"graphql" | "apex" | "fixture">("fixture");
+  const [error, setError] = useState("");
+  const [source, setSource] = useState<"graphql" | "apex">("apex");
+  const [attempt, setAttempt] = useState(0);
 
   /**
    * GraphQL first, Apex second.
@@ -36,39 +25,61 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
   useEffect(() => {
     let active = true;
     (async () => {
+      setLoading(true);
       const viaGraphql = await fetchContractsViaGraphql();
-      const viaApex = viaGraphql === null ? await fetchClmContracts() : null;
-      const rows = viaGraphql ?? viaApex;
       if (!active) return;
-      // Null from both means nothing answered, so the fixture stands in. An empty array
-      // is an org with no contracts yet -- a real answer, and shown as one.
-      setSource(rows === null ? "fixture" : viaGraphql ? "graphql" : "apex");
-      setLive(rows !== null);
-      setContracts(rows ?? FIXTURE_ROWS);
+      if (viaGraphql !== null) {
+        setSource("graphql");
+        setContracts(viaGraphql);
+        setError("");
+        setLoading(false);
+        return;
+      }
+      // Only when the UI API is not offered here. An empty array from it is a real answer
+      // and must not be retried through a different projection.
+      const viaApex = await fetchClmContracts();
+      if (!active) return;
+      setSource("apex");
+      setError(viaApex.ok ? "" : viaApex.error);
+      setContracts(viaApex.ok ? viaApex.value : []);
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, []);
+  }, [attempt]);
+
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   if (loading) {
     return <div className="workspace-state" data-testid="contracts-loading">Loading contract records…</div>;
+  }
+
+  // Nothing is drawn over a failure. A list of contracts is a claim about what this
+  // organisation is party to, and inventing one is worse than saying it cannot be read.
+  if (error) {
+    return (
+      <DataError
+        title="Your contracts could not be loaded"
+        detail={error}
+        onRetry={retry}
+        testId="contracts-error"
+      />
+    );
   }
 
   return (
     <>
       {/* Above the list, because the portfolio question ("what state is all this in") is
           asked before the record question ("which one do I open"). */}
-      {live ? <PortfolioCharts contracts={contracts} /> : null}
+      <PortfolioCharts contracts={contracts} />
       <section className="contract-list-card" data-testid="contracts-view" data-source={source}>
       {/*
         No heading. The nav already says which view this is, and the sentence under it
         described the page to someone who is looking at it -- the charts above and the
-        columns below say more, in less space. The fixture warning stays, because that one
-        tells the reader something the page cannot otherwise show.
+        columns below say more, in less space.
       */}
-      {live && contracts.length === 0 ? (
+      {contracts.length === 0 ? (
         <div className="workspace-state" data-testid="contracts-empty">
           No contract records yet. Creating one in Salesforce brings it here.
         </div>
@@ -84,8 +95,8 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
             </tr>
           </thead>
           <tbody>
-            {contracts.map((contract, index) => (
-              <tr key={contract.recordId || `fixture-${index}`} data-testid="contract-row">
+            {contracts.map((contract) => (
+              <tr key={contract.recordId} data-testid="contract-row">
                 <td>
                   {/* A button, not a row handler: the contract name is the thing you
                       activate, and it stays reachable from the keyboard. */}
@@ -122,13 +133,6 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
           </tbody>
         </table>
       )}
-
-      {!live ? (
-        <div className="secure-note" data-testid="contracts-fixture-note">
-          <ShieldAlert size={15} /> No Salesforce contract records were returned; the workspace
-          will fall back to synthetic Box fixtures.
-        </div>
-      ) : null}
       </section>
     </>
   );

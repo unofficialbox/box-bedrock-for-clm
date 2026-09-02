@@ -1,14 +1,14 @@
-import { lazy, Suspense, useEffect, useRef, useState } from "react";
+import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
 import { WorkspaceSkeleton } from "./WorkspaceSkeleton";
-import { ExternalLink, FileText, FolderOpen, Upload } from "lucide-react";
+import { ExternalLink, Upload } from "lucide-react";
 import { CLM_CONFIG } from "../config";
-import { CONTRACT_FILES } from "../data";
+import { DataError } from "./DataError";
 import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem, type ClmPageContext } from "../lib/box";
 
 /**
  * Loaded lazily to keep box-ui-elements out of the initial bundle. It is several
- * megabytes, and the synthetic-fixture path never needs it, so the entry chunk stays
- * small for anyone who does not reach live Box content.
+ * megabytes, and a workspace that fails to authorise never needs it, so the entry chunk
+ * stays small for anyone who does not reach live Box content.
  */
 const BoxElements = lazy(() =>
   import("./BoxElements").then((module) => ({ default: module.BoxElements })),
@@ -20,6 +20,7 @@ export function BoxWorkspace({
   onBoxReady,
   reloadKey,
   onUpload,
+  onFailed,
 }: {
   context: ClmPageContext;
   /**
@@ -36,6 +37,11 @@ export function BoxWorkspace({
   reloadKey?: number;
   /** Opens the upload dialog, which the workspace owns. */
   onUpload?: () => void;
+  /**
+   * Raised when Box cannot be read at all. The workspace hides the panels built from the
+   * listing rather than leaving them in a loading state that will never resolve.
+   */
+  onFailed?: (error: string) => void;
 }) {
   const [token, setToken] = useState("");
   const [folderId, setFolderId] = useState("");
@@ -54,6 +60,13 @@ export function BoxWorkspace({
   useEffect(() => {
     notifyBox.current = onBoxReady;
   }, [onBoxReady]);
+  const notifyFailed = useRef(onFailed);
+  useEffect(() => {
+    notifyFailed.current = onFailed;
+  }, [onFailed]);
+  const [error, setError] = useState("");
+  /** Bumped by the retry button, so a transient failure does not need a page reload. */
+  const [attempt, setAttempt] = useState(0);
 
   /**
    * Resolve the governed token, then probe the folder.
@@ -62,108 +75,91 @@ export function BoxWorkspace({
    * for Salesforce association and tells us which folder it minted for. Everything below
    * uses that answer rather than anything the URL supplied.
    *
-   * The listing does double duty: it decides between live Box content and the synthetic
-   * fixtures (and logs why when Box refuses), and it is the table the workspace renders,
-   * so the folder is read once rather than once per component.
+   * Either step can fail, and neither failure is papered over. The listing is also the
+   * table the workspace renders, so the folder is read once rather than once per
+   * component.
    */
   useEffect(() => {
     let active = true;
     (async () => {
+      setLoading(true);
+      const fail = (reason: string) => {
+        setError(reason);
+        setFiles(null);
+        setLoading(false);
+        notifyFailed.current?.(reason);
+        notifyBox.current?.(null);
+      };
+
       const granted = await fetchDownscopedBoxToken(context);
       if (!active) return;
-      setToken(granted.accessToken);
-      setFolderId(granted.folderId);
-      if (!granted.accessToken) {
-        setLoading(false);
-        return;
-      }
-      const entries = await listBoxFolderItems(granted.folderId, granted.accessToken);
+      if (!granted.ok) return fail(granted.error);
+
+      setToken(granted.value.accessToken);
+      setFolderId(granted.value.folderId);
+
+      const listing = await listBoxFolderItems(granted.value.folderId, granted.value.accessToken);
       if (!active) return;
-      setFiles(entries);
-      notifyFiles.current?.(entries || []);
-      notifyBox.current?.(
-        granted.accessToken && granted.folderId
-          ? { token: granted.accessToken, folderId: granted.folderId }
-          : null,
-      );
+      if (!listing.ok) return fail(listing.error);
+
+      setError("");
+      setFiles(listing.value);
+      notifyFiles.current?.(listing.value);
+      notifyBox.current?.({
+        token: granted.value.accessToken,
+        folderId: granted.value.folderId,
+      });
       setLoading(false);
     })();
     return () => {
       active = false;
     };
-  }, [context, reloadKey]);
+  }, [context, reloadKey, attempt]);
+
+  const retry = useCallback(() => setAttempt((n) => n + 1), []);
 
   if (loading) {
     return <WorkspaceSkeleton />;
   }
 
-  // A token plus a listing that came back is live content, even when the folder is empty.
-  // A newly provisioned contract folder has no files yet and is still the real workspace.
-  if (token && files !== null) {
+  if (error) {
     return (
-      <section className="box-live" data-testid="box-preview">
-        <div className="box-fallback-head">
-          <div>
-            <h2>{CLM_CONFIG.workspace.name}</h2>
-          </div>
-          <div className="head-actions">
-            {CLM_CONFIG.workspace.boxUrl ? (
-              <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
-                Open in Box <ExternalLink size={15} />
-              </a>
-            ) : null}
-            {onUpload ? (
-              <button
-                type="button"
-                className="upload-button"
-                onClick={onUpload}
-                data-testid="box-upload-open"
-              >
-                <Upload size={15} /> Upload document
-              </button>
-            ) : null}
-          </div>
-        </div>
-        <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} files={files} />
-        </Suspense>
-      </section>
+      <DataError
+        title="This workspace could not be opened"
+        detail={error}
+        onRetry={retry}
+        testId="box-error"
+      />
     );
   }
 
   return (
-    <section className="box-fallback" data-testid="box-fallback">
-      <div className="box-fallback-head">
+    <section className="box-live" data-testid="box-preview">
+      <div className="panel-head">
         <div>
-          <span className="eyebrow"><FolderOpen size={15} /> Box workspace</span>
           <h2>{CLM_CONFIG.workspace.name}</h2>
-          <p>Synthetic file fixtures are shown; live content activates when Salesforce supplies a downscoped Box token.</p>
         </div>
-        {CLM_CONFIG.workspace.boxUrl ? (
-          <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
-            Open in Box <ExternalLink size={15} />
-          </a>
-        ) : null}
+        <div className="head-actions">
+          {CLM_CONFIG.workspace.boxUrl ? (
+            <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
+              Open in Box <ExternalLink size={15} />
+            </a>
+          ) : null}
+          {onUpload ? (
+            <button
+              type="button"
+              className="upload-button"
+              onClick={onUpload}
+              data-testid="box-upload-open"
+            >
+              <Upload size={15} /> Upload document
+            </button>
+          ) : null}
+        </div>
       </div>
-      <div className="file-list">
-        {CONTRACT_FILES.map((file) => {
-          const href = CLM_CONFIG.workspace.boxHostname && !file.id.startsWith("demo-")
-            ? `https://${CLM_CONFIG.workspace.boxHostname}/file/${file.id}`
-            : "";
-          const content = (
-            <>
-            <span className="file-icon"><FileText size={18} /></span>
-            <span className="file-copy"><strong>{file.label}</strong><small>{file.name}</small></span>
-            {href ? <ExternalLink size={15} /> : null}
-            </>
-          );
-          return href ? (
-            <a key={file.id} className="file-row" href={href} target="_blank" rel="noreferrer">{content}</a>
-          ) : (
-            <div key={file.id} className="file-row">{content}</div>
-          );
-        })}
-      </div>
+      <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
+        <BoxElements folderId={folderId} token={token} files={files ?? []} />
+      </Suspense>
     </section>
   );
 }

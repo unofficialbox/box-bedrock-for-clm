@@ -36,7 +36,7 @@ A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce + 
 
 ### Wave 2 — making it actually work (PRs #31–#38, 2026-08-28)
 
-Nothing in wave 1 had ever run against Box. Every layer failed, each one masking the next, because the workspace falls back to synthetic fixtures on *any* Box failure — a CORS rejection, a dead endpoint, and a crashed component all rendered the same screen.
+Nothing in wave 1 had ever run against Box. Every layer failed, each one masking the next, because the workspace fell back to synthetic fixtures on *any* Box failure — a CORS rejection, a dead endpoint, and a crashed component all rendered the same screen. (That fallback was removed on 2026-09-01; every failure now names itself.)
 
 - **#31, #32** scripted the `CLM_Box_Config__c` org default (MT-039) and recorded the Multi-Framework feature gate as MT-041.
 - **#33, #35** embedded Content Explorer and Content Uploader, granted the token as a user rather than the service account, and moved credential setup into `configure-clm-box-credential.sh` (MT-038), dropping the Basic username/password.
@@ -71,7 +71,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 | `.../objects/CLM_Box_Config__c/` | `Box_User_Id__c` / `Enterprise_Id__c` + `Allowed_Folder_Ids__c` folder allowlist |
 | `.../permissionsets/CLM_Box_Preview_Guest.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
 | `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and CCG subject + folder allowlist (MT-039) |
-| `.../clmreactapp/src/components/BoxWorkspace.tsx` | Live branch (token + folder listing) with synthetic-fixture fallback; both failure paths log |
+| `.../clmreactapp/src/components/BoxWorkspace.tsx` | Token, then folder listing; either failure renders `DataError` with the reason, and no fixture stands in |
 | `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
 | `.../clmreactapp/src/components/BoxDocumentTable.tsx` | The file table itself — name, modified, size |
 | `.../clmreactapp/src/components/BoxDocumentPreview.tsx` | Inline document preview: Box's expiring embed URL in an iframe, no preview library |
@@ -89,7 +89,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
 ## 6. Open threads / caveats
 
-1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** **MT-043** (the `CLM_Box_App` trusted site that lets the preview iframe render) was deployed to the `agentforce` org on 2026-08-31 and verified: `https://*.app.box.com`, active, frame-src true — the wildcard is accepted, so no tenant subdomain is hardcoded. Any other environment still needs it. Worth noting the org itself confirms the constraint this design works around: querying `IsApplicableToScriptSrc` on `CspTrustedSite` fails with "No such column". `http://localhost:4173` was added to the Box app's CORS domains on 2026-08-31, so the local harness reaches live Box. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing and the workspace silently falls back to fixtures. Check the browser console: both failure paths log now.
+1. **Live Box is verified; MT-036–MT-039, MT-041, and MT-042 are effectively done.** **MT-043** (the `CLM_Box_App` trusted site that lets the preview iframe render) was deployed to the `agentforce` org on 2026-08-31 and verified: `https://*.app.box.com`, active, frame-src true — the wildcard is accepted, so no tenant subdomain is hardcoded. Any other environment still needs it. Worth noting the org itself confirms the constraint this design works around: querying `IsApplicableToScriptSrc` on `CspTrustedSite` fails with "No such column". `http://localhost:4173` was added to the Box app's CORS domains on 2026-08-31, so the local harness reaches live Box. Otherwise only **MT-040** remains (optional: move to per-user Box OAuth for production hardening). If preview breaks in a new environment, check the CORS domains on the Box app first — the browser calls `api.box.com` directly, so a missing origin fails the folder listing, and the workspace now names the rejection on screen rather than standing in fixtures.
 2. **The contract dashboard needs a sharing decision before it shows real data.**
    `ClmContractListService` works — verified as an admin against the org, returning 13
    records through its fixed projection — but `CLM_Contract__c` is Private/Private and
@@ -98,11 +98,11 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    on `CLM_Box_Preview_Guest`; what is missing is a **guest user sharing rule**, and
    creating one makes contract records readable by unauthenticated visitors. That is a
    deliberate exposure, tracked as **MT-045**, not a bug to fix. Until it exists the
-   dashboard renders its synthetic fixture and says so.
+   dashboard reports that the contract list could not be read.
 3. **Folder-id gotcha.** The workspace still defaults to the non-numeric string `demo-workspace` (`src/config.ts`), which the endpoint rejects as `invalid_folder_id` before any Box call. Pass `?folderId=` or rebuild with `VITE_BOX_FOLDER_ID`; locally, `CLM_BOX_FOLDER_ID` for `preview:live`.
 4. **Document preview works, and it is not the Content Explorer.** The workspace lists
-   the governed folder itself (`BoxWorkspace` already fetched that listing to decide live
-   vs fixtures) and renders it as a plain table; clicking a row mounts
+   the governed folder itself (`BoxWorkspace` already fetched that listing to decide
+   whether there is a workspace at all) and renders it as a plain table; clicking a row mounts
    `box-ui-elements/es/elements/content-preview` on that file id. Verified against live
    Box on 2026-08-31 through the local harness, in both the dev server and the production
    bundle: a 7-page redline renders.
@@ -353,7 +353,7 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
 
    **This affects every contract whose folder the package provisions.** The workspace
    requests `item_upload item_delete item_rename item_share`, so the token mint fails
-   outright and the panel falls back to fixtures. It has gone unnoticed only because the
+   outright and the panel reports the refusal. It has gone unnoticed only because the
    demo has always pointed at Northstar. Until `ClmBoxFolderService` grants the
    collaboration itself, provisioning a contract folder is a two-step operation:
 

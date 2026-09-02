@@ -1,38 +1,3 @@
-import { CLM_CONFIG } from "./config";
-
-export interface ContractRecord {
-  id: string;
-  name: string;
-  counterparty: string;
-  contractType: string;
-  value: string;
-  term: string;
-  status: string;
-  risk: "Critical" | "High" | "Medium" | "Low";
-  owner: string;
-  folderId: string;
-}
-
-export const NORTHSTAR_CONTRACT: ContractRecord = {
-  id: "CLM-2026-0017",
-  name: "Northstar Health MSA",
-  counterparty: "Northstar Health System",
-  contractType: "Master Services Agreement",
-  value: "$2.4M ARR",
-  term: "36 months",
-  status: "Approval blocked",
-  risk: "Critical",
-  owner: "Maya Chen",
-  folderId: CLM_CONFIG.workspace.folderId,
-};
-
-export const CONTRACT_FILES = [
-  { id: "demo-file-msa", name: "northstar-msa-redline-v3.pdf", label: "MSA redline", risk: "Critical" },
-  { id: "demo-file-dpa", name: "northstar-dpa.pdf", label: "DPA", risk: "High" },
-  { id: "demo-file-sow", name: "northstar-sow-implementation.pdf", label: "SOW", risk: "Medium" },
-  { id: "demo-file-order", name: "northstar-order-form.pdf", label: "Order form", risk: "High" },
-] as const;
-
 export type RedlineDomain = "Commercial Legal" | "Finance" | "Privacy";
 export type RedlineRisk = "Critical" | "High" | "Medium" | "Low";
 
@@ -144,11 +109,4 @@ export const REDLINE_FINDINGS: readonly RedlineFinding[] = [
     sourceFileId: "demo-file-dpa",
     sourceCitation: "DPA, section 3.4",
   },
-] as const;
-
-export const AGENT_PROMPTS = [
-  "Summarize the Northstar package and cite the source files.",
-  "Explain why signature is blocked and identify each domain expert and Box task.",
-  "Compare the MSA redline with the approved clause playbook and group cited findings by expert domain.",
-  "Draft the approval memo using the live Box DocGen template.",
 ] as const;

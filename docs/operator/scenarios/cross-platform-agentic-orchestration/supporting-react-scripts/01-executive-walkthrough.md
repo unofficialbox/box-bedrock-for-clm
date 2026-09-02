@@ -243,8 +243,8 @@ Read these before presenting. Each is a real limitation, not a setup error.
   not offer it, and the org preference is already enabled. Set the user's password by reset
   and sign in to the site in a private window instead.
 - **Contract folders need a direct Box collaboration.** A freshly provisioned folder inherits
-  access, which is not enough to downscope a token; the workspace falls back to fixtures with
-  an `invalid_resource` error that reads like a scope problem. `ClmBoxFolderService` grants it
+  access, which is not enough to downscope a token; the workspace reports an
+  `invalid_resource` error that reads like a scope problem. `ClmBoxFolderService` grants it
   on provisioning -- verify it for any folder created another way.
 - **The `clmContract` template is not applied to folders**, so contract-level facts are not
   searchable and beat 2 stays at document level.

@@ -11,25 +11,39 @@ beforeEach(() => {
 describe("Workspace", () => {
   test("opens on the contract list when the page carries no record context", async () => {
     render(<Workspace />);
-    // Nothing identifies a contract yet, so the dashboard is the entry point.
-    expect(await screen.findByTestId("contracts-view")).toBeVisible();
-    // Salesforce is unreachable here, so the list says so rather than showing empty.
-    expect(screen.getByTestId("contracts-fixture-note")).toBeVisible();
+    // Nothing identifies a contract yet, so the dashboard is the entry point rather than
+    // a workspace. Salesforce is unreachable here, so it says so rather than inventing rows.
+    expect(await screen.findByTestId("contracts-error")).toBeVisible();
+    expect(screen.queryByTestId("box-error")).not.toBeInTheDocument();
   });
 
-  test("opens the workspace for a contract chosen from the list", async () => {
+  test("says why the workspace is unavailable instead of drawing a synthetic one", async () => {
+    // Fixtures used to stand in here, so a workspace that could not authorise looked
+    // identical to one that had -- a demo could run to the end against nothing.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
     render(<Workspace />);
-    fireEvent.click(await screen.findByTestId("contract-open"));
-    expect(screen.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
-    expect(await screen.findByTestId("box-fallback")).toBeVisible();
-    expect(screen.getByText("northstar-msa-redline-v3.pdf")).toBeVisible();
+    const failure = await screen.findByTestId("box-error");
+    expect(failure).toBeVisible();
+    expect(failure).toHaveTextContent(/could not be reached|returned/i);
+    expect(screen.queryByText("northstar-msa-redline-v3.pdf")).not.toBeInTheDocument();
+  });
+
+  test("hides the panels built from the listing when the listing failed", async () => {
+    // The history panel and the metric tiles are derived from the folder listing. Left up
+    // on a failure they sit in a skeleton that will never resolve, which reads as slow
+    // rather than broken.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    render(<Workspace />);
+    await screen.findByTestId("box-error");
+    expect(screen.queryByTestId("timeline-loading")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("workspace-metrics")).not.toBeInTheDocument();
   });
 
   test("goes straight to the workspace when the page is opened on a record", async () => {
     // A Lightning or Experience page bound to one contract should not ask again.
     window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
     render(<Workspace />);
-    expect(await screen.findByTestId("box-fallback")).toBeVisible();
+    expect(await screen.findByTestId("box-error")).toBeVisible();
     expect(screen.queryByTestId("contracts-view")).not.toBeInTheDocument();
   });
 
@@ -65,7 +79,7 @@ describe("Workspace", () => {
     // reached it. It could read redlines and the approved clause library, which is exactly
     // what a counterparty must not get.
     const { container } = render(<Workspace />);
-    await screen.findByTestId("contracts-view");
+    await screen.findByTestId("contracts-error");
     expect(screen.queryByTestId("agentforce-placeholder")).not.toBeInTheDocument();
     expect(screen.queryByText(/Contract Copilot/i)).not.toBeInTheDocument();
     expect(container.querySelector(".agent-panel")).toBeNull();
@@ -76,10 +90,8 @@ describe("Workspace", () => {
     // contract's name, value and term -- and by "Approval blocked", contradicting the
     // status on the row beneath it.
     const { container } = render(<Workspace />);
-    await screen.findByTestId("contracts-view");
+    await screen.findByTestId("contracts-error");
     expect(container.querySelector(".contract-banner")).toBeNull();
-    // The list legitimately shows a status per row; the banner's fixture values are what
-    // must not appear.
     expect(screen.queryByText(/36 months/)).not.toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "Northstar Health MSA" })).not.toBeInTheDocument();
   });
@@ -168,7 +180,7 @@ describe("Workspace", () => {
     render(<Workspace />);
     fireEvent.click(await screen.findByTestId("contract-open"));
 
-    await screen.findByTestId("box-fallback");
+    await screen.findByTestId("box-error");
     const tokenCall = urls.find((url) => url.includes("box-token")) || "";
     expect(tokenCall).toContain("recordId=a01xx0000009abcAAA");
     expect(tokenCall).not.toContain("folderId=");

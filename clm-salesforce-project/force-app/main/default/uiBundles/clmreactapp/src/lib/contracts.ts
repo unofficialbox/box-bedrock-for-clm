@@ -8,6 +8,7 @@
  */
 
 import { apexRestUrl } from "./apexRest";
+import { describeError, failed, firstLine, type Loaded } from "./loaded";
 
 export interface ClmContractSummary {
   recordId: string;
@@ -28,29 +29,30 @@ export interface ClmContractSummary {
 }
 
 /**
- * Null when the endpoint could not be reached, so the dashboard can fall back to its
- * synthetic fixture and still demo with no org behind it. An empty array means the org
- * genuinely has no contracts, which is a valid state and not a failure -- an org that has
- * not been seeded yet should say so rather than show a fixture and claim Salesforce is
- * unreachable.
+ * The contract records this user may see.
+ *
+ * An empty array is a real answer -- an org that has not been seeded yet genuinely has no
+ * contracts -- and is distinct from a failure, which carries the reason it failed. There
+ * is no third case where the page invents rows: a list that cannot be read says so.
  */
-export async function fetchClmContracts(): Promise<ClmContractSummary[] | null> {
+export async function fetchClmContracts(): Promise<Loaded<ClmContractSummary[]>> {
   try {
     const response = await fetch(apexRestUrl("/services/apexrest/clm/contracts"), {
       headers: { Accept: "application/json" },
     });
     if (!response.ok) {
-      console.warn(
-        `[CLM] Contract list returned ${response.status}; falling back to fixtures.`,
-        await response.text().catch(() => "")
+      const detail = firstLine(await response.text().catch(() => ""));
+      return failed(
+        `Salesforce returned ${response.status} for the contract list.${detail ? ` ${detail}` : ""}`,
       );
-      return null;
     }
-    const result = (await response.json()) as ClmContractSummary[];
-    return Array.isArray(result) ? result.filter((row) => row && row.recordId) : null;
+    const result: unknown = await response.json();
+    if (!Array.isArray(result)) {
+      return failed("The contract endpoint answered with something that is not a list of records.");
+    }
+    return { ok: true, value: (result as ClmContractSummary[]).filter((row) => row && row.recordId) };
   } catch (error) {
-    console.warn("[CLM] Contract list unreachable; falling back to fixtures.", error);
-    return null;
+    return failed(`The contract endpoint could not be reached. ${describeError(error)}`);
   }
 }
 
