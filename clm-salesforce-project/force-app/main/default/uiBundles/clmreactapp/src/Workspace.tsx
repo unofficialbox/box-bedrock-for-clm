@@ -44,7 +44,11 @@ function contractSearch(contract: ClmContractSummary): string {
 export function Workspace() {
   const [context, setContext] = useState(() => getClmPageContext());
   const [selected, setSelected] = useState<ClmContractSummary | null>(null);
-  const [files, setFiles] = useState<BoxFolderItem[]>([]);
+  /**
+   * Null until the folder has been listed. An empty array means the folder is genuinely
+   * empty, and the history panel says something different for each.
+   */
+  const [files, setFiles] = useState<BoxFolderItem[] | null>(null);
   /**
    * A record in the URL means the page was opened with context -- a Lightning or
    * Experience page bound to one contract -- so it goes straight to that workspace.
@@ -64,6 +68,7 @@ export function Workspace() {
       const namesAContract = params.has("recordId") || params.has("folderId");
       setContext(getClmPageContext());
       setSelected(null);
+      setFiles(null);
       setView(namesAContract ? "workspace" : "contracts");
     }
     window.addEventListener("popstate", syncToUrl);
@@ -72,6 +77,7 @@ export function Workspace() {
 
   const openContract = useCallback((contract: ClmContractSummary) => {
     const search = contractSearch(contract);
+    setFiles(null);
     window.history.pushState({}, "", search ? `?${search}` : window.location.pathname);
     setSelected(contract);
     setView("workspace");

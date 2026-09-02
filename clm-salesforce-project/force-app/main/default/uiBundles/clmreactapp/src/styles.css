@@ -291,3 +291,10 @@ button { cursor: pointer; }
 @media (prefers-reduced-motion: reduce) {
   .skeleton-bar, .skeleton-icon { animation: none; }
 }
+
+/* The history skeleton reuses the timeline's own geometry, so the entries do not shift
+   when the real ones replace them. */
+.skeleton-timeline .timeline-dot { border-color: #e0e5ec; background: #e8ecf2; }
+.skeleton-bar-date { width: 62px; height: 9px; }
+.skeleton-bar-name { width: 84%; height: 12px; margin-top: 1px; }
+.skeleton-timeline .skeleton-bar-meta { width: 108px; height: 10px; }

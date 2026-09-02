@@ -35,3 +35,30 @@ export function WorkspaceSkeleton() {
     </div>
   );
 }
+
+/**
+ * The document history while the same listing is in flight.
+ *
+ * The panel's own heading stays real -- it is known before any data arrives, and
+ * skeletoning a word we already have would be theatre. Only the entries are placeholders.
+ *
+ * Four of them, not six: the timeline's rows are taller than the table's, and four fills
+ * the panel without implying the folder holds exactly that many.
+ */
+export function TimelineSkeleton() {
+  return (
+    <ol className="timeline skeleton-timeline" data-testid="timeline-loading" aria-busy="true">
+      <li className="visually-hidden">Loading the document history</li>
+      {[0, 1, 2, 3].map((row) => (
+        <li className="timeline-item" key={row} aria-hidden="true">
+          <span className="timeline-dot" />
+          <div className="timeline-body">
+            <span className="skeleton-bar skeleton-bar-date" />
+            <span className="skeleton-bar skeleton-bar-name" />
+            <span className="skeleton-bar skeleton-bar-meta" />
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}

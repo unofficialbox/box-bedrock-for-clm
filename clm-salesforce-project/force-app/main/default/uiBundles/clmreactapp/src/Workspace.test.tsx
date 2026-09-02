@@ -45,6 +45,20 @@ describe("Workspace", () => {
     expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
   });
 
+  test("the history shows a skeleton while loading, not an empty state", async () => {
+    // "Nothing has been filed against this contract yet" is a claim about the folder. It
+    // must not be made before the folder has been listed, so the panel distinguishes
+    // not-known-yet from known-and-empty.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    // Never resolves: the listing stays in flight for the life of the assertion.
+    vi.stubGlobal("fetch", vi.fn(() => new Promise(() => {})));
+
+    render(<Workspace />);
+
+    expect(await screen.findByTestId("timeline-loading")).toBeInTheDocument();
+    expect(screen.queryByTestId("timeline-empty")).not.toBeInTheDocument();
+  });
+
   test("carries no agent on the counterparty's surface", async () => {
     // The Copilot ran as its own agent user rather than as the person signed in, and took
     // the contract it answered about from the conversation -- so no scoping on this page

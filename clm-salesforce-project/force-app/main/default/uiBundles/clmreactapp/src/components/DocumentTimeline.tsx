@@ -1,6 +1,7 @@
 import { History } from "lucide-react";
 import type { BoxFolderItem } from "../lib/box";
 import { byMostRecent, documentFacts, formatDate } from "../lib/documents";
+import { TimelineSkeleton } from "./WorkspaceSkeleton";
 
 /**
  * What has happened to this contract's documents, newest first.
@@ -15,8 +16,11 @@ import { byMostRecent, documentFacts, formatDate } from "../lib/documents";
  * The counterparty sees this too, so it lists only documents that survived the redline
  * filter -- it is built from the same array the table renders, not from a second fetch.
  */
-export function DocumentTimeline({ files }: { files: BoxFolderItem[] }) {
-  const ordered = byMostRecent(files);
+export function DocumentTimeline({ files }: { files: BoxFolderItem[] | null }) {
+  // Null is "not known yet" and an empty array is "known, and there are none". Collapsing
+  // them would have this panel claim nothing has been filed while the fetch is still in
+  // flight.
+  const ordered = files === null ? [] : byMostRecent(files);
 
   return (
     <aside className="timeline-panel" data-testid="document-timeline">
@@ -26,7 +30,9 @@ export function DocumentTimeline({ files }: { files: BoxFolderItem[] }) {
         </span>
       </div>
 
-      {ordered.length === 0 ? (
+      {files === null ? (
+        <TimelineSkeleton />
+      ) : ordered.length === 0 ? (
         <div className="workspace-state" data-testid="timeline-empty">
           Nothing has been filed against this contract yet.
         </div>
