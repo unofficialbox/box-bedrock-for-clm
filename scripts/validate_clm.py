@@ -100,7 +100,9 @@ def run_command(command: list[str], *, cwd: Path = ROOT) -> str:
 def repository_files(root: Path = ROOT) -> list[Path]:
     if (root / ".git").exists() and shutil.which("git"):
         output = run_command(["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"], cwd=root)
-        return [root / item for item in output.split("\0") if item]
+        # `--cached` still lists a file deleted from the working tree but not yet staged,
+        # so an uncommitted deletion used to crash every check that reads these paths.
+        return [path for item in output.split("\0") if item for path in [root / item] if path.is_file()]
     return [path for path in root.rglob("*") if path.is_file() and not EXCLUDED_PARTS.intersection(path.parts)]
 
 
