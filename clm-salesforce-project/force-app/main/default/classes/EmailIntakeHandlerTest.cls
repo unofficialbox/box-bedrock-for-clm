@@ -50,10 +50,10 @@ private class EmailIntakeHandlerTest {
 
     @isTest
     static void matchesByDomainWhenNoContact() {
-        Account acct = new Account(Name = 'Acme Cloudworks', Website = 'https://www.acmecloudworks.example');
+        Account acct = new Account(Name = 'Halcyon Cloudworks', Website = 'https://www.acmecloudworks.example');
         insert acct;
         Opportunity opp = new Opportunity(
-            Name = 'Acme Cloudworks Cloud Security Expansion 2026',
+            Name = 'Halcyon Cloudworks Cloud Security Expansion 2026',
             AccountId = acct.Id, StageName = 'Qualification',
             CloseDate = Date.today().addMonths(4)
         );

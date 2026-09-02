@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { createPortal } from "react-dom";
 import { X } from "lucide-react";
+import { UploaderSkeleton } from "./WorkspaceSkeleton";
 import { IntlProvider } from "react-intl";
 import "box-ui-elements/dist/uploader.css";
 
@@ -92,7 +93,7 @@ export function UploadDialog({
             dialog renders outside BoxElements, so it cannot inherit that one.
           */}
           <IntlProvider locale="en" messages={{}}>
-            <Suspense fallback={<div className="workspace-state">Loading the uploader…</div>}>
+            <Suspense fallback={<UploaderSkeleton />}>
               <ContentUploader
                 token={tokenProvider}
                 rootFolderId={folderId}

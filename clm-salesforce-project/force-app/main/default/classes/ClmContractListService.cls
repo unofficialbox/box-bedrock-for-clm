@@ -53,6 +53,22 @@ global with sharing class ClmContractListService {
         RestResponse response = RestContext.response;
         response.addHeader('Content-Type', 'application/json');
 
+        // A guest is not a counterparty with no contracts; it is nobody. Sharing would
+        // return an empty list either way, and the page would then state "no contract
+        // records yet" to somebody whose session has simply expired -- a claim about the
+        // org made from a fact about the visitor. Refusing here keeps "empty" meaning
+        // empty. Granting a guest sharing rule is MT-045, a deliberate exposure.
+        if (UserInfo.getUserType() == 'Guest') {
+            response.statusCode = 401;
+            response.responseBody = Blob.valueOf(
+                JSON.serialize(new Map<String, String>{
+                    'error' => 'not_authenticated',
+                    'detail' => 'Sign in to see the contracts your organisation is party to.'
+                })
+            );
+            return;
+        }
+
         try {
             response.statusCode = 200;
             response.responseBody = Blob.valueOf(JSON.serialize(new ContractReader().read()));

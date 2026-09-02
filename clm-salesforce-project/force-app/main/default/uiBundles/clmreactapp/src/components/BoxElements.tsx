@@ -7,6 +7,7 @@ import "box-ui-elements/dist/preview.css";
 import type { BoxFolderItem } from "../lib/box";
 import { installBoxPreview } from "../lib/boxPreviewRuntime";
 import { BoxDocumentTable } from "./BoxDocumentTable";
+import { PreviewSkeleton } from "./WorkspaceSkeleton";
 
 // Before ContentPreview mounts, so it finds the library already there and never reaches
 // for the CDN script the site's CSP blocks.
@@ -139,7 +140,7 @@ export function BoxElements({
                   {" "}this app, so this is not the CDN or the page CSP — check the console.
                 </div>
               ) : null}
-              <Suspense fallback={<div className="workspace-state">Loading preview…</div>}>
+              <Suspense fallback={<PreviewSkeleton />}>
                 {/*
                   The annotations layer is wrapped in react-router's withRouter and throws
                   "You should not use <withRouter(WithAnnotations(Component))/> outside a

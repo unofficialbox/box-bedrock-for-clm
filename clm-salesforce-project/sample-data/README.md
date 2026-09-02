@@ -6,7 +6,7 @@ This folder contains portable, demo-safe sample data definitions and an executab
 
 - **Accounts**
   - `Northstar Health` (Healthcare)
-  - `Acme Cloudworks` (Technology)
+  - `Halcyon Cloudworks` (Technology)
 
 - **Contacts**
   - Alex Mendoza (`alex.mendoza@northstar.example`)
@@ -14,7 +14,7 @@ This folder contains portable, demo-safe sample data definitions and an executab
 
 - **Opportunities**
   - `Northstar Master Service Agreement 2026`
-  - `Acme Cloudworks Cloud Security Expansion 2026`
+  - `Halcyon Cloudworks Cloud Security Expansion 2026`
 
 - **Contracts**
   - `CLM-2026-0042` — Northstar 2026, **Legal Review** (in redline)

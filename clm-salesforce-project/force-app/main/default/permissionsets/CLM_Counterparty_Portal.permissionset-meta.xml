@@ -11,6 +11,10 @@
         <apexClass>ClmCounterpartyContracts</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <classAccesses>
+        <apexClass>ClmWhoAmI</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>CLM_Contract__c.Contract_ID__c</field>

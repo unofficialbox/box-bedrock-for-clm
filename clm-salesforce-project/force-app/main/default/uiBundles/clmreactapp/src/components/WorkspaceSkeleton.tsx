@@ -132,3 +132,58 @@ export function ContractsSkeleton() {
     </div>
   );
 }
+
+/**
+ * The document table while its lazy chunk downloads.
+ *
+ * box-ui-elements is several megabytes, so this fallback is on screen for a real moment on
+ * a cold load. The panel's own header is already rendered above it, so this is rows only --
+ * skeletoning a heading that is already on screen would make it flicker.
+ */
+export function TableSkeleton() {
+  return (
+    <div className="skeleton-table" data-testid="box-table-loading" aria-busy="true" aria-live="polite">
+      <span className="visually-hidden">Loading the contract documents</span>
+      {ROW_WIDTHS.map((width, index) => (
+        <div className="skeleton-row" key={index} aria-hidden="true">
+          <span className="skeleton-icon" />
+          <span className="skeleton-bar" style={{ width }} />
+          <span className="skeleton-bar skeleton-bar-meta" />
+          <span className="skeleton-bar skeleton-bar-pill" />
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/**
+ * A document while the preview renderer downloads and paints.
+ *
+ * The shape is a page, because that is what arrives: one tall block with a couple of lines
+ * of chrome above it. "Loading preview…" in the middle of an empty pane read as an error
+ * on a slow connection.
+ */
+export function PreviewSkeleton() {
+  return (
+    <div className="skeleton-preview" data-testid="box-preview-loading" aria-busy="true" aria-live="polite">
+      <span className="visually-hidden">Loading the document preview</span>
+      <div className="skeleton-page" aria-hidden="true">
+        <span className="skeleton-bar skeleton-bar-title" />
+        {["92%", "88%", "95%", "72%", "90%", "84%", "58%"].map((width, index) => (
+          <span className="skeleton-bar" key={index} style={{ width }} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** The uploader while its own chunk loads: the drop target, at the size it will be. */
+export function UploaderSkeleton() {
+  return (
+    <div className="skeleton-uploader" data-testid="uploader-loading" aria-busy="true" aria-live="polite">
+      <span className="visually-hidden">Loading the uploader</span>
+      <span className="skeleton-dropzone" aria-hidden="true" />
+      <span className="skeleton-bar skeleton-bar-title" aria-hidden="true" />
+    </div>
+  );
+}

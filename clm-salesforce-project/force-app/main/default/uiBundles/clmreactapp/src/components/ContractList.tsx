@@ -1,13 +1,20 @@
 import { useCallback, useEffect, useState } from "react";
 import { FileStack } from "lucide-react";
-import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
+import { NOT_AUTHENTICATED, fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
 import { PortfolioCharts } from "./PortfolioCharts";
 import { DataError } from "./DataError";
 import { ContractsSkeleton } from "./WorkspaceSkeleton";
 import { formatDate } from "../lib/documents";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 
-export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSummary) => void }) {
+export function ContractList({
+  onSelect,
+  signInUrl,
+}: {
+  onSelect: (contract: ClmContractSummary) => void;
+  /** Supplied by the identity endpoint; the path is not derivable in the browser. */
+  signInUrl?: string;
+}) {
   const [contracts, setContracts] = useState<ClmContractSummary[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -58,6 +65,19 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
 
   // Nothing is drawn over a failure. A list of contracts is a claim about what this
   // organisation is party to, and inventing one is worse than saying it cannot be read.
+  // Being signed out is not a failure to report, it is a door to point at.
+  if (error === NOT_AUTHENTICATED) {
+    return (
+      <DataError
+        title="Sign in to see your contracts"
+        detail="Your session has ended. Signing in again brings back the contracts your organisation is party to."
+        signInUrl={signInUrl}
+        onRetry={retry}
+        testId="contracts-signed-out"
+      />
+    );
+  }
+
   if (error) {
     return (
       <DataError

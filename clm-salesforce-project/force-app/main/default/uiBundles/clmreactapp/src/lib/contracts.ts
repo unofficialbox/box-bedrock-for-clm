@@ -10,6 +10,9 @@
 import { apexRestUrl } from "./apexRest";
 import { describeError, failed, firstLine, type Loaded } from "./loaded";
 
+/** Recognisable by the view, so it can offer a way in rather than a reason. */
+export const NOT_AUTHENTICATED = "not-authenticated";
+
 export interface ClmContractSummary {
   recordId: string;
   contractId?: string;
@@ -41,6 +44,12 @@ export async function fetchClmContracts(): Promise<Loaded<ClmContractSummary[]>>
     });
     if (!response.ok) {
       const detail = firstLine(await response.text().catch(() => ""));
+      // The endpoint refuses a guest rather than answering with an empty list, so that a
+      // signed-out visitor is told to sign in instead of being told the org has no
+      // contracts. Surface it as its own state, not as a status code.
+      if (response.status === 401 || detail.includes("not_authenticated")) {
+        return { ok: false, error: NOT_AUTHENTICATED };
+      }
       return failed(
         `Salesforce returned ${response.status} for the contract list.${detail ? ` ${detail}` : ""}`,
       );

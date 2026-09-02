@@ -91,3 +91,23 @@ export function byDocumentType(files: BoxFolderItem[]): Array<{ label: string; v
     .map(([label, value]) => ({ label, value }))
     .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
 }
+
+/**
+ * Documents by review status, largest first, ties broken on label.
+ *
+ * Reads the same `versionStatus` the table's pill and the timeline read, so the three
+ * cannot disagree about what state a document is in. A document with no clmDocument
+ * instance is "Unclassified" rather than dropped -- the point of the chart is to show how
+ * much of a package has actually landed, and silently omitting the untagged ones would
+ * overstate it.
+ */
+export function byDocumentStatus(files: BoxFolderItem[]): Array<{ label: string; value: number }> {
+  const counts = new Map<string, number>();
+  for (const file of files) {
+    const label = documentFacts(file).status?.trim() || "Unclassified";
+    counts.set(label, (counts.get(label) || 0) + 1);
+  }
+  return [...counts.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
+}

@@ -11,7 +11,7 @@ for (Account acct : [
     FROM Account
     WHERE Name IN :new List<String>{
         'Northstar Health',
-        'Acme Cloudworks'
+        'Halcyon Cloudworks'
     }
 ]) {
     accountsByName.put(acct.Name, acct);
@@ -27,9 +27,9 @@ if (!accountsByName.containsKey('Northstar Health')) {
         Website = 'https://www.northstar.example'
     ));
 }
-if (!accountsByName.containsKey('Acme Cloudworks')) {
+if (!accountsByName.containsKey('Halcyon Cloudworks')) {
     accountsToInsert.add(new Account(
-        Name = 'Acme Cloudworks',
+        Name = 'Halcyon Cloudworks',
         Industry = 'Technology',
         Phone = '(213) 555-0102',
         Website = 'https://www.acmecloudworks.example'
@@ -46,7 +46,7 @@ for (Account acct : [
     FROM Account
     WHERE Name IN :new List<String>{
         'Northstar Health',
-        'Acme Cloudworks'
+        'Halcyon Cloudworks'
     }
 ]) {
     accountsByName.put(acct.Name, acct);
@@ -80,7 +80,7 @@ if (!contactsByEmail.containsKey('sarah.kim@acmecloudworks.example')) {
         FirstName = 'Sarah',
         LastName = 'Kim',
         Email = 'sarah.kim@acmecloudworks.example',
-        AccountId = accountsByName.get('Acme Cloudworks').Id
+        AccountId = accountsByName.get('Halcyon Cloudworks').Id
     ));
 }
 if (!contactsToInsert.isEmpty()) {
@@ -97,7 +97,7 @@ for (Opportunity opp : [
         'Northstar Master Service Agreement 2024',
         'Northstar Master Service Agreement 2025',
         'Northstar Master Service Agreement 2026',
-        'Acme Cloudworks Cloud Security Expansion 2026'
+        'Halcyon Cloudworks Cloud Security Expansion 2026'
     }
 ]) {
     opportunitiesByKey.put(opp.Name + '|' + opp.AccountId, opp);
@@ -109,7 +109,7 @@ List<Opportunity> opportunitiesToInsert = new List<Opportunity>();
 String northStarOppKey = 'Northstar Master Service Agreement 2026|' + accountsByName.get('Northstar Health').Id;
 String northStar2024OppKey = 'Northstar Master Service Agreement 2024|' + accountsByName.get('Northstar Health').Id;
 String northStar2025OppKey = 'Northstar Master Service Agreement 2025|' + accountsByName.get('Northstar Health').Id;
-String acmeOppKey = 'Acme Cloudworks Cloud Security Expansion 2026|' + accountsByName.get('Acme Cloudworks').Id;
+String acmeOppKey = 'Halcyon Cloudworks Cloud Security Expansion 2026|' + accountsByName.get('Halcyon Cloudworks').Id;
 
 if (!opportunitiesByKey.containsKey(northStar2024OppKey)) {
     opportunitiesToInsert.add(new Opportunity(
@@ -140,8 +140,8 @@ if (!opportunitiesByKey.containsKey(northStarOppKey)) {
 }
 if (!opportunitiesByKey.containsKey(acmeOppKey)) {
     opportunitiesToInsert.add(new Opportunity(
-        Name = 'Acme Cloudworks Cloud Security Expansion 2026',
-        AccountId = accountsByName.get('Acme Cloudworks').Id,
+        Name = 'Halcyon Cloudworks Cloud Security Expansion 2026',
+        AccountId = accountsByName.get('Halcyon Cloudworks').Id,
         Amount = 120000,
         CloseDate = Date.today().addMonths(6),
         StageName = 'Qualification'
@@ -160,7 +160,7 @@ for (Opportunity opp : [
         'Northstar Master Service Agreement 2024',
         'Northstar Master Service Agreement 2025',
         'Northstar Master Service Agreement 2026',
-        'Acme Cloudworks Cloud Security Expansion 2026'
+        'Halcyon Cloudworks Cloud Security Expansion 2026'
     }
 ]) {
     opportunitiesByKey.put(opp.Name + '|' + opp.AccountId, opp);
@@ -269,9 +269,9 @@ if (acmeContract == null) {
 } else {
     contractsToUpdate.add(acmeContract);
 }
-acmeContract.Name = 'Acme Cloudworks Cloud Security Expansion 2026';
-acmeContract.Counterparty__c = 'Acme Cloudworks';
-acmeContract.Counterparty_Account__c = accountsByName.get('Acme Cloudworks').Id;
+acmeContract.Name = 'Halcyon Cloudworks Cloud Security Expansion 2026';
+acmeContract.Counterparty__c = 'Halcyon Cloudworks';
+acmeContract.Counterparty_Account__c = accountsByName.get('Halcyon Cloudworks').Id;
 acmeContract.Opportunity__c = opportunitiesByKey.get(acmeOppKey).Id;
 acmeContract.Contract_Type__c = 'SOW';
 acmeContract.Status__c = 'Intake';
@@ -299,7 +299,7 @@ if (!contractsToUpdate.isEmpty()) {
 System.debug(LoggingLevel.INFO, 'SEED COMPLETE accounts new=' + accountsCreated + ' contacts new=' + contactsCreated + ' opportunities new=' + opportunitiesCreated + ' contracts new=' + contractsCreated + ' contracts updated=' + contractsUpdated);
 System.debug(LoggingLevel.INFO, 'SEED IDS: ' +
     'account.Northstar=' + accountsByName.get('Northstar Health').Id +
-    ', account.Acme=' + accountsByName.get('Acme Cloudworks').Id +
+    ', account.Acme=' + accountsByName.get('Halcyon Cloudworks').Id +
     ', opp.Northstar=' + opportunitiesByKey.get(northStarOppKey).Id +
     ', opp.Acme=' + opportunitiesByKey.get(acmeOppKey).Id +
     ', contract.NST=' + (northContract.Id == null ? 'pending_insert' : northContract.Id) +
