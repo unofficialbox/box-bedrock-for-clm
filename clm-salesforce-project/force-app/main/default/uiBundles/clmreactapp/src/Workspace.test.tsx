@@ -2,6 +2,12 @@ import { fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, test, vi } from "vitest";
 import { Workspace } from "./Workspace";
 
+// The real one pulls in box-ui-elements, which is megabytes and needs a live token. The
+// panels these tests assert on are rendered by Workspace, not by this component.
+vi.mock("./components/BoxElements", () => ({
+  BoxElements: () => <div data-testid="box-elements-double" />,
+}));
+
 beforeEach(() => {
   window.history.replaceState({}, "", "/");
   Object.assign(navigator, { clipboard: { writeText: vi.fn().mockResolvedValue(undefined) } });
@@ -227,5 +233,49 @@ describe("Workspace", () => {
     expect(await screen.findByTestId("contracts-empty")).toBeVisible();
     expect(screen.queryByTestId("contracts-fixture-note")).not.toBeInTheDocument();
     expect(screen.queryByTestId("contract-row")).not.toBeInTheDocument();
+  });
+});
+
+describe("Workspace recovery", () => {
+  test("brings the metrics and history back when a retry succeeds", async () => {
+    // The workspace hides both panels while Box is failing, because they are derived from
+    // a listing that never arrived. The failure was raised to the workspace and never
+    // withdrawn, so a retry that worked left them hidden over a loaded workspace.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123");
+    let tokenCalls = 0;
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) => {
+        const target = String(url);
+        if (target.includes("box-token")) {
+          tokenCalls += 1;
+          return tokenCalls === 1
+            ? { ok: false, status: 500, text: async () => "{}", json: async () => ({}) }
+            : { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123" }) };
+        }
+        if (target.includes("api.box.com")) {
+          return {
+            ok: true,
+            json: async () => ({
+              entries: [
+                { id: "1", name: "msa.pdf", type: "file", modified_at: "2026-07-01T00:00:00Z" },
+              ],
+            }),
+          };
+        }
+        return { ok: true, json: async () => [] };
+      }),
+    );
+
+    render(<Workspace />);
+
+    await screen.findByTestId("box-error");
+    expect(screen.queryByTestId("workspace-metrics")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("document-timeline")).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole("button", { name: /Try again/ }));
+
+    expect(await screen.findByTestId("workspace-metrics")).toBeVisible();
+    expect(screen.queryByTestId("box-error")).not.toBeInTheDocument();
   });
 });

@@ -105,6 +105,10 @@ export function BoxWorkspace({
       setError("");
       setFiles(listing.value);
       notifyFiles.current?.(listing.value);
+      // Withdraw an earlier failure as well as recording success. The workspace hides the
+      // metrics and the history while this panel is failing, so a raised error that is
+      // never lowered leaves them hidden over a workspace that has since loaded.
+      notifyFailed.current?.("");
       notifyBox.current?.({
         token: granted.value.accessToken,
         folderId: granted.value.folderId,
