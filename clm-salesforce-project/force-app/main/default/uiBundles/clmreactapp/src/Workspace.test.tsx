@@ -22,7 +22,6 @@ describe("Workspace", () => {
     fireEvent.click(await screen.findByTestId("contract-row"));
     expect(screen.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
     expect(await screen.findByTestId("box-fallback")).toBeVisible();
-    expect(screen.getByTestId("agentforce-placeholder")).toBeVisible();
     expect(screen.getByText("northstar-msa-redline-v3.pdf")).toBeVisible();
   });
 
@@ -44,6 +43,18 @@ describe("Workspace", () => {
     expect(screen.queryByTestId("approvals-view")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: /Copy agent context/ })).not.toBeInTheDocument();
     expect(screen.queryByText("Jordan Lee")).not.toBeInTheDocument();
+  });
+
+  test("carries no agent on the counterparty's surface", async () => {
+    // The Copilot ran as its own agent user rather than as the person signed in, and took
+    // the contract it answered about from the conversation -- so no scoping on this page
+    // reached it. It could read redlines and the approved clause library, which is exactly
+    // what a counterparty must not get.
+    const { container } = render(<Workspace />);
+    await screen.findByTestId("contracts-view");
+    expect(screen.queryByTestId("agentforce-placeholder")).not.toBeInTheDocument();
+    expect(screen.queryByText(/Contract Copilot/i)).not.toBeInTheDocument();
+    expect(container.querySelector(".agent-panel")).toBeNull();
   });
 
   test("shows no contract banner until a contract is open", async () => {

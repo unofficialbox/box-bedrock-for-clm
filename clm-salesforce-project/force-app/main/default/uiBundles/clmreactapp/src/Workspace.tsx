@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { FileStack, LayoutDashboard } from "lucide-react";
-import { AgentforcePanel } from "./components/AgentforcePanel";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { ContractList } from "./components/ContractList";
 import { formatDealValue, type ClmContractSummary } from "./lib/contracts";
@@ -8,6 +7,14 @@ import { getClmPageContext } from "./lib/box";
 
 /**
  * This app is the counterparty's surface, and only theirs.
+ *
+ * It carries no agent. The Copilot that used to sit beside this content ran as its own
+ * agent user rather than as the person signed in, and took the contract it answered about
+ * from the conversation -- so the one control on the page that could be asked anything was
+ * the one control none of the scoping reached. Everything a counterparty would ask it
+ * ("is it signed", "what did we agree", "what do you need from me") is already on the page,
+ * and everything it could reach that they cannot -- redlines, the approved clause library,
+ * our fallback positions -- is the reason not to put it here.
  *
  * It used to serve both sides, which is why it carried a redline review queue and a "copy
  * agent context" button. The internal persona now works headlessly through the MCP server,
@@ -136,7 +143,6 @@ export function Workspace() {
             <BoxWorkspace context={workspaceContext} />
           )}
         </main>
-        <AgentforcePanel contractId={selected?.contractId || context.contractId} />
       </div>
     </div>
   );

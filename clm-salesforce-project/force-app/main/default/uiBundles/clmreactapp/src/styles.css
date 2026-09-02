@@ -23,8 +23,6 @@ button { cursor: pointer; }
 .topbar nav button { border: 0; padding: 0 16px; display: flex; align-items: center; gap: 7px; color: #9db0c9; background: transparent; border-bottom: 3px solid transparent; }
 .topbar nav button:hover, .topbar nav .nav-active { color: white; border-bottom-color: #4d9aff; }
 .count { display: grid; place-items: center; min-width: 20px; height: 20px; padding: 0 6px; border-radius: 999px; font-size: 11px; color: white; background: #d83a48; }
-.agent-context-button { margin-left: auto; border: 1px solid #315071; border-radius: 8px; padding: 9px 13px; display: flex; align-items: center; gap: 7px; color: white; background: #102a48; }
-.agent-context-button:hover { background: #173a61; }
 
 .contract-banner { padding: 24px 30px; display: flex; align-items: center; justify-content: space-between; gap: 30px; color: white; background: linear-gradient(110deg, #0b294b, #103b68 63%, #0f4a77); box-shadow: inset 0 -1px #214c77; }
 .contract-banner h1 { margin: 5px 0 3px; font-size: 26px; letter-spacing: -0.02em; }
@@ -40,37 +38,15 @@ button { cursor: pointer; }
 
 /* Two cards side by side. The padding lives on the grid rather than on main, so both
    columns start at the same y; grid's default stretch then gives them the same height. */
-.content-grid { display: grid; grid-template-columns: minmax(0, 1fr) 370px; gap: 24px; padding: 24px 28px 34px; align-items: stretch; }
+.content-grid { display: grid; grid-template-columns: minmax(0, 1fr); gap: 24px; padding: 24px 28px 34px; align-items: stretch; }
 .content-grid main { min-width: 0; display: flex; flex-direction: column; }
 
-/* Matches .box-live exactly -- same border, radius and shadow -- so the two panels read
-   as one pair rather than a card next to a sidebar. */
-.agent-panel {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  border: 1px solid #dce3ec;
-  border-radius: 12px;
-  overflow: hidden;
-  background: white;
-  box-shadow: 0 5px 20px rgba(18, 46, 79, .05);
-}
-.agent-heading { height: 56px; padding: 0 18px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid #e0e6ee; }
-.agent-title { font-size: 14px; }
-.agent-title { display: flex; align-items: center; gap: 8px; font-weight: 750; }
 .live-pill { padding: 4px 8px; border-radius: 999px; color: #27623b; background: #e7f7ec; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
-.agent-host { flex: 1; min-height: 0; }
-.agent-placeholder { padding: 24px 22px; color: #44566e; }
-.agent-placeholder strong { display: block; margin: 12px 0 5px; color: #10233f; }
-.agent-placeholder p { margin: 0 0 18px; font-size: 13px; line-height: 1.55; }
-.agent-placeholder ul { margin: 0; padding: 0; list-style: none; }
-.agent-placeholder li { margin-bottom: 10px; padding: 10px 12px; border: 1px solid #e0e7f0; border-radius: 8px; background: #f8fafc; font-size: 12px; line-height: 1.45; }
-.agent-shield { width: 43px; height: 43px; display: grid; place-items: center; border-radius: 11px; color: #1166e8; background: #e8f1ff; }
 
 .box-live, .box-fallback, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
 /* Both panels are exactly this tall, so the pair lines up whatever is inside them.
    Their contents scroll rather than stretching the card. */
-.box-live, .box-fallback, .approvals-card, .agent-panel { height: 625px; }
+.box-live, .box-fallback, .approvals-card { height: 625px; }
 .box-live, .box-fallback { display: flex; flex-direction: column; }
 .approvals-card { overflow: auto; }
 .box-fallback-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
@@ -125,12 +101,10 @@ button { cursor: pointer; }
 @media (max-width: 980px) {
   .topbar { padding: 0 16px; }
   .brand { min-width: auto; }
-  .brand span:last-child, .agent-context-button { display: none; }
+  .brand span:last-child { display: none; }
   .contract-banner { align-items: flex-start; flex-direction: column; }
   .banner-metrics { width: 100%; overflow-x: auto; }
   .content-grid { grid-template-columns: 1fr; }
-  .agent-panel { min-height: 520px; }
-  .agent-host { height: 600px; }
 }
 
 @media (max-width: 620px) {

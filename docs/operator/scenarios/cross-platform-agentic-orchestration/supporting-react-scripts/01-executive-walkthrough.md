@@ -204,11 +204,10 @@ opens it, sees the signer, and presses send. Verified live in all three states.
 > to one folder. The analysis from beat 3 -- our positions, our fallbacks, our owner -- never
 > crosses to this side.
 
-**Do not extend this claim to the agent.** The workspace is scoped by the signed-in identity;
-the Copilot is not, and cannot be on this surface. See **Known constraints**.
-
-**Presenter warning:** do not invite the audience to prompt the Copilot here. See
-**Known constraints**.
+**There is no agent on this page, and that is the point to make.** Everything a
+counterparty would ask one -- is it signed, what did we agree, what do you need from me --
+is already on the screen. What an agent could reach that they cannot -- the redlines, the
+approved clause library, our fallback positions -- is the reason it is not here.
 
 ## Close
 
@@ -230,15 +229,16 @@ the Copilot is not, and cannot be on this surface. See **Known constraints**.
 
 Read these before presenting. Each is a real limitation, not a setup error.
 
-- **The Contract Copilot is not identity-scoped.** It is a Service Agent
-  (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its assigned agent user, and its
-  contract argument is filled from the conversation -- so a counterparty can ask it about
-  another company's contract by naming it. The scoping in beat 4 is the *workspace*, not the
-  agent. Keep the Copilot out of the counterparty half of this demo.
+- **The counterparty app carries no agent, and that was a decision.** The Copilot it used to
+  host is a Service Agent (`ExternalCopilot` / `EinsteinServiceAgent`), which runs as its
+  assigned agent user rather than as the person signed in, and takes the contract it answers
+  about from the conversation. None of the page's scoping reached it: it could read a redline
+  the page withholds, and the clause library holding Acme's negotiating positions. Nothing a
+  counterparty would ask it is absent from the page.
 
   This is a property of the agent type, not of Agentforce. An **Employee Agent** inherits the
-  permissions of the logged-in user and takes no agent user, which is the surface where
-  "same agent, different access" would hold.
+  permissions of the logged-in user and takes no agent user, which is the surface on which a
+  conversational beat is worth building.
 - **Login As is unavailable for the counterparty user.** The Customer Community licence does
   not offer it, and the org preference is already enabled. Set the user's password by reset
   and sign in to the site in a private window instead.
