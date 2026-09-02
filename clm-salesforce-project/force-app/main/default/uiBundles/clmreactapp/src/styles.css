@@ -342,7 +342,7 @@ button { cursor: pointer; }
 .stat-value { font-size: 25px; font-weight: 750; line-height: 1.15; font-variant-numeric: tabular-nums; }
 .stat-note { font-size: 12px; color: #6a7686; }
 
-.chart-row { display: grid; grid-template-columns: minmax(0, 340px) minmax(0, 1fr); gap: 14px; }
+.chart-row { display: grid; grid-template-columns: minmax(0, 260px) minmax(0, 1fr) minmax(0, 1fr); gap: 14px; }
 .chart-figure { margin: 0; padding: 16px 18px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
 .chart-title { font-size: 13px; font-weight: 700; margin-bottom: 14px; }
 
@@ -357,14 +357,16 @@ button { cursor: pointer; }
 .legend-label { color: #3f4a58; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .legend-value { margin-left: auto; font-weight: 700; font-variant-numeric: tabular-nums; }
 
-.bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 11px; }
-.bar-row { display: grid; grid-template-columns: minmax(0, 132px) minmax(0, 1fr) 58px; align-items: center; gap: 12px; font-size: 12.5px; }
-.bar-label { color: #3f4a58; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bars { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 13px; }
+.bar-row { display: flex; flex-direction: column; gap: 5px; font-size: 12.5px; }
+.bar-head { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; }
+.bar-label { color: #3f4a58; min-width: 0; overflow-wrap: anywhere; }
 .bar-track { height: 14px; border-radius: 4px; background: #eef1f5; overflow: hidden; }
 .bar-fill { display: block; height: 100%; border-radius: 4px; background: var(--series-1); }
-.bar-value { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bar-value { flex: none; font-weight: 700; font-variant-numeric: tabular-nums; }
+.bar-value-critical { color: #c0392b; }
 
-@media (max-width: 900px) {
+@media (max-width: 940px) {
   .stat-row { grid-template-columns: 1fr; }
   .chart-row { grid-template-columns: 1fr; }
 }
@@ -376,12 +378,10 @@ button { cursor: pointer; }
 .cell-type { color: #3f4a58; white-space: nowrap; }
 @media (max-width: 900px) { .stat-row-4 { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 
-.chart-row-wide { grid-template-columns: minmax(0, 1fr); }
 .chart-empty { margin: 0; font-size: 12.5px; color: #6a7686; }
 /* Reserved status colour, used only where the chart's subject is a status. */
 .bar-fill-critical { background: #c0392b; }
 
-.box-table-actions { display: flex; justify-content: flex-end; padding: 0 0 14px; }
 .stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 .workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
 @media (max-width: 1000px) { .workspace-metrics { grid-template-columns: 1fr; } }
@@ -389,3 +389,5 @@ button { cursor: pointer; }
 .contract-table { margin-top: 4px; }
 .contract-table .box-table-name { text-align: left; }
 .cell-number { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+.head-actions { display: flex; align-items: center; gap: 10px; }

@@ -1,6 +1,6 @@
 import { lazy, Suspense, useEffect, useRef, useState } from "react";
 import { WorkspaceSkeleton } from "./WorkspaceSkeleton";
-import { ExternalLink, FileText, FolderOpen } from "lucide-react";
+import { ExternalLink, FileText, FolderOpen, Upload } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { CONTRACT_FILES } from "../data";
 import { fetchDownscopedBoxToken, listBoxFolderItems, type BoxFolderItem, type ClmPageContext } from "../lib/box";
@@ -106,14 +106,26 @@ export function BoxWorkspace({
           <div>
             <h2>{CLM_CONFIG.workspace.name}</h2>
           </div>
-          {CLM_CONFIG.workspace.boxUrl ? (
-            <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
-              Open in Box <ExternalLink size={15} />
-            </a>
-          ) : null}
+          <div className="head-actions">
+            {CLM_CONFIG.workspace.boxUrl ? (
+              <a className="secondary-button" href={CLM_CONFIG.workspace.boxUrl} target="_blank" rel="noreferrer">
+                Open in Box <ExternalLink size={15} />
+              </a>
+            ) : null}
+            {onUpload ? (
+              <button
+                type="button"
+                className="upload-button"
+                onClick={onUpload}
+                data-testid="box-upload-open"
+              >
+                <Upload size={15} /> Upload document
+              </button>
+            ) : null}
+          </div>
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} files={files} onUpload={onUpload} />
+          <BoxElements folderId={folderId} token={token} files={files} />
         </Suspense>
       </section>
     );

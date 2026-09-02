@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useState } from "react";
-import { ArrowLeft, Upload } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import BoxAnnotations from "box-annotations";
 import { IntlProvider } from "react-intl";
 import { MemoryRouter } from "react-router-dom";
@@ -95,13 +95,10 @@ export function BoxElements({
   folderId,
   token,
   files,
-  onUpload,
 }: {
   folderId: string;
   token: string;
   files: BoxFolderItem[];
-  /** Opens the upload dialog. The workspace owns the dialog; this is only the trigger. */
-  onUpload?: () => void;
 }) {
   const [selected, setSelected] = useState<BoxFolderItem | null>(null);
 
@@ -165,18 +162,6 @@ export function BoxElements({
           </div>
         ) : (
           <div className="box-table-host">
-            {onUpload ? (
-              <div className="box-table-actions">
-                <button
-                  type="button"
-                  className="upload-button"
-                  onClick={onUpload}
-                  data-testid="box-upload-open"
-                >
-                  <Upload size={15} /> Upload document
-                </button>
-              </div>
-            ) : null}
             <BoxDocumentTable files={files} onSelect={setSelected} />
           </div>
         )}

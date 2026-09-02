@@ -47,7 +47,10 @@ function ValueBars({ title, slices }: { title: string; slices: Slice[] }) {
       <ul className="bars">
         {slices.map((slice) => (
           <li key={slice.label} className="bar-row">
-            <span className="bar-label" title={slice.label}>{slice.label}</span>
+            <span className="bar-head">
+              <span className="bar-label">{slice.label}</span>
+              <span className="bar-value">{formatCompactValue(slice.value)}</span>
+            </span>
             <span className="bar-track">
               <span
                 className="bar-fill"
@@ -56,7 +59,6 @@ function ValueBars({ title, slices }: { title: string; slices: Slice[] }) {
                 <title>{`${slice.label}: ${formatCompactValue(slice.value)}`}</title>
               </span>
             </span>
-            <span className="bar-value">{formatCompactValue(slice.value)}</span>
           </li>
         ))}
       </ul>
@@ -86,7 +88,12 @@ function RenewalHorizon({ renewals, windowDays }: { renewals: Renewal[]; windowD
             const used = lapsed ? 1 : 1 - renewal.daysRemaining / windowDays;
             return (
               <li key={renewal.label} className="bar-row">
-                <span className="bar-label" title={renewal.label}>{renewal.label}</span>
+                <span className="bar-head">
+                  <span className="bar-label">{renewal.label}</span>
+                  <span className={`bar-value${lapsed ? " bar-value-critical" : ""}`}>
+                    {lapsed ? "Lapsed" : `${renewal.daysRemaining}d`}
+                  </span>
+                </span>
                 <span className="bar-track">
                   <span
                     className={`bar-fill${lapsed ? " bar-fill-critical" : ""}`}
@@ -94,9 +101,6 @@ function RenewalHorizon({ renewals, windowDays }: { renewals: Renewal[]; windowD
                   >
                     <title>{`${renewal.label}: ends ${renewal.endDate}`}</title>
                   </span>
-                </span>
-                <span className="bar-value">
-                  {lapsed ? "Lapsed" : `${renewal.daysRemaining}d`}
                 </span>
               </li>
             );
@@ -137,8 +141,6 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
       <div className="chart-row">
         <Donut slices={statuses} centreLabel="contracts" title="Contracts by status" />
         <ValueBars title={breakdown.title} slices={values} />
-      </div>
-      <div className="chart-row chart-row-wide">
         <RenewalHorizon renewals={renewals} windowDays={RENEWAL_WINDOW_DAYS} />
       </div>
     </section>
