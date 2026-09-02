@@ -24,4 +24,16 @@ describe("UploadDialog", () => {
     // this one takes the uploader down at mount, not at upload.
     expect(await screen.findByTestId("uploader-double")).toBeVisible();
   });
+
+  test("renders outside the app tree so nothing in the page can paint over it", async () => {
+    // An ancestor in the workspace layout establishes a stacking context. Rendered in
+    // place the dialog painted under the panels it covers, and no z-index could lift it
+    // out. Only the body is guaranteed to be neither a stacking context nor a clip.
+    const { container } = render(
+      <UploadDialog folderId="0" tokenProvider={() => "t"} onClose={() => {}} />,
+    );
+    const dialog = await screen.findByTestId("upload-dialog");
+    expect(dialog.parentElement).toBe(document.body);
+    expect(container).not.toContainElement(dialog);
+  });
 });

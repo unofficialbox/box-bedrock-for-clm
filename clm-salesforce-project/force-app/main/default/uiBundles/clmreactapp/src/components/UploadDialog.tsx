@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
+import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import { IntlProvider } from "react-intl";
 import "box-ui-elements/dist/uploader.css";
@@ -51,7 +52,16 @@ export function UploadDialog({
     };
   }, [onClose]);
 
-  return (
+  /*
+   * Portalled to the body rather than left where it is written.
+   *
+   * In the page it sat inside the workspace's own layout and painted underneath the
+   * panels it was supposed to cover -- an ancestor there establishes a stacking context,
+   * so no z-index on the backdrop could lift it out, and `position: fixed` resolved
+   * against that ancestor rather than the viewport, which clipped it as well. The body
+   * is the only parent that guarantees neither.
+   */
+  return createPortal(
     <div
       className="modal-backdrop"
       data-testid="upload-dialog"
@@ -95,6 +105,7 @@ export function UploadDialog({
           </IntlProvider>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }
