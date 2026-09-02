@@ -345,3 +345,34 @@ describe("Signed out", () => {
     expect(screen.queryByTestId("contracts-signed-out")).not.toBeInTheDocument();
   });
 });
+
+describe("The contract banner", () => {
+  test("does not head the list of every contract with one contract's facts", async () => {
+    // The selection survives a trip to the list, which is what lets the Workspace tab
+    // return to it. The banner has to be gated on the view as well, or it states one
+    // contract's name, value and term above a list of all of them.
+    const rows = [
+      { recordId: "a01xx0000009abcAAA", contractId: "CLM-1", name: "First Contract", boxFolderId: "1", dealValue: 100 },
+      { recordId: "a01xx0000009defAAA", contractId: "CLM-2", name: "Second Contract", boxFolderId: "2", dealValue: 200 },
+    ];
+    vi.stubGlobal(
+      "fetch",
+      vi.fn(async (url: string) =>
+        String(url).includes("/clm/contracts")
+          ? { ok: true, json: async () => rows }
+          : { ok: false, status: 500, text: async () => "{}", json: async () => ({}) },
+      ),
+    );
+
+    const { container } = render(<Workspace />);
+    fireEvent.click((await screen.findAllByTestId("contract-open"))[0]);
+    expect(container.querySelector(".contract-banner")).not.toBeNull();
+
+    fireEvent.click(screen.getByRole("button", { name: /Your contracts/ }));
+
+    expect(container.querySelector(".contract-banner")).toBeNull();
+    // Still selected underneath, so the Workspace tab can go back to it.
+    fireEvent.click(screen.getByRole("button", { name: /Workspace/ }));
+    expect(container.querySelector(".contract-banner")).not.toBeNull();
+  });
+});
