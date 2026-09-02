@@ -1,5 +1,7 @@
 import { lazy, Suspense, useEffect, useRef } from "react";
 import { X } from "lucide-react";
+import { IntlProvider } from "react-intl";
+import "box-ui-elements/dist/uploader.css";
 
 /**
  * Several megabytes, and only needed when someone actually uploads, so it gets its own
@@ -75,15 +77,22 @@ export function UploadDialog({
         </div>
 
         <div className="modal-body">
-          <Suspense fallback={<div className="workspace-state">Loading the uploader…</div>}>
-            <ContentUploader
-              token={tokenProvider}
-              rootFolderId={folderId}
-              /* The token is downscoped to this one folder, so an upload cannot land
-                 anywhere else even if the element were asked to. */
-              onClose={onClose}
-            />
-          </Suspense>
+          {/*
+            Same provider the preview needs: box-ui-elements reads from react-intl context
+            and throws "Could not find required `intl` object" without one above it. The
+            dialog renders outside BoxElements, so it cannot inherit that one.
+          */}
+          <IntlProvider locale="en" messages={{}}>
+            <Suspense fallback={<div className="workspace-state">Loading the uploader…</div>}>
+              <ContentUploader
+                token={tokenProvider}
+                rootFolderId={folderId}
+                /* The token is downscoped to this one folder, so an upload cannot land
+                   anywhere else even if the element were asked to. */
+                onClose={onClose}
+              />
+            </Suspense>
+          </IntlProvider>
         </div>
       </div>
     </div>
