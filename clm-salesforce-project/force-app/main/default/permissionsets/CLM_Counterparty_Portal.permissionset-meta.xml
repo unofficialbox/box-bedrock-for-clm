@@ -51,6 +51,21 @@
         <field>CLM_Contract__c.Deal_Value__c</field>
         <readable>true</readable>
     </fieldPermissions>
+    <!--
+      Apex REST is what mints the Box token, and a call to /services/apexrest is refused
+      with a bare 403 unless the caller has API Enabled. The Customer Community profile
+      does not grant it. That is why the workspace could list contracts and then fail to
+      load a single document: the GraphQL UI API goes through the site's own bridge and
+      needs no such permission, so one path worked while the other did not.
+
+      It widens nothing this user can reach. API Enabled governs whether the platform will
+      answer them at all, not what it answers with; every call is still bounded by the
+      object read, the eight fields, and the sharing set below.
+    -->
+    <userPermissions>
+        <enabled>true</enabled>
+        <name>ApiEnabled</name>
+    </userPermissions>
     <objectPermissions>
         <allowCreate>false</allowCreate>
         <allowDelete>false</allowDelete>

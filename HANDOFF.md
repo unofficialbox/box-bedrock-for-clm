@@ -608,6 +608,16 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    `clmDocument` metadata. `ClmBoxFolderService` does the first two together; calling the
    Toolkit directly does not.
 
+    **A counterparty needs `API Enabled` or the Box token endpoint 403s.** This is the
+    subtlest of the counterparty problems because it fails in only one direction. The
+    contract list reads through the GraphQL UI API, which goes through the site's own
+    bridge and needs no such permission, so the list worked. The Box token is minted by
+    Apex REST, and a call to `/services/apexrest` is refused with a bare 403 unless the
+    caller has `API Enabled`, which the Customer Community profile does not grant. The
+    result is a workspace that lists contracts perfectly and then cannot load a single
+    document. It is on `CLM_Counterparty_Portal` now, and it widens nothing: it governs
+    whether the platform answers that user at all, not what it answers with.
+
 12. **The counterparty app carries no agent, and that was a decision.** The Copilot was a
    Service Agent: it ran as its assigned agent user rather than the person signed in, and
    took the contract it answered about from the conversation. So the sharing set, the field
