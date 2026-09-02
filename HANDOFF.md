@@ -576,6 +576,51 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    Toolkit writes as the Salesforce Admin Box user, so the upload 404'd until that folder was
    collaborated to the Toolkit's identity -- the mirror image of the gap in item 6.
 
+11. **The counterparty sees a filtered folder, not a different one.** Two contracts had
+   problems that looked unrelated and were the same problem: a counterparty could read
+   Acme's redlines, and the demo's default contract showed synthetic fixtures.
+
+   `listBoxFolderItems` now asks Box for the `clmDocument` instance inline and withholds
+   anything marked `Redline`. The field is requested as `metadata.enterprise.clmDocument` --
+   the shorthand for the caller's own enterprise, verified against the API -- so no
+   enterprise ID reaches the browser. It matches on `versionStatus`, not the file name,
+   which is the difference between a control and a coincidence: a redline named
+   `v5-final.pdf` is still a redline. Untagged files are shown, because an unclassified
+   upload is a tagging gap to fix rather than a document to hide.
+
+   **`CLM-2026-0017` had no Box folder at all** -- no `box__FRUP__c` row and a null
+   `Box_Workspace_Folder_ID__c` -- which is why it fell back to fixtures, why its documents
+   were not clickable (fallback rows are `div`s, not links), and why risk pills appeared
+   (fixture data). One missing mapping, three symptoms. It now has a provisioned folder
+   carrying the seven documents of the 2026 negotiation. The 2024 and 2025 executed MSAs are
+   deliberately *not* in it: they belong to their own contracts, and copying them would
+   repeat the shape `CLM-SAMPLE-NST-2024`'s folder already has, where one folder holds every
+   Northstar document regardless of which contract it belongs to.
+
+   That folder is now the better demonstration of the filter, because the same folder answers
+   differently by audience: the internal package lists seven, the counterparty's workspace
+   lists five. Anywhere else the redlines were only incidentally absent.
+
+   **Provisioning by hand is four steps, and the second is the one people miss:**
+   `box.Toolkit.createFolderForRecordId`, then a `POST /2.0/collaborations` granting
+   `CLM_Box_Config__c.Box_User_Id__c` editor on the new folder (see item 6 -- without it
+   nothing can read the folder, not even the CCG app), then the uploads, then the
+   `clmDocument` metadata. `ClmBoxFolderService` does the first two together; calling the
+   Toolkit directly does not.
+
+12. **The counterparty app carries no agent, and that was a decision.** The Copilot was a
+   Service Agent: it ran as its assigned agent user rather than the person signed in, and
+   took the contract it answered about from the conversation. So the sharing set, the field
+   permissions and the redline filter all bounded the page while the agent sat beside them
+   bounded by none of it -- able to read a redline the page had just withheld, and the clause
+   library holding Acme's negotiating positions. What it offered in exchange was thin: every
+   question a counterparty would ask it is answered by the record already on screen.
+
+   Removed with it: the panel, its styles, the `agentforce` config block, and
+   `getAgentContextPrompt`. Three unit tests and one e2e now assert the absence, so the
+   decision does not drift back. An **Employee Agent** inherits the signed-in user's
+   permissions and is the surface on which a conversational beat would be worth building.
+
 ## 7. How to verify you're in a good state
 
 ```bash
