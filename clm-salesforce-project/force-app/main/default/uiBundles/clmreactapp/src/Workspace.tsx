@@ -164,21 +164,24 @@ export function Workspace() {
           )}
         </main>
         {view === "workspace" ? (
-          <div className="workspace-aside">
-            {/* Adding a document is an action on the contract, not on the table, so it
-                sits with the contract's own column rather than inside the file list. */}
+          <>
+            {/* Its own grid row, so the action sits above the right-hand panel while both
+                panels still start on the same line. Nesting it with the timeline pushed
+                that panel down and left the table stranded a button's height above it. */}
             {box ? (
-              <button
-                type="button"
-                className="primary-button upload-button"
-                onClick={() => setUploading(true)}
-                data-testid="box-upload-open"
-              >
-                <Upload size={15} /> Upload document
-              </button>
+              <div className="workspace-actions">
+                <button
+                  type="button"
+                  className="upload-button"
+                  onClick={() => setUploading(true)}
+                  data-testid="box-upload-open"
+                >
+                  <Upload size={15} /> Upload document
+                </button>
+              </div>
             ) : null}
             <DocumentTimeline files={files} />
-          </div>
+          </>
         ) : null}
       </div>
       {uploading && box ? (

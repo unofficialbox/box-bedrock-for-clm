@@ -316,11 +316,14 @@ button { cursor: pointer; }
   @keyframes modal-rise { from { transform: translateY(6px); opacity: 0; } to { transform: none; opacity: 1; } }
 }
 
-/* The contract's own column: the action that adds to it, then its history. */
-.workspace-aside { display: flex; flex-direction: column; gap: 12px; min-width: 0; }
-.workspace-aside .timeline-panel { flex: 1; height: auto; min-height: 0; }
+/* Two rows: the action, then the pair of panels. Main sits out the first row so the
+   table and the history start on the same line. */
+.content-grid-aside { grid-template-rows: auto minmax(0, 1fr); }
+.content-grid-aside > main { grid-column: 1; grid-row: 2; }
+.content-grid-aside .workspace-actions { grid-column: 2; grid-row: 1; display: flex; justify-content: flex-end; }
+.content-grid-aside .timeline-panel { grid-column: 2; grid-row: 2; height: auto; min-height: 0; }
 
-.upload-button { align-self: flex-end; display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 8px; border: 1px solid #101f33; background: #16233a; color: white; font-size: 13px; font-weight: 650; cursor: pointer; }
+.upload-button { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 8px; border: 1px solid #101f33; background: #16233a; color: white; font-size: 13px; font-weight: 650; cursor: pointer; }
 .upload-button:hover { background: #22334f; }
 .upload-button:focus-visible { outline: 2px solid #1166e8; outline-offset: 2px; }
 
