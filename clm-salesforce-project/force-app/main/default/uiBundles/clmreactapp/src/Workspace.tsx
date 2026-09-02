@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { FileStack, LayoutDashboard, Upload } from "lucide-react";
+import { FileStack, LayoutDashboard } from "lucide-react";
 import { BoxWorkspace } from "./components/BoxWorkspace";
 import { DocumentTimeline } from "./components/DocumentTimeline";
 import { UploadDialog } from "./components/UploadDialog";
@@ -167,29 +167,11 @@ export function Workspace() {
               onFilesLoaded={setFiles}
               onBoxReady={setBox}
               reloadKey={reloadKey}
+              onUpload={() => setUploading(true)}
             />
           )}
         </main>
-        {view === "workspace" ? (
-          <>
-            {/* Its own grid row, so the action sits above the right-hand panel while both
-                panels still start on the same line. Nesting it with the timeline pushed
-                that panel down and left the table stranded a button's height above it. */}
-            {box ? (
-              <div className="workspace-actions">
-                <button
-                  type="button"
-                  className="upload-button"
-                  onClick={() => setUploading(true)}
-                  data-testid="box-upload-open"
-                >
-                  <Upload size={15} /> Upload document
-                </button>
-              </div>
-            ) : null}
-            <DocumentTimeline files={files} />
-          </>
-        ) : null}
+        {view === "workspace" ? <DocumentTimeline files={files} /> : null}
       </div>
       {uploading && box ? (
         <UploadDialog

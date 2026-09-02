@@ -14,6 +14,8 @@ export interface ClmContractSummary {
   contractId?: string;
   name?: string;
   counterparty?: string;
+  /** The signing subsidiary, where a counterparty contracts through several entities. */
+  counterpartyEntity?: string;
   contractType?: string;
   status?: string;
   riskLevel?: string;

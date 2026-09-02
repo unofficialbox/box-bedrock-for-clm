@@ -34,6 +34,8 @@ global with sharing class ClmContractListService {
         global Integer termMonths;
         /** ISO date, or null while the contract is still being negotiated. */
         global String endDate;
+        /** The signing subsidiary, where the counterparty contracts through several. */
+        global String counterpartyEntity;
         /** The Box workspace folder this contract is associated with. */
         global String boxFolderId;
     }
@@ -74,7 +76,7 @@ global with sharing class ClmContractListService {
         private List<ContractSummary> read() {
             List<ContractSummary> summaries = new List<ContractSummary>();
             for (CLM_Contract__c record : [
-                SELECT Id, Name, Contract_ID__c, Counterparty__c, Contract_Type__c,
+                SELECT Id, Name, Contract_ID__c, Counterparty__c, Counterparty_Entity__c, Contract_Type__c,
                        Status__c, Risk_Level__c, Deal_Value__c, Term_Months__c,
                        End_Date__c, Box_Workspace_Folder_ID__c
                 FROM CLM_Contract__c
@@ -93,6 +95,7 @@ global with sharing class ClmContractListService {
                 summary.termMonths = record.Term_Months__c == null
                     ? null
                     : Integer.valueOf(record.Term_Months__c);
+                summary.counterpartyEntity = record.Counterparty_Entity__c;
                 summary.endDate = record.End_Date__c == null
                     ? null
                     : String.valueOf(record.End_Date__c);

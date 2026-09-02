@@ -1,7 +1,8 @@
 import { useEffect, useState } from "react";
-import { ChevronRight, FileStack, ShieldAlert } from "lucide-react";
+import { FileStack, ShieldAlert } from "lucide-react";
 import { fetchClmContracts, formatDealValue, type ClmContractSummary } from "../lib/contracts";
 import { PortfolioCharts } from "./PortfolioCharts";
+import { formatDate } from "../lib/documents";
 import { fetchContractsViaGraphql } from "../lib/contractsGraphql";
 import { NORTHSTAR_CONTRACT } from "../data";
 
@@ -61,55 +62,66 @@ export function ContractList({ onSelect }: { onSelect: (contract: ClmContractSum
           asked before the record question ("which one do I open"). */}
       {live ? <PortfolioCharts contracts={contracts} /> : null}
       <section className="contract-list-card" data-testid="contracts-view" data-source={source}>
-      <div className="section-heading">
-        <div>
-          <span className="eyebrow"><FileStack size={15} /> Contract records</span>
-          <h2>Your contracts</h2>
-          <p>
-            {/*
-              This page faces a counterparty, so it says what they are looking at rather
-              than how it was fetched. Which rows appear is decided by Salesforce sharing
-              for the signed-in user, not by anything here -- an admin sees every contract
-              and a counterparty sees only their own, from the same code.
-            */}
-            {live
-              ? "Contracts your organisation is party to. Open one to read its documents."
-              : "Synthetic fixture shown; the live list activates when Salesforce is reachable."}
-          </p>
-        </div>
-      </div>
-
+      {/*
+        No heading. The nav already says which view this is, and the sentence under it
+        described the page to someone who is looking at it -- the charts above and the
+        columns below say more, in less space. The fixture warning stays, because that one
+        tells the reader something the page cannot otherwise show.
+      */}
       {live && contracts.length === 0 ? (
         <div className="workspace-state" data-testid="contracts-empty">
           No contract records yet. Creating one in Salesforce brings it here.
         </div>
-      ) : null}
-
-      <div className="contract-rows">
-        {contracts.map((contract, index) => (
-          <button
-            type="button"
-            key={contract.recordId || `fixture-${index}`}
-            className="contract-row"
-            onClick={() => onSelect(contract)}
-            data-testid="contract-row"
-          >
-            <span className="contract-copy">
-              <strong>{contract.name || contract.contractId || "Untitled contract"}</strong>
-              <small>
-                {[contract.contractId, contract.counterparty, contract.contractType]
-                  .filter(Boolean)
-                  .join(" · ")}
-              </small>
-            </span>
-            <span className="contract-meta">
-              {contract.dealValue != null ? <span className="contract-value">{formatDealValue(contract.dealValue)}</span> : null}
-              {contract.status ? <span className="status-pill">{contract.status}</span> : null}
-            </span>
-            <ChevronRight size={16} />
-          </button>
-        ))}
-      </div>
+      ) : (
+        <table className="box-table contract-table" data-testid="contract-table">
+          <thead>
+            <tr>
+              <th scope="col">Contract</th>
+              <th scope="col">Signed by</th>
+              <th scope="col">Value</th>
+              <th scope="col">Term ends</th>
+              <th scope="col">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {contracts.map((contract, index) => (
+              <tr key={contract.recordId || `fixture-${index}`} data-testid="contract-row">
+                <td>
+                  {/* A button, not a row handler: the contract name is the thing you
+                      activate, and it stays reachable from the keyboard. */}
+                  <button
+                    type="button"
+                    className="box-table-name"
+                    onClick={() => onSelect(contract)}
+                    data-testid="contract-open"
+                  >
+                    <FileStack size={15} aria-hidden="true" />
+                    <span className="cell-stack">
+                      <span>{contract.name || contract.contractId || "Untitled contract"}</span>
+                      <small>{contract.contractId}</small>
+                    </span>
+                  </button>
+                </td>
+                <td className="cell-type">
+                  <span className="cell-stack">
+                    <span>{contract.counterpartyEntity || contract.counterparty || "—"}</span>
+                    {contract.counterpartyEntity && contract.counterparty ? (
+                      <small>{contract.counterparty}</small>
+                    ) : null}
+                  </span>
+                </td>
+                <td className="cell-number">
+                  {contract.dealValue != null ? formatDealValue(contract.dealValue) : "—"}
+                </td>
+                <td className="cell-number">{formatDate(contract.endDate)}</td>
+                <td>
+                  {contract.status ? <span className="status-pill">{contract.status}</span> : null}
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
 
       {!live ? (
         <div className="secure-note" data-testid="contracts-fixture-note">

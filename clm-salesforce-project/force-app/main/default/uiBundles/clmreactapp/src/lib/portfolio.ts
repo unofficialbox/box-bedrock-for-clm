@@ -93,9 +93,28 @@ export function valueByContract(contracts: ClmContractSummary[]): Slice[] {
  */
 export function valueBreakdown(contracts: ClmContractSummary[]): { title: string; slices: Slice[] } {
   const byParty = valueByCounterparty(contracts);
-  return byParty.length > 1
-    ? { title: "Value by counterparty", slices: byParty }
-    : { title: "Value by contract", slices: valueByContract(contracts) };
+  if (byParty.length > 1) return { title: "Value by counterparty", slices: byParty };
+
+  const byEntity = sumBy(contracts, (contract) => contract.counterpartyEntity);
+  if (byEntity.length > 1) return { title: "Value by signing entity", slices: byEntity };
+
+  return { title: "Value by contract", slices: valueByContract(contracts) };
+}
+
+/** Sums deal value under whatever key the picker returns, skipping contracts with none. */
+function sumBy(
+  contracts: ClmContractSummary[],
+  key: (contract: ClmContractSummary) => string | undefined,
+): Slice[] {
+  const totals = new Map<string, number>();
+  for (const contract of contracts) {
+    const label = key(contract)?.trim();
+    if (!label) continue;
+    totals.set(label, (totals.get(label) || 0) + (contract.dealValue || 0));
+  }
+  return [...totals.entries()]
+    .map(([label, value]) => ({ label, value }))
+    .sort((a, b) => b.value - a.value || a.label.localeCompare(b.label));
 }
 
 export interface Renewal {

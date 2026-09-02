@@ -19,7 +19,7 @@ describe("Workspace", () => {
 
   test("opens the workspace for a contract chosen from the list", async () => {
     render(<Workspace />);
-    fireEvent.click(await screen.findByTestId("contract-row"));
+    fireEvent.click(await screen.findByTestId("contract-open"));
     expect(screen.getByRole("heading", { name: "Northstar Health MSA" })).toBeVisible();
     expect(await screen.findByTestId("box-fallback")).toBeVisible();
     expect(screen.getByText("northstar-msa-redline-v3.pdf")).toBeVisible();
@@ -166,7 +166,7 @@ describe("Workspace", () => {
     );
 
     render(<Workspace />);
-    fireEvent.click(await screen.findByTestId("contract-row"));
+    fireEvent.click(await screen.findByTestId("contract-open"));
 
     await screen.findByTestId("box-fallback");
     const tokenCall = urls.find((url) => url.includes("box-token")) || "";
@@ -198,7 +198,7 @@ describe("Workspace", () => {
     render(<Workspace />);
     expect(window.location.search).toBe("");
 
-    fireEvent.click(await screen.findByTestId("contract-row"));
+    fireEvent.click(await screen.findByTestId("contract-open"));
 
     const params = new URLSearchParams(window.location.search);
     expect(params.get("folderId")).toBe("123456789");

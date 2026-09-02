@@ -320,7 +320,6 @@ button { cursor: pointer; }
    table and the history start on the same line. */
 .content-grid-aside { grid-template-rows: auto minmax(0, 1fr); }
 .content-grid-aside > main { grid-column: 1; grid-row: 2; }
-.content-grid-aside .workspace-actions { grid-column: 2; grid-row: 1; display: flex; justify-content: flex-end; }
 .content-grid-aside .timeline-panel { grid-column: 2; grid-row: 2; height: auto; min-height: 0; }
 
 .upload-button { display: inline-flex; align-items: center; gap: 7px; padding: 9px 14px; border-radius: 8px; border: 1px solid #101f33; background: #16233a; color: white; font-size: 13px; font-weight: 650; cursor: pointer; }
@@ -330,11 +329,12 @@ button { cursor: pointer; }
 /* ---- Portfolio ----
    Validated three-slot categorical set (blue, orange, aqua), assigned by position and
    never cycled; dark is the same three hues re-stepped for the dark surface, not a flip. */
-.portfolio { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
+.viz { --series-1: #2a78d6; --series-2: #eb6834; --series-3: #1baf7a; }
+.portfolio { display: flex; flex-direction: column; gap: 16px; margin-bottom: 20px; }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) .portfolio { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
+  :root:not([data-theme="light"]) .viz { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
 }
-:root[data-theme="dark"] .portfolio { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
+:root[data-theme="dark"] .viz { --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; }
 
 .stat-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; }
 .stat-tile { display: flex; flex-direction: column; gap: 3px; padding: 15px 17px; border: 1px solid #dce3ec; border-radius: 12px; background: white; }
@@ -380,3 +380,12 @@ button { cursor: pointer; }
 .chart-empty { margin: 0; font-size: 12.5px; color: #6a7686; }
 /* Reserved status colour, used only where the chart's subject is a status. */
 .bar-fill-critical { background: #c0392b; }
+
+.box-table-actions { display: flex; justify-content: flex-end; padding: 0 0 14px; }
+.stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+@media (max-width: 1000px) { .workspace-metrics { grid-template-columns: 1fr; } }
+
+.contract-table { margin-top: 4px; }
+.contract-table .box-table-name { text-align: left; }
+.cell-number { font-variant-numeric: tabular-nums; white-space: nowrap; }

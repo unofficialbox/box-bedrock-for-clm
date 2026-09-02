@@ -1,4 +1,5 @@
 import type { ClmContractSummary } from "../lib/contracts";
+import { Donut, foldToPalette } from "./Donut";
 import {
   byStatus,
   formatCompactValue,
@@ -22,16 +23,6 @@ import {
  * statuses beyond the third fold into "Other" rather than growing a fourth hue.
  */
 
-const MAX_SLICES = 3;
-
-/** Folds the tail into a single "Other" so the palette is never extended past its cap. */
-function capped(slices: Slice[]): Slice[] {
-  if (slices.length <= MAX_SLICES) return slices;
-  const head = slices.slice(0, MAX_SLICES - 1);
-  const rest = slices.slice(MAX_SLICES - 1);
-  return [...head, { label: "Other", value: rest.reduce((sum, s) => sum + s.value, 0) }];
-}
-
 function StatTile({ label, value, note }: { label: string; value: string; note?: string }) {
   return (
     <div className="stat-tile">
@@ -39,71 +30,6 @@ function StatTile({ label, value, note }: { label: string; value: string; note?:
       <strong className="stat-value">{value}</strong>
       {note ? <span className="stat-note">{note}</span> : null}
     </div>
-  );
-}
-
-/**
- * A donut, drawn as stroked arcs on one circle.
- *
- * Each arc carries a 2px surface-coloured gap so adjacent segments read as separate marks
- * rather than one band changing colour, and every segment is direct-labelled in the legend
- * with its count -- the light palette's aqua sits under 3:1 against white, and the
- * validator's contrast warning is discharged by labels, not ignored.
- */
-function StatusDonut({ slices }: { slices: Slice[] }) {
-  const total = slices.reduce((sum, s) => sum + s.value, 0);
-  const radius = 54;
-  const circumference = 2 * Math.PI * radius;
-  const gap = 2;
-
-  // Each arc starts where the previous one ended, folded rather than accumulated into an
-  // outer variable: mutating during render is what makes a component disagree with itself
-  // across re-renders.
-  const arcs = slices.reduce<
-    Array<{ label: string; value: number; index: number; dash: number; offset: number; length: number }>
-  >((acc, slice, index) => {
-    const previous = acc[acc.length - 1];
-    const offset = previous ? previous.offset + previous.length : 0;
-    const length = total === 0 ? 0 : (slice.value / total) * circumference;
-    return [...acc, { ...slice, index, length, offset, dash: Math.max(length - gap, 0) }];
-  }, []);
-
-  return (
-    <figure className="chart-figure">
-      <figcaption className="chart-title">Contracts by status</figcaption>
-      <div className="donut-row">
-        <svg viewBox="0 0 140 140" className="donut" role="img" aria-label={`Contracts by status, ${total} in total`}>
-          <g transform="translate(70,70) rotate(-90)">
-            {arcs.map((arc) => (
-              <circle
-                key={arc.label}
-                r={radius}
-                fill="none"
-                stroke={`var(--series-${arc.index + 1})`}
-                strokeWidth="16"
-                strokeDasharray={`${arc.dash} ${circumference - arc.dash}`}
-                strokeDashoffset={-arc.offset}
-              >
-                <title>{`${arc.label}: ${arc.value} of ${total}`}</title>
-              </circle>
-            ))}
-          </g>
-          <text x="70" y="66" className="donut-total">{total}</text>
-          <text x="70" y="84" className="donut-total-label">contracts</text>
-        </svg>
-
-        {/* Legend and direct labels in one: identity is never colour alone. */}
-        <ul className="legend">
-          {slices.map((slice, index) => (
-            <li key={slice.label}>
-              <span className="legend-swatch" style={{ background: `var(--series-${index + 1})` }} />
-              <span className="legend-label">{slice.label}</span>
-              <span className="legend-value">{slice.value}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </figure>
   );
 }
 
@@ -187,13 +113,13 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
   if (contracts.length === 0) return null;
 
   const totals = portfolioTotals(contracts);
-  const statuses = capped(byStatus(contracts));
+  const statuses = foldToPalette(byStatus(contracts));
   const breakdown = valueBreakdown(contracts);
   const renewals = renewalHorizon(contracts, RENEWAL_WINDOW_DAYS);
   const values = breakdown.slices.slice(0, 6);
 
   return (
-    <section className="portfolio" data-testid="portfolio-charts">
+    <section className="portfolio viz" data-testid="portfolio-charts">
       <div className="stat-row stat-row-4">
         <StatTile label="Contracts" value={String(totals.contracts)} />
         <StatTile label="Total value" value={formatCompactValue(totals.value)} />
@@ -209,7 +135,7 @@ export function PortfolioCharts({ contracts }: { contracts: ClmContractSummary[]
         />
       </div>
       <div className="chart-row">
-        <StatusDonut slices={statuses} />
+        <Donut slices={statuses} centreLabel="contracts" title="Contracts by status" />
         <ValueBars title={breakdown.title} slices={values} />
       </div>
       <div className="chart-row chart-row-wide">

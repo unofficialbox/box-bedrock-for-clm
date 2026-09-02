@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Counterparty_Entity__c</fullName>
+    <description>The operating entity that actually signs, where a counterparty contracts through subsidiaries or regions. The relationship, and record access, still hang off Counterparty_Account__c: a sharing set matches a Contact to one Account and does not walk an account hierarchy, so modelling subsidiaries as child Accounts would have hidden their contracts from the very people who signed them.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Signing entity, where the counterparty contracts through subsidiaries. Leave empty when the parent signs directly.</inlineHelpText>
+    <label>Counterparty Entity</label>
+    <length>120</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

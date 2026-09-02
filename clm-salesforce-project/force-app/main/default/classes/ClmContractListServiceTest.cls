@@ -71,6 +71,9 @@ private class ClmContractListServiceTest {
                 // contract, so its end date is theirs to know; it is also the only way the
                 // renewal horizon can be drawn.
                 'endDate',
+                // The signing subsidiary. A counterparty knows which of its own entities
+                // signed; naming it is how the portfolio splits into more than one bar.
+                'counterpartyEntity',
                 // The dashboard deep-links a contract straight to its Box folder, so the
                 // id travels with the row. It names a folder and grants nothing: reaching
                 // that folder still requires a token the endpoint mints per record.

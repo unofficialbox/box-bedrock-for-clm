@@ -19,6 +19,7 @@ export function BoxWorkspace({
   onFilesLoaded,
   onBoxReady,
   reloadKey,
+  onUpload,
 }: {
   context: ClmPageContext;
   /**
@@ -33,6 +34,8 @@ export function BoxWorkspace({
   onBoxReady?: (box: { token: string; folderId: string } | null) => void;
   /** Change this to re-list the folder -- after an upload, say. */
   reloadKey?: number;
+  /** Opens the upload dialog, which the workspace owns. */
+  onUpload?: () => void;
 }) {
   const [token, setToken] = useState("");
   const [folderId, setFolderId] = useState("");
@@ -110,7 +113,7 @@ export function BoxWorkspace({
           ) : null}
         </div>
         <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
-          <BoxElements folderId={folderId} token={token} files={files} />
+          <BoxElements folderId={folderId} token={token} files={files} onUpload={onUpload} />
         </Suspense>
       </section>
     );

@@ -33,6 +33,7 @@ const GET_CLM_CONTRACTS = gql`
               Name { value }
               Contract_ID__c { value }
               Counterparty__c { value }
+              Counterparty_Entity__c { value }
               Contract_Type__c { value }
               Status__c { value }
               Deal_Value__c { value }
@@ -56,6 +57,7 @@ interface ContractNode {
   Name?: FieldValue<string>;
   Contract_ID__c?: FieldValue<string>;
   Counterparty__c?: FieldValue<string>;
+  Counterparty_Entity__c?: FieldValue<string>;
   Contract_Type__c?: FieldValue<string>;
   Status__c?: FieldValue<string>;
   Deal_Value__c?: FieldValue<number>;
@@ -99,6 +101,7 @@ export async function fetchContractsViaGraphql(): Promise<ClmContractSummary[] |
         name: node.Name?.value ?? undefined,
         contractId: node.Contract_ID__c?.value ?? undefined,
         counterparty: node.Counterparty__c?.value ?? undefined,
+        counterpartyEntity: node.Counterparty_Entity__c?.value ?? undefined,
         contractType: node.Contract_Type__c?.value ?? undefined,
         status: node.Status__c?.value ?? undefined,
         dealValue: node.Deal_Value__c?.value ?? undefined,
