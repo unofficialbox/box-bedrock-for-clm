@@ -8,7 +8,6 @@ describe("CLM page context", () => {
       folderId: "demo-workspace",
     });
   });
-
 });
 
 describe("Box folder listing", () => {
