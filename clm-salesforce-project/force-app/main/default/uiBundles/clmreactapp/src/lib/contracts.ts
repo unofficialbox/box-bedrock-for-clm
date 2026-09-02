@@ -19,7 +19,6 @@ export interface ClmContractSummary {
   counterpartyEntity?: string;
   contractType?: string;
   status?: string;
-  riskLevel?: string;
   dealValue?: number;
   termMonths?: number;
   /** ISO date the term ends. Absent while a contract is still being negotiated. */

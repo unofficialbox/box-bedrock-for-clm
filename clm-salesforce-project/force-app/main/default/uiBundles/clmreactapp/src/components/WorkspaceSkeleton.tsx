@@ -62,3 +62,73 @@ export function TimelineSkeleton() {
     </ol>
   );
 }
+
+/**
+ * The contract list while Salesforce is being asked what this organisation is party to.
+ *
+ * Same argument as the workspace's: "Loading contract records…" narrates the machinery
+ * and leaves the page empty until it resolves. This one has more to hold still, because
+ * the real view is three bands -- headline tiles, three figures, then the table -- and a
+ * single line of text lets all three land at once and shove the page around.
+ *
+ * The figures are drawn as their own shapes rather than as generic blocks: a ring for the
+ * donut, stacked bars for the two bar charts. A skeleton that does not resemble what
+ * replaces it is just a differently-shaped wait.
+ */
+const CONTRACT_ROW_WIDTHS = ["68%", "76%", "54%", "72%"];
+
+export function ContractsSkeleton() {
+  return (
+    <div className="contracts-skeleton" data-testid="contracts-loading" aria-busy="true" aria-live="polite">
+      <span className="visually-hidden">Loading your contracts</span>
+
+      <div className="stat-row stat-row-4" aria-hidden="true">
+        {[0, 1, 2, 3].map((tile) => (
+          <div className="stat-tile" key={tile}>
+            <span className="skeleton-bar skeleton-bar-label" />
+            <span className="skeleton-bar skeleton-bar-figure" />
+          </div>
+        ))}
+      </div>
+
+      <div className="chart-row" aria-hidden="true">
+        <figure className="chart-figure">
+          <span className="skeleton-bar skeleton-bar-title" />
+          <div className="skeleton-donut-row">
+            <span className="skeleton-donut" />
+            <div className="skeleton-legend">
+              <span className="skeleton-bar skeleton-bar-meta" />
+              <span className="skeleton-bar skeleton-bar-meta" />
+            </div>
+          </div>
+        </figure>
+        {[0, 1].map((chart) => (
+          <figure className="chart-figure" key={chart}>
+            <span className="skeleton-bar skeleton-bar-title" />
+            <div className="skeleton-bars">
+              {CONTRACT_ROW_WIDTHS.map((width, row) => (
+                <div className="skeleton-bar-group" key={row}>
+                  <span className="skeleton-bar skeleton-bar-label" />
+                  <span className="skeleton-bar skeleton-bar-track" style={{ width }} />
+                </div>
+              ))}
+            </div>
+          </figure>
+        ))}
+      </div>
+
+      <div className="skeleton skeleton-contracts-table" aria-hidden="true">
+        <div className="skeleton-table">
+          {CONTRACT_ROW_WIDTHS.map((width, row) => (
+            <div className="skeleton-row" key={row}>
+              <span className="skeleton-icon" />
+              <span className="skeleton-bar" style={{ width }} />
+              <span className="skeleton-bar skeleton-bar-meta" />
+              <span className="skeleton-bar skeleton-bar-pill" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}

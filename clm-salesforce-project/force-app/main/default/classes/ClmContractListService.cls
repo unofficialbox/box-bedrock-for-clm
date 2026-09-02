@@ -14,6 +14,15 @@
  * empty list on the one surface this serves. The exposure is therefore the projection
  * below, and nothing else -- adding a field here publishes it to anyone who can open
  * the site, so add deliberately.
+ *
+ * Two rules the projection has to obey, both learned the hard way. It must match what the
+ * GraphQL path returns, or the same dashboard says different things depending on which
+ * surface answered -- Risk_Level__c was selected here long after GraphQL dropped it, so
+ * Acme's own assessment of a deal reached the counterparty's browser through this door.
+ * And every field must be readable by the permission sets that serve the site: Salesforce
+ * enforces field-level security inside SOQL for guest users and reports an unreadable
+ * field as `No such column`, which fails the whole request rather than blanking a column.
+ * `scripts/validate_clm.py` checks the second rule offline.
  */
 @RestResource(urlMapping='/clm/contracts/*')
 global with sharing class ClmContractListService {
@@ -29,7 +38,6 @@ global with sharing class ClmContractListService {
         global String counterparty;
         global String contractType;
         global String status;
-        global String riskLevel;
         global Decimal dealValue;
         global Integer termMonths;
         /** ISO date, or null while the contract is still being negotiated. */
@@ -77,7 +85,7 @@ global with sharing class ClmContractListService {
             List<ContractSummary> summaries = new List<ContractSummary>();
             for (CLM_Contract__c record : [
                 SELECT Id, Name, Contract_ID__c, Counterparty__c, Counterparty_Entity__c, Contract_Type__c,
-                       Status__c, Risk_Level__c, Deal_Value__c, Term_Months__c,
+                       Status__c, Deal_Value__c, Term_Months__c,
                        End_Date__c, Box_Workspace_Folder_ID__c
                 FROM CLM_Contract__c
                 ORDER BY LastModifiedDate DESC
@@ -90,7 +98,6 @@ global with sharing class ClmContractListService {
                 summary.counterparty = record.Counterparty__c;
                 summary.contractType = record.Contract_Type__c;
                 summary.status = record.Status__c;
-                summary.riskLevel = record.Risk_Level__c;
                 summary.dealValue = record.Deal_Value__c;
                 summary.termMonths = record.Term_Months__c == null
                     ? null

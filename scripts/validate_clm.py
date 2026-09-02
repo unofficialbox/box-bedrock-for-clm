@@ -66,7 +66,11 @@ SECRET_ASSIGNMENT = re.compile(
 )
 PRIVATE_KEY = re.compile(r"-----BEGIN (?:RSA |EC |OPENSSH )?PRIVATE KEY-----")
 LIVE_BOX_HOST = re.compile(r"https?://[a-z0-9-]+\.ent\.box\.com", re.IGNORECASE)
-LIVE_SALESFORCE_HOST = re.compile(r"https?://(?!example\.)[a-z0-9-]+(?:\.develop)?\.my\.salesforce\.com", re.IGNORECASE)
+# Experience Cloud sites answer on my.site.com, not my.salesforce.com. Only the latter
+# was matched, so a run sheet naming a live site host committed cleanly.
+LIVE_SALESFORCE_HOST = re.compile(
+    r"https?://(?!example\.)[a-z0-9-]+(?:\.develop)?\.my\.(?:salesforce|site)\.com", re.IGNORECASE
+)
 LONG_NUMERIC_ID = re.compile(r"(?<![A-Za-z0-9])\d{10,}(?![A-Za-z0-9])")
 
 
@@ -575,6 +579,53 @@ def execute(name: str, action: Callable[[], str]) -> Result:
         return Result(name, "FAIL", time.monotonic() - start, str(error))
 
 
+def check_soql_field_permissions(root: Path = ROOT) -> str:
+    """Every CLM_Contract__c field the site's REST projection selects must be readable.
+
+    Salesforce enforces field-level security inside SOQL for guest users, and reports a
+    field the guest cannot read as ``No such column`` -- a QueryException, not an empty
+    column. So adding a field to the projection without adding it to the permission sets
+    that serve the site does not degrade the response, it fails the whole request with a
+    500 that names no field. That is what happened when Counterparty_Entity__c and
+    End_Date__c were added: the class compiled, deployed, and worked for an administrator,
+    and broke only for a signed-out visitor.
+
+    Checked offline, against the metadata, because the browser is otherwise the first
+    place it shows up.
+    """
+    service = root / "clm-salesforce-project/force-app/main/default/classes/ClmContractListService.cls"
+    if not service.exists():
+        raise ValidationError(f"missing {service.relative_to(root)}")
+
+    match = re.search(r"SELECT\s+(.*?)\s+FROM\s+CLM_Contract__c", service.read_text(), re.IGNORECASE | re.DOTALL)
+    if not match:
+        raise ValidationError("could not find the CLM_Contract__c projection in ClmContractListService")
+    selected = {
+        field.strip()
+        for field in match.group(1).split(",")
+        if field.strip().endswith("__c")
+    }
+    if not selected:
+        raise ValidationError("the CLM_Contract__c projection parsed as empty; the check would prove nothing")
+
+    findings: list[str] = []
+    permissions = root / "clm-salesforce-project/force-app/main/default/permissionsets"
+    for name in ("CLM_Box_Preview_Guest", "CLM_Counterparty_Portal"):
+        path = permissions / f"{name}.permissionset-meta.xml"
+        if not path.exists():
+            findings.append(f"{name}: permission set not found")
+            continue
+        granted = set(re.findall(r"<field>CLM_Contract__c\.([A-Za-z0-9_]+)</field>", path.read_text()))
+        for field in sorted(selected - granted):
+            findings.append(f"{name}: does not grant {field}, which the REST projection selects")
+
+    if findings:
+        raise ValidationError(
+            "SOQL projection and permission sets disagree:\n" + "\n".join(findings)
+        )
+    return f"{len(selected)} projected fields granted in 2 permission sets"
+
+
 def validate(*, skip_react: bool, skip_playwright: bool, presenter_ready: bool, root: Path = ROOT) -> list[Result]:
     rows: list[tuple[str, Callable[[], str]]] = [
         ("secrets + runtime IDs", lambda: check_secrets_and_runtime_ids(root)),
@@ -586,6 +637,7 @@ def validate(*, skip_react: bool, skip_playwright: bool, presenter_ready: bool, 
         ("generated presenters", lambda: check_generated_presenters(root)),
         ("manifests + screenshots", lambda: check_manifests_and_screenshots(root)),
         ("reset + idempotency", lambda: check_reset_and_idempotency_contract(root)),
+        ("SOQL field permissions", lambda: check_soql_field_permissions(root)),
     ]
     if not skip_react:
         rows.extend([
