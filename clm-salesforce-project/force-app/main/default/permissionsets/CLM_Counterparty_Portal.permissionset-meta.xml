@@ -80,4 +80,25 @@
         -->
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
+    <!--
+      Minting the Box token is a callout under the org's Client Credentials Grant, and Apex
+      cannot use that credential on a user's behalf unless the user is granted the
+      principal. Without both of these the endpoint is reached, runs, and throws
+      System.CalloutException, which surfaces to the browser as box_request_failed with no
+      indication that a permission is missing. CLM_Box_Preview_Guest and CLM_Contract_Agent
+      both carry the same pair for the same reason.
+    -->
+    <objectPermissions>
+        <allowCreate>false</allowCreate>
+        <allowDelete>false</allowDelete>
+        <allowEdit>false</allowEdit>
+        <allowRead>true</allowRead>
+        <modifyAllRecords>false</modifyAllRecords>
+        <object>UserExternalCredential</object>
+        <viewAllRecords>false</viewAllRecords>
+    </objectPermissions>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>CLM_Box-CLM_Box_Principal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
 </PermissionSet>

@@ -608,6 +608,28 @@ Wave 2 also **retired both concessions** wave 1's vendoring forced: `validate_cl
    `clmDocument` metadata. `ClmBoxFolderService` does the first two together; calling the
    Toolkit directly does not.
 
+    **Getting a counterparty to a Box document took four separate grants, and each one
+    failed differently.** Worth reading as a set, because none of the failures named the
+    thing that was missing:
+
+    - **Field-level security on every field the query selects.** UI API rejects the whole
+      query when one selected field is hidden, so the list came back empty and the app fell
+      back to a fixture -- which happened to be a contract for the same counterparty, so it
+      read as the scoping working.
+    - **`API Enabled`.** Apex REST refuses without it, with a bare 403. The contract list
+      kept working throughout, because GraphQL goes through the site's own bridge.
+    - **Read on `UserExternalCredential`, and the `CLM_Box-CLM_Box_Principal` external
+      credential.** Apex cannot use the org's Client Credentials Grant on a user's behalf
+      unless that user is granted the principal. Missing, the endpoint is reached, runs, and
+      throws `System.CalloutException`, which reaches the browser as `box_request_failed`
+      with nothing to say a permission is involved. `CLM_Box_Preview_Guest` and
+      `CLM_Contract_Agent` both carry the same pair.
+
+    The pattern across all four: a permission gap on this path never says "permission".
+    It says empty, or 403, or CalloutException. When a counterparty surface half-works,
+    compare its permission set against `CLM_Box_Preview_Guest`, which is the one known to
+    reach Box end to end.
+
     **A counterparty needs `API Enabled` or the Box token endpoint 403s.** This is the
     subtlest of the counterparty problems because it fails in only one direction. The
     contract list reads through the GraphQL UI API, which goes through the site's own
