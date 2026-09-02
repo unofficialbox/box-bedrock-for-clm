@@ -66,7 +66,7 @@ private class ClmContractListServiceTest {
         System.assertEquals(
             new Set<String>{
                 'recordId', 'contractId', 'name', 'counterparty',
-                'contractType', 'status', 'riskLevel', 'dealValue', 'termMonths',
+                'contractType', 'status', 'dealValue', 'termMonths',
                 // When an executed contract's term ends. A counterparty is party to the
                 // contract, so its end date is theirs to know; it is also the only way the
                 // renewal horizon can be drawn.
