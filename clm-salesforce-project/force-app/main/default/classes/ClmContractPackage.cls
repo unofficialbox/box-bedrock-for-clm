@@ -108,7 +108,7 @@ public with sharing class ClmContractPackage {
             return result;
         }
 
-        lines.add('Documents in Box folder ' + folderId + ', with the file ID to ask Box AI about:');
+        lines.add('Documents:');
         lines.addAll(files);
         result.outputFound = true;
         result.outputSummary = String.join(lines, '\n');
@@ -197,11 +197,13 @@ public with sharing class ClmContractPackage {
     }
 
     private static String describe(CLM_Contract__c contract) {
-        List<String> parts = new List<String>{ 'Contract ' + contract.Contract_ID__c + ' -- ' + contract.Name };
+        // The record id is deliberately not in the prose: it is already returned as
+        // outputRecordId, and everything in this string is text a model may repeat back to
+        // a person. Every word here is a word the answer can inherit.
+        List<String> parts = new List<String>{ contract.Contract_ID__c + ' -- ' + contract.Name };
         if (String.isNotBlank(contract.Counterparty__c)) parts.add('Counterparty: ' + contract.Counterparty__c);
         if (String.isNotBlank(contract.Status__c)) parts.add('Status: ' + contract.Status__c);
         if (String.isNotBlank(contract.Risk_Level__c)) parts.add('Risk: ' + contract.Risk_Level__c);
-        parts.add('Salesforce record: ' + contract.Id);
         return String.join(parts, '. ') + '.';
     }
 
@@ -237,7 +239,7 @@ public with sharing class ClmContractPackage {
             if (item.type != 'file') {
                 continue;
             }
-            lines.add('- ' + item.name + ' (Box file ID ' + item.id + ')');
+            lines.add('- ' + item.name + ' (id ' + item.id + ')');
         }
         return lines;
     }

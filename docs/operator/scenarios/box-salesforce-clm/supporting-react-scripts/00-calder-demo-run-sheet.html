@@ -304,7 +304,7 @@
 
   <section>
     <h2>Preflight</h2>
-    <p class="section-note">Three checks before anyone is watching. P4 and P5 are one-time setup, already done — they stay here because a rebuilt org needs them again.</p>
+    <p class="section-note">Four checks before anyone is watching. P4 and P5 are one-time setup, already done — they stay here because a rebuilt org needs them again.</p>
 
     <div class="step">
       <div class="marker">P1</div>
@@ -324,6 +324,23 @@
       <div class="marker">P2</div>
       <div>
         <span class="where">Claude Desktop</span>
+        <h3>Set the answer length</h3>
+        <p>Claude Desktop decides how long an answer is, and it defaults to an essay &mdash; the
+        beat 4 precedent question comes back as roughly 500 words and three tables. Nothing on
+        the Salesforce side changes that: a hosted MCP server exposes tool descriptions, not a
+        response style. Put this in the project&rsquo;s custom instructions before you present.</p>
+        <div class="block">
+          <div class="block-label"><span>instruction</span><button class="copy" type="button">Copy</button></div>
+          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
+        </div>
+        <div class="expect"><strong>Expect</strong> beat 4 to answer in a short paragraph and one table, not a briefing note.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="marker">P3</div>
+      <div>
+        <span class="where">Claude Desktop</span>
         <h3>Refresh the CLM MCP connector</h3>
         <p>It had three tools when you first connected it and now has five. Open <strong>Settings → Connectors</strong>, find the CLM connector, disconnect and reconnect it. Don't retype the endpoint — reuse the one already configured.</p>
         <div class="expect"><strong>Expect</strong> five tools: <code>listContracts</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
@@ -331,7 +348,7 @@
     </div>
 
     <div class="step">
-      <div class="marker">P3</div>
+      <div class="marker">P4</div>
       <div>
         <span class="where">Terminal</span>
         <h3>Confirm the contract statuses</h3>
@@ -345,7 +362,7 @@
     </div>
 
     <div class="step">
-      <div class="marker">P4</div>
+      <div class="marker">P5</div>
       <div>
         <span class="where">Box</span>
         <h3>Delete the stray duplicate</h3>
@@ -354,7 +371,7 @@
     </div>
 
     <div class="step">
-      <div class="marker">P5</div>
+      <div class="marker">P6</div>
       <div>
         <span class="where">Salesforce Setup</span>
         <h3>Set Dana's password</h3>
