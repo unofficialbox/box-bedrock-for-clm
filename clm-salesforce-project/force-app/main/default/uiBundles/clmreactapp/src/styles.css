@@ -43,15 +43,14 @@ button { cursor: pointer; }
 
 .live-pill { padding: 4px 8px; border-radius: 999px; color: #27623b; background: #e7f7ec; font-size: 10px; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; }
 
-.box-live, .approvals-card { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
-/* Both panels are exactly this tall, so the pair lines up whatever is inside them.
-   Their contents scroll rather than stretching the card. */
-.box-live, .approvals-card { height: 625px; }
+.box-live { border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; box-shadow: 0 5px 20px rgba(18, 46, 79, .05); }
+/* Shared with .timeline-panel and .skeleton so the panels line up whatever is inside
+   them. Their contents scroll rather than stretching the card. */
+.box-live { height: 625px; }
 .box-live { display: flex; flex-direction: column; }
-.approvals-card { overflow: auto; }
 .panel-head, .section-heading { padding: 22px 24px; display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; border-bottom: 1px solid #e3e9f1; }
-.box-live h2, .approvals-card h2 { margin: 6px 0 4px; font-size: 21px; }
-.box-live p, .approvals-card p { margin: 0; color: #65768b; font-size: 13px; }
+.box-live h2 { margin: 6px 0 4px; font-size: 21px; }
+.box-live p { margin: 0; color: #65768b; font-size: 13px; }
 .secondary-button { padding: 9px 12px; display: inline-flex; align-items: center; gap: 7px; flex-shrink: 0; border: 1px solid #cbd6e3; border-radius: 8px; color: #174f91; text-decoration: none; background: #fff; font-size: 12px; font-weight: 750; }
 .secondary-button:hover { background: #f4f8fd; }
 .file-list { padding: 8px; }
@@ -67,10 +66,8 @@ button { cursor: pointer; }
 .risk-medium { color: #67570d; background: #fff8cc; }
 .risk-low { color: #27623b; background: #e7f7ec; }
 .secure-note { padding: 11px 18px; display: flex; align-items: center; gap: 7px; color: #66788d; background: #f8fafc; border-top: 1px solid #e5ebf2; font-size: 11px; }
-.box-explorer { height: calc(100vh - 220px); min-height: 620px; border: 1px solid #dce3ec; border-radius: 12px; overflow: hidden; background: white; }
 .workspace-state { padding: 40px; border: 1px solid #dce3ec; border-radius: 12px; color: #61738a; background: white; }
 
-.blocked-pill { padding: 7px 10px; display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; color: #a82431; background: #ffe8eb; font-size: 11px; font-weight: 800; white-space: nowrap; }
 
 @media (max-width: 980px) {
   .topbar { padding: 0 16px; }
