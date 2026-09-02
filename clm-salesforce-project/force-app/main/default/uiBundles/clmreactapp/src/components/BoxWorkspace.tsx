@@ -1,5 +1,5 @@
 import { lazy, Suspense, useCallback, useEffect, useRef, useState } from "react";
-import { WorkspaceSkeleton } from "./WorkspaceSkeleton";
+import { TableSkeleton, WorkspaceSkeleton } from "./WorkspaceSkeleton";
 import { ExternalLink, Upload } from "lucide-react";
 import { CLM_CONFIG } from "../config";
 import { DataError } from "./DataError";
@@ -161,7 +161,7 @@ export function BoxWorkspace({
           ) : null}
         </div>
       </div>
-      <Suspense fallback={<div className="workspace-state">Loading Box elements…</div>}>
+      <Suspense fallback={<TableSkeleton />}>
         <BoxElements folderId={folderId} token={token} files={files ?? []} />
       </Suspense>
     </section>

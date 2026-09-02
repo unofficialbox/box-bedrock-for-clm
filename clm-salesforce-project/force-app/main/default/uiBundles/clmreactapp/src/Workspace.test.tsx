@@ -279,3 +279,37 @@ describe("Workspace recovery", () => {
     expect(screen.queryByTestId("box-error")).not.toBeInTheDocument();
   });
 });
+
+describe("Navigation and the address bar", () => {
+  test("returning to the contract list is reflected in the URL", async () => {
+    // The tab changed the view and left the URL alone, so a reload re-read the contract
+    // still named there and dropped the reader back into the workspace they had left.
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&contractId=CLM-1&folderId=123");
+    render(<Workspace />);
+    await screen.findByTestId("box-error");
+
+    fireEvent.click(screen.getByRole("button", { name: /Your contracts/ }));
+
+    expect(new URLSearchParams(window.location.search).get("view")).toBe("contracts");
+    // The contract stays named, so the Workspace tab can return to it.
+    expect(window.location.search).toContain("recordId=a01xx0000001234");
+  });
+
+  test("a reloaded list URL opens the list, not the contract it still names", async () => {
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123&view=contracts");
+    render(<Workspace />);
+    expect(await screen.findByTestId("contracts-error")).toBeVisible();
+    expect(screen.queryByTestId("box-error")).not.toBeInTheDocument();
+  });
+
+  test("the workspace tab drops the marker so its URL reopens the workspace", async () => {
+    window.history.replaceState({}, "", "/?recordId=a01xx0000001234&folderId=123&view=contracts");
+    render(<Workspace />);
+    await screen.findByTestId("contracts-error");
+
+    fireEvent.click(screen.getByRole("button", { name: /Workspace/ }));
+
+    expect(new URLSearchParams(window.location.search).has("view")).toBe(false);
+    expect(await screen.findByTestId("box-error")).toBeVisible();
+  });
+});

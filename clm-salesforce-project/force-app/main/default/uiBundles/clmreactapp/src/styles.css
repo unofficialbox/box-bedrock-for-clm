@@ -229,6 +229,14 @@ button { cursor: pointer; }
   .skeleton-bar, .skeleton-icon { animation: none; }
 }
 
+/* Lazy chunks are megabytes, so these fallbacks are on screen for a real moment. Each one
+   holds the shape of what replaces it. */
+.skeleton-preview { padding: 22px; display: flex; justify-content: center; }
+.skeleton-page { width: min(560px, 100%); padding: 30px 34px; display: flex; flex-direction: column; gap: 13px; border: 1px solid #e3e9f1; border-radius: 8px; background: white; }
+.skeleton-page .skeleton-bar-title { margin-bottom: 9px; }
+.skeleton-uploader { padding: 26px; display: flex; flex-direction: column; align-items: center; gap: 16px; }
+.skeleton-dropzone { width: min(340px, 100%); height: 128px; border-radius: 10px; background: #eef1f5; }
+
 /* The contract list's skeleton borrows the real bands -- tiles, figures, table -- so the
    page does not rearrange itself when the rows land. */
 .contracts-skeleton { display: flex; flex-direction: column; gap: 14px; }
@@ -336,8 +344,9 @@ button { cursor: pointer; }
 .bar-fill-critical { background: #c0392b; }
 
 .stat-row-2x2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
-@media (max-width: 1000px) { .workspace-metrics { grid-template-columns: 1fr; } }
+.workspace-metrics { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 300px) minmax(0, 300px); gap: 14px; align-items: start; }
+@media (max-width: 1240px) { .workspace-metrics { grid-template-columns: minmax(0, 1fr) minmax(0, 300px); } }
+@media (max-width: 900px) { .workspace-metrics { grid-template-columns: 1fr; } }
 
 .contract-table { margin-top: 4px; }
 .contract-table .box-table-name { text-align: left; }

@@ -21,7 +21,7 @@ locals {
             }
             {
               "industry" = "Technology"
-              "name" = "Acme Cloudworks"
+              "name" = "Halcyon Cloudworks"
               "phone" = "(213) 555-0102"
               "website" = "https://www.acmecloudworks.example"
             }
@@ -36,7 +36,7 @@ locals {
               "lastName" = "Mendoza"
             }
             {
-              "account" = "Acme Cloudworks"
+              "account" = "Halcyon Cloudworks"
               "email" = "sarah.kim@acmecloudworks.example"
               "firstName" = "Sarah"
               "lastName" = "Kim"
@@ -110,12 +110,12 @@ locals {
               "businessOwner" = "Acme Cloud Contract Owner"
               "contractId" = "CLM-2026-0088"
               "contractType" = "SOW"
-              "counterparty" = "Acme Cloudworks"
-              "counterpartyAccount" = "Acme Cloudworks"
+              "counterparty" = "Halcyon Cloudworks"
+              "counterpartyAccount" = "Halcyon Cloudworks"
               "dataCategory" = "Confidential"
               "dealValue" = 120000
-              "name" = "Acme Cloudworks Cloud Security Expansion 2026"
-              "opportunity" = "Acme Cloudworks Cloud Security Expansion 2026"
+              "name" = "Halcyon Cloudworks Cloud Security Expansion 2026"
+              "opportunity" = "Halcyon Cloudworks Cloud Security Expansion 2026"
               "recordSource" = "Manual"
               "region" = "Global"
               "requesterEmail" = "sarah.kim@acmecloudworks.example"
@@ -152,10 +152,10 @@ locals {
               "stage" = "Closed Won"
             }
             {
-              "account" = "Acme Cloudworks"
+              "account" = "Halcyon Cloudworks"
               "amount" = 120000
               "closeDateOffsetMonths" = 6
-              "name" = "Acme Cloudworks Cloud Security Expansion 2026"
+              "name" = "Halcyon Cloudworks Cloud Security Expansion 2026"
               "stage" = "Qualification"
             }
           ]

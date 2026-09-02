@@ -35,6 +35,23 @@ type View = "contracts" | "workspace";
  * readable. Selecting a contract has to change the URL, or the workspace cannot be
  * linked to, reloaded, or reached with the back button.
  */
+function viewFromSearch(search = window.location.search): View {
+  const params = new URLSearchParams(search);
+  // An explicit marker wins: the list is reachable with a contract still named in the URL,
+  // so returning to it does not throw away which contract was open.
+  if (params.get("view") === "contracts") return "contracts";
+  return params.has("recordId") || params.has("folderId") ? "workspace" : "contracts";
+}
+
+/** The same query the page already carries, with the view marker set or cleared. */
+function searchForView(view: View): string {
+  const params = new URLSearchParams(window.location.search);
+  if (view === "contracts") params.set("view", "contracts");
+  else params.delete("view");
+  const search = params.toString();
+  return search ? `?${search}` : window.location.pathname;
+}
+
 function contractSearch(contract: ClmContractSummary): string {
   const params = new URLSearchParams();
   if (contract.contractId) params.set("contractId", contract.contractId);
@@ -63,7 +80,7 @@ export function Workspace() {
    * Experience page bound to one contract -- so it goes straight to that workspace.
    * Without one there is nothing to show yet, and the dashboard is the entry point.
    */
-  const [view, setView] = useState<View>(context.salesforceRecordId ? "workspace" : "contracts");
+  const [view, setView] = useState<View>(() => viewFromSearch());
 
   /**
    * Keep the app in step with the address bar. Without this, Back after opening a
@@ -73,12 +90,11 @@ export function Workspace() {
    */
   useEffect(() => {
     function syncToUrl() {
-      const params = new URLSearchParams(window.location.search);
-      const namesAContract = params.has("recordId") || params.has("folderId");
       setContext(getClmPageContext());
       setSelected(null);
       setFiles(null);
-      setView(namesAContract ? "workspace" : "contracts");
+      setBoxError("");
+      setView(viewFromSearch());
     }
     window.addEventListener("popstate", syncToUrl);
     return () => window.removeEventListener("popstate", syncToUrl);
@@ -87,9 +103,23 @@ export function Workspace() {
   const openContract = useCallback((contract: ClmContractSummary) => {
     const search = contractSearch(contract);
     setFiles(null);
+    setBoxError("");
     window.history.pushState({}, "", search ? `?${search}` : window.location.pathname);
     setSelected(contract);
     setView("workspace");
+  }, []);
+
+  /**
+   * Switching tabs is a navigation, so it goes through the address bar.
+   *
+   * Without this the view changed and the URL did not, so a reload re-read the contract
+   * still named there and dropped the reader back into the workspace they had just left.
+   * The contract stays in the query when the list is shown, which is what lets the
+   * Workspace tab return to it rather than becoming a dead control.
+   */
+  const showView = useCallback((next: View) => {
+    window.history.pushState({}, "", searchForView(next));
+    setView(next);
   }, []);
 
   /**
@@ -120,8 +150,8 @@ export function Workspace() {
       <header className="topbar">
         <div className="brand"><span className="brand-mark">A</span><span><strong>Acme Contracts</strong><small>Box-powered CLM</small></span></div>
         <nav aria-label="Primary">
-          <button className={view === "contracts" ? "nav-active" : ""} onClick={() => setView("contracts")}><FileStack size={16} /> Your contracts</button>
-          <button className={view === "workspace" ? "nav-active" : ""} onClick={() => setView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
+          <button className={view === "contracts" ? "nav-active" : ""} onClick={() => showView("contracts")}><FileStack size={16} /> Your contracts</button>
+          <button className={view === "workspace" ? "nav-active" : ""} onClick={() => showView("workspace")}><LayoutDashboard size={16} /> Workspace</button>
         </nav>
       </header>
 
