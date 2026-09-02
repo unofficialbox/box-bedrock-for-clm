@@ -406,10 +406,10 @@
         <p>Needs the Box connector as well as the CLM one. Skip this beat if Box isn't connected.</p>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Search Box metadata using the clmDocument template for documents where clauseRisk is Critical, scoped to the CLM Root folder.</pre>
+          <pre>Search Box metadata using the clmDocument template for documents where clauseRisk is Critical, with ancestor_folder_id &lt;clm-root-folder-id&gt;.</pre>
         </div>
         <div class="expect"><strong>Expect</strong> exactly two files, on two different papers: <code>northstar-msa-redline-v4.pdf</code> and <code>calder-msa-customer-paper-v2.pdf</code>.</div>
-        <div class="warn"><strong>Say "scoped to the CLM Root folder" or the beat breaks.</strong> Box metadata is enterprise-wide, so an unscoped search also returns documents from earlier demo environments — same file names, different IDs, folders that aren't governed contract folders. To an audience that reads as the wrong account appearing.</div>
+        <div class="warn"><strong><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query.</strong> Box metadata is enterprise-wide, so an unscoped search also returns documents from earlier demo environments — same file names, different IDs, folders that aren't governed contract folders. To an audience that reads as the wrong account appearing.</div>
       </div>
     </div>
 
