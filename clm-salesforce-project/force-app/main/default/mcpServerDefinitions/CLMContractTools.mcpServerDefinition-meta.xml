@@ -18,7 +18,7 @@
             <apiSource>API_CATALOG</apiSource>
             <operation>ClmContractPackage</operation>
         </apiDefinition>
-        <descriptionOverride>Finds a CLM contract from the reference a person used, its governed Box folder, and every document with its Box file ID. Call before asking about any document: it is the only source of file IDs.</descriptionOverride>
+        <descriptionOverride>Finds a CLM contract from the reference a person used, its governed Box folder, and a link to every document. Call before asking about a document or previewing one: the file ID is the last path segment of each link.</descriptionOverride>
         <toolName>getContractPackage</toolName>
         <toolTitle>Get CLM Contract Package</toolTitle>
     </tools>
