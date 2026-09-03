@@ -1,21 +1,22 @@
 /**
- * Prepares a Box Sign request for a contract document -- and stops short of sending it.
+ * Sends a contract document for signature through Box Sign.
  *
- * The whole demo rests on the claim that autonomy stops at signature, so an action that
- * lets an agent put a contract in front of a signer would quietly falsify it. This one is
- * built so that it cannot:
+ * This action sends. That is a real outward step, so what bounds it is not a person in the
+ * middle of it but what it refuses to do:
  *
  *   - It refuses unless the contract has reached an approved state. A contract still in
  *     Legal Review is not signable and the refusal says which state it is in.
  *   - It bounds the document to the contract that was named, the same way reading one is
  *     bounded, so a Box file ID from somewhere else cannot be routed for signature.
- *   - It sets `is_document_preparation_needed`, which is the difference that matters.
- *     Box returns a prepare URL and sends nothing. A human opens that URL, places the
- *     fields, sees who it goes to, and presses send. The signature request exists; the
- *     decision to make it real stays with a person.
+ *   - It refuses without a signer rather than inventing one.
  *
- * So the honest description of this action is "get it ready for someone to send", and the
- * summary it returns says exactly that rather than implying a request went out.
+ * It used to stop short of sending by setting `is_document_preparation_needed`, which had
+ * Box return a prepare URL and mail nothing. That kept the decision with a person, and it
+ * also kept the request invisible: one awaiting preparation sits in Box as a draft in
+ * `created` state, absent from the sent list, that nobody is notified about. Following it
+ * meant leaving the conversation for a Box tab and placing fields by hand -- the kind of
+ * detour a short demo cannot afford. Sending outright is what makes the request real, and
+ * Box places the signature block itself.
  *
  * The callout goes through the Box managed package rather than straight to Box. That costs
  * a little directness and buys the thing a direct call cannot do: the package writes the
@@ -25,7 +26,7 @@
 public with sharing class ClmSendForSignature {
 
     /**
-     * The contract states from which a signature request may be prepared. Anything earlier
+     * The contract states from which a signature request may be sent. Anything earlier
      * is still being negotiated, and 'Executed' is already done.
      */
     private static final Set<String> SIGNABLE = new Set<String>{ 'Approved', 'Signature' };
@@ -60,36 +61,36 @@ public with sharing class ClmSendForSignature {
     public class Result {
         @InvocableVariable(label='Outcome')
         public String summary;
-        @InvocableVariable(label='Whether a signature request was prepared')
-        public Boolean prepared;
-        @InvocableVariable(label='URL a human opens to review and send')
-        public String prepareUrl;
+        @InvocableVariable(label='Whether the signature request was sent')
+        public Boolean sent;
+        @InvocableVariable(label='URL where the signature request can be tracked')
+        public String statusUrl;
         @InvocableVariable(label='Box Sign request ID')
         public String requestId;
     }
 
     @InvocableMethod(
-        label='Prepare a Box Sign request for a CLM document'
-        description='Prepares -- but does not send -- a Box Sign request for one contract document. Returns a URL a named human opens to review and send it.'
+        label='Send a CLM document for signature with Box Sign'
+        description='Sends one contract document for signature. Refuses unless the contract is approved and the document belongs to it.'
     )
     public static List<Result> prepare(List<Request> requests) {
         List<Result> results = new List<Result>();
         for (Request req : requests) {
-            results.add(prepareOne(req));
+            results.add(sendOne(req));
         }
         return results;
     }
 
-    private static Result prepareOne(Request req) {
+    private static Result sendOne(Request req) {
         Result result = new Result();
-        result.prepared = false;
+        result.sent = false;
 
         if (req == null || String.isBlank(req.contractReference)) {
             result.summary = 'I need to know which contract this document belongs to.';
             return result;
         }
         if (String.isBlank(req.itemId)) {
-            result.summary = 'I need a Box file ID from the contract package before I can prepare a signature request.';
+            result.summary = 'I need a Box file ID from the contract package before I can send it for signature.';
             return result;
         }
         // A demo stalls on "who is signing?", and the honest answer in a demo is the person
@@ -98,7 +99,7 @@ public with sharing class ClmSendForSignature {
         // refusal below.
         String signerEmail = String.isNotBlank(req.signerEmail) ? req.signerEmail : demoSigner();
         if (String.isBlank(signerEmail)) {
-            result.summary = 'I need a signer before I can prepare a signature request. I will not guess at one.';
+            result.summary = 'I need a signer before I can send this for signature. I will not guess at one.';
             return result;
         }
 
@@ -136,25 +137,37 @@ public with sharing class ClmSendForSignature {
                 req.signerName, subjectFor(req, found));
 
             if (String.isBlank(outcome.requestId)) {
-                result.summary = 'Box Sign refused the request. Nothing was prepared and'
-                    + ' nothing was sent.';
+                result.summary = 'Box Sign refused the request. Nothing was sent.';
                 System.debug(LoggingLevel.WARN, 'CLM Sign: ' + outcome.error);
                 return result;
             }
 
             result.requestId = outcome.requestId;
-            result.prepareUrl = outcome.prepareUrl;
-            result.prepared = true;
-            result.summary = 'A Box Sign request is prepared for '
-                + found.contract.Contract_ID__c + ' and addressed to '
-                + signerEmail.trim() + '. Nothing has been sent. Open the prepare URL'
-                + ' to place the signature fields and send it.';
+            result.statusUrl = trackingUrl(outcome.recordId);
+            result.sent = true;
+            result.summary = 'The signature request for ' + found.contract.Contract_ID__c
+                + ' has been sent to ' + signerEmail.trim()
+                + '. It is on the contract record under Box Sign Requests.';
             return result;
         } catch (Exception e) {
-            result.summary = 'The signature request could not be prepared. Nothing was sent.';
+            result.summary = 'The signature request could not be sent.';
             System.debug(LoggingLevel.WARN, 'CLM Sign failed: ' + e.getMessage());
         }
         return result;
+    }
+
+    /**
+     * Where a person watches the request from. The package puts the Box Sign status page on
+     * the record it just wrote, which is a better answer than a URL assembled here.
+     */
+    private static String trackingUrl(Id signRecordId) {
+        if (signRecordId == null) {
+            return null;
+        }
+        List<box__BoxSign__c> rows = [
+            SELECT box__BoxSign_url__c FROM box__BoxSign__c WHERE Id = :signRecordId LIMIT 1
+        ];
+        return rows.isEmpty() ? null : rows[0].box__BoxSign_url__c;
     }
 
     private static String subjectFor(Request req, ClmContractPackage.Located found) {
@@ -166,7 +179,6 @@ public with sharing class ClmSendForSignature {
     /** What the Box Sign call gives back, in this class's own terms. */
     public class SignOutcome {
         public String requestId;
-        public String prepareUrl;
         public Id recordId;
         public String error;
     }
@@ -206,7 +218,9 @@ public with sharing class ClmSendForSignature {
             request.sf_files = new List<box.File>{ file };
             request.signers = new List<box.Signer>{ signer };
             request.subject = subject;
-            request.is_document_preparation_needed = true;
+            // False, so Box mails the signer instead of parking a draft nobody sees. Box
+            // places the signature block; there is no manual field-placement detour.
+            request.is_document_preparation_needed = false;
 
             SignOutcome outcome = new SignOutcome();
             List<box.BoxSignResponse> responses =
@@ -218,7 +232,6 @@ public with sharing class ClmSendForSignature {
 
             box.BoxSignResponse response = responses[0];
             outcome.requestId = response.id;
-            outcome.prepareUrl = response.prepare_url;
             outcome.recordId = response.salesforce_id;
             outcome.error = response.error;
             return outcome;

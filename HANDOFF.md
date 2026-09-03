@@ -249,9 +249,10 @@ Neither is on the counterparty surface.
 - **Doc Gen is versioned**: `box-version: 2025.0` required; Sign wants 2024.0 or no header.
 - **Doc Gen is asynchronous**: a 202 means accepted, not written. Poll
   `GET /2.0/docgen_batch_jobs/<id>`.
-- **Sign prepares and does not send.** `is_document_preparation_needed` returns a
-  `prepare_url`; no mail leaves. It also refuses unless `Status__c` is Approved or
-  Signature. All three states verified live.
+- **Sign sends.** `is_document_preparation_needed` is false, so Box mails the signer.
+  Left true it returns a `prepare_url` and parks a `created` draft that never reaches the
+  sent list and notifies nobody. It refuses unless `Status__c` is Approved or Signature.
+  All three states verified live.
 - **`@InvocableVariable` attributes are space-separated** — `(label='x', required=true)` is
   a parse error with a misleading cascade.
 - **`documentIdsFor` returns nothing in a test context** because the Toolkit does, so

@@ -8,7 +8,7 @@ flowchart LR
     Record --> Gate{"Contract approved?"}
     Memo --> Gate
     Gate -- "No" --> Block["Signature refused<br/>state check in Apex"]
-    Gate -- "Yes" --> Prepare["Box Sign preparation<br/>a person presses send"]
+    Gate -- "Yes" --> Prepare["Box Sign request sent<br/>bounded to the contract"]
     Folder --> Counterparty["Counterparty workspace<br/>scoped folder, redlines withheld"]
 
     classDef agent fill:#eee9ff,stroke:#6b46c1,color:#24134f
