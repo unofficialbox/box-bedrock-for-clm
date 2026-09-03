@@ -96,23 +96,25 @@ describe("Downscoped token request", () => {
     expect(granted).toEqual({ ok: true, value: { accessToken: "example-scoped-token", folderId: "123456789" } });
   });
 
-  test("falls back to folderId when there is no record context", async () => {
-    let seenUrl = "";
-    globalThis.fetch = (async (url: string) => {
-      seenUrl = url;
-      return { ok: true, json: async () => ({ accessToken: "example-scoped-token", folderId: "123" }) };
+  test("refuses to ask for a folder when there is no record context", async () => {
+    // The endpoint no longer accepts a caller-named folder, so asking for one is a
+    // mistake to report here rather than a request to send and have refused.
+    let called = false;
+    globalThis.fetch = (async () => {
+      called = true;
+      return { ok: true, json: async () => ({}) };
     }) as unknown as typeof fetch;
 
-    await fetchDownscopedBoxToken({ folderId: "123" });
-    expect(seenUrl).toContain("folderId=123");
-    expect(seenUrl).not.toContain("recordId=");
+    const granted = await fetchDownscopedBoxToken({ folderId: "123" });
+    expect(granted.ok).toBe(false);
+    expect(called).toBe(false);
   });
 
   test("reports the refusal rather than handing back an empty token", async () => {
     globalThis.fetch = (async () => ({
       ok: false,
       status: 404,
-      text: async () => '{"error":"no_box_folder_mapping"}',
+      text: async () => '{"error":"box_not_configured"}',
       json: async () => ({}),
     })) as unknown as typeof fetch;
 
@@ -170,7 +172,7 @@ describe("Downscoped token request", () => {
     const calls: string[] = [];
     globalThis.fetch = (async (url: string) => {
       calls.push(String(url));
-      return { ok: false, status: 403, text: async () => '{"error":"folder_not_allowed"}', json: async () => ({}) };
+      return { ok: false, status: 403, text: async () => '{"error":"box_not_configured"}', json: async () => ({}) };
     }) as unknown as typeof fetch;
 
     const granted = await fetchDownscopedBoxToken({ folderId: "123", salesforceRecordId: "a01xx0000009abcAAA" });

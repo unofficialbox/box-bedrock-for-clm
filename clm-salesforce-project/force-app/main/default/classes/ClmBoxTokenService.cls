@@ -79,31 +79,35 @@ global with sharing class ClmBoxTokenService {
         response.addHeader('Cache-Control', 'no-store');
 
         String recordId = request.params.get('recordId');
-        String folderId = request.params.get('folderId');
 
-        // recordId is the real entry point: the browser names a Salesforce record and the
-        // org's own Box mapping decides the folder, so no Box id travels in a URL and a
-        // caller cannot ask for a folder the record is not associated with. folderId
-        // remains for the local harness and for pages with no record context.
-        if (String.isNotBlank(recordId)) {
-            Id parsedRecordId;
-            try {
-                parsedRecordId = Id.valueOf(recordId);
-            } catch (Exception e) {
-                fail(response, 400, 'invalid_record_id', 'recordId is not a Salesforce id.');
-                return;
-            }
-            // Inner classes cannot hold static members in Apex, hence the instance.
-            folderId = new FolderMapping().forRecord(parsedRecordId);
-            if (String.isBlank(folderId)) {
-                fail(response, 404, 'no_box_folder_mapping',
-                    'No Box folder is associated with that record. Associate one with the Box for Salesforce package first.');
-                return;
-            }
+        // A record is the only way in. The browser names a Salesforce record and the org's
+        // own Box mapping decides the folder, so no Box id travels in a URL and a caller
+        // cannot ask for a folder the record is not associated with.
+        //
+        // This used to also accept a caller-supplied folderId, bounded by an allowlist on
+        // the custom setting. That was duplicative -- the managed package already scopes a
+        // folder to its record -- and it did not scale: an exact-match list in a Text(255)
+        // holds around seventeen ids and says nothing about their children, so it could
+        // never cover per-contract folders. Left empty, as it was, the branch it guarded
+        // let any caller who could reach this endpoint name any folder the service account
+        // could see, and the guest user can reach this endpoint.
+        if (String.isBlank(recordId)) {
+            fail(response, 400, 'missing_record_id', 'Pass recordId.');
+            return;
         }
 
+        Id parsedRecordId;
+        try {
+            parsedRecordId = Id.valueOf(recordId);
+        } catch (Exception e) {
+            fail(response, 400, 'invalid_record_id', 'recordId is not a Salesforce id.');
+            return;
+        }
+        // Inner classes cannot hold static members in Apex, hence the instance.
+        String folderId = new FolderMapping().forRecord(parsedRecordId);
         if (String.isBlank(folderId)) {
-            fail(response, 400, 'missing_folder_id', 'Pass recordId, or folderId.');
+            fail(response, 404, 'no_box_folder_mapping',
+                'No Box folder is associated with that record. Associate one with the Box for Salesforce package first.');
             return;
         }
         if (!folderId.isNumeric()) {
@@ -118,15 +122,6 @@ global with sharing class ClmBoxTokenService {
                 'Set Box User Id (or Enterprise Id) on the CLM Box Config custom setting, and the Box client id and secret on the CLM Box external credential.');
             return;
         }
-        // The allowlist bounds what a caller may name. A folder resolved from a record
-        // was never named by the caller -- the record's own association chose it -- so
-        // applying the list there would refuse every folder the package provisions.
-        if (String.isBlank(recordId) && !isFolderAllowed(config, folderId)) {
-            fail(response, 403, 'folder_not_allowed',
-                'folderId is not in the configured Allowed Folder Ids list.');
-            return;
-        }
-
         try {
             // Shared with the agent actions, which need the same grant against the same app.
             String parentToken = ClmBoxAuth.parentToken();
@@ -175,25 +170,6 @@ global with sharing class ClmBoxTokenService {
                 return null;
             }
         }
-    }
-
-    /**
-     * An empty allowlist means "any folder". Populate Allowed_Folder_Ids__c with a
-     * comma-separated list to restrict the endpoint to the demo workspace.
-     *
-     * This applies only to a caller-supplied folderId. Folders reached through a record
-     * are bounded by the record instead.
-     */
-    private static Boolean isFolderAllowed(CLM_Box_Config__c config, String folderId) {
-        if (String.isBlank(config.Allowed_Folder_Ids__c)) {
-            return true;
-        }
-        for (String allowed : config.Allowed_Folder_Ids__c.split(',')) {
-            if (allowed.trim() == folderId) {
-                return true;
-            }
-        }
-        return false;
     }
 
     /** Exchange the parent token for one limited to preview scopes on a single folder. */

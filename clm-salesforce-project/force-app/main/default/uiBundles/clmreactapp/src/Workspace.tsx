@@ -145,9 +145,8 @@ export function Workspace() {
    * asking by record is both authoritative and self-healing; Box_Workspace_Folder_ID__c
    * is a denormalised copy that can fall behind it.
    *
-   * A folder id is used only when there is no record to ask about -- a deep link or the
-   * local harness -- and that path is still bounded by Allowed_Folder_Ids__c, because
-   * there the caller chose the folder rather than a record.
+   * A record is the only way in. The endpoint no longer accepts a caller-named folder at
+   * all, so a folder id here only labels what came back.
    */
   const workspaceContext = useMemo(() => {
     if (selected?.recordId) {

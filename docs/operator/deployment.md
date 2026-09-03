@@ -51,7 +51,6 @@ produce wrong answers. It produces refusals, on stage.
 | Setting | Missing means |
 |---|---|
 | `Box_User_Id__c` *or* `Enterprise_Id__c` | The token endpoint answers `box_not_configured` (503) and the workspace shows no documents |
-| `Allowed_Folder_Ids__c` | The endpoint will mint a token for **any** folder — the opposite of what the demo claims |
 | `Contracts_Root_Folder_Id__c` | The portfolio risk search refuses: it cannot be bounded, and will not run unbounded |
 | `Clause_Library_Hub_Id__c` | Clause-library questions have nothing governed to read against |
 | `Counter_Position_Template_ID__c` | The counter-position memo cannot be generated |

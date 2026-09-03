@@ -24,14 +24,13 @@
  */
 String boxUserId        = '__BOX_USER_ID__';
 String enterpriseId     = '__BOX_ENTERPRISE_ID__';
-String allowedFolderIds = '__BOX_ALLOWED_FOLDER_IDS__';
 String contractsRoot    = '__BOX_CONTRACTS_ROOT_FOLDER_ID__';
 String clauseLibraryHub = '__BOX_CLAUSE_LIBRARY_HUB_ID__';
 String counterTemplate  = '__BOX_COUNTER_POSITION_TEMPLATE_ID__';
 String demoSigner       = '__CLM_DEMO_SIGNER_EMAIL__';
 
 // ---------- Guard: refuse unsubstituted input ----------
-for (String raw : new List<String>{ boxUserId, enterpriseId, allowedFolderIds,
+for (String raw : new List<String>{ boxUserId, enterpriseId,
         contractsRoot, clauseLibraryHub, counterTemplate, demoSigner }) {
     if (raw.startsWith('__BOX_') || raw.startsWith('__CLM_')) {
         throw new System.IllegalArgumentException(
@@ -73,26 +72,6 @@ if (String.isNotBlank(demoSigner) && !demoSigner.contains('@')) {
     throw new System.IllegalArgumentException('BOX CONFIG: the demo signer must be an email address.');
 }
 
-// Normalize the allowlist so stored values match the numeric folder ids the endpoint
-// compares against. ClmBoxTokenService trims each entry, but a non-numeric entry would
-// be dead weight: such a folderId is rejected by isNumeric() before the list is consulted.
-List<String> normalizedFolderIds = new List<String>();
-for (String candidate : allowedFolderIds.split(',')) {
-    String folderId = candidate.trim();
-    if (String.isBlank(folderId)) {
-        continue;
-    }
-    if (!folderId.isNumeric()) {
-        throw new System.IllegalArgumentException(
-            'BOX CONFIG: allowlist entry "' + folderId + '" is not numeric; the endpoint rejects non-numeric folder ids with invalid_folder_id.');
-    }
-    normalizedFolderIds.add(folderId);
-}
-String normalizedAllowlist = String.join(normalizedFolderIds, ',');
-if (normalizedAllowlist.length() > 255) {
-    throw new System.IllegalArgumentException('BOX CONFIG: folder allowlist exceeds the 255-character field length.');
-}
-
 // ---------- Upsert the org default ----------
 CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
 if (config == null) {
@@ -115,7 +94,6 @@ String keptSigner   = String.isBlank(demoSigner)       ? config.Demo_Signer_Emai
 Boolean changed = creating
     || boxUserId != (config.Box_User_Id__c == null ? '' : config.Box_User_Id__c)
     || enterpriseId != (config.Enterprise_Id__c == null ? '' : config.Enterprise_Id__c)
-    || normalizedAllowlist != (config.Allowed_Folder_Ids__c == null ? '' : config.Allowed_Folder_Ids__c)
     || keptRoot != config.Contracts_Root_Folder_Id__c
     || keptHub != config.Clause_Library_Hub_Id__c
     || keptTemplate != config.Counter_Position_Template_ID__c
@@ -123,7 +101,6 @@ Boolean changed = creating
 
 config.Box_User_Id__c = boxUserId;
 config.Enterprise_Id__c = enterpriseId;
-config.Allowed_Folder_Ids__c = normalizedAllowlist;
 config.Contracts_Root_Folder_Id__c = keptRoot;
 config.Clause_Library_Hub_Id__c = keptHub;
 config.Counter_Position_Template_ID__c = keptTemplate;
@@ -135,16 +112,11 @@ String subjectType = String.isNotBlank(boxUserId) ? 'user' : 'enterprise';
 String subjectId = String.isNotBlank(boxUserId) ? boxUserId : enterpriseId;
 String action = creating ? 'created' : (changed ? 'updated' : 'unchanged');
 System.debug(LoggingLevel.INFO, 'BOX CONFIG: org-default record ' + action
-    + ' (subject ' + subjectType + ' ...' + subjectId.right(4)
-    + ', ' + normalizedFolderIds.size() + ' allowed folder id(s))');
+    + ' (subject ' + subjectType + ' ...' + subjectId.right(4) + ')');
 
 if (String.isNotBlank(boxUserId) && String.isNotBlank(enterpriseId)) {
     System.debug(LoggingLevel.WARN, 'BOX CONFIG: both a user id and an enterprise id are set. '
         + 'ClmBoxTokenService grants as the user; the enterprise id is unused.');
-}
-if (normalizedFolderIds.isEmpty()) {
-    System.debug(LoggingLevel.WARN, 'BOX CONFIG: the allowlist is empty, which ClmBoxTokenService treats as "allow any folder". '
-        + 'Populate Allowed Folder Ids to scope the endpoint to the demo workspace.');
 }
 Map<String, String> blank = new Map<String, String>();
 if (String.isBlank(keptRoot)) {

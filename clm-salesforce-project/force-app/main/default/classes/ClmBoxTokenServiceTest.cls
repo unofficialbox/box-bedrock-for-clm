@@ -43,11 +43,12 @@ private class ClmBoxTokenServiceTest {
         return new BoxMock(200, 200, '{"access_token":"' + CHILD_TOKEN + '","expires_in":2400}');
     }
 
-    private static void configure(String allowedFolders) {
+    private static void configure(String unusedAllowlist) {
+        // The parameter is vestigial: the allowlist it set is gone, and a caller can no
+        // longer name a folder at all. Kept so the call sites read unchanged.
         insert new CLM_Box_Config__c(
             SetupOwnerId = UserInfo.getOrganizationId(),
-            Enterprise_Id__c = '99999',
-            Allowed_Folder_Ids__c = allowedFolders
+            Enterprise_Id__c = '99999'
         );
     }
 
@@ -93,8 +94,9 @@ private class ClmBoxTokenServiceTest {
         BoxMock mock = okMock();
         Test.setMock(HttpCalloutMock.class, mock);
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(200, RestContext.response.statusCode, 'Expected a successful token response');
@@ -124,8 +126,9 @@ private class ClmBoxTokenServiceTest {
         configure(null);
         Test.setMock(HttpCalloutMock.class, okMock());
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         String raw = RestContext.response.responseBody.toString();
@@ -138,8 +141,9 @@ private class ClmBoxTokenServiceTest {
         BoxMock mock = okMock();
         Test.setMock(HttpCalloutMock.class, mock);
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(2, mock.bodies.size(), 'Expected a client-credentials call then an exchange call');
@@ -160,44 +164,48 @@ private class ClmBoxTokenServiceTest {
     }
 
     @IsTest
-    static void rejectsAFolderOutsideTheAllowlist() {
-        configure('111,222');
+    static void refusesAFolderNamedByTheCaller() {
+        // The allowlist is gone because naming a folder is gone. A folder reaches this
+        // endpoint only by way of a record the package has associated it with.
+        configure(null);
         Test.setMock(HttpCalloutMock.class, okMock());
 
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(FOLDER_ID, null);
         Test.stopTest();
 
-        System.assertEquals(403, RestContext.response.statusCode, 'Folders outside the allowlist must be refused');
-        System.assertEquals('folder_not_allowed', body().get('error'));
+        System.assertEquals(400, RestContext.response.statusCode,
+            'A caller-supplied folder must be refused, not bounded by a list');
+        System.assertEquals('missing_record_id', body().get('error'));
     }
 
     @IsTest
-    static void rejectsAMissingFolderId() {
+    static void rejectsAMissingRecordId() {
         configure(null);
         Test.startTest();
-        call(null);
+        callWith(null, null);
         Test.stopTest();
 
         System.assertEquals(400, RestContext.response.statusCode);
-        System.assertEquals('missing_folder_id', body().get('error'));
+        System.assertEquals('missing_record_id', body().get('error'));
     }
 
     @IsTest
-    static void rejectsANonNumericFolderId() {
+    static void rejectsATraversalAttemptAsAMissingRecord() {
         configure(null);
         Test.startTest();
-        call('../../etc/passwd');
+        callWith('../../etc/passwd', null);
         Test.stopTest();
 
-        System.assertEquals(400, RestContext.response.statusCode, 'Non-numeric ids must not reach Box');
-        System.assertEquals('invalid_folder_id', body().get('error'));
+        System.assertEquals(400, RestContext.response.statusCode, 'A folder named in a URL must not reach Box');
+        System.assertEquals('missing_record_id', body().get('error'));
     }
 
     @IsTest
     static void reportsWhenBoxCredentialsAreNotConfigured() {
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(500, RestContext.response.statusCode, 'An unconfigured org should fail closed');
@@ -209,8 +217,9 @@ private class ClmBoxTokenServiceTest {
         configure(null);
         Test.setMock(HttpCalloutMock.class, new BoxMock(401, 200, '{}'));
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(500, RestContext.response.statusCode);
@@ -222,8 +231,9 @@ private class ClmBoxTokenServiceTest {
         configure(null);
         Test.setMock(HttpCalloutMock.class, new BoxMock(200, 400, '{"error":"invalid_grant"}'));
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(500, RestContext.response.statusCode);
@@ -239,8 +249,9 @@ private class ClmBoxTokenServiceTest {
         BoxMock mock = okMock();
         Test.setMock(HttpCalloutMock.class, mock);
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(200, RestContext.response.statusCode, 'A user subject should mint a token');
@@ -261,8 +272,9 @@ private class ClmBoxTokenServiceTest {
         BoxMock mock = okMock();
         Test.setMock(HttpCalloutMock.class, mock);
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         String grant = mock.bodies[0];
@@ -276,8 +288,9 @@ private class ClmBoxTokenServiceTest {
     static void reportsWhenNeitherSubjectIsConfigured() {
         insert new CLM_Box_Config__c(SetupOwnerId = UserInfo.getOrganizationId());
 
+        Id mappedRecord = mapRecordToFolder(FOLDER_ID);
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(null, mappedRecord);
         Test.stopTest();
 
         System.assertEquals(500, RestContext.response.statusCode, 'A record with no subject must fail closed');
@@ -331,11 +344,10 @@ private class ClmBoxTokenServiceTest {
     }
 
     @IsTest
-    static void doesNotApplyTheAllowlistToAFolderReachedThroughARecord() {
-        // The allowlist bounds what a caller may name. A record's own folder is chosen by
-        // the record, and the package provisions folders that no list could enumerate in
-        // advance, so the list must not gate that path.
-        configure('999');
+    static void mintsForAFolderReachedThroughARecord() {
+        // The package provisions folders no list could enumerate in advance, which is why
+        // the record, not a list, is what bounds this.
+        configure(null);
         Id recordId = mapRecordToFolder(FOLDER_ID);
         Test.setMock(HttpCalloutMock.class, okMock());
 
@@ -344,25 +356,25 @@ private class ClmBoxTokenServiceTest {
         Test.stopTest();
 
         System.assertEquals(200, RestContext.response.statusCode,
-            'A record-resolved folder is bounded by the record, not the allowlist');
+            'A record-resolved folder is bounded by the record');
         System.assertEquals(FOLDER_ID, body().get('folderId'));
     }
 
     @IsTest
-    static void stillAppliesTheAllowlistToACallerSuppliedFolder() {
-        configure('999');
+    static void refusesAFolderNamedByTheCallerEvenWithConfigPresent() {
+        configure(null);
 
         Test.startTest();
-        call(FOLDER_ID);
+        callWith(FOLDER_ID, null);
         Test.stopTest();
 
-        System.assertEquals(403, RestContext.response.statusCode,
-            'A folder named by the caller must still be checked against the allowlist');
-        System.assertEquals('folder_not_allowed', body().get('error'));
+        System.assertEquals(400, RestContext.response.statusCode,
+            'Configuration cannot re-open a path that no longer exists');
+        System.assertEquals('missing_record_id', body().get('error'));
     }
 
     @IsTest
-    static void reportsWhenNeitherRecordNorFolderIsGiven() {
+    static void reportsWhenNoRecordIsGiven() {
         configure(null);
 
         Test.startTest();
@@ -370,6 +382,6 @@ private class ClmBoxTokenServiceTest {
         Test.stopTest();
 
         System.assertEquals(400, RestContext.response.statusCode);
-        System.assertEquals('missing_folder_id', body().get('error'));
+        System.assertEquals('missing_record_id', body().get('error'));
     }
 }

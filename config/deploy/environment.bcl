@@ -53,15 +53,6 @@ locals {
 
           # ---- Box folders and templates -------------------------------------------
           "boxContent" = {
-            "allowedFolderIds" = {
-              "envVar" = "BOX_ALLOWED_FOLDER_IDS"
-              "field" = "CLM_Box_Config__c.Allowed_Folder_Ids__c"
-              "find" = "box folders:items 0 --fields=id,name,type"
-              "note" = "Comma-separated. Empty means the endpoint will mint a token for ANY folder."
-              "required" = "strongly recommended"
-              "value" = "<box-folder-id>,<box-folder-id>"
-              "withoutIt" = "The downscoped-token endpoint is unbounded, which is the opposite of what the demo claims."
-            }
             "contractsRootFolderId" = {
               "envVar" = "BOX_CONTRACTS_ROOT_FOLDER_ID"
               "field" = "CLM_Box_Config__c.Contracts_Root_Folder_Id__c"

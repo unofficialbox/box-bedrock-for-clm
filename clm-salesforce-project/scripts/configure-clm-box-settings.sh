@@ -13,8 +13,7 @@ set -euo pipefail
 #
 # or, for a single run:
 #
-#   BOX_USER_ID=<id> BOX_ALLOWED_FOLDER_IDS=<id,id> \
-#     clm-salesforce-project/scripts/configure-clm-box-settings.sh <org-alias>
+#   BOX_USER_ID=<id> clm-salesforce-project/scripts/configure-clm-box-settings.sh <org-alias>
 #
 # Set BOX_USER_ID to grant as a Box user (the demo default: the token inherits
 # that user's access, so no folder collaboration is needed), or BOX_ENTERPRISE_ID
@@ -52,7 +51,6 @@ fi
 
 BOX_USER_ID="${BOX_USER_ID:-}"
 BOX_ENTERPRISE_ID="${BOX_ENTERPRISE_ID:-}"
-BOX_ALLOWED_FOLDER_IDS="${BOX_ALLOWED_FOLDER_IDS:-}"
 BOX_CONTRACTS_ROOT_FOLDER_ID="${BOX_CONTRACTS_ROOT_FOLDER_ID:-}"
 BOX_CLAUSE_LIBRARY_HUB_ID="${BOX_CLAUSE_LIBRARY_HUB_ID:-}"
 BOX_COUNTER_POSITION_TEMPLATE_ID="${BOX_COUNTER_POSITION_TEMPLATE_ID:-}"
@@ -74,13 +72,6 @@ for VAR in BOX_USER_ID BOX_ENTERPRISE_ID BOX_CONTRACTS_ROOT_FOLDER_ID; do
     exit 1
   fi
 done
-if [[ -n "${BOX_ALLOWED_FOLDER_IDS}" ]] && ! [[ "${BOX_ALLOWED_FOLDER_IDS}" =~ ^[0-9]+(,[0-9]+)*$ ]]; then
-  echo "BOX_ALLOWED_FOLDER_IDS must be a comma-separated list of numeric folder ids." >&2
-  exit 1
-fi
-if [[ -z "${BOX_ALLOWED_FOLDER_IDS}" ]]; then
-  echo "Warning: BOX_ALLOWED_FOLDER_IDS is empty, which allows the endpoint to mint a token for ANY folder." >&2
-fi
 if [[ -n "${BOX_USER_ID}" && -n "${BOX_ENTERPRISE_ID}" ]]; then
   echo "Warning: both BOX_USER_ID and BOX_ENTERPRISE_ID are set; the user subject wins." >&2
 fi
@@ -101,7 +92,6 @@ chmod 600 "${RESOLVED}"
 
 sed -e "s|__BOX_USER_ID__|${BOX_USER_ID}|g" \
     -e "s|__BOX_ENTERPRISE_ID__|${BOX_ENTERPRISE_ID}|g" \
-    -e "s|__BOX_ALLOWED_FOLDER_IDS__|${BOX_ALLOWED_FOLDER_IDS}|g" \
     -e "s|__BOX_CONTRACTS_ROOT_FOLDER_ID__|${BOX_CONTRACTS_ROOT_FOLDER_ID}|g" \
     -e "s|__BOX_CLAUSE_LIBRARY_HUB_ID__|${BOX_CLAUSE_LIBRARY_HUB_ID}|g" \
     -e "s|__BOX_COUNTER_POSITION_TEMPLATE_ID__|${BOX_COUNTER_POSITION_TEMPLATE_ID}|g" \
