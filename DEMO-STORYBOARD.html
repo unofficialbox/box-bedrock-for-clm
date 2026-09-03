@@ -1,4 +1,4 @@
-<title>Calder Demo Storyboard</title>
+<title>CLM Demo Storyboard</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap">
 <style>
   :root {
@@ -291,13 +291,13 @@
 
   <header class="masthead">
     <p class="eyebrow">Presenter storyboard</p>
-    <h1>Calder Demo Storyboard</h1>
-    <p class="standfirst">A deal on the customer's paper, read against the approved clause library and the two agreements Calder already signed. Six beats, two windows, every prompt below is copy-paste.</p>
+    <h1>CLM Demo Storyboard</h1>
+    <p class="standfirst">The counterparty uploads their redline in their own portal, and it is read against the approved clause library and the two agreements they have already signed. Six beats on one account, two windows, every prompt below is copy-paste.</p>
     <p class="standfirst"><strong>Bind before use.</strong> The site URL and the counterparty login below are placeholders; substitute the values for the environment you are presenting from. Everything else -- prompts, contract references, expected answers -- is portable.</p>
     <div class="facts">
       <span><b>5–6 min</b> run time</span>
-      <span><b>Claude Desktop</b> beats 1–5</span>
-      <span><b>Private browser</b> beat 6</span>
+      <span><b>Private browser</b> beat 1</span>
+      <span><b>Claude Desktop</b> beats 2–6</span>
       <span><b>Copilot v16</b> active</span>
     </div>
   </header>
@@ -352,12 +352,12 @@
       <div>
         <span class="where">Terminal</span>
         <h3>Confirm the contract statuses</h3>
-        <p>Beat 5's signature refusal depends on the 2026 contract sitting in Legal Review.</p>
+        <p>Beat 6 needs both halves on the hero account: one contract still in Legal Review to refuse, and one already Approved to send.</p>
         <div class="block">
           <div class="block-label"><span>bash</span><button class="copy" type="button">Copy</button></div>
-          <pre>sf data query -o agentforce -q "SELECT Contract_ID__c, Status__c FROM CLM_Contract__c WHERE Counterparty__c='Calder Financial Group' ORDER BY Contract_ID__c"</pre>
+          <pre>sf data query -o agentforce -q "SELECT Contract_ID__c, Status__c FROM CLM_Contract__c WHERE Counterparty__c='Northstar Health' ORDER BY Contract_ID__c"</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> <code>CLM-2022-0873 Executed</code>, <code>CLM-2024-0596 Executed</code>, <code>CLM-2026-0104 Legal Review</code>.</div>
+        <div class="expect"><strong>Expect</strong> <code>CLM-2024-0311 Executed</code>, <code>CLM-2025-0148 Executed</code>, <code>CLM-2026-0017 Approved</code>, <code>CLM-2026-0042 Legal Review</code>. The two executed ones are beat 5's precedent, the Legal Review one is what beat 6 refuses, and the Approved one is what it then sends.</div>
       </div>
     </div>
 
@@ -365,8 +365,9 @@
       <div class="marker">P5</div>
       <div>
         <span class="where">Box</span>
-        <h3>Delete the stray duplicate</h3>
-        <p>In <strong>CLM Root / Contracts / Calder Financial Group Master Agreement 2026</strong>, delete <code>calder-msa-customer-paper-v2 (1).pdf</code>. It carries no metadata and it shows up in the beat 1 folder listing. <strong>Done in this org.</strong></p>
+        <h3>Clear the way for Dana's upload</h3>
+        <p>Beat 1 has the counterparty upload <code>northstar-msa-redline-v4.pdf</code>. If a copy is already sitting in <strong>CLM Root / Contracts / Northstar Health Master Service Agreement 2026</strong>, the upload becomes a new version of a file that is already there, and the arrival stops being visible. Delete it before the run, and keep a copy at <code>output/pdf/northstar-msa-redline-v4.pdf</code> to upload.</p>
+        <div class="warn"><strong>Then wait a few minutes before beat 3.</strong> Box reindexes metadata after an upload, so a document that arrives during the demo may not answer a portfolio risk search yet. If the run is tight, upload during setup and let beat 1 show the document already in place.</div>
       </div>
     </div>
 
@@ -375,7 +376,7 @@
       <div>
         <span class="where">Salesforce Setup</span>
         <h3>Set Dana's password</h3>
-        <p>Login As is unavailable for her Customer Community licence, so beat 6 needs a real password. Go to <strong>Setup → Users → Dana Whitfield → Reset Password</strong>. <strong>Done in this org</strong> — confirm the password still works, don't reset it again.</p>
+        <p>Login As is unavailable for her Customer Community licence, so beat 1 needs a real password. Go to <strong>Setup → Users → Dana Whitfield → Reset Password</strong>. <strong>Done in this org</strong> — confirm the password still works, don't reset it again.</p>
         <div class="warn"><strong>Note</strong> the link goes to <code>&lt;counterparty-user-email&gt;</code>, not your main inbox. Set the password, then confirm you can sign in to the site in a private window before the demo — not during it.</div>
       </div>
     </div>
@@ -383,24 +384,46 @@
 
   <section>
     <h2>The six beats</h2>
-    <p class="section-note">Beats 1 through 5 run in Claude Desktop against <strong>both</strong> connectors &mdash; CLM for the contract data, Box for previews and metadata search. Beat 6 is a private browser window.</p>
+    <p class="section-note">Beat 1 is a private browser window &mdash; the counterparty's own
+    portal, where the paper actually arrives. Beats 2 through 6 run in Claude Desktop against
+    <strong>both</strong> connectors: CLM for the contract data, Box for previews and metadata
+    search. One account carries the whole story, start to finish &mdash; Northstar Health.</p>
 
     <div class="step">
-      <div class="marker">1<span class="dur">45 sec</span></div>
+      <div class="marker">1<span class="dur">60 sec</span></div>
       <div>
-        <span class="where">Claude Desktop</span>
-        <h3>Their paper arrives</h3>
+        <span class="where">Private browser window</span>
+        <h3>Their paper arrives, from their side</h3>
         <div class="block">
-          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Show me Calder Financial Group's master agreement that is still in legal review, then open a preview of the customer paper.</pre>
+          <div class="block-label"><span>url</span><button class="copy" type="button">Copy</button></div>
+          <pre>https://&lt;your-site&gt;.my.site.com/clmvforcesite/login?startURL=%2Fclm%2F</pre>
         </div>
-        <p>Point at <code>calder-msa-customer-paper-v2.pdf</code>. Say the line that sets up everything after it: Calder doesn't accept supplier paper, so this is the document being negotiated — and <strong>there is no Limitation of Liability section anywhere in it</strong>.</p>
-        <p><strong>The preview is the beat.</strong> The package listing is only the means to it &mdash; Box file IDs are plumbing and mean nothing to a room, so let the document carry the point instead of reading a list aloud.</p>
+        <p>Sign in as Dana Whitfield, Northstar's counsel. The password is the one set in P6.</p>
+        <div class="warn"><strong>Go to the login path, not the app path.</strong> <code>/clm/</code> serves the app for every URL beneath it &mdash; <code>/clm/login</code> and <code>/clm/s/login/</code> both render the workspace rather than a sign-in page, and a signed-out visitor is never redirected. The login page lives on the other path prefix, <code>/clmvforcesite/login</code>; <code>startURL</code> returns you to the workspace after.</div>
+        <div class="expect"><strong>Expect the header to name her</strong> &mdash; <code>Dana Whitfield &middot; Northstar Health</code> &mdash; above four Northstar contracts and no Calder or Halcyon. Same code, different identity, different rows &mdash; enforced by a Salesforce sharing set on the counterparty account, with the Box token downscoped to one folder.</div>
+        <p><strong>Now do the thing the whole demo hangs on.</strong> Open <em>Northstar Health Master Agreement 2026</em> and upload their redline: <code>output/pdf/northstar-msa-redline-v4.pdf</code>. This is the counterparty sending their paper, on their own login, into a folder they can reach and no other counterparty can.</p>
+        <div class="expect"><strong>Expect the upload to land in the contract's governed Box folder</strong> and appear in the document list without a page reload. Nobody emailed an attachment, and nobody on our side filed it &mdash; which is why the next beat can start from &ldquo;it is already here&rdquo;.</div>
+        <div class="warn"><strong>There is no Copilot on this page.</strong> It ran as its own agent user rather than as Dana and took the contract name from the conversation, so it could be asked about another company's contract &mdash; a scoped workspace around an unscoped agent. It was removed from the external app rather than left for someone to find.</div>
+        <p><strong>Point at the name before you leave.</strong> The page states who it is scoped to, so the scoping is shown rather than asserted. Open a contract and the workspace lists fewer documents than the internal package does: the redlines are withheld by metadata, not by a different folder.</p>
       </div>
     </div>
 
     <div class="step">
       <div class="marker">2<span class="dur">45 sec</span></div>
+      <div>
+        <span class="where">Claude Desktop</span>
+        <h3>We pick it up on our side</h3>
+        <div class="block">
+          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
+          <pre>Show me the Northstar master agreement that is still in legal review, then open a preview of the redline they just sent.</pre>
+        </div>
+        <p>Switch windows and say the line that sets up everything after it: nobody forwarded this, nobody filed it. It is the same document Dana uploaded a minute ago, now in front of the team that has to answer it.</p>
+        <p><strong>The preview is the beat.</strong> The package listing is only the means to it &mdash; Box file IDs are plumbing and mean nothing to a room, so let the document carry the point instead of reading a list aloud.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="marker">3<span class="dur">45 sec</span></div>
       <div>
         <span class="where">Claude Desktop</span>
         <h3>The portfolio already knows what's risky</h3>
@@ -409,91 +432,65 @@
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
           <pre>Which contract documents across the portfolio are flagged critical risk?</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> exactly two files, on two different papers: <code>northstar-msa-redline-v4.pdf</code> and <code>calder-msa-customer-paper-v2.pdf</code>.</div>
-        <div class="warn"><strong><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query.</strong> Box metadata is enterprise-wide, so an unscoped search also returns documents from earlier demo environments — same file names, different IDs, folders that aren't governed contract folders. To an audience that reads as the wrong account appearing.</div>
+        <div class="expect"><strong>Expect two files, on two different papers</strong> &mdash; <code>northstar-msa-redline-v4.pdf</code>, the one just uploaded, and <code>calder-msa-customer-paper-v2.pdf</code> from an unrelated account. The flag was applied when the document landed, not when someone asked.</div>
+        <div class="warn"><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query. To an audience, an unscoped search reads as the wrong account appearing.</div>
+        <div class="warn"><strong>A freshly moved or uploaded file takes a few minutes to appear here.</strong> Box reindexes metadata after the fact, so a document uploaded in beat 1 may not be searchable by the time you reach this beat. Upload it during setup if the run is tight.</div>
       </div>
     </div>
 
     <div class="step">
-      <div class="marker">3<span class="dur">90 sec</span></div>
+      <div class="marker">4<span class="dur">90 sec</span></div>
       <div>
         <span class="where">Claude Desktop</span>
         <h3>Read it against our approved positions</h3>
         <p>The beat the demo exists for.</p>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Where is our liability exposure in Calder's customer paper, and how does it compare to our approved clause library? Cite the file and the clause IDs.</pre>
+          <pre>Where is our liability exposure in Northstar's redline, and how does it compare to our approved clause library? Cite the file and the clause IDs.</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> exposure at <code>19.2</code> and <code>22.4</code>; approved position <code>CLM-LIAB-001</code> (12 months); fallback <code>CLM-LIAB-002</code> (24 months); uncapped is not an approved position; <strong>Commercial Legal</strong> owns the deviation.</div>
-        <p>Land it: a template diff can't find this — there's no Acme template to diff against. A keyword search for "limitation of liability" returns nothing, because the phrase doesn't appear. Only reading it against a governed library does.</p>
+        <div class="expect"><strong>Expect the redline to have deleted the cap</strong>, not argued about it: the fee-based limit and the two-times cap for data and security breaches are struck from <code>15.1</code>&ndash;<code>15.3</code> and replaced with unlimited liability for direct and indirect damages. Approved position <code>CLM-LIAB-001</code> is twelve months of fees; fallback <code>CLM-LIAB-002</code> is twenty-four; uncapped is not an approved position, and <strong>Commercial Legal</strong> owns the deviation.</div>
+        <p>Land it: a template diff cannot find this, because the change is a deletion &mdash; the clause that would fail the diff is simply gone. Only reading the document against a governed library catches an exposure that is defined by absence.</p>
       </div>
     </div>
 
     <div class="step">
-      <div class="marker">4<span class="dur">45 sec</span></div>
+      <div class="marker">5<span class="dur">45 sec</span></div>
       <div>
         <span class="where">Claude Desktop</span>
         <h3>What they agreed the last two times</h3>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Compare clause 22.4 and clause 19.2 across the two Calder agreements we have already executed and this 2026 draft. What did Calder actually agree before, and does the draft match it?</pre>
+          <pre>Compare the liability cap across the two Northstar agreements we have already executed and this 2026 redline. What did they actually agree before, and does the redline match it?</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> both prior agreements carry a negotiated 24-month aggregate cap, recorded in a <strong>Schedule 1</strong> of agreed amendments to Calder's own standard form — and the 2026 draft restores the unamended house text of both clauses.</div>
-        <p>Land it: Calder isn't asking for something new. Their template regressed two positions their own legal team conceded, in writing, twice. That's a course-of-dealing argument, and it's the one that moves a negotiation.</p>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="marker">5<span class="dur">60 sec</span></div>
-      <div>
-        <span class="where">Claude Desktop</span>
-        <h3>Put the position on paper, then stop</h3>
-        <div class="block">
-          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Draft the counter-position memo for this Calder agreement, using the approved fallback and the precedent from the executed agreements.</pre>
-        </div>
-        <div class="warn"><strong>Doc Gen is asynchronous.</strong> The reply says "submitted" and the PDF lands a few seconds later. Have the Calder Box folder open in a tab and refresh it rather than waiting on the chat.</div>
-        <p>Show the memo: clause at issue, what their draft says, the approved fallback, Commercial Legal as owner, the precedent, the proposed counter-position. Nothing on that page was typed. Then show the boundary:</p>
-        <div class="block">
-          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Send the Calder agreement for signature.</pre>
-        </div>
-        <div class="expect"><strong>Expect the action to be called</strong>, and to come back refusing, naming <strong>Legal Review</strong>. That's a state check in Apex, not a prompt instruction — and once the contract <em>is</em> approved, the action still only prepares the request and hands back a URL for a person to send.</div>
-        <div class="warn"><strong>If the assistant declines without calling the action, the beat has not happened.</strong> A model that reasons "this would fail anyway" and offers alternatives is making a prompt-level refusal look like a control &mdash; the opposite of the point. Say &ldquo;call it anyway and show me what it returns&rdquo;. The P2 instruction tells it not to pre-judge, so this should be rare.</div>
-        <p><strong>Then show it working.</strong> The refusal is the control; a demo that only ever
-        refuses has not shown the step. <code>CLM-2026-0017</code> is Approved and carries documents, so
-        the same action prepares against it.</p>
-        <div class="block">
-          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Now send the Northstar MSA package for signature.</pre>
-        </div>
-        <div class="expect"><strong>Expect the request to go out</strong>, addressed to the configured
-        demo signer. Nobody types a signer: the action falls back to
-        <code>CLM_Box_Config__c.Demo_Signer_Email__c</code>, so a demo does not stall on &ldquo;who is
-        signing?&rdquo; and no address lives in source. Box places the signature block itself, so there
-        is no prepare-and-place detour out of the conversation.</div>
-        <div class="expect"><strong>Then open the contract record</strong> in Salesforce. The request is
-        on it, under <em>Box Sign Requests</em>. The action goes through the Box managed package rather
-        than calling Box directly, which is what writes that row and links it &mdash; the paper trail
-        lands where the deal is managed, not only inside Box.</div>
-        
+        <div class="expect"><strong>Expect a fee-based cap in both executed agreements</strong> &mdash; the 2024 states twelve months of fees under the affected order form, at its Limitation of Liability clause &mdash; against a 2026 redline that removes the cap altogether.</div>
+        <p>Land it: Northstar is not asking for something new. They signed a twelve-month cap twice, and their redline now deletes the clause they signed. That is a course-of-dealing argument, and it is the one that moves a negotiation.</p>
       </div>
     </div>
 
     <div class="step">
       <div class="marker">6<span class="dur">60 sec</span></div>
       <div>
-        <span class="where">Private browser window</span>
-        <h3>The same platform, scoped to the other side</h3>
+        <span class="where">Claude Desktop</span>
+        <h3>Put the position on paper, then stop</h3>
         <div class="block">
-          <div class="block-label"><span>url</span><button class="copy" type="button">Copy</button></div>
-          <pre>https://&lt;your-site&gt;.my.site.com/clmvforcesite/login?startURL=%2Fclm%2F</pre>
+          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
+          <pre>Draft the counter-position memo for this Northstar agreement, using the approved fallback and the precedent from the executed agreements.</pre>
         </div>
-        <p>Sign in as Dana Whitfield. The password is the one set in P5.</p>
-        <div class="warn"><strong>Go to the login path, not the app path.</strong> <code>/clm/</code> serves the app for every URL beneath it — <code>/clm/login</code> and <code>/clm/s/login/</code> both render the workspace rather than a sign-in page, and a signed-out visitor is never redirected. The login page lives on the other path prefix, <code>/clmvforcesite/login</code>; <code>startURL</code> returns you to the workspace after.</div>
-        <div class="expect"><strong>Expect the header to name her</strong> — <code>Dana Whitfield · Northstar Health</code> — above four Northstar contracts and no Calder or Halcyon. <code>$7.1M total</code> on the value chart, two renewals inside 90 days. Same code, different identity, different rows — enforced by a Salesforce sharing set on the counterparty account, with the Box token downscoped to one folder.</div>
-        <p><strong>Point at the name.</strong> The page states who it is scoped to, so the scoping is shown rather than asserted — that is the whole beat. Open a contract afterwards and the workspace lists five documents where the internal package lists seven: the redlines are withheld by metadata, not by a different folder.</p>
-        <div class="warn"><strong>There is no Copilot on this page any more.</strong> It ran as its own agent user rather than as Dana and took the contract name from the conversation, so it could be asked about another company's contract — a scoped workspace around an unscoped agent. It was removed from the external app rather than left for someone to find.</div>
+        <div class="warn"><strong>Doc Gen is asynchronous.</strong> The reply says &ldquo;submitted&rdquo; and the PDF lands a few seconds later. Have the Northstar Box folder open in a tab and refresh it rather than waiting on the chat.</div>
+        <p>Show the memo: clause at issue, what their redline says, the approved fallback, Commercial Legal as owner, the precedent, the proposed counter-position. Nothing on that page was typed. Then show the boundary:</p>
+        <div class="block">
+          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
+          <pre>Send Northstar's 2026 master agreement for signature.</pre>
+        </div>
+        <div class="expect"><strong>Expect the action to be called</strong>, and to come back refusing, naming <strong>Legal Review</strong>. That is a state check in Apex, not a prompt instruction.</div>
+        <div class="warn"><strong>If the assistant declines without calling the action, the beat has not happened.</strong> A model that reasons &ldquo;this would fail anyway&rdquo; and offers alternatives is making a prompt-level refusal look like a control &mdash; the opposite of the point. Say &ldquo;call it anyway and show me what it returns&rdquo;. The P2 instruction tells it not to pre-judge, so this should be rare.</div>
+        <p><strong>Then show it working.</strong> The refusal is the control; a demo that only ever refuses has not shown the step. The same counterparty has a package already through review, so the same action goes through against it.</p>
+        <div class="block">
+          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
+          <pre>Now send the approved Northstar MSA package for signature.</pre>
+        </div>
+        <div class="expect"><strong>Expect the request to go out</strong>, addressed to the configured demo signer. Nobody types a signer: the action falls back to <code>CLM_Box_Config__c.Demo_Signer_Email__c</code>, so a demo does not stall on &ldquo;who is signing?&rdquo; and no address lives in source. Box places the signature block itself, so there is no prepare-and-place detour out of the conversation.</div>
+        <div class="expect"><strong>Then open the contract record</strong> in Salesforce. The request is on it, under <em>Box Sign Requests</em>. The action goes through the Box managed package rather than calling Box directly, which is what writes that row and links it &mdash; the paper trail lands where the deal is managed, not only inside Box. It closes the loop Dana opened in beat 1, on the same account.</div>
       </div>
     </div>
   </section>
