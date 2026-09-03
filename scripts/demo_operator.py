@@ -41,8 +41,7 @@ SALESFORCE_ADMIN_PERMISSION_SETS = (
     "box__Box_Admin_All_Licenses",
     "box__Docgen_Template_Manager",
     "box__Box_Sign_Admin",
-    "CLM_Box_Automate_Integration",
-    "CLM_Demo_Operator",
+    "CLM_Contract_Internal",
 )
 FOLDERS = [
     "01 - Intake",
@@ -812,8 +811,8 @@ def salesforce_deploy(config_path: Path, *, dry_run: bool) -> None:
         "force-app/main/default/layouts/CLM_Contract__c-CLM Contract Layout.layout-meta.xml",
         "force-app/main/default/flexipages/CLM_Contract_Record_Page.flexipage-meta.xml",
         "force-app/main/default/applications/CLM_Demo.app-meta.xml",
-        "force-app/main/default/permissionsets/CLM_Box_Automate_Integration.permissionset-meta.xml",
-        "force-app/main/default/permissionsets/CLM_Demo_Operator.permissionset-meta.xml",
+        "force-app/main/default/permissionsets/CLM_Contract_Internal.permissionset-meta.xml",
+        "force-app/main/default/permissionsets/CLM_Contract_External.permissionset-meta.xml",
         "force-app/main/default/tabs/CLM_Contract__c.tab-meta.xml",
     ]
     experience_site_sources = [

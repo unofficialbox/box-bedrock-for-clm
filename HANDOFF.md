@@ -6,7 +6,7 @@ Snapshot of `box-bedrock-for-clm` for an agent picking up this repo cold. Writte
 
 A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce**. It ships deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter HTML. Nothing here requires a live org to validate — "repository mode" is fully green offline; live presenter-readiness is a separate opt-in gate.
 
-**One scenario** since `62f9678`: **Box + Salesforce Contract Lifecycle**. Primary surface is the Salesforce Multi-Framework React app; governed Apex actions are the only path between Box and Salesforce, and humans keep decision authority. The standalone Box Automate scenario was removed, but **Box intake stays** — the metadata-triggered Automate entry point is still how a contract reaches the React workspace, so `config/box/*.bcl`, the 04 entry-point module, the shared Box screenshots, and the `CLM_Box_Automate_Integration` permission set are all retained.
+**One scenario** since `62f9678`: **Box + Salesforce Contract Lifecycle**. Primary surface is the Salesforce Multi-Framework React app; governed Apex actions are the only path between Box and Salesforce, and humans keep decision authority. The standalone Box Automate scenario was removed, but **Box intake stays** — the metadata-triggered Automate entry point is still how a contract reaches the React workspace, so `config/box/*.bcl`, the 04 entry-point module, the shared Box screenshots, and the `CLM_Contract_Internal` permission set are all retained.
 
 **Governance invariant:** Box is authoritative for contract *content*; Salesforce `CLM_Contract__c` is authoritative for structured *commercial truth*; the Opportunity is the Box-mapped object. Contract bytes never flow to Salesforce. Human gates precede any generation, signature, or Salesforce write.
 
@@ -55,7 +55,7 @@ same plausible screen. That fallback is gone; every failure now names itself on 
 | `.../classes/ClmBoxTokenService.cls` | Downscoped Box token endpoint; reads the `CLM_Box` external credential |
 | `.../externalCredentials/CLM_Box.externalCredential-meta.xml` | Where the Box client id/secret live (encrypted in the org, never in source) |
 | `.../objects/CLM_Box_Config__c/` | `Box_User_Id__c` / `Enterprise_Id__c` + `Allowed_Folder_Ids__c` folder allowlist |
-| `.../permissionsets/CLM_Box_Preview_Guest.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
+| `.../permissionsets/CLM_Contract_External.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
 | `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and CCG subject + folder allowlist (MT-039) |
 | `.../clmreactapp/src/components/BoxWorkspace.tsx` | Token, then folder listing; either failure renders `DataError` with the reason, and no fixture stands in |
 | `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
@@ -142,7 +142,7 @@ differently. None of the failures named the missing thing:
 | A **sharing set** (`CLM_Counterparty_Access`) | Zero rows, with no error |
 
 When a counterparty surface half-works, diff its permission set against
-`CLM_Box_Preview_Guest`, which is the one known to reach Box end to end.
+`CLM_Contract_External`, which is the one known to reach Box end to end.
 
 Two verification traps: `CLM_Contract__Share` shows **zero rows** for a community user —
 sharing sets compute access rather than materialise shares, so an empty share table is a

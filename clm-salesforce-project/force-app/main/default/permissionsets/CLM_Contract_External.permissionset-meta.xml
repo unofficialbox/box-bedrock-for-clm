@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
+<?xml version='1.0' encoding='UTF-8'?>
 <PermissionSet xmlns="http://soap.sforce.com/2006/04/metadata">
-    <description>Least-privilege guest access: the ClmBoxTokenService and ClmContractListService classes, the CLM_Box principal, and read on CLM_Contract__c. Guest sharing still exposes no records; only the endpoints' projections do.</description>
+    <description>Everything an external principal needs: the Experience Cloud guest user and the authenticated counterparty. It grants no internal access. CLM_Contract__c stays Private, so what a visitor reads is decided by sharing, not by this set.</description>
     <hasActivationRequired>false</hasActivationRequired>
-    <label>CLM Box Preview Guest</label>
+    <label>CLM Contract External</label>
     <classAccesses>
         <apexClass>ClmBoxTokenService</apexClass>
         <enabled>true</enabled>
@@ -12,9 +12,17 @@
         <enabled>true</enabled>
     </classAccesses>
     <classAccesses>
+        <apexClass>ClmCounterpartyContracts</apexClass>
+        <enabled>true</enabled>
+    </classAccesses>
+    <classAccesses>
         <apexClass>ClmWhoAmI</apexClass>
         <enabled>true</enabled>
     </classAccesses>
+    <externalCredentialPrincipalAccesses>
+        <enabled>true</enabled>
+        <externalCredentialPrincipal>CLM_Box-CLM_Box_Principal</externalCredentialPrincipal>
+    </externalCredentialPrincipalAccesses>
     <fieldPermissions>
         <editable>false</editable>
         <field>CLM_Contract__c.Box_Workspace_Folder_ID__c</field>
@@ -27,27 +35,12 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>CLM_Contract__c.Counterparty__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
         <field>CLM_Contract__c.Contract_Type__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
-        <field>CLM_Contract__c.Status__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>CLM_Contract__c.Deal_Value__c</field>
-        <readable>true</readable>
-    </fieldPermissions>
-    <fieldPermissions>
-        <editable>false</editable>
-        <field>CLM_Contract__c.Term_Months__c</field>
+        <field>CLM_Contract__c.Counterparty_Account__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <fieldPermissions>
@@ -57,7 +50,27 @@
     </fieldPermissions>
     <fieldPermissions>
         <editable>false</editable>
+        <field>CLM_Contract__c.Counterparty__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Deal_Value__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
         <field>CLM_Contract__c.End_Date__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Status__c</field>
+        <readable>true</readable>
+    </fieldPermissions>
+    <fieldPermissions>
+        <editable>false</editable>
+        <field>CLM_Contract__c.Term_Months__c</field>
         <readable>true</readable>
     </fieldPermissions>
     <objectPermissions>
@@ -78,8 +91,8 @@
         <object>UserExternalCredential</object>
         <viewAllRecords>false</viewAllRecords>
     </objectPermissions>
-    <externalCredentialPrincipalAccesses>
+    <userPermissions>
         <enabled>true</enabled>
-        <externalCredentialPrincipal>CLM_Box-CLM_Box_Principal</externalCredentialPrincipal>
-    </externalCredentialPrincipalAccesses>
+        <name>ApiEnabled</name>
+    </userPermissions>
 </PermissionSet>

@@ -193,7 +193,7 @@ demo.
 
 - `McpServerDefinition:CLMContractTools` exposing `listContracts`, `getContractPackage`, and
   `askContractDocument`.
-- `CLM_MCP_Client`, an empty permission set that exists only to gate who may authenticate.
+- `CLM_Contract_Internal`, the permission set that gates who may authenticate through the app.
 
 **Explain**
 

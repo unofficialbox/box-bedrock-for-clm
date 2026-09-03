@@ -3,11 +3,12 @@
     <externalClientApplication>CLM_Claude_MCP</externalClientApplication>
     <label>CLM_Claude_MCP_policy</label>
     <!--
-      Without this any user in the org could authenticate through the app. The permission
-      set is the gate and grants nothing itself.
+      Without this any user in the org could authenticate through the app. The gate is now
+      the same set that carries internal access, so pre-authorization follows from being an
+      internal principal rather than from a separate empty permission set.
     -->
     <permittedUsersPolicyType>AdminApprovedPreAuthorized</permittedUsersPolicyType>
-    <commaSeparatedPermissionSet>CLM_MCP_Client</commaSeparatedPermissionSet>
+    <commaSeparatedPermissionSet>CLM_Contract_Internal</commaSeparatedPermissionSet>
     <refreshTokenPolicyType>SpecificLifetime</refreshTokenPolicyType>
     <refreshTokenValidityPeriod>30</refreshTokenValidityPeriod>
     <refreshTokenValidityUnit>Days</refreshTokenValidityUnit>

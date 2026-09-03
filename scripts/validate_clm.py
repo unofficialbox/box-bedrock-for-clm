@@ -582,7 +582,7 @@ def check_soql_field_permissions(root: Path = ROOT) -> str:
 
     findings: list[str] = []
     permissions = root / "clm-salesforce-project/force-app/main/default/permissionsets"
-    for name in ("CLM_Box_Preview_Guest", "CLM_Counterparty_Portal"):
+    for name in ("CLM_Contract_External",):
         path = permissions / f"{name}.permissionset-meta.xml"
         if not path.exists():
             findings.append(f"{name}: permission set not found")
