@@ -47,7 +47,7 @@ Box token and a counterparty's browser holds a token scoped to a single folder.
 | Contract package | Resolves a contract from a reference, name or record id; lists its documents with Box file ids |
 | Ask a document | Box AI over one file, refused unless that file belongs to the named contract |
 | Generate counter-position | Box Doc Gen from a template the org owns, not one the caller chooses |
-| Prepare signature | Box Sign preparation only — refuses unless the contract is approved, and never sends |
+| Send for signature | Box Sign — refuses unless the contract is approved and the document belongs to it |
 | Downscoped token | One folder, short-lived, minted per record for the workspace |
 
 [Continue to flow](#3-flow)

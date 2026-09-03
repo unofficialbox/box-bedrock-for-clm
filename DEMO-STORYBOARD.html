@@ -343,7 +343,7 @@
         <span class="where">Claude Desktop</span>
         <h3>Connect both connectors, and refresh the CLM one</h3>
         <p><strong>The Box connector must be on as well as the CLM one.</strong> Beat 1 previews the customer paper and beat 2 searches Box metadata; neither is possible with only the CLM tools loaded. Then the CLM one: it had three tools when you first connected it and now has five. Open <strong>Settings → Connectors</strong>, find the CLM connector, disconnect and reconnect it. Don't retype the endpoint — reuse the one already configured.</p>
-        <div class="expect"><strong>Expect both connectors listed under Context in the session</strong>, not merely enabled in Settings &mdash; a project with only CLM loaded cannot preview a document, and beat 1 falls back to reading file IDs aloud. Six CLM tools: <code>listContracts</code>, <code>findDocumentsByRisk</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
+        <div class="expect"><strong>Expect both connectors listed under Context in the session</strong>, not merely enabled in Settings &mdash; a project with only CLM loaded cannot preview a document, and beat 1 falls back to reading file IDs aloud. Six CLM tools: <code>listContracts</code>, <code>findDocumentsByRisk</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>sendSignatureRequest</code>. Beat 5 needs the last two.</div>
       </div>
     </div>
 
@@ -467,11 +467,11 @@
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
           <pre>Now prepare the Northstar MSA package for signature.</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> a Box Sign prepare URL, addressed to the configured
+        <div class="expect"><strong>Expect the request to go out</strong>, addressed to the configured
         demo signer. Nobody types a signer: the action falls back to
         <code>CLM_Box_Config__c.Demo_Signer_Email__c</code>, so a demo does not stall on &ldquo;who is
-        signing?&rdquo; and no address lives in source. Still sends nothing &mdash; a person opens the
-        URL, places the fields and presses send.</div>
+        signing?&rdquo; and no address lives in source. Box places the signature block itself, so there
+        is no prepare-and-place detour out of the conversation.</div>
         <div class="expect"><strong>Then open the contract record</strong> in Salesforce. The request is
         on it, under <em>Box Sign Requests</em>. The action goes through the Box managed package rather
         than calling Box directly, which is what writes that row and links it &mdash; the paper trail

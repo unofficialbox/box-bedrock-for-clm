@@ -63,7 +63,7 @@ Source: [Mermaid diagram](../diagrams/clm-architecture.mmd)
 │                    Salesforce - governed Apex actions                      │
 │                                                                            │
 │  ┌────────────┐ ┌────────────┐ ┌────────────┐ ┌───────────────────────┐    │
-│  │ Contract   │ │ Ask a      │ │ Generate   │ │ Prepare signature     │    │
+│  │ Contract   │ │ Ask a      │ │ Generate   │ │ Send for signature    │    │
 │  │ package    │ │ document   │ │ memo       │ │ (state-gated)         │    │
 │  └─────┬──────┘ └─────┬──────┘ └─────┬──────┘ └───────────┬───────────┘    │
 │        │              │              │                    │                │

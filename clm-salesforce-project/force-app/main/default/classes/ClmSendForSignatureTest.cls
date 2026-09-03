@@ -54,10 +54,9 @@ private class ClmSendForSignatureTest {
     }
 
     /** A sender that would succeed, so a test asserting it was never called means it. */
-    private static FakeSender prepares() {
+    private static FakeSender sends() {
         ClmSendForSignature.SignOutcome outcome = new ClmSendForSignature.SignOutcome();
         outcome.requestId = 'sign-1';
-        outcome.prepareUrl = 'https://app.box.com/sign/prepare/abc';
         return install(outcome);
     }
 
@@ -97,13 +96,13 @@ private class ClmSendForSignatureTest {
         configure();
         seedContract('Legal Review');
         Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"id":"unreachable"}'));
-        FakeSender sender = prepares();
+        FakeSender sender = sends();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(result.summary.contains('not approved for signature'), result.summary);
         System.assertEquals(false, sender.called, 'Box must not be called for an unapproved contract.');
     }
@@ -118,7 +117,7 @@ private class ClmSendForSignatureTest {
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(result.summary.contains('not approved for signature'), result.summary);
     }
 
@@ -129,13 +128,13 @@ private class ClmSendForSignatureTest {
         configure();
         seedContract('Approved');
         Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"id":"unreachable"}'));
-        FakeSender sender = prepares();
+        FakeSender sender = sends();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(
             result.summary.contains('could not resolve') || result.summary.contains('not in the Box folder'),
             result.summary);
@@ -143,24 +142,23 @@ private class ClmSendForSignatureTest {
     }
 
     @IsTest
-    static void preparesWithoutSendingWhenTheContractIsApproved() {
-        // The success path, and the distinction the whole action exists to preserve: Box
-        // returns a prepare URL, nothing is sent, and the summary says so.
+    static void sendsOnceTheContractIsApproved() {
+        // The success path. Preparation is skipped, so Box mails the signer rather than
+        // parking a draft, and the summary says the request went out.
         configure();
         seedContract('Approved');
         ClmContractPackage.documentIdsOverride = new Set<String>{ '700000001' };
         Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{}'));
-        FakeSender sender = prepares();
+        FakeSender sender = sends();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(true, result.prepared, result.summary);
+        System.assertEquals(true, result.sent, result.summary);
         System.assertEquals('sign-1', result.requestId);
-        System.assertEquals('https://app.box.com/sign/prepare/abc', result.prepareUrl);
         System.assertEquals(true, sender.called);
-        System.assert(result.summary.contains('Nothing has been sent'), result.summary);
+        System.assert(result.summary.contains('has been sent to'), result.summary);
     }
 
     @IsTest
@@ -175,8 +173,8 @@ private class ClmSendForSignatureTest {
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
-        System.assert(result.summary.contains('nothing was sent'), result.summary);
+        System.assertEquals(false, result.sent);
+        System.assert(result.summary.contains('Nothing was sent'), result.summary);
     }
 
     @IsTest
@@ -189,7 +187,7 @@ private class ClmSendForSignatureTest {
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', null);
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(result.summary.contains('need a signer'), result.summary);
     }
 
@@ -202,7 +200,7 @@ private class ClmSendForSignatureTest {
         ClmSendForSignature.Result result = run('CLM-NOT-A-CONTRACT', '700000001', 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(result.summary.contains('could not find'), result.summary);
     }
 
@@ -216,7 +214,7 @@ private class ClmSendForSignatureTest {
         ClmSendForSignature.Result result = run('CLM-TEST-0001', null, 'signer@example.com');
         Test.stopTest();
 
-        System.assertEquals(false, result.prepared);
+        System.assertEquals(false, result.sent);
         System.assert(result.summary.contains('Box file ID'), result.summary);
     }
 }
