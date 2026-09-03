@@ -96,7 +96,7 @@ public with sharing class ClmContractPackage {
             return result;
         }
 
-        List<String> files = listFiles(folderId);
+        List<Doc> files = listFiles(folderId);
         if (files == null) {
             lines.add('Box did not return the contents of folder ' + folderId + '. Do not guess at the documents.');
             result.outputSummary = String.join(lines, '\n');
@@ -109,7 +109,9 @@ public with sharing class ClmContractPackage {
         }
 
         lines.add('Documents:');
-        lines.addAll(files);
+        for (Doc doc : files) {
+            lines.add(doc.line());
+        }
         result.outputFound = true;
         result.outputSummary = String.join(lines, '\n');
         return result;
@@ -182,16 +184,18 @@ public with sharing class ClmContractPackage {
         if (String.isBlank(folderId)) {
             return null;
         }
-        List<String> lines = listFiles(folderId);
-        if (lines == null) {
+        List<Doc> docs = listFiles(folderId);
+        if (docs == null) {
             return null;
         }
+        // Read straight off the document. This used to parse the id back out of the display
+        // line, so changing how a document is written -- "(Box file ID 123)" to a link --
+        // silently emptied this set, and every governed read was refused. A caller that
+        // could reach Box another way then simply did, which is the one thing the check
+        // exists to prevent.
         Set<String> ids = new Set<String>();
-        for (String line : lines) {
-            // "- name.pdf (Box file ID 123)" -- the id is the last token before the paren.
-            Integer marker = line.lastIndexOf('Box file ID ');
-            if (marker < 0) continue;
-            ids.add(line.substring(marker + 'Box file ID '.length()).replace(')', '').trim());
+        for (Doc doc : docs) {
+            ids.add(doc.id);
         }
         return ids;
     }
@@ -217,7 +221,21 @@ public with sharing class ClmContractPackage {
      *
      * No commitChanges(): this reads and writes nothing, so there is no pending work.
      */
-    private static List<String> listFiles(String folderId) {
+    /** One document in a governed folder. */
+    public class Doc {
+        public String name;
+        public String id;
+        private Doc(String name, String id) {
+            this.name = name;
+            this.id = id;
+        }
+        /** How the document is shown: a link, because an id means nothing to a person. */
+        public String line() {
+            return '- ' + this.name + ' - https://app.box.com/file/' + this.id;
+        }
+    }
+
+    private static List<Doc> listFiles(String folderId) {
         box.Folder contents;
         try {
             contents = new box.Toolkit().getFolderContents(folderId);
@@ -231,20 +249,16 @@ public with sharing class ClmContractPackage {
             return null;
         }
 
-        List<String> lines = new List<String>();
+        List<Doc> docs = new List<Doc>();
         if (contents.entries == null) {
-            return lines;
+            return docs;
         }
         for (box.Entry item : contents.entries) {
-            if (item.type != 'file') {
-                continue;
+            if (item.type == 'file') {
+                docs.add(new Doc(item.name, item.id));
             }
-            // A link rather than a bare id. The id is meaningless to a person and gets read
-            // aloud in a demo; as the last segment of a URL it stays machine-usable for the
-            // preview and the ask, and the natural thing to display is now the useful thing.
-            lines.add('- ' + item.name + ' - https://app.box.com/file/' + item.id);
         }
-        return lines;
+        return docs;
     }
 
     /**
