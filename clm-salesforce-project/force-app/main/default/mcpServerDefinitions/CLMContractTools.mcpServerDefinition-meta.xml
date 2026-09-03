@@ -58,7 +58,7 @@
             <apiSource>API_CATALOG</apiSource>
             <operation>ClmSendForSignature</operation>
         </apiDefinition>
-        <descriptionOverride>Prepares a Box Sign request for one document of a contract and returns a URL for a human to review and send. It sends nothing. Always call it rather than judging eligibility yourself - the refusal names the blocking status and is the answer.</descriptionOverride>
+        <descriptionOverride>Prepares a Box Sign request for one document and returns a URL for a human to review and send. It sends nothing. The signer defaults to the configured demo address. Always call it rather than judging eligibility - the refusal names the blocking status.</descriptionOverride>
         <toolName>prepareSignatureRequest</toolName>
         <toolTitle>Prepare a Box Sign Request</toolTitle>
     </tools>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Demo_Signer_Email__c</fullName>
+    <description>Fallback signer for a signature request when the caller names none. Exists so a demo does not stall on "who is signing?", and so the answer is the presenter rather than a guessed counterparty contact. Configuration, not source: an address is environment-bound. Leave blank in a real environment and the action will keep refusing to invent a signer.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Email that receives demo signature requests. Set per environment; not stored in source.</inlineHelpText>
+    <label>Demo Signer Email</label>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Email</type>
+    <unique>false</unique>
+</CustomField>

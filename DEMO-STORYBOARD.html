@@ -460,6 +460,19 @@
         </div>
         <div class="expect"><strong>Expect the action to be called</strong>, and to come back refusing, naming <strong>Legal Review</strong>. That's a state check in Apex, not a prompt instruction — and once the contract <em>is</em> approved, the action still only prepares the request and hands back a URL for a person to send.</div>
         <div class="warn"><strong>If the assistant declines without calling the action, the beat has not happened.</strong> A model that reasons "this would fail anyway" and offers alternatives is making a prompt-level refusal look like a control &mdash; the opposite of the point. Say &ldquo;call it anyway and show me what it returns&rdquo;. The P2 instruction tells it not to pre-judge, so this should be rare.</div>
+        <p><strong>Then show it working.</strong> The refusal is the control; a demo that only ever
+        refuses has not shown the step. <code>CLM-2026-0017</code> is Approved and carries documents, so
+        the same action prepares against it.</p>
+        <div class="block">
+          <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
+          <pre>Now prepare the Northstar MSA package for signature.</pre>
+        </div>
+        <div class="expect"><strong>Expect</strong> a Box Sign prepare URL, addressed to the configured
+        demo signer. Nobody types a signer: the action falls back to
+        <code>CLM_Box_Config__c.Demo_Signer_Email__c</code>, so a demo does not stall on &ldquo;who is
+        signing?&rdquo; and no address lives in source. Still sends nothing &mdash; a person opens the
+        URL, places the fields and presses send.</div>
+        
       </div>
     </div>
 

@@ -27,6 +27,12 @@ public with sharing class ClmSendForSignature {
      */
     private static final Set<String> SIGNABLE = new Set<String>{ 'Approved', 'Signature' };
 
+    /** The configured fallback signer, or null where none is set. */
+    private static String demoSigner() {
+        CLM_Box_Config__c config = CLM_Box_Config__c.getOrgDefaults();
+        return config == null ? null : config.Demo_Signer_Email__c;
+    }
+
     public class Request {
         @InvocableVariable(
             label='Contract reference'
@@ -40,7 +46,7 @@ public with sharing class ClmSendForSignature {
             required=true
         )
         public String itemId;
-        @InvocableVariable(label='Signer email' required=true)
+        @InvocableVariable(label='Signer email' description='Optional. Falls back to the configured demo signer; with neither, the request is refused rather than invented.')
         public String signerEmail;
         @InvocableVariable(label='Signer name')
         public String signerName;
@@ -83,7 +89,12 @@ public with sharing class ClmSendForSignature {
             result.summary = 'I need a Box file ID from the contract package before I can prepare a signature request.';
             return result;
         }
-        if (String.isBlank(req.signerEmail)) {
+        // A demo stalls on "who is signing?", and the honest answer in a demo is the person
+        // running it -- not a guessed counterparty contact. Configuration supplies it, so no
+        // address lives in source and a real environment that leaves it blank keeps the
+        // refusal below.
+        String signerEmail = String.isNotBlank(req.signerEmail) ? req.signerEmail : demoSigner();
+        if (String.isBlank(signerEmail)) {
             result.summary = 'I need a signer before I can prepare a signature request. I will not guess at one.';
             return result;
         }
@@ -123,7 +134,7 @@ public with sharing class ClmSendForSignature {
             httpReq.setHeader('Content-Type', 'application/json');
             httpReq.setHeader('Authorization', 'Bearer ' + ClmBoxAuth.parentToken());
             httpReq.setTimeout(60000);
-            httpReq.setBody(JSON.serialize(body(req, found)));
+            httpReq.setBody(JSON.serialize(body(req, found, signerEmail)));
 
             HttpResponse res = new Http().send(httpReq);
             if (res.getStatusCode() == 200 || res.getStatusCode() == 201) {
@@ -135,7 +146,7 @@ public with sharing class ClmSendForSignature {
                 result.prepared = true;
                 result.summary = 'A Box Sign request is prepared for '
                     + found.contract.Contract_ID__c + ' and addressed to '
-                    + req.signerEmail.trim() + '. Nothing has been sent. Open the prepare URL'
+                    + signerEmail.trim() + '. Nothing has been sent. Open the prepare URL'
                     + ' to place the signature fields and send it.';
                 return result;
             }
@@ -149,9 +160,9 @@ public with sharing class ClmSendForSignature {
         return result;
     }
 
-    private static Map<String, Object> body(Request req, ClmContractPackage.Located found) {
+    private static Map<String, Object> body(Request req, ClmContractPackage.Located found, String signerEmail) {
         Map<String, Object> signer = new Map<String, Object>{
-            'email' => req.signerEmail.trim(),
+            'email' => signerEmail.trim(),
             'role' => 'signer'
         };
         if (String.isNotBlank(req.signerName)) {
