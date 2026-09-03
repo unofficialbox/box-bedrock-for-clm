@@ -331,7 +331,7 @@
         response style. Put this in the project&rsquo;s custom instructions before you present.</p>
         <div class="block">
           <div class="block-label"><span>instruction</span><button class="copy" type="button">Copy</button></div>
-          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
+          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. Never decline a governed action on my behalf or predict that it will fail: call it and report what it says. Offer at most one follow-up, in one line. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
         </div>
         <div class="expect"><strong>Expect</strong> beat 4 to answer in a short paragraph and one table, not a briefing note.</div>
       </div>
@@ -458,7 +458,8 @@
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
           <pre>Send the Calder agreement for signature.</pre>
         </div>
-        <div class="expect"><strong>Expect</strong> a refusal naming <strong>Legal Review</strong>. That's a state check in Apex, not a prompt instruction — and once the contract <em>is</em> approved, the action still only prepares the request and hands back a URL for a person to send.</div>
+        <div class="expect"><strong>Expect the action to be called</strong>, and to come back refusing, naming <strong>Legal Review</strong>. That's a state check in Apex, not a prompt instruction — and once the contract <em>is</em> approved, the action still only prepares the request and hands back a URL for a person to send.</div>
+        <div class="warn"><strong>If the assistant declines without calling the action, the beat has not happened.</strong> A model that reasons "this would fail anyway" and offers alternatives is making a prompt-level refusal look like a control &mdash; the opposite of the point. Say &ldquo;call it anyway and show me what it returns&rdquo;. The P2 instruction tells it not to pre-judge, so this should be rare.</div>
       </div>
     </div>
 
