@@ -368,6 +368,41 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
     </div>
 
     <div class="step">
+      <div class="marker">P3b</div>
+      <div>
+        <span class="where">Claude Desktop</span>
+        <h3>Optional: put the beats in the menu</h3>
+        <p>A hosted Salesforce MCP server exposes tools only, so the beats cannot come from
+        the org. A small local server offers them as prompts instead, and Claude Desktop lists
+        those in its attachment menu &mdash; the presenter picks <em>Beat 4 &middot; Read it
+        against our approved positions</em> rather than copying a block out of a run sheet on a
+        shared screen. It reads <code>DEMO-STORYBOARD.html</code> at request time, so editing a
+        beat changes the menu with nothing to regenerate.</p>
+        <div class="block">
+          <div class="block-label"><span>claude_desktop_config.json</span><button class="copy" type="button">Copy</button></div>
+          <pre>{
+  &quot;mcpServers&quot;: {
+    &quot;clm-demo&quot;: {
+      &quot;command&quot;: &quot;python3&quot;,
+      &quot;args&quot;: [&quot;&lt;repo&gt;/scripts/clm_demo_mcp.py&quot;]
+    }
+  }
+}</pre>
+        </div>
+        <p>Substitute the repository path and restart Claude Desktop. Nothing else is needed:
+        the server is stdlib Python with no install step, because it has to run on a laptop the
+        morning of a demo.</p>
+        <div class="expect"><strong>Expect seven entries</strong>, numbered the way this sheet is
+        &mdash; <code>Beat 2</code> through <code>Beat 6c</code>, with the signature beat lettered
+        because it drafts, then refuses, then sends. Verify without Claude Desktop by running
+        <code>python3 -m unittest tests.test_clm_demo_mcp</code>.</div>
+        <div class="warn"><strong>This is a convenience, not a dependency.</strong> Skip it and the
+        run still works: the custom instruction in P2 carries the same order, and every answer
+        ends with the next prompt for you to approve with <code>next</code>.</div>
+      </div>
+    </div>
+
+    <div class="step">
       <div class="marker">P4</div>
       <div>
         <span class="where">Terminal</span>
