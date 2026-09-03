@@ -1,0 +1,122 @@
+# Box Dispatch BCL config artifact. BCL is the only supported import format.
+#
+# Every value that binds this demo to one Salesforce org or one Box enterprise, in one
+# place. The values here are PLACEHOLDERS on purpose: a live folder id or enterprise id in
+# a committed file is what the secret scan rejects, and what makes a repository readable
+# only by the person who set it up.
+#
+# To deploy into a new environment, copy this file to environment.local.bcl (gitignored),
+# replace every placeholder, and run:
+#
+#   clm-salesforce-project/scripts/configure-clm-box-settings.sh <org-alias>
+#
+# Anything still holding a placeholder is reported by name rather than written to the org.
+# See docs/operator/deployment.md.
+locals {
+  "bcl" = {
+    "context" = "clm"
+    "generatedAt" = "2026-09-03T00:00:00Z"
+    "metadata" = {
+    }
+    "provider" = "generic"
+    "resources" = [
+      {
+        "config" = {
+          "artifact_name" = "environment"
+          "artifact_type" = "config"
+          "documentation" = "docs/operator/deployment.md"
+
+          # ---- Box subject: who the downscoped-token endpoint grants as -------------
+          # Exactly one of these. A user subject inherits that user's access, so no
+          # folder collaboration is needed; that is the demo default. An enterprise
+          # subject mints a Service Account token whose root starts empty, so the
+          # service identity must be collaborated onto every folder it touches.
+          # If both are set the user wins, matching ClmBoxTokenService.
+          "boxSubject" = {
+            "boxUserId" = {
+              "envVar" = "BOX_USER_ID"
+              "field" = "CLM_Box_Config__c.Box_User_Id__c"
+              "find" = "box users:get --fields=id,login"
+              "required" = "one of boxUserId or enterpriseId"
+              "value" = "<box-user-id>"
+              "withoutIt" = "The token endpoint answers box_not_configured (503) and the workspace shows no documents."
+            }
+            "enterpriseId" = {
+              "envVar" = "BOX_ENTERPRISE_ID"
+              "field" = "CLM_Box_Config__c.Enterprise_Id__c"
+              "find" = "box users:get --fields=enterprise"
+              "required" = "one of boxUserId or enterpriseId"
+              "value" = "<box-enterprise-id>"
+              "withoutIt" = "Also scopes the portfolio metadata search; without it findDocumentsByRisk refuses as unconfigured."
+            }
+          }
+
+          # ---- Box folders and templates -------------------------------------------
+          "boxContent" = {
+            "allowedFolderIds" = {
+              "envVar" = "BOX_ALLOWED_FOLDER_IDS"
+              "field" = "CLM_Box_Config__c.Allowed_Folder_Ids__c"
+              "find" = "box folders:items 0 --fields=id,name,type"
+              "note" = "Comma-separated. Empty means the endpoint will mint a token for ANY folder."
+              "required" = "strongly recommended"
+              "value" = "<box-folder-id>,<box-folder-id>"
+              "withoutIt" = "The downscoped-token endpoint is unbounded, which is the opposite of what the demo claims."
+            }
+            "contractsRootFolderId" = {
+              "envVar" = "BOX_CONTRACTS_ROOT_FOLDER_ID"
+              "field" = "CLM_Box_Config__c.Contracts_Root_Folder_Id__c"
+              "find" = "The CLM Root folder that holds the Contracts folder."
+              "note" = "Box metadata search is enterprise-wide; this is the ancestor_folder_id that bounds it."
+              "required" = "yes for the portfolio risk beat"
+              "value" = "<box-folder-id>"
+              "withoutIt" = "findDocumentsByRisk refuses: the search cannot be bounded, so it will not run unbounded."
+            }
+            "clauseLibraryHubId" = {
+              "envVar" = "BOX_CLAUSE_LIBRARY_HUB_ID"
+              "field" = "CLM_Box_Config__c.Clause_Library_Hub_Id__c"
+              "find" = "The Box Hub holding the approved clause library."
+              "required" = "yes for the approved-positions beat"
+              "value" = "<box-hub-id>"
+              "withoutIt" = "Clause-library questions have nothing governed to read against."
+            }
+            "counterPositionTemplateId" = {
+              "envVar" = "BOX_COUNTER_POSITION_TEMPLATE_ID"
+              "field" = "CLM_Box_Config__c.Counter_Position_Template_ID__c"
+              "find" = "The Box Doc Gen template id for the counter-position memo."
+              "note" = "Configuration, not a caller input: the agent may generate the memo, not choose what the org generates from."
+              "required" = "yes for the counter-position beat"
+              "value" = "<box-docgen-template-id>"
+              "withoutIt" = "generateCounterPosition has no template and refuses."
+            }
+          }
+
+          # ---- Demo identities ------------------------------------------------------
+          "demo" = {
+            "signerEmail" = {
+              "envVar" = "CLM_DEMO_SIGNER_EMAIL"
+              "field" = "CLM_Box_Config__c.Demo_Signer_Email__c"
+              "find" = "The address of the person running the demo."
+              "note" = "Left blank in a real environment, the signature action refuses rather than inventing a signer. That refusal is correct there and only stalls a demo."
+              "required" = "yes for the signature beat"
+              "value" = "<demo-signer-email>"
+              "withoutIt" = "sendSignatureRequest answers 'I need a signer before I can send this for signature.'"
+            }
+          }
+
+          # ---- Values that are NOT here, and must not be ------------------------------
+          # Deliberately a list, not key = value: a credential-shaped assignment is what
+          # the secret scan looks for, and it is right to flag one even in a comment.
+          "heldElsewhere" = [
+            "Box client id and its paired credential: the CLM_Box external credential, set by configure-clm-box-credential.sh (MT-038). Encrypted in the org; never in this repository and never through an assistant."
+            "External Client App consumer key and its pair: Setup only (MT-032). Retrieving that metadata brings the credential back with it."
+            "Site URL: read from the org at run time; the storyboard carries a <your-site> placeholder rather than a host."
+          ]
+        }
+        "metadata" = {
+          "artifact_name" = "environment"
+          "artifact_type" = "config"
+        }
+      }
+    ]
+  }
+}

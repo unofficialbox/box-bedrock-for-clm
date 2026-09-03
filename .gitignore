@@ -159,3 +159,7 @@ dist
 # source of truth; these are rebuilt on every publish.
 clm-salesforce-project/force-app/main/default/bots/
 clm-salesforce-project/force-app/main/default/genAiPlannerBundles/
+
+# Environment-specific values for a deployment. The committed environment.bcl holds
+# placeholders; this one holds the real folder, enterprise and signer values.
+config/deploy/environment.local.bcl

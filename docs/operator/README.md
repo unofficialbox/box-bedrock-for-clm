@@ -15,14 +15,16 @@ See [`scripts/README.md`](../../scripts/README.md) for the operator scripts and 
    python3 scripts/demo_operator.py bootstrap --scenario <scenario> --dry-run
    ```
 
-5. Follow [Start Here](start-here.md).
+5. Bind the environment: [Deployment](deployment.md) lists every value tied to one
+   Salesforce org or Box enterprise, and what breaks when one is missing.
+7. Follow [Start Here](start-here.md).
 6. Complete [Browser Configuration](browser-configuration.md).
-7. Complete [Cross-Platform Deployment](start-here.md) when that scenario is selected.
-8. Complete [Box Preview Setup](box-preview-setup.md) to bring up governed Box content; until it is done the workspace reports that it cannot be opened.
-9. Run the [Smoke Test](smoke-test.md).
-10. Rehearse the [scenario guide](scenarios/box-salesforce-clm/README.md).
-11. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
-12. Complete [Finalization](final-phase.md) before declaring presenter readiness.
+8. Complete [Cross-Platform Deployment](start-here.md) when that scenario is selected.
+9. Complete [Box Preview Setup](box-preview-setup.md) to bring up governed Box content; until it is done the workspace reports that it cannot be opened.
+10. Run the [Smoke Test](smoke-test.md).
+11. Rehearse the [scenario guide](scenarios/box-salesforce-clm/README.md).
+12. Build [Presenter Deliverables](presenter-deliverables.md) and finish the [Manual-Task Register](manual-task-register.md).
+13. Complete [Finalization](final-phase.md) before declaring presenter readiness.
 
 [Inbound Email Intake Service](email-intake-service.md): Salesforce email service that captures a counterparty's emailed contract onto the matching Opportunity and stages the attachment for Box intake.
 
