@@ -328,7 +328,7 @@
         <p>Claude Desktop decides how long an answer is, and it defaults to an essay &mdash; the
         beat 4 precedent question comes back as roughly 500 words and three tables. Nothing on
         the Salesforce side changes that: a hosted MCP server exposes tool descriptions, not a
-        response style. Put this in the project&rsquo;s custom instructions before you present.</p>
+        response style. Put this in the project&rsquo;s custom instructions before you present, and <strong>run the beats inside that project</strong>. A fresh chat outside it carries none of these rules, and the difference is stark: the same beat 3 question answers in 60 words inside the project and in roughly 400, with tables and a closing offer, outside it.</p>
         <div class="block">
           <div class="block-label"><span>instruction</span><button class="copy" type="button">Copy</button></div>
           <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. Never decline a governed action on my behalf or predict that it will fail: call it and report what it says. Offer at most one follow-up, in one line. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
