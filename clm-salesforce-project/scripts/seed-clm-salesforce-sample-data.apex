@@ -173,6 +173,7 @@ for (CLM_Contract__c contract : [
     FROM CLM_Contract__c
     WHERE Contract_ID__c IN :new List<String>{
         'CLM-2026-0042',
+        'CLM-2026-0017',
         'CLM-2024-0311',
         'CLM-2025-0148',
         'CLM-2026-0088'
@@ -261,6 +262,33 @@ northContract2025.Business_Owner_Name__c = 'Northstar Master Contract Owner';
 northContract2025.Record_Source__c = 'Manual';
 northContract2025.Risk_Level__c = 'Low';
 northContract2025.Special_Terms_Risk_Notes__c = 'Executed prior-year MSA; retained for demo contract history.';
+
+// The one contract that has cleared review. The signature beat needs both halves on the
+// same counterparty: CLM-2026-0042 in Legal Review to refuse, and this one to send.
+CLM_Contract__c northPackage = contractsByContractId.get('CLM-2026-0017');
+if (northPackage == null) {
+    northPackage = new CLM_Contract__c(Contract_ID__c = 'CLM-2026-0017');
+    contractsToInsert.add(northPackage);
+} else {
+    contractsToUpdate.add(northPackage);
+}
+northPackage.Name = 'Northstar Health System MSA Package';
+northPackage.Counterparty__c = 'Northstar Health';
+northPackage.Counterparty_Account__c = accountsByName.get('Northstar Health').Id;
+northPackage.Opportunity__c = opportunitiesByKey.get(northStarOppKey).Id;
+northPackage.Contract_Type__c = 'MSA Package';
+northPackage.Status__c = 'Approved';
+northPackage.Deal_Value__c = 480000;
+northPackage.Term_Months__c = 24;
+northPackage.Region__c = 'US';
+northPackage.Data_Category__c = 'PHI';
+northPackage.Target_Signature_Date__c = Date.today().addMonths(1);
+northPackage.Requester_Name__c = 'Alex Mendoza';
+northPackage.Requester_Email__c = 'alex.mendoza@northstar.example';
+northPackage.Business_Owner_Name__c = 'Northstar Master Contract Owner';
+northPackage.Record_Source__c = 'Manual';
+northPackage.Risk_Level__c = 'Low';
+northPackage.Special_Terms_Risk_Notes__c = 'Approved package; the signature beat sends against this record.';
 
 CLM_Contract__c acmeContract = contractsByContractId.get('CLM-2026-0088');
 if (acmeContract == null) {

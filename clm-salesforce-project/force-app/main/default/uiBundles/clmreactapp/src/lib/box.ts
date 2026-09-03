@@ -129,9 +129,12 @@ export interface BoxWorkspaceToken {
  * never has to know a Box folder id and one cannot be supplied from the URL. The folder
  * comes back in the response because the caller does not know it up front.
  *
- * `folderId` remains for pages with no record context and for the local harness. Opened
- * with neither, the default `demo-workspace` is not numeric and the endpoint rejects it
- * -- which is now a visible failure rather than the quiet trigger for a fixture.
+ * A record is now the only way in. The endpoint used to also accept a caller-supplied
+ * folderId, bounded by an allowlist that was empty in practice and could not scale past
+ * the seventeen-odd ids a Text(255) holds. The package already scopes a folder to its
+ * record, so that path was duplicative as well as unbounded. `context.folderId` survives
+ * only to name the folder the local harness injects a token for, and to show which folder
+ * came back.
  */
 export async function fetchDownscopedBoxToken(
   context: { folderId: string; salesforceRecordId?: string },
@@ -142,9 +145,13 @@ export async function fetchDownscopedBoxToken(
   }
 
   const recordId = context.salesforceRecordId;
-  const query = recordId
-    ? `recordId=${encodeURIComponent(recordId)}`
-    : `folderId=${encodeURIComponent(context.folderId)}`;
+  if (!recordId) {
+    return failed(
+      "This workspace needs a Salesforce record to resolve its Box folder. " +
+        "Open it from a contract rather than by folder id.",
+    );
+  }
+  const query = `recordId=${encodeURIComponent(recordId)}`;
 
   try {
     let granted = await requestToken(query, context.folderId);

@@ -54,9 +54,9 @@ same plausible screen. That fallback is gone; every failure now names itself on 
 | `clm-salesforce-project/.forceignore` | Keeps `node_modules` out of the UI bundle deploy — do not delete |
 | `.../classes/ClmBoxTokenService.cls` | Downscoped Box token endpoint; reads the `CLM_Box` external credential |
 | `.../externalCredentials/CLM_Box.externalCredential-meta.xml` | Where the Box client id/secret live (encrypted in the org, never in source) |
-| `.../objects/CLM_Box_Config__c/` | `Box_User_Id__c` / `Enterprise_Id__c` + `Allowed_Folder_Ids__c` folder allowlist |
+| `.../objects/CLM_Box_Config__c/` | Six non-secret settings; declared in `config/deploy/environment.bcl` |
 | `.../permissionsets/CLM_Contract_External.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
-| `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and CCG subject + folder allowlist (MT-039) |
+| `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and the six settings (MT-039) |
 | `.../clmreactapp/src/components/BoxWorkspace.tsx` | Token, then folder listing; either failure renders `DataError` with the reason, and no fixture stands in |
 | `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
 | `.../clmreactapp/src/components/BoxDocumentTable.tsx` | The file table itself — name, modified, size |

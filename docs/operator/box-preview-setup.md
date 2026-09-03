@@ -37,11 +37,11 @@ The folder is chosen by the org, not the caller. `box__FRUP__c` is where the Box
 Salesforce managed package stores the record-to-folder association, so the browser names
 a Salesforce record and the endpoint answers with the folder that record is linked to --
 no Box folder id travels in a URL, and a caller cannot request a folder the record is not
-associated with. `Allowed_Folder_Ids__c` is applied to the resolved folder as well, so the
-mapping is not a way around the allowlist.
-
-`folderId=<box-folder-id>` still works for pages with no record context and for the local
-harness.
+associated with. A record is the only way in: the endpoint used to also accept a
+caller-supplied `folderId` bounded by an allowlist on the custom setting, and that was
+both duplicative -- the package already scopes a folder to its record -- and unscalable,
+being an exact-match list in a `Text(255)` that said nothing about a folder's children.
+Left empty, as it was, it bounded nothing at all.
 
 The browser never receives a client secret and never receives the enterprise token. Apex
 never holds a credential either: Salesforce substitutes the encrypted values into the
@@ -109,9 +109,6 @@ These go on the `CLM_Box_Config__c` org-default record:
   Account** token, whose root starts empty, so the service identity must be added as a
   collaborator on the folder. Prefer the user id; it needs no collaboration. If both are
   set the user wins.
-- **Allowed Folder Ids** — a comma-separated list of Box folder IDs the endpoint may mint
-  tokens for. Leave blank to allow **any** folder; populate it to restrict the endpoint to
-  the demo workspace.
 
 Apply them with the script, which validates the values, upserts the org default, and
 prints a masked summary. Rerunning it updates the same record rather than adding one:
@@ -194,7 +191,7 @@ permission set to the community user profile instead of the guest user.
 | `no_box_folder_mapping` (404) | No `box__FRUP__c` row for that record | Associate a Box folder with the record in the Box for Salesforce package (MT-044) |
 | `invalid_folder_id` (400) | `folderId` is not numeric | Usually the `demo-workspace` default; see Part 4 |
 | `box_not_configured` (500) | No CCG subject is set | Complete Part 3 |
-| `folder_not_allowed` (403) | Folder is not in `Allowed_Folder_Ids__c` | Add the folder ID, or clear the field to allow any |
+| `missing_record_id` (400) | A `folderId` was passed instead of a `recordId` | Open the workspace from a contract; a folder cannot be named in the URL |
 | `box_auth_failed` (500) | Box rejected the client credentials | Check Part 2 values; confirm the app is authorized in the Admin Console |
 | `box_downscope_failed` (500) | Box refused the token exchange | Confirm the subject can see the folder. With a user subject, check that user's access; with an enterprise subject, collaborate the service account onto the folder |
 | `box_request_failed` (500) | The callout itself threw | Usually the caller lacks **read on `UserExternalCredential`** -- see Part 6. Also check the named credential is enabled and the permission set grants principal access |
