@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CustomField xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Contracts_Root_Folder_Id__c</fullName>
+    <description>Box folder ID that contains every governed contract folder. Configuration rather than a caller argument: a portfolio search has to be bounded, and the boundary is the org's to set. Box metadata search is enterprise-wide, so without this an unscoped query also returns documents from earlier demo environments carrying the same file names.</description>
+    <externalId>false</externalId>
+    <inlineHelpText>Box folder ID of the contracts root. Set per environment; not stored in source.</inlineHelpText>
+    <label>Contracts Root Folder ID</label>
+    <length>32</length>
+    <required>false</required>
+    <trackTrending>false</trackTrending>
+    <type>Text</type>
+    <unique>false</unique>
+</CustomField>

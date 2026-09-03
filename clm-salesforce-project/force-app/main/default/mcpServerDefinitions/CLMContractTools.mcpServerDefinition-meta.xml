@@ -4,6 +4,16 @@
     <masterLabel>CLM Contract Tools</masterLabel>
     <tools>
         <apiDefinition>
+            <apiIdentifier>aa:apex-ClmPortfolioSearch</apiIdentifier>
+            <apiSource>API_CATALOG</apiSource>
+            <operation>ClmPortfolioSearch</operation>
+        </apiDefinition>
+        <descriptionOverride>Finds documents across every governed contract carrying a given clause risk (Critical, High, Medium, Low), with a link to each. Bounded to the contracts root by configuration - a caller never supplies a folder id.</descriptionOverride>
+        <toolName>findDocumentsByRisk</toolName>
+        <toolTitle>Find Contract Documents by Risk</toolTitle>
+    </tools>
+    <tools>
+        <apiDefinition>
             <apiIdentifier>aa:apex-ClmContractList</apiIdentifier>
             <apiSource>API_CATALOG</apiSource>
             <operation>ClmContractList</operation>
