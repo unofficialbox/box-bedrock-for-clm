@@ -64,6 +64,13 @@
         </layoutColumns>
         <style>TwoColumnsTopToBottom</style>
     </layoutSections>
+    <relatedLists>
+        <fields>NAME</fields>
+        <fields>box__Name__c</fields>
+        <fields>box__Status__c</fields>
+        <fields>CREATED_DATE</fields>
+        <relatedList>box__BoxSign__c.CLM_Contract__c</relatedList>
+    </relatedLists>
     <showHighlightsPanel>true</showHighlightsPanel>
     <showInteractionLogPanel>false</showInteractionLogPanel>
 </Layout>

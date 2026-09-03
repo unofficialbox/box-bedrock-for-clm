@@ -16,10 +16,13 @@
  *
  * So the honest description of this action is "get it ready for someone to send", and the
  * summary it returns says exactly that rather than implying a request went out.
+ *
+ * The callout goes through the Box managed package rather than straight to Box. That costs
+ * a little directness and buys the thing a direct call cannot do: the package writes the
+ * box__BoxSign__c record and stamps it with the record in `recordId`, so the signature
+ * request appears on the contract it came from instead of existing only inside Box.
  */
 public with sharing class ClmSendForSignature {
-
-    private static final String SIGN_ENDPOINT = 'callout:CLM_Box/2.0/sign_requests';
 
     /**
      * The contract states from which a signature request may be prepared. Anything earlier
@@ -128,31 +131,25 @@ public with sharing class ClmSendForSignature {
         }
 
         try {
-            HttpRequest httpReq = new HttpRequest();
-            httpReq.setEndpoint(SIGN_ENDPOINT);
-            httpReq.setMethod('POST');
-            httpReq.setHeader('Content-Type', 'application/json');
-            httpReq.setHeader('Authorization', 'Bearer ' + ClmBoxAuth.parentToken());
-            httpReq.setTimeout(60000);
-            httpReq.setBody(JSON.serialize(body(req, found, signerEmail)));
+            SignOutcome outcome = sender.send(
+                found.contract.Id, req.itemId.trim(), signerEmail.trim(),
+                req.signerName, subjectFor(req, found));
 
-            HttpResponse res = new Http().send(httpReq);
-            if (res.getStatusCode() == 200 || res.getStatusCode() == 201) {
-                Map<String, Object> parsed =
-                    (Map<String, Object>) JSON.deserializeUntyped(res.getBody());
-                result.requestId = String.valueOf(parsed.get('id'));
-                result.prepareUrl = parsed.get('prepare_url') == null
-                    ? null : String.valueOf(parsed.get('prepare_url'));
-                result.prepared = true;
-                result.summary = 'A Box Sign request is prepared for '
-                    + found.contract.Contract_ID__c + ' and addressed to '
-                    + signerEmail.trim() + '. Nothing has been sent. Open the prepare URL'
-                    + ' to place the signature fields and send it.';
+            if (String.isBlank(outcome.requestId)) {
+                result.summary = 'Box Sign refused the request. Nothing was prepared and'
+                    + ' nothing was sent.';
+                System.debug(LoggingLevel.WARN, 'CLM Sign: ' + outcome.error);
                 return result;
             }
-            result.summary = 'Box Sign refused the request (' + res.getStatusCode()
-                + '). Nothing was prepared and nothing was sent.';
-            System.debug(LoggingLevel.WARN, 'CLM Sign: ' + res.getStatusCode() + ' ' + res.getBody());
+
+            result.requestId = outcome.requestId;
+            result.prepareUrl = outcome.prepareUrl;
+            result.prepared = true;
+            result.summary = 'A Box Sign request is prepared for '
+                + found.contract.Contract_ID__c + ' and addressed to '
+                + signerEmail.trim() + '. Nothing has been sent. Open the prepare URL'
+                + ' to place the signature fields and send it.';
+            return result;
         } catch (Exception e) {
             result.summary = 'The signature request could not be prepared. Nothing was sent.';
             System.debug(LoggingLevel.WARN, 'CLM Sign failed: ' + e.getMessage());
@@ -160,26 +157,71 @@ public with sharing class ClmSendForSignature {
         return result;
     }
 
-    private static Map<String, Object> body(Request req, ClmContractPackage.Located found, String signerEmail) {
-        Map<String, Object> signer = new Map<String, Object>{
-            'email' => signerEmail.trim(),
-            'role' => 'signer'
-        };
-        if (String.isNotBlank(req.signerName)) {
-            signer.put('name', req.signerName.trim());
+    private static String subjectFor(Request req, ClmContractPackage.Located found) {
+        return String.isBlank(req.subject)
+            ? 'Signature requested: ' + found.contract.Contract_ID__c
+            : req.subject.trim();
+    }
+
+    /** What the Box Sign call gives back, in this class's own terms. */
+    public class SignOutcome {
+        public String requestId;
+        public String prepareUrl;
+        public Id recordId;
+        public String error;
+    }
+
+    /**
+     * The Box Sign call, behind a seam. The managed package's types cannot be mocked, so a
+     * test stands in for the whole call rather than for an HTTP response.
+     */
+    public interface SignSender {
+        SignOutcome send(Id contractId, String boxFileId, String signerEmail,
+            String signerName, String subject);
+    }
+
+    @TestVisible
+    private static SignSender sender = new PackageSender();
+
+    private class PackageSender implements SignSender {
+        public SignOutcome send(Id contractId, String boxFileId, String signerEmail,
+            String signerName, String subject) {
+
+            box.File file = new box.File();
+            file.id = boxFileId;
+            file.type = 'file';
+
+            box.Signer signer = new box.Signer();
+            signer.email = signerEmail;
+            signer.role = 'signer';
+            if (String.isNotBlank(signerName)) {
+                signer.signer_name = signerName.trim();
+            }
+
+            box.BoxSignRequest request = new box.BoxSignRequest();
+            // The record the signature request hangs off. The package resolves it to the
+            // matching lookup on box__BoxSign__c, which is why that field has to point at
+            // CLM_Contract__c and not at the standard Contract object.
+            request.recordId = contractId;
+            request.sf_files = new List<box.File>{ file };
+            request.signers = new List<box.Signer>{ signer };
+            request.subject = subject;
+            request.is_document_preparation_needed = true;
+
+            SignOutcome outcome = new SignOutcome();
+            List<box.BoxSignResponse> responses =
+                box.BoxSignService.sendSignRequests(new List<box.BoxSignRequest>{ request });
+            if (responses == null || responses.isEmpty()) {
+                outcome.error = 'Box Sign returned no response.';
+                return outcome;
+            }
+
+            box.BoxSignResponse response = responses[0];
+            outcome.requestId = response.id;
+            outcome.prepareUrl = response.prepare_url;
+            outcome.recordId = response.salesforce_id;
+            outcome.error = response.error;
+            return outcome;
         }
-        return new Map<String, Object>{
-            'source_files' => new List<Object>{
-                new Map<String, Object>{ 'id' => req.itemId.trim(), 'type' => 'file' }
-            },
-            'parent_folder' => new Map<String, Object>{
-                'id' => found.folderId, 'type' => 'folder'
-            },
-            'signers' => new List<Object>{ signer },
-            'is_document_preparation_needed' => true,
-            'subject' => String.isBlank(req.subject)
-                ? 'Signature requested: ' + found.contract.Contract_ID__c
-                : req.subject.trim()
-        };
     }
 }
