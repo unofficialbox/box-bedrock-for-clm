@@ -331,7 +331,7 @@
         response style. Put this in the project&rsquo;s custom instructions before you present.</p>
         <div class="block">
           <div class="block-label"><span>instruction</span><button class="copy" type="button">Copy</button></div>
-          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
+          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
         </div>
         <div class="expect"><strong>Expect</strong> beat 4 to answer in a short paragraph and one table, not a briefing note.</div>
       </div>
@@ -341,9 +341,9 @@
       <div class="marker">P3</div>
       <div>
         <span class="where">Claude Desktop</span>
-        <h3>Refresh the CLM MCP connector</h3>
-        <p>It had three tools when you first connected it and now has five. Open <strong>Settings → Connectors</strong>, find the CLM connector, disconnect and reconnect it. Don't retype the endpoint — reuse the one already configured.</p>
-        <div class="expect"><strong>Expect</strong> five tools: <code>listContracts</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
+        <h3>Connect both connectors, and refresh the CLM one</h3>
+        <p><strong>The Box connector must be on as well as the CLM one.</strong> Beat 1 previews the customer paper and beat 2 searches Box metadata; neither is possible with only the CLM tools loaded. Then the CLM one: it had three tools when you first connected it and now has five. Open <strong>Settings → Connectors</strong>, find the CLM connector, disconnect and reconnect it. Don't retype the endpoint — reuse the one already configured.</p>
+        <div class="expect"><strong>Expect both connectors listed under Context in the session</strong>, not merely enabled in Settings &mdash; a project with only CLM loaded cannot preview a document, and beat 1 falls back to reading file IDs aloud. Five CLM tools: <code>listContracts</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
       </div>
     </div>
 
@@ -383,7 +383,7 @@
 
   <section>
     <h2>The six beats</h2>
-    <p class="section-note">Beats 1 through 5 run in Claude Desktop against the CLM connector. Beat 6 is a private browser window.</p>
+    <p class="section-note">Beats 1 through 5 run in Claude Desktop against <strong>both</strong> connectors &mdash; CLM for the contract data, Box for previews and metadata search. Beat 6 is a private browser window.</p>
 
     <div class="step">
       <div class="marker">1<span class="dur">45 sec</span></div>
@@ -392,9 +392,10 @@
         <h3>Their paper arrives</h3>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Show me the contract package for CLM-2026-0104.</pre>
+          <pre>Show me the contract package for CLM-2026-0104, then open a preview of the customer paper.</pre>
         </div>
         <p>Point at <code>calder-msa-customer-paper-v2.pdf</code>. Say the line that sets up everything after it: Calder doesn't accept supplier paper, so this is the document being negotiated — and <strong>there is no Limitation of Liability section anywhere in it</strong>.</p>
+        <p><strong>The preview is the beat.</strong> The package listing is only the means to it &mdash; Box file IDs are plumbing and mean nothing to a room, so let the document carry the point instead of reading a list aloud.</p>
       </div>
     </div>
 
@@ -403,7 +404,7 @@
       <div>
         <span class="where">Claude Desktop</span>
         <h3>The portfolio already knows what's risky</h3>
-        <p>Needs the Box connector as well as the CLM one. Skip this beat if Box isn't connected.</p>
+        <p>Uses the Box connector, enabled in P3.</p>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
           <pre>Search Box metadata using the clmDocument template for documents where clauseRisk is Critical, with ancestor_folder_id &lt;clm-root-folder-id&gt;.</pre>
