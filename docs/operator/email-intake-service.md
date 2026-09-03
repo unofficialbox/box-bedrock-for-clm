@@ -36,7 +36,7 @@ The Apex deploys with the metadata; the inbound **address** and its **Run As** u
    - Accept Attachments: **All** (binary + text)
    - Active: checked
 2. **New Email Address** under that service:
-   - Run As: a licensed user with access to `Contact`/`Account`/`Opportunity`, create on `EmailMessage`/`Task`, and access to `box.Toolkit` (e.g. the CLM integration user with `CLM_Box_Automate_Integration`).
+   - Run As: a licensed user with access to `Contact`/`Account`/`Opportunity`, create on `EmailMessage`/`Task`, and access to `box.Toolkit` (e.g. the CLM integration user with `CLM_Contract_Internal`).
    - Active: checked. Optionally restrict **Accept Email From** to the counterparty domains.
 3. Salesforce generates the inbound address (`<localpart>@<...>.apex.salesforce.com`). Route counterparty mail to it — forward a shared mailbox, or add it as a BCC/recipient on the counterparty thread.
 

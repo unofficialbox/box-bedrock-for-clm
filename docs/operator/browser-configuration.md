@@ -35,10 +35,10 @@ Include the clause README, standard clauses, approved fallbacks, governance note
 ## 5. Salesforce OAuth connection
 
 1. Create a dedicated API-only integration user in the target org.
-2. Assign `CLM_Box_Automate_Integration`.
+2. Assign `CLM_Contract_Internal`.
 3. In **Setup → External Client App Manager**, create **Box Automate CLM Integration**.
 4. Enable OAuth and client-credentials flow; use `api` scope only.
-5. Require administrator preauthorization and allow only `CLM_Box_Automate_Integration`.
+5. Require administrator preauthorization and allow only `CLM_Contract_Internal`.
 6. Set the dedicated integration user as the client-credentials Run As user.
 7. Keep refresh-token, device, JWT, and token-exchange flows disabled.
 8. If Box requires a callback URL, use the target environment's saved workflow URL; the client-credentials flow does not otherwise use it.

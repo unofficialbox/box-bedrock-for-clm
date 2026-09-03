@@ -128,7 +128,7 @@ written into the working tree. Retrieve them with `box users:get --fields=id,log
 The equivalent by hand is **Setup → Custom Settings → CLM Box Config → Manage → New** (the
 org default record), setting the same two fields.
 
-Then assign the `CLM_Demo_Operator` permission set to anyone who will open the workspace. It
+Then assign the `CLM_Contract_Internal` permission set to anyone who will open the workspace. It
 grants both the Apex class and access to the credential principal.
 `python3 scripts/demo_operator.py salesforce-deploy` assigns it automatically.
 
@@ -162,7 +162,7 @@ Then open the workspace and confirm the redlined contract renders in place of th
 ## Part 6 -- Let the site user reach the endpoint
 
 The React workspace calls the endpoint from the browser, so the request runs as the
-**Experience Cloud site user**, not as the admin who deployed. `CLM_Demo_Operator` is
+**Experience Cloud site user**, not as the admin who deployed. `CLM_Contract_Internal` is
 assigned to the deploying user and does not cover that.
 
 For an unauthenticated site, assign **CLM Box Preview Guest** to the site's guest user
@@ -177,7 +177,7 @@ That third grant is the one that is easy to miss. Without it the callout throws
 `System.CalloutException: You don't have read permissions on the User External Credential
 object`, which the endpoint reports only as `box_request_failed`.
 
-`CLM_Demo_Operator` cannot be used here: a Guest User License disallows its
+`CLM_Contract_Internal` cannot be used here: a Guest User License disallows its
 `CLM_Contract__c` edit, delete, and view-all permissions, and the assignment is rejected.
 
 Anyone reaching the site can then mint a folder-scoped, read-and-upload token without

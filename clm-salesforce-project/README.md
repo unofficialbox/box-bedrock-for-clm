@@ -70,7 +70,7 @@ CLM_INTEGRATION_EMAIL='your-admin@your-domain.example' \
 ./scripts/configure-clm-oauth.sh <org-alias>
 ```
 
-The script creates or reuses an API-only integration user and assigns only `CLM_Box_Automate_Integration`.
+The script creates or reuses an API-only integration user and assigns `CLM_Contract_Internal`, the single internal permission set.
 
 ## External Client App
 

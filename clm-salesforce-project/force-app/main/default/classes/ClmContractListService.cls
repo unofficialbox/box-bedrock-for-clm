@@ -1,10 +1,10 @@
 /**
  * Same-origin endpoint that lists CLM contract records for the workspace dashboard.
  *
- * This exists so the Experience Cloud guest user is never granted access to
- * CLM_Contract__c itself. `CLM_Box_Preview_Guest` deliberately carries no business
- * object permissions -- a site visitor can mint a folder-scoped Box token and reach no
- * Salesforce data directly. That property is kept here: the guest is granted this one
+ * This exists so the Experience Cloud guest user reaches CLM_Contract__c only through a
+ * fixed projection. `CLM_Contract_External` grants read on the object, but the records are
+ * Private, so a visitor sees nothing at all without the sharing rule of MT-045 -- and where
+ * that rule exists, this is the shape of what they get. The guest is granted this one
  * Apex class, and the class returns a fixed, read-only projection of a handful of
  * fields. There is no filter, sort, or field parameter, so the response cannot be
  * widened from the browser.
