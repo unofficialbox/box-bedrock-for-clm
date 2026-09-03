@@ -50,12 +50,27 @@ public with sharing class ClmPortfolioSearch {
         return results;
     }
 
+    /** The Box enum, keyed by what a person would type. */
+    private static final Map<String, String> LEVELS = new Map<String, String>{
+        'critical' => 'Critical', 'high' => 'High', 'medium' => 'Medium', 'low' => 'Low'
+    };
+
     private static Result search(String riskLevel) {
         Result result = new Result();
         result.outputCount = 0;
 
         if (String.isBlank(riskLevel)) {
             result.outputSummary = 'Tell me which risk level to look for: Critical, High, Medium or Low.';
+            return result;
+        }
+
+        // People ask for "critical risk", not "Critical". The Box enum is capitalised and
+        // case-sensitive, and passing the words through verbatim earns a 400 that reads like
+        // Box is down rather than like a spelling difference.
+        riskLevel = LEVELS.get(riskLevel.trim().toLowerCase());
+        if (riskLevel == null) {
+            result.outputSummary = 'I can look for Critical, High, Medium or Low risk. '
+                + 'Nothing else is a risk level the contracts carry.';
             return result;
         }
 
