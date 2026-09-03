@@ -343,7 +343,7 @@
         <span class="where">Claude Desktop</span>
         <h3>Connect both connectors, and refresh the CLM one</h3>
         <p><strong>The Box connector must be on as well as the CLM one.</strong> Beat 1 previews the customer paper and beat 2 searches Box metadata; neither is possible with only the CLM tools loaded. Then the CLM one: it had three tools when you first connected it and now has five. Open <strong>Settings → Connectors</strong>, find the CLM connector, disconnect and reconnect it. Don't retype the endpoint — reuse the one already configured.</p>
-        <div class="expect"><strong>Expect both connectors listed under Context in the session</strong>, not merely enabled in Settings &mdash; a project with only CLM loaded cannot preview a document, and beat 1 falls back to reading file IDs aloud. Five CLM tools: <code>listContracts</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
+        <div class="expect"><strong>Expect both connectors listed under Context in the session</strong>, not merely enabled in Settings &mdash; a project with only CLM loaded cannot preview a document, and beat 1 falls back to reading file IDs aloud. Six CLM tools: <code>listContracts</code>, <code>findDocumentsByRisk</code>, <code>getContractPackage</code>, <code>askContractDocument</code>, <code>generateCounterPosition</code>, <code>prepareSignatureRequest</code>. Beat 5 needs the last two.</div>
       </div>
     </div>
 
@@ -392,7 +392,7 @@
         <h3>Their paper arrives</h3>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Show me the contract package for CLM-2026-0104, then open a preview of the customer paper.</pre>
+          <pre>Show me Calder Financial Group's master agreement that is still in legal review, then open a preview of the customer paper.</pre>
         </div>
         <p>Point at <code>calder-msa-customer-paper-v2.pdf</code>. Say the line that sets up everything after it: Calder doesn't accept supplier paper, so this is the document being negotiated — and <strong>there is no Limitation of Liability section anywhere in it</strong>.</p>
         <p><strong>The preview is the beat.</strong> The package listing is only the means to it &mdash; Box file IDs are plumbing and mean nothing to a room, so let the document carry the point instead of reading a list aloud.</p>
@@ -407,7 +407,7 @@
         <p>Uses the Box connector, enabled in P3.</p>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Search Box metadata using the clmDocument template for documents where clauseRisk is Critical, with ancestor_folder_id &lt;clm-root-folder-id&gt;.</pre>
+          <pre>Which contract documents across the portfolio are flagged critical risk?</pre>
         </div>
         <div class="expect"><strong>Expect</strong> exactly two files, on two different papers: <code>northstar-msa-redline-v4.pdf</code> and <code>calder-msa-customer-paper-v2.pdf</code>.</div>
         <div class="warn"><strong><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query.</strong> Box metadata is enterprise-wide, so an unscoped search also returns documents from earlier demo environments — same file names, different IDs, folders that aren't governed contract folders. To an audience that reads as the wrong account appearing.</div>
@@ -422,7 +422,7 @@
         <p>The beat the demo exists for.</p>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>For CLM-2026-0104, where is Acme's liability exposure in the customer paper, and how does it compare to our approved clause library? Cite the file and the clause IDs.</pre>
+          <pre>Where is our liability exposure in Calder's customer paper, and how does it compare to our approved clause library? Cite the file and the clause IDs.</pre>
         </div>
         <div class="expect"><strong>Expect</strong> exposure at <code>19.2</code> and <code>22.4</code>; approved position <code>CLM-LIAB-001</code> (12 months); fallback <code>CLM-LIAB-002</code> (24 months); uncapped is not an approved position; <strong>Commercial Legal</strong> owns the deviation.</div>
         <p>Land it: a template diff can't find this — there's no Acme template to diff against. A keyword search for "limitation of liability" returns nothing, because the phrase doesn't appear. Only reading it against a governed library does.</p>
@@ -436,7 +436,7 @@
         <h3>What they agreed the last two times</h3>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Compare clause 22.4 and clause 19.2 across CLM-2022-0873, CLM-2024-0596 and CLM-2026-0104. What did Calder actually agree before, and does the 2026 draft match it?</pre>
+          <pre>Compare clause 22.4 and clause 19.2 across the two Calder agreements we have already executed and this 2026 draft. What did Calder actually agree before, and does the draft match it?</pre>
         </div>
         <div class="expect"><strong>Expect</strong> both prior agreements carry a negotiated 24-month aggregate cap, recorded in a <strong>Schedule 1</strong> of agreed amendments to Calder's own standard form — and the 2026 draft restores the unamended house text of both clauses.</div>
         <p>Land it: Calder isn't asking for something new. Their template regressed two positions their own legal team conceded, in writing, twice. That's a course-of-dealing argument, and it's the one that moves a negotiation.</p>
@@ -450,7 +450,7 @@
         <h3>Put the position on paper, then stop</h3>
         <div class="block">
           <div class="block-label"><span>prompt</span><button class="copy" type="button">Copy</button></div>
-          <pre>Draft the counter-position memo for CLM-2026-0104, using the approved fallback and the precedent from the executed agreements.</pre>
+          <pre>Draft the counter-position memo for this Calder agreement, using the approved fallback and the precedent from the executed agreements.</pre>
         </div>
         <div class="warn"><strong>Doc Gen is asynchronous.</strong> The reply says "submitted" and the PDF lands a few seconds later. Have the Calder Box folder open in a tab and refresh it rather than waiting on the chat.</div>
         <p>Show the memo: clause at issue, what their draft says, the approved fallback, Commercial Legal as owner, the precedent, the proposed counter-position. Nothing on that page was typed. Then show the boundary:</p>
