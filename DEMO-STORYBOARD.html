@@ -472,6 +472,10 @@
         <code>CLM_Box_Config__c.Demo_Signer_Email__c</code>, so a demo does not stall on &ldquo;who is
         signing?&rdquo; and no address lives in source. Still sends nothing &mdash; a person opens the
         URL, places the fields and presses send.</div>
+        <div class="expect"><strong>Then open the contract record</strong> in Salesforce. The request is
+        on it, under <em>Box Sign Requests</em>. The action goes through the Box managed package rather
+        than calling Box directly, which is what writes that row and links it &mdash; the paper trail
+        lands where the deal is managed, not only inside Box.</div>
         
       </div>
     </div>

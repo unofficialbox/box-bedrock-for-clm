@@ -8,7 +8,6 @@ private class ClmSendForSignatureTest {
     private class BoxMock implements HttpCalloutMock {
         private Integer status;
         private String body;
-        private Boolean signCalled = false;
 
         private BoxMock(Integer status, String body) {
             this.status = status;
@@ -23,11 +22,49 @@ private class ClmSendForSignatureTest {
                 response.setBody('{"access_' + 'token":"' + PARENT_TOKEN + '","expires_in":3600}');
                 return response;
             }
-            signCalled = true;
             response.setStatusCode(status);
             response.setBody(body);
             return response;
         }
+    }
+
+    /**
+     * Stands in for the Box managed package. What most of these tests assert is that it is
+     * never reached at all.
+     */
+    private class FakeSender implements ClmSendForSignature.SignSender {
+        private Boolean called = false;
+        private ClmSendForSignature.SignOutcome outcome;
+
+        private FakeSender(ClmSendForSignature.SignOutcome outcome) {
+            this.outcome = outcome;
+        }
+
+        public ClmSendForSignature.SignOutcome send(Id contractId, String boxFileId,
+            String signerEmail, String signerName, String subject) {
+            called = true;
+            return outcome;
+        }
+    }
+
+    private static FakeSender install(ClmSendForSignature.SignOutcome outcome) {
+        FakeSender sender = new FakeSender(outcome);
+        ClmSendForSignature.sender = sender;
+        return sender;
+    }
+
+    /** A sender that would succeed, so a test asserting it was never called means it. */
+    private static FakeSender prepares() {
+        ClmSendForSignature.SignOutcome outcome = new ClmSendForSignature.SignOutcome();
+        outcome.requestId = 'sign-1';
+        outcome.prepareUrl = 'https://app.box.com/sign/prepare/abc';
+        return install(outcome);
+    }
+
+    private static FakeSender refuses() {
+        ClmSendForSignature.SignOutcome outcome = new ClmSendForSignature.SignOutcome();
+        outcome.error = 'forbidden';
+        return install(outcome);
     }
 
     private static void configure() {
@@ -59,8 +96,8 @@ private class ClmSendForSignatureTest {
         // not signable, and no request reaches Box at all.
         configure();
         seedContract('Legal Review');
-        BoxMock mock = new BoxMock(200, '{"id":"unreachable"}');
-        Test.setMock(HttpCalloutMock.class, mock);
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"id":"unreachable"}'));
+        FakeSender sender = prepares();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
@@ -68,7 +105,7 @@ private class ClmSendForSignatureTest {
 
         System.assertEquals(false, result.prepared);
         System.assert(result.summary.contains('not approved for signature'), result.summary);
-        System.assertEquals(false, mock.signCalled, 'Box must not be called for an unapproved contract.');
+        System.assertEquals(false, sender.called, 'Box must not be called for an unapproved contract.');
     }
 
     @IsTest
@@ -91,8 +128,8 @@ private class ClmSendForSignatureTest {
         // test context, so no file can be confirmed as in scope and none is routed.
         configure();
         seedContract('Approved');
-        BoxMock mock = new BoxMock(200, '{"id":"unreachable"}');
-        Test.setMock(HttpCalloutMock.class, mock);
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{"id":"unreachable"}'));
+        FakeSender sender = prepares();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
@@ -102,7 +139,7 @@ private class ClmSendForSignatureTest {
         System.assert(
             result.summary.contains('could not resolve') || result.summary.contains('not in the Box folder'),
             result.summary);
-        System.assertEquals(false, mock.signCalled, 'An out-of-scope file must never reach Box Sign.');
+        System.assertEquals(false, sender.called, 'An out-of-scope file must never reach Box Sign.');
     }
 
     @IsTest
@@ -112,9 +149,8 @@ private class ClmSendForSignatureTest {
         configure();
         seedContract('Approved');
         ClmContractPackage.documentIdsOverride = new Set<String>{ '700000001' };
-        BoxMock mock = new BoxMock(200,
-            '{"id":"sign-1","prepare_url":"https://app.box.com/sign/prepare/abc"}');
-        Test.setMock(HttpCalloutMock.class, mock);
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{}'));
+        FakeSender sender = prepares();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
@@ -123,6 +159,7 @@ private class ClmSendForSignatureTest {
         System.assertEquals(true, result.prepared, result.summary);
         System.assertEquals('sign-1', result.requestId);
         System.assertEquals('https://app.box.com/sign/prepare/abc', result.prepareUrl);
+        System.assertEquals(true, sender.called);
         System.assert(result.summary.contains('Nothing has been sent'), result.summary);
     }
 
@@ -131,7 +168,8 @@ private class ClmSendForSignatureTest {
         configure();
         seedContract('Approved');
         ClmContractPackage.documentIdsOverride = new Set<String>{ '700000001' };
-        Test.setMock(HttpCalloutMock.class, new BoxMock(403, '{"code":"forbidden"}'));
+        Test.setMock(HttpCalloutMock.class, new BoxMock(200, '{}'));
+        refuses();
 
         Test.startTest();
         ClmSendForSignature.Result result = run('CLM-TEST-0001', '700000001', 'signer@example.com');
