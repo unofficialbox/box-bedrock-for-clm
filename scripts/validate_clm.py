@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import html
 import importlib.util
 import json
 import re
@@ -224,6 +225,46 @@ def check_diagram_drift(root: Path = ROOT) -> str:
     if failures:
         raise ValidationError("Mermaid/SVG drift:\n" + "\n".join(failures))
     return f"{len(sources)} source/render pairs"
+
+
+def check_storyboard_run_order(root: Path = ROOT) -> str:
+    """The run order in the operator's custom instructions must match the beats.
+
+    The instruction block is what a presenter actually pastes, and after that the whole
+    run is the word "next" -- so a prompt edited in a beat but not in the list is a demo
+    that quietly asks the wrong question, with nothing on screen to reveal it.
+    """
+    storyboard = root / "DEMO-STORYBOARD.html"
+    if not storyboard.is_file():
+        raise ValidationError("DEMO-STORYBOARD.html is missing")
+    text = storyboard.read_text(encoding="utf-8")
+
+    beats = text[text.index("<h2>The six beats</h2>"):]
+    prompts = [
+        html.unescape(re.sub(r"<[^>]+>", "", match.group(1))).strip()
+        for match in re.finditer(
+            r'<div class="block-label"><span>prompt</span>.*?<pre>(.*?)</pre>', beats, re.S
+        )
+    ]
+    if not prompts:
+        raise ValidationError("no beat prompts found; the check would prove nothing")
+
+    # The last entry carries the closing </pre> on its own line, so strip tags here too.
+    listed = [
+        html.unescape(re.sub(r"<[^>]+>", "", line.split(". ", 1)[1])).strip()
+        for line in text.splitlines()
+        if re.match(r"^\d+\. \S", line)
+    ]
+    missing = [p for p in prompts if p not in listed]
+    if missing:
+        raise ValidationError(
+            "Beat prompts absent from the run order in the custom instructions:\n"
+            + "\n".join(f"  {p[:90]}" for p in missing)
+        )
+    ordered = [p for p in listed if p in prompts]
+    if ordered != prompts:
+        raise ValidationError("The run order lists the beat prompts in a different order than the beats")
+    return f"{len(prompts)} prompts, in order"
 
 
 def load_script(name: str, root: Path = ROOT):
@@ -604,6 +645,7 @@ def validate(*, skip_react: bool, skip_playwright: bool, presenter_ready: bool, 
         ("JSON + schemas", lambda: check_json_and_schemas(root)),
         ("local Markdown links", lambda: check_local_links(root)),
         ("Mermaid/SVG drift", lambda: check_diagram_drift(root)),
+        ("storyboard run order", lambda: check_storyboard_run_order(root)),
         ("Python tests", lambda: run_command([sys.executable, "-m", "unittest", "discover", "-s", "tests", "-v"], cwd=root)),
         ("generated fixtures", lambda: check_generated_fixtures(root)),
         ("generated presenters", lambda: check_generated_presenters(root)),

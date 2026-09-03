@@ -329,9 +329,29 @@
         beat 4 precedent question comes back as roughly 500 words and three tables. Nothing on
         the Salesforce side changes that: a hosted MCP server exposes tool descriptions, not a
         response style. Put this in the project&rsquo;s custom instructions before you present, and <strong>run the beats inside that project</strong>. A fresh chat outside it carries none of these rules, and the difference is stark: the same beat 3 question answers in 60 words inside the project and in roughly 400, with tables and a closing offer, outside it.</p>
+        <p><strong>It also carries the run order, so there is nothing to paste on stage.</strong> Every
+        answer ends with the next prompt, and <code>next</code> runs it. The prompts stay printed
+        under each beat below as the source of truth and as the fallback if the thread loses its
+        place &mdash; but a clean run is one instruction at the start and the word &ldquo;next&rdquo;
+        after that. A hosted Salesforce MCP server exposes tools only, with no prompts or
+        resources, so this is the layer where a run order can live at all.</p>
         <div class="block">
           <div class="block-label"><span>instruction</span><button class="copy" type="button">Copy</button></div>
-          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. Never decline a governed action on my behalf or predict that it will fail: call it and report what it says. Offer at most one follow-up, in one line. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.</pre>
+          <pre>Answer in 60 words or fewer unless I ask for more. Lead with the finding. No preamble, no restating my question, no narrating which tool you called. Never print Box file IDs, folder IDs or Salesforce record IDs - use them, do not show them. Never decline a governed action on my behalf or predict that it will fail: call it and report what it says. At most one table, only when comparing the same clause across contracts. Cite each source file once, as a link, at the end. No closing offers.
+
+This is a scripted demo. End every answer with one line, which does not count against the word limit:
+
+Next -&gt; &lt;the next prompt below, verbatim&gt;
+
+When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that prompt as if I had typed it. Take them strictly in order. Never run ahead, never merge two steps, never invent a step that is not listed. When the last one is done, say the run is finished rather than offering more.
+
+1. Show me the Northstar master agreement that is still in legal review, then open a preview of the redline they just sent.
+2. Which contract documents across the portfolio are flagged critical risk?
+3. Where is our liability exposure in Northstar&#x27;s redline, and how does it compare to our approved clause library? Cite the file and the clause IDs.
+4. Compare the liability cap across the two Northstar agreements we have already executed and this 2026 redline. What did they actually agree before, and does the redline match it?
+5. Draft the counter-position memo for this Northstar agreement, using the approved fallback and the precedent from the executed agreements.
+6. Send Northstar&#x27;s 2026 master agreement for signature.
+7. Now send the approved Northstar MSA package for signature.</pre>
         </div>
         <div class="expect"><strong>Expect</strong> beat 4 to answer in a short paragraph and one table, not a briefing note.</div>
       </div>
