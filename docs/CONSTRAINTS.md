@@ -1,84 +1,10 @@
-# CLM Demo — Agent Handoff
-
-Snapshot of `box-bedrock-for-clm` for an agent picking up this repo cold. Written 2026-08-27, refreshed 2026-08-31. Verify anything time-sensitive against current `git log` / `validate_clm.py` before relying on it.
-
-## 1. What this repo is
-
-A mature Contract Lifecycle Management (CLM) demo built on **Box + Salesforce**. It ships deterministic local fixtures, portable configuration, real-product screenshots, and self-contained presenter HTML. Nothing here requires a live org to validate — "repository mode" is fully green offline; live presenter-readiness is a separate opt-in gate.
-
-**One scenario** since `62f9678`: **Box + Salesforce Contract Lifecycle**. Primary surface is the Salesforce Multi-Framework React app; governed Apex actions are the only path between Box and Salesforce, and humans keep decision authority. The standalone Box Automate scenario was removed, but **Box intake stays** — the metadata-triggered Automate entry point is still how a contract reaches the React workspace, so `config/box/*.bcl`, the 04 entry-point module, the shared Box screenshots, and the `CLM_Contract_Internal` permission set are all retained.
-
-**Governance invariant:** Box is authoritative for contract *content*; Salesforce `CLM_Contract__c` is authoritative for structured *commercial truth*; the Opportunity is the Box-mapped object. Contract bytes never flow to Salesforce. Human gates precede any generation, signature, or Salesforce write.
-
-## 2. Working rules (from project CLAUDE.md — read before acting)
-
-- Work from the Git root; use repository-relative paths in durable files.
-- Read `README.md` + **exactly one** persona instruction before exploring: `.claude/personas/{maintainer,operator,use-case-creator}.md`. Don't load the whole doc tree.
-- Search with `rg`, open only linked evidence, summarize large outputs.
-- **External deploy / publish / share / sign / delete / any live-org mutation requires explicit approval and a confirmed target.** Keep secrets, environment IDs, live record IDs, and machine-specific paths out of committed files.
-- Box Sign / signature sends are human-gated — never fired by an agent.
-
-## 3. Current state
-
-- Branch `main`, pushed to `origin`.
-- Validation: **14 passed, 0 failed, 1 skipped** (the skip is live receipts, expected in repository mode), **62 Python unit tests OK**, and **60 React tests**. Four of the fourteen checks shell out to the UI bundle, so `npm ci` in `clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp` has to run first.
-- **Live Box works end to end against a real folder**, and so do Doc Gen, Box Sign preparation, the MCP server, and the counterparty-scoped workspace.
-- The Contract Copilot is an internal surface only. Active version **v16**.
-
-Getting live Box working took two waves of stacked failures, each masking the next, and the
-repo no longer narrates them: every constraint they discovered that still governs the code
-is in §6, and the commits are in `git log`. The one habit worth carrying forward is why
-they were so slow to find — the workspace used to answer *any* Box failure with synthetic
-fixtures, so a CORS rejection, a dead endpoint and a crashed component all rendered the
-same plausible screen. That fallback is gone; every failure now names itself on the page.
-
-## 4. Config model (important — two formats on purpose)
-
-- **Authored specs = BCL** (`config/**/*.bcl`): HCL2-subset envelope `locals { "bcl" = { resources = [{ "config" = {...} }] } }`. The real payload is `resources[0].config`. Parsed by external Go tooling; also by this repo's `scripts/bcl.py`.
-- **Runtime files = JSON** (`config/runtime/*.json`, gitignored): written back by `setup_clm_dev.py` and round-tripped by tooling. Deliberately NOT BCL (no external tool imports them; a BCL emitter would be lossy).
-- `scripts/bcl.py` is a **dependency-free** recursive-descent reader (`load_bcl`, `parse_bcl`, `load_artifact`, `BCLError`). `demo_operator.py` dispatches via `load_config()` (`.bcl` → `bcl.load_bcl`, else JSON). Consumers: `demo_operator.py`, `validate_clm.py`.
-- Generated per-operator specs land in `config/runtime/generated/` as resolved `.json` (with parallel `.bcl` for the Go side).
-- `config/runtime/*.example.json` are the committed templates; the real `demo-environment.json`, `bootstrap-state.json`, `validation-receipts.json`, and `generated/` are gitignored.
-
-## 5. Key paths
-
-| Path | Purpose |
-|---|---|
-| `scripts/demo_operator.py` | Operator automation: bootstrap, provision, seed, resolve-config, validate, teardown |
-| `scripts/validate_clm.py` | The offline validation matrix (secrets, JSON/BCL, links, drift, tests, fixtures, presenters, manifests, idempotency) |
-| `scripts/bcl.py` | Dependency-free BCL reader |
-| `scripts/setup_clm_dev.py` | One-command dev setup; writes runtime JSON |
-| `scripts/generate_sample_contract_assets.py` | reportlab PDFs (incl. executed MSAs) |
-| `scripts/generate_docgen_templates.py` | python-docx Doc Gen templates (incl. 2026 redline) |
-| `config/box/automate-workflows.bcl` | Intake workflow incl. the Generate Document → Request Signature tail |
-| `clm-salesforce-project/.forceignore` | Keeps `node_modules` out of the UI bundle deploy — do not delete |
-| `.../classes/ClmBoxTokenService.cls` | Downscoped Box token endpoint; reads the `CLM_Box` external credential |
-| `.../externalCredentials/CLM_Box.externalCredential-meta.xml` | Where the Box client id/secret live (encrypted in the org, never in source) |
-| `.../objects/CLM_Box_Config__c/` | Six non-secret settings; declared in `config/deploy/environment.bcl` |
-| `.../permissionsets/CLM_Contract_External.permissionset-meta.xml` | Least-privilege grant letting the site guest user mint a token (MT-042) |
-| `clm-salesforce-project/scripts/configure-clm-box-*.sh` | Set the Box credential (MT-038) and the six settings (MT-039) |
-| `.../clmreactapp/src/components/BoxWorkspace.tsx` | Token, then folder listing; either failure renders `DataError` with the reason, and no fixture stands in |
-| `.../clmreactapp/src/components/BoxElements.tsx` | Folder table + lazy Content Preview; needs `react-intl` and `MemoryRouter` providers |
-| `.../clmreactapp/src/components/BoxDocumentTable.tsx` | The file table itself — name, modified, size |
-| `.../cspTrustedSites/CLM_Box_App.cspTrustedSite-meta.xml` | frame-src grant for `*.app.box.com`, without which the preview frame is blank (MT-043) |
-| `.../clmreactapp/vite.live-box.ts` | Dev-only plugin serving a real downscoped token locally (`npm run preview:live`) |
-| `.../clmreactapp/src/lib/loaded.ts` | `Loaded<T>` — every remote read returns a value or the reason there is none |
-| `.../clmreactapp/src/styles.test.ts` | Guards against sharing a CSS class name with box-ui-elements |
-| `.../clmreactapp/.npmrc` | `legacy-peer-deps=true`, without which `npm ci` cannot reproduce the lockfile — do not delete |
-| `clm-salesforce-project/sample-data/clm-sample-records.bcl` | Sample Salesforce records (Northstar history) |
-| `clm-salesforce-project/scripts/seed-clm-*.apex` / `.sh` | Anonymous-apex seeders (records; per-record Box file uploads) |
-| `docs/DOCUMENTS-SETUP.md` | Box app, credential, CORS, folder-id gotcha, error→cause table |
-| `docs/MAINTAINING.md` | The local live-Box harness: `preview:live` vs `dev:live`, and why |
-| `docs/MANUAL-TASKS.md` | MT register; MT-036–MT-042 are the live-Box tasks |
-| `tests/` | `test_bcl.py`, `test_demo_operator.py`, `test_validate_clm.py`, presenter/branding/navigation tests |
-| `docs/CONVENTIONS.md` | Readiness vocabulary (4 states) + safety contract |
-
-## 6. Constraints that will bite you
+# Constraints that will bite you
 
 Compressed from the debugging that found them. Each is a property of Box, Salesforce or
-box-ui-elements that this repo has already paid for once. The blow-by-blow is in `git log`.
+box-ui-elements that this repository has already paid for once, and none of them names
+itself when it fails. The blow-by-blow is in `git log`.
 
-### 6.1 A Box folder needs a *direct* collaboration before it can be downscoped
+## A Box folder needs a *direct* collaboration before it can be downscoped
 
 Inherited access is not enough, and the failure is disguised: `GET /2.0/folders/<id>`
 returns 200 with `can_upload = true`, and the token exchange still returns
@@ -97,7 +23,7 @@ Toolkit has only staged the association at that point, so a callout is still leg
 would not be after the DML. A 409 counts as success. **Provision through
 `ClmBoxFolderService`, or grant the collaboration yourself.**
 
-### 6.2 Content Preview: four things must be true at once
+## Content Preview: four things must be true at once
 
 Verified live. Any one missing gives a blank frame or the "Sad Box Cloud", and none of
 them names itself:
@@ -128,7 +54,7 @@ even though npm ships them, and the CDN's version list is sparse — probe befor
 Content Explorer was dropped: it never emitted a file activation in this embedding, so the
 workspace lists the folder itself and owns the row click.
 
-### 6.3 Every counterparty permission gap fails without saying "permission"
+## Every counterparty permission gap fails without saying "permission"
 
 Four grants were needed to get a counterparty to a Box document, and each failed
 differently. None of the failures named the missing thing:
@@ -167,7 +93,7 @@ every URL beneath it, so `/clm/login` and `/clm/s/login/` both render the worksp
 signed-out visitor is never redirected. Sign in at
 `https://<your-site>.my.site.com/clmvforcesite/login?startURL=%2Fclm%2F`.
 
-### 6.4 Guest users enforce field-level security *inside SOQL*
+## Guest users enforce field-level security *inside SOQL*
 
 Apex ignores FLS in SOQL for authenticated users but **not for guests**, and it reports a
 field the guest cannot read as `No such column '<field>' on entity` — a `QueryException`,
@@ -183,7 +109,7 @@ in the projection reaches the browser whatever the permission set says. `Risk_Le
 withheld from the counterparty and still shipped in the JSON until it was removed from the
 projection itself.
 
-### 6.5 The external agent is scoped by nothing, which is why there isn't one
+## The external agent is scoped by nothing, which is why there isn't one
 
 The workspace runs as the signed-in user, so `ClmCounterpartyContracts` can resolve their
 Contact → Account and filter. An **ACC Service Agent runs as its own user**
@@ -202,7 +128,7 @@ Related: ACC offers no way to pass context to the agent — checked three ways
 `lightning/accApi` is importable only from an LWC). The agent bundle declares `contractId`
 and `boxFolderId` variables that nothing on the client can set.
 
-### 6.6 Agent Script and publishing
+## Agent Script and publishing
 
 - **`subagents:` is not a field on `start_agent`.** A subagent is a top-level block with
   its own `actions:`; routing is `@utils.transition to @subagent.<name>`.
@@ -222,7 +148,7 @@ and `boxFolderId` variables that nothing on the client can set.
   unavailable action is invisible, not failed. A `TraceFlag` on the agent user named every
   such failure in one line.
 
-### 6.7 Box metadata is the index, and it must be scoped
+## Box metadata is the index, and it must be scoped
 
 `search_files_metadata` over `clmDocument` replaces a folder listing plus a per-file AI
 read — but metadata search is **enterprise-wide**, and this enterprise still holds
@@ -239,7 +165,7 @@ an unclassified upload is a tagging gap, not a document to hide.
 **The tagging is still manual.** A metadata cascade policy on the contract folder is what
 would make it survive the next contract.
 
-### 6.8 Doc Gen and Sign
+## Doc Gen and Sign
 
 `ClmGenerateCounterProposal` → `/2.0/docgen_batches`; `ClmSendForSignature` →
 `/2.0/sign_requests`. Both go through `ClmBoxAuth`, so an MCP client holds no Box token.
@@ -258,7 +184,7 @@ Neither is on the counterparty surface.
   bounded callers can only be tested on their refusal path.
 - **`pushFileToBox` appends the extension**, so a `.docx` title becomes `.docx.docx`.
 
-### 6.9 Hosted MCP metadata is undocumented
+## Hosted MCP metadata is undocumented
 
 `McpServerDefinition` is **not in the Metadata API Developer Guide**. Shape learned from a
 deployed example and two org errors: an Apex tool is `aa:apex-<ClassName>` with `apiSource`
@@ -270,7 +196,7 @@ equal the server's. It exists from **API v66.0** and is **source-deploy only** (
 packaging, no change sets). **Never retrieve `ExtlClntAppGlobalOauthSettings`** — it brings
 back the consumer secret.
 
-### 6.10 Dependency pins that are load-bearing
+## Dependency pins that are load-bearing
 
 - **`.npmrc` sets `legacy-peer-deps=true`.** Without it `npm ci` fails ERESOLVE and four
   validation checks go red. It changes no resolved version.
@@ -287,42 +213,9 @@ back the consumer secret.
   carries `z-index: -1` and painted our upload dialog behind the page. `styles.test.ts`
   guards this.
 
-## 7. What is still open
 
-1. **MT-045 — guest sharing decision.** `CLM_Contract__c` is Private/Private and the
-   Experience Cloud guest has no record access. The endpoint returns `200 []` for a
-   signed-out visitor, correctly. Granting a guest sharing rule would make contract records
-   readable by anyone who can open the site: a deliberate exposure, not a bug to fix.
-2. **MT-040 — per-user Box OAuth** (optional production hardening). The `CLM_Box` auth
-   provider is committed with placeholder credentials so the path is scaffolded.
-3. **`ClmBoxAuth` has 0 of 47 lines covered.** Fine in a dev org; blocks any production
-   deploy or packaging.
-4. **MT-072 — workspace screenshots are stale.** `clm-react-workspace.png` is marked
-   `readiness = "real-demo"` but predates the folder table, Content Preview and the charts.
-   `validate_clm.py` checks the manifest structurally and cannot detect this.
-5. **The generate/sign tail of the Automate workflow is spec-only.**
-   `config/box/automate-workflows.bcl` orders 8–10 are designed, not built.
-   `seed-clm-contract-files.apex` has never been run against the `agentforce` org.
-6. **`production-custom-ui-requirements.md` predates the scenario reduction.** It frames
-   Mode A / Mode B as parallel runtime modes. Treat it as a wish-list.
-7. **Sibling-repo propagation is deferred.** Self-contained per-repo prompts are at
-   `../propagation-prompts/*.md`; background in `../BCL-CLEANUP-PROPAGATION.md`. Don't
-   start unless asked.
-8. **No live-org state in commits.** Any org mutation needs explicit approval and a
-   confirmed target, and is the user's call to fire.
+## The generate and sign tail of the Automate workflow is specification only
 
-## 8. How to verify you're in a good state
-
-```bash
-npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
-python3 scripts/validate_clm.py            # expect 14 passed / 0 failed / 1 skipped
-python3 -m unittest discover -s tests -p 'test_*.py'   # expect 62 tests OK
-```
-
-Requires Python 3.11+ (`validate_clm.py` imports `datetime.UTC`). The `npm ci` is not optional
-on a fresh clone: four of the thirteen checks are React lint/test/build/Playwright, and they
-fail closed without `node_modules`.
-
-If validation is red, the first suspects are: a BCL file that doesn't parse (`scripts/bcl.py`), a stale set-comparison contract in `validate_clm.py` (`EXPECTED_SCENARIOS`, `EXPECTED_PRESENTERS`, screenshot/PDF/docx manifests), a runtime JSON drifted from its `.example`, or a new Markdown file with a relative link that doesn't resolve — `check_local_links` walks every non-excluded `.md` in the tree, tracked or not.
-
-One failure mode is worth naming because it only appears on a **fresh** clone or worktree: `.gitattributes` normalizes text to LF, so anything a generator writes with CRLF reads back as `Deterministic fixture drift` even though the content is identical. A checkout that predates the generator keeps its CRLF copy on disk and passes, which is why this can be green locally and red everywhere else. Writers must pin LF explicitly — see `write_csv` in `scripts/generate_sample_contract_assets.py`.
+`config/box/automate-workflows.bcl` orders 8 to 10 are designed, not built, and
+`seed-clm-contract-files.apex` has never been run against the `agentforce` org. Treat both
+as **Portable specification** in the sense [CONVENTIONS.md](CONVENTIONS.md) gives the term.

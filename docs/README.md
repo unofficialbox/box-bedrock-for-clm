@@ -27,7 +27,8 @@ crosses roles.
 | [FINALIZATION.md](FINALIZATION.md) | The end-to-end completion gate |
 | [EMAIL-INTAKE.md](EMAIL-INTAKE.md) | The inbound email intake service |
 | [SALESFORCE-RECORD.md](SALESFORCE-RECORD.md) | The `CLM_Contract__c` record contract |
-| [CONVENTIONS.md](CONVENTIONS.md) | Readiness vocabulary and the safety contract |
+| [CONSTRAINTS.md](CONSTRAINTS.md) | What bites: Box, Salesforce and box-ui-elements behaviour this repo has already paid for |
+| [CONVENTIONS.md](CONVENTIONS.md) | Readiness vocabulary, the safety contract, and the config model |
 
 The beats themselves live in [DEMO-STORYBOARD.html](../DEMO-STORYBOARD.html) at the
 repository root, and the presenter rules an assistant follows live in

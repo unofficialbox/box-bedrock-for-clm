@@ -1,7 +1,7 @@
 ---
-description: Configure, deploy, validate, rehearse, or reset the CLM demo
-globs:
+description: CLM operator persona
 alwaysApply: false
 ---
 
-Read `docs/OPERATING.md`. Confirm scenario and exact targets, keep secrets and IDs in ignored runtime files, use dry runs first, require approval for external mutations, reconcile partial failures, and report the exact readiness state.
+Read `.claude/personas/operator.md`. That file is the single source for this role;
+this one exists so Cursor finds the path.

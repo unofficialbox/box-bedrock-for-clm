@@ -88,3 +88,19 @@ The repository provides **Portable specification** and **Local deterministic fix
 ## Forward priority
 
 Run the Box + Salesforce Contract Lifecycle path in confirmed target environments and populate `config/runtime/validation-receipts.json`. That is the remaining evidence boundary for full presenter readiness.
+
+## Verifying a clean state
+
+```bash
+npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
+python3 scripts/validate_clm.py            # expect 15 passed / 0 failed / 1 skipped
+python3 -m unittest discover -s tests -p 'test_*.py'   # expect 72 tests OK
+```
+
+Requires Python 3.11+ (`validate_clm.py` imports `datetime.UTC`). The `npm ci` is not optional
+on a fresh clone: four of the fifteen checks are React lint/test/build/Playwright, and they
+fail closed without `node_modules`.
+
+If validation is red, the first suspects are: a BCL file that doesn't parse (`scripts/bcl.py`), a stale set-comparison contract in `validate_clm.py` (`EXPECTED_SCENARIOS`, `EXPECTED_PRESENTERS`, screenshot/PDF/docx manifests), a runtime JSON drifted from its `.example`, or a new Markdown file with a relative link that doesn't resolve — `check_local_links` walks every non-excluded `.md` in the tree, tracked or not.
+
+One failure mode is worth naming because it only appears on a **fresh** clone or worktree: `.gitattributes` normalizes text to LF, so anything a generator writes with CRLF reads back as `Deterministic fixture drift` even though the content is identical. A checkout that predates the generator keeps its CRLF copy on disk and passes, which is why this can be green locally and red everywhere else. Writers must pin LF explicitly — see `write_csv` in `scripts/generate_sample_contract_assets.py`.
