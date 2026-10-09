@@ -11,9 +11,9 @@ This repository contains a mature Contract Lifecycle Management demo with a cros
 
 | Goal | Start here |
 |---|---|
-| Configure, deploy, validate, or present the demo | [Operator guide](docs/operator/README.md) |
-| Understand or tailor the CLM domain, controls, agents, and value story | [Use-case creator guide](docs/use-case-creator/README.md) |
-| Change code, configuration, tests, generated assets, or release state | [Maintainer guide](docs/maintainers/README.md) |
+| Configure, deploy, validate, or present the demo | [Operator guide](docs/OPERATING.md) |
+| Understand or tailor the CLM domain, controls, agents, and value story | [Use-case creator guide](docs/USE-CASE.md) |
+| Change code, configuration, tests, generated assets, or release state | [Maintainer guide](docs/MAINTAINING.md) |
 
 The complete persona index is in [docs/README.md](docs/README.md). AI assistants must read this file and exactly one matching persona instruction before exploring further.
 
@@ -21,7 +21,7 @@ The complete persona index is in [docs/README.md](docs/README.md). AI assistants
 
 | Scenario | Primary surface | Coordination model |
 |---|---|---|
-| [Box + Salesforce Contract Lifecycle](docs/operator/scenarios/box-salesforce-clm/README.md) | Salesforce Multi-Framework React | Governed Apex actions serve an internal agent surface and a scoped counterparty workspace while humans retain decision authority. |
+| [Box + Salesforce Contract Lifecycle](docs/SCENARIO-GUIDE.md) | Salesforce Multi-Framework React | Governed Apex actions serve an internal agent surface and a scoped counterparty workspace while humans retain decision authority. |
 
 The scenario uses the Northstar contract package and governance model. Box remains authoritative for contract content; Salesforce `CLM_Contract__c` remains authoritative for structured commercial truth.
 
@@ -80,9 +80,9 @@ Start with the [presenter library](output/html/index.html). It routes to every s
 | Path | Purpose |
 |---|---|
 | `config/` | Portable platform, scenario, operator, and runtime contracts |
-| `docs/use-case-creator/` | CLM architecture, agents, controls, references, value, and marketecture |
-| `docs/operator/` | Ordered environment setup, deployment, validation, and presentation path |
-| `docs/maintainers/` | Source precedence, development workflow, validation, and release rules |
+| `docs/*.md` | One topic per file: architecture, setup, deployment, presenting, conventions. [Index](docs/README.md) |
+| `docs/alternate-scripts/` | Other ways to run the same assets: executive, technical, Box-metadata entry |
+| `skills/clm-contract-lifecycle/SKILL.md` | What an assistant follows when presenting, in any harness |
 | `docs/diagrams/` | Mermaid sources and synchronized SVG renders |
 | `sample-data/` | Synthetic CLM inputs and governed clause Markdown |
 | `scripts/` | Deterministic generators, operator automation, mocks, and validation |
@@ -94,4 +94,4 @@ Run commands from the repository root unless a guide explicitly changes director
 
 ## Conventions
 
-The shared **readiness vocabulary** (how maturity is claimed) and the **safety contract** (credential, approval, and reset rules) live in [docs/conventions.md](docs/conventions.md). Follow both in any documentation, configuration, or presenter claim.
+The shared **readiness vocabulary** (how maturity is claimed) and the **safety contract** (credential, approval, and reset rules) live in [docs/CONVENTIONS.md](docs/CONVENTIONS.md). Follow both in any documentation, configuration, or presenter claim.

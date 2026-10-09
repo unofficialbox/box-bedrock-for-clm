@@ -4,8 +4,8 @@ Use this path to understand or tailor the existing Contract Lifecycle Management
 
 ## Review order
 
-1. [Architecture](architecture.md)
-2. [Salesforce Record Contract](salesforce-record-contract.md)
+1. [Architecture](ARCHITECTURE.md)
+2. [Salesforce Record Contract](SALESFORCE-RECORD.md)
 
 ## Definition of the use case
 
@@ -22,6 +22,6 @@ Use this path to understand or tailor the existing Contract Lifecycle Management
 | Failure path | Triage missing evidence, low confidence, unresolved owners, partial writes, and blocked approvals before retry |
 | Reset path | Remove or archive only resources owned by the confirmed demo run and retain reset evidence |
 
-Every material claim must use the readiness vocabulary in `docs/conventions.md`. Keep credentials, tenant IDs, org IDs, live record IDs, and machine-specific paths out of committed files.
+Every material claim must use the readiness vocabulary in `docs/CONVENTIONS.md`. Keep credentials, tenant IDs, org IDs, live record IDs, and machine-specific paths out of committed files.
 
-After changing domain behavior, hand the result to the [operator](../operator/README.md) for environment binding and live validation.
+After changing domain behavior, hand the result to the [operator](OPERATING.md) for environment binding and live validation.

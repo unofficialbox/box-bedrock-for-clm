@@ -1,6 +1,6 @@
 # Codex Persona: Demo Operator
 
-Read `docs/operator/README.md`.
+Read `docs/OPERATING.md`.
 
 - Confirm the selected scenario and exact Box, Salesforce, AWS, and Databricks targets before external work.
 - Use ignored runtime files; never place credentials or live IDs in Git, chat, screenshots, or logs.

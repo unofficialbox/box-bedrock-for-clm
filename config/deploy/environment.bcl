@@ -11,7 +11,7 @@
 #   clm-salesforce-project/scripts/configure-clm-box-settings.sh <org-alias>
 #
 # Anything still holding a placeholder is reported by name rather than written to the org.
-# See docs/operator/deployment.md.
+# See docs/DEPLOYMENT.md.
 locals {
   "bcl" = {
     "context" = "clm"
@@ -24,7 +24,7 @@ locals {
         "config" = {
           "artifact_name" = "environment"
           "artifact_type" = "config"
-          "documentation" = "docs/operator/deployment.md"
+          "documentation" = "docs/DEPLOYMENT.md"
 
           # ---- Box subject: who the downscoped-token endpoint grants as -------------
           # Exactly one of these. A user subject inherits that user's access, so no

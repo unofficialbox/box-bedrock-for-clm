@@ -67,12 +67,11 @@ same plausible screen. That fallback is gone; every failure now names itself on 
 | `.../clmreactapp/.npmrc` | `legacy-peer-deps=true`, without which `npm ci` cannot reproduce the lockfile — do not delete |
 | `clm-salesforce-project/sample-data/clm-sample-records.bcl` | Sample Salesforce records (Northstar history) |
 | `clm-salesforce-project/scripts/seed-clm-*.apex` / `.sh` | Anonymous-apex seeders (records; per-record Box file uploads) |
-| `docs/operator/box-preview-setup.md` | Box app, credential, CORS, folder-id gotcha, error→cause table |
-| `docs/maintainers/README.md` | The local live-Box harness: `preview:live` vs `dev:live`, and why |
-| `docs/operator/manual-task-register.md` | MT register; MT-036–MT-042 are the live-Box tasks |
-| `docs/use-case-creator/production-custom-ui-requirements.md` | Forward-looking spec for a production operator/business UI (aspirational, not built) |
+| `docs/DOCUMENTS-SETUP.md` | Box app, credential, CORS, folder-id gotcha, error→cause table |
+| `docs/MAINTAINING.md` | The local live-Box harness: `preview:live` vs `dev:live`, and why |
+| `docs/MANUAL-TASKS.md` | MT register; MT-036–MT-042 are the live-Box tasks |
 | `tests/` | `test_bcl.py`, `test_demo_operator.py`, `test_validate_clm.py`, presenter/branding/navigation tests |
-| `docs/conventions.md` | Readiness vocabulary (4 states) + safety contract |
+| `docs/CONVENTIONS.md` | Readiness vocabulary (4 states) + safety contract |
 
 ## 6. Constraints that will bite you
 

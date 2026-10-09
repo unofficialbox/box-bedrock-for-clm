@@ -11,7 +11,7 @@ and the encrypted halves of two credentials.
 
 ## The one file to edit
 
-[`config/deploy/environment.bcl`](../../config/deploy/environment.bcl) declares every
+[`config/deploy/environment.bcl`](../config/deploy/environment.bcl) declares every
 environment-specific setting: the field it lands in, the environment variable that carries
 it, how to find its value, and what stops working without it. It is committed and holds
 **placeholders only** — a live folder id in the working tree is what the secret scan
@@ -80,7 +80,7 @@ the address is configuration rather than a default in source.
    `clm-salesforce-project/scripts/seed-clm-sample-data.sh` and
    `seed-clm-contract-files.sh`.
 6. Work the remaining Required rows in the
-   [manual-task register](manual-task-register.md).
+   [manual-task register](MANUAL-TASKS.md).
 
 ## The honest cost
 

@@ -25,10 +25,10 @@ python3 scripts/build_contract_lifecycle_readiness_marketecture.py
 ## Rehearsal package
 
 1. Open `output/html/00-operator-setup-guide.html` and verify offline navigation.
-2. Select one scenario in [Scenario Guides](scenarios/box-salesforce-clm/README.md).
+2. Select one scenario in [Scenario Guides](SCENARIO-GUIDE.md).
 3. Review its complete guide before using the shorter visual gallery.
 4. Verify every claim against the current readiness state.
-5. Complete every relevant item in the [Manual-Task Register](manual-task-register.md).
+5. Complete every relevant item in the [Manual-Task Register](MANUAL-TASKS.md).
 6. Record reset ownership and the post-demo reconciliation path.
 
 The Markdown source remains authoritative. HTML is a portable, self-contained sharing layer.

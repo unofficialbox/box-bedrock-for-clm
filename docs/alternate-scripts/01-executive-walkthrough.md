@@ -258,6 +258,6 @@ would let the record drive the renewal and finance work that comes after signatu
 ## References
 
 - [Cross-platform agentic orchestration scenario](../README.md)
-- [Salesforce record contract](../../../../use-case-creator/salesforce-record-contract.md)
-- [Operator setup and activation](../../../start-here.md)
+- [Salesforce record contract](../SALESFORCE-RECORD.md)
+- [Operator setup and activation](../SETUP.md)
 - [Supporting React scripts](README.md)

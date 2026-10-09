@@ -230,4 +230,4 @@ React unit, lint, build, and Playwright suites, and local Markdown link resoluti
 - [Executive walkthrough](01-executive-walkthrough.md)
 - [Box metadata entry-point variation](04-box-metadata-automate-entry.md)
 - [Cross-platform agentic orchestration scenario](../README.md)
-- [Operator setup and activation](../../../start-here.md)
+- [Operator setup and activation](../SETUP.md)
