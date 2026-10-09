@@ -86,21 +86,26 @@ if (creating) {
 // field every run -- means one forgotten export silently erases working configuration,
 // and the failure only shows up as a refusal on stage. To clear one of these, clear the
 // field in Setup.
+// The subject fields needed this too, and not having it cost a working demo: a run that
+// supplied only BOX_USER_ID blanked Enterprise_Id__c, and the portfolio search -- which
+// scopes its metadata query with enterprise_<id> -- refused as unconfigured from then on.
+String keptUser     = String.isBlank(boxUserId)        ? config.Box_User_Id__c                  : boxUserId;
+String keptEnt      = String.isBlank(enterpriseId)     ? config.Enterprise_Id__c                : enterpriseId;
 String keptRoot     = String.isBlank(contractsRoot)    ? config.Contracts_Root_Folder_Id__c     : contractsRoot;
 String keptHub      = String.isBlank(clauseLibraryHub) ? config.Clause_Library_Hub_Id__c        : clauseLibraryHub;
 String keptTemplate = String.isBlank(counterTemplate)  ? config.Counter_Position_Template_ID__c : counterTemplate;
 String keptSigner   = String.isBlank(demoSigner)       ? config.Demo_Signer_Email__c            : demoSigner;
 
 Boolean changed = creating
-    || boxUserId != (config.Box_User_Id__c == null ? '' : config.Box_User_Id__c)
-    || enterpriseId != (config.Enterprise_Id__c == null ? '' : config.Enterprise_Id__c)
+    || keptUser != config.Box_User_Id__c
+    || keptEnt != config.Enterprise_Id__c
     || keptRoot != config.Contracts_Root_Folder_Id__c
     || keptHub != config.Clause_Library_Hub_Id__c
     || keptTemplate != config.Counter_Position_Template_ID__c
     || keptSigner != config.Demo_Signer_Email__c;
 
-config.Box_User_Id__c = boxUserId;
-config.Enterprise_Id__c = enterpriseId;
+config.Box_User_Id__c = keptUser;
+config.Enterprise_Id__c = keptEnt;
 config.Contracts_Root_Folder_Id__c = keptRoot;
 config.Clause_Library_Hub_Id__c = keptHub;
 config.Counter_Position_Template_ID__c = keptTemplate;
@@ -108,13 +113,13 @@ config.Demo_Signer_Email__c = keptSigner;
 upsert config;
 
 // ---------- Report without echoing the values ----------
-String subjectType = String.isNotBlank(boxUserId) ? 'user' : 'enterprise';
-String subjectId = String.isNotBlank(boxUserId) ? boxUserId : enterpriseId;
+String subjectType = String.isNotBlank(keptUser) ? 'user' : 'enterprise';
+String subjectId = String.isNotBlank(keptUser) ? keptUser : keptEnt;
 String action = creating ? 'created' : (changed ? 'updated' : 'unchanged');
 System.debug(LoggingLevel.INFO, 'BOX CONFIG: org-default record ' + action
     + ' (subject ' + subjectType + ' ...' + subjectId.right(4) + ')');
 
-if (String.isNotBlank(boxUserId) && String.isNotBlank(enterpriseId)) {
+if (String.isNotBlank(keptUser) && String.isNotBlank(keptEnt)) {
     System.debug(LoggingLevel.WARN, 'BOX CONFIG: both a user id and an enterprise id are set. '
         + 'ClmBoxTokenService grants as the user; the enterprise id is unused.');
 }

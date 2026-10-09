@@ -73,7 +73,7 @@ Status values: **Required**, **Per run**, **Optional**, and **Confirmation requi
 |---|---|---|---|---|
 | MT-070 | Rehearse the selected tell/show/tell script | Presenter | Per run | Script completes inside its time box without hidden setup |
 | MT-071 | Pre-open only the selected scenario's surfaces | Presenter | Per run | Every page loads under the intended account |
-| MT-072 | Capture screenshots from the real page viewport and update `config/demo/screenshot-manifest.json` | Maintainer | After UI changes | No browser chrome, documentation pages, or unrelated content appears; source, date, scenario, and readiness are current |
+| MT-072 | Capture screenshots from the real page viewport and update `config/demo/screenshot-manifest.bcl` | Maintainer | **Overdue: `clm-react-workspace.png` was captured 2026-07-14 and `freshnessDays` is 90, so validation fails from 2026-10-12.** It also predates the workspace redesign while still claiming `readiness = real-demo`. Needs an authenticated session on the real page; no script can do it | No browser chrome, documentation pages, or unrelated content appears; source, date, scenario, and readiness are current |
 | MT-073 | Record test artifacts and restore demo state | Operator | Per run | Workflows/tasks are ready for the next session |
 | MT-074 | Delete data or remove collaborators | System owner | Confirmation required | Impact is reviewed and exact objects are approved |
 

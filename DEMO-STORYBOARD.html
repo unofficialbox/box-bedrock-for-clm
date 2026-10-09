@@ -422,7 +422,7 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
         <span class="where">Box</span>
         <h3>Clear the way for Dana's upload</h3>
         <p>Beat 1 has the counterparty upload <code>northstar-msa-redline-v4.pdf</code>. If a copy is already sitting in <strong>CLM Root / Contracts / Northstar Health Master Service Agreement 2026</strong>, the upload becomes a new version of a file that is already there, and the arrival stops being visible. Delete it before the run, and keep a copy at <code>output/pdf/northstar-msa-redline-v4.pdf</code> to upload.</p>
-        <div class="warn"><strong>Then wait a few minutes before beat 3.</strong> Box reindexes metadata after an upload, so a document that arrives during the demo may not answer a portfolio risk search yet. If the run is tight, upload during setup and let beat 1 show the document already in place.</div>
+        <div class="warn"><strong>If beat 3 then misses the document, check the folder's collaborators first.</strong> Box&rsquo;s metadata search only returns what the querying user can reach, and a contract folder provisioned outside <code>ClmBoxFolderService</code> has none &mdash; the token reads it as an admin, so the folder looks fine and its documents are simply absent from every search. That cost a correct-looking demo once, and it was diagnosed as indexing lag for weeks. Indexing lag is real but measured in seconds, not minutes.</div>
       </div>
     </div>
 
@@ -489,7 +489,7 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
         </div>
         <div class="expect"><strong>Expect the document just uploaded</strong> &mdash; <code>northstar-msa-redline-v4.pdf</code> &mdash; flagged when it landed, not when someone asked. In an environment that also carries the Calder sample set, <code>calder-msa-customer-paper-v2.pdf</code> comes back beside it, and the beat reads better: two files, two different papers, one question.</div>
         <div class="warn"><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query. To an audience, an unscoped search reads as the wrong account appearing.</div>
-        <div class="warn"><strong>A freshly moved or uploaded file takes a few minutes to appear here.</strong> Box reindexes metadata after the fact, so a document uploaded in beat 1 may not be searchable by the time you reach this beat. Upload it during setup if the run is tight.</div>
+        <div class="warn"><strong>A document missing here is almost never indexing lag.</strong> It is the folder&rsquo;s collaborators: this search returns only what the querying user can reach, and a folder provisioned outside <code>ClmBoxFolderService</code> has no collaborators at all. See <code>docs/CONSTRAINTS.md</code>.</div>
       </div>
     </div>
 
@@ -601,7 +601,7 @@ python3 -m unittest discover -s tests      # expect 63 tests OK</pre>
         <li><strong>Architecture and flow diagrams</strong> &mdash;
         <code>docs/diagrams/</code>, Mermaid sources with synchronized renders.</li>
         <li><strong>Screenshots</strong> &mdash; <code>output/screenshots/</code>, described by
-        <code>config/demo/screenshot-manifest.json</code>.</li>
+        <code>config/demo/screenshot-manifest.bcl</code>.</li>
       </ul>
     </div>
   </section>

@@ -23,6 +23,13 @@ Toolkit has only staged the association at that point, so a callout is still leg
 would not be after the DML. A 409 counts as success. **Provision through
 `ClmBoxFolderService`, or grant the collaboration yourself.**
 
+It is wider still than the downscope and the 404. **Box's metadata search returns only what
+the querying user can reach**, so a folder with no collaborators contributes nothing to a
+portfolio query while looking entirely healthy: `GET` on it succeeds, its documents list,
+their metadata is intact, and the search simply omits them. That presents as indexing lag
+and survives any amount of waiting. Check `GET /2.0/folders/<id>/collaborations` before
+believing a delay.
+
 ## Content Preview: four things must be true at once
 
 Verified live. Any one missing gives a blank frame or the "Sad Box Cloud", and none of

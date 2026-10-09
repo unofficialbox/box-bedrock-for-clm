@@ -31,5 +31,5 @@ this page.
 - Capture the real Box, Salesforce or React page viewport.
 - Exclude browser tabs, address bars, desktop content, notifications and unrelated records.
 - Use the target scenario directory under `output/screenshots/`.
-- Update `config/demo/screenshot-manifest.json` with source, capture date, crop rule,
+- Update `config/demo/screenshot-manifest.bcl` with source, capture date, crop rule,
   scenario and readiness state.

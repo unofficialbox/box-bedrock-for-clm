@@ -46,7 +46,7 @@ python3 scripts/demo_operator.py validate --scenario box-salesforce-clm
 1. Record the latest:
    - published URLs in `config/runtime/demo-environment.json`
    - test artifacts, workflow run IDs, and Salesforce record IDs in your external run log
-   - screenshot set and manifest updates (`config/demo/screenshot-manifest.json`)
+   - screenshot set and manifest updates (`config/demo/screenshot-manifest.bcl`)
 2. Copy and fill the receipt file:
 
 ```bash
