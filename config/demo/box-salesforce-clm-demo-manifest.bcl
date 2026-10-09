@@ -47,7 +47,6 @@ locals {
           }
           "screenshots" = {
             "scenarioSpecific" = "output/screenshots/box-salesforce-clm/"
-            "sharedBox" = "output/screenshots/box-automate-agentic-orchestration/"
           }
         }
         "metadata" = {
