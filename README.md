@@ -73,7 +73,7 @@ This fails closed unless Box and Salesforce have current secret-free passed rece
 
 ## Presenter output
 
-Start with the [presenter library](output/html/index.html). It routes to every standalone chapter and to the [complete self-contained edition](output/html/06-complete-presenter-edition.html), which embeds all seven chapters and needs no sibling files or network access. The Markdown source remains authoritative; generated HTML is the portable sharing layer.
+Start with [DEMO-STORYBOARD.html](DEMO-STORYBOARD.html). It is the single presentation artifact: preflight, the beats with every prompt, what each should return, and the questions worth answering honestly. The Markdown under [docs/](docs/README.md) remains authoritative for everything else.
 
 ## Source map
 
