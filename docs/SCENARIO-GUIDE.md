@@ -31,14 +31,14 @@ configures their own Box app, Salesforce org and Agentforce agent.
 
 ## 2. Architecture
 
-![Box + Salesforce Contract Lifecycle architecture](../../../diagrams/clm-architecture.svg)
+![Box + Salesforce Contract Lifecycle architecture](diagrams/clm-architecture.svg)
 
 Every read of contract content goes through Apex. That is what lets one implementation
 serve both audiences: the Box credential never leaves the org, so an MCP client holds no
 Box token and a counterparty's browser holds a token scoped to a single folder.
 
-- [Architecture source](../../../diagrams/clm-architecture.mmd)
-- [Shared architecture and control detail](../../../use-case-creator/architecture.md)
+- [Architecture source](diagrams/clm-architecture.mmd)
+- [Shared architecture and control detail](ARCHITECTURE.md)
 
 ### Governed actions
 
@@ -54,7 +54,7 @@ Box token and a counterparty's browser holds a token scoped to a single folder.
 
 ## 3. Flow
 
-![Box + Salesforce Contract Lifecycle flow](../../../diagrams/box-salesforce-clm-flow.svg)
+![Box + Salesforce Contract Lifecycle flow](diagrams/box-salesforce-clm-flow.svg)
 
 1. A contract arrives on the customer's paper and lands in a governed Box folder.
 2. The internal reader asks what is in it and how it compares to approved positions.
@@ -63,14 +63,14 @@ Box token and a counterparty's browser holds a token scoped to a single folder.
 5. A counter-position memo is generated into the folder; signature is refused until approved.
 6. The counterparty opens the same platform, scoped to their own contracts and filtered content.
 
-- [Flow source](../../../diagrams/box-salesforce-clm-flow.mmd)
+- [Flow source](diagrams/box-salesforce-clm-flow.mmd)
 
 [Continue to presenter script](#4-presenter-script)
 
 ## 4. Presenter script
 
 **Duration:** 5–6 minutes for the executive path; see the
-[supporting React scripts](supporting-react-scripts/README.md) for the longer variants.
+[supporting React scripts](alternate-scripts/README.md) for the longer variants.
 
 | Step | Tell | Show | Tell |
 |---|---|---|---|
@@ -93,20 +93,20 @@ are workspace-specific.
 
 ### Unified React workspace
 
-![Northstar React workspace](../../../../output/screenshots/box-salesforce-clm/clm-react-workspace.png)
+![Northstar React workspace](../output/screenshots/box-salesforce-clm/clm-react-workspace.png)
 
 ### Shared governed Box context
 
-![Box App portfolio dashboard](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
+![Box App portfolio dashboard](../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
 
-![Box App Clause Library](../../../../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
+![Box App Clause Library](../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
 
-![Approved Clause Hub](../../../../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
+![Approved Clause Hub](../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
 
-![Human approval branch](../../../../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
+![Human approval branch](../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-Optional offline presentation: [self-contained visual gallery](../../../../output/html/02-box-salesforce-clm-gallery.html).
-For the complete narrative, use the [portable guide](../../../../output/html/01-box-salesforce-clm-guide.html).
+Optional offline presentation: [self-contained visual gallery](../output/html/02-box-salesforce-clm-gallery.html).
+For the complete narrative, use the [portable guide](../output/html/01-box-salesforce-clm-guide.html).
 
 [Continue to components and readiness](#6-components-and-readiness)
 
@@ -140,8 +140,8 @@ For the complete narrative, use the [portable guide](../../../../output/html/01-
 
 ## 7. Setup and validation
 
-1. Complete [Operator Start Here](../../start-here.md) and the Box surface foundation first.
-2. Complete [Box Preview Setup](../../box-preview-setup.md) so the workspace reaches live
+1. Complete [Operator Start Here](SETUP.md) and the Box surface foundation first.
+2. Complete [Box Preview Setup](DOCUMENTS-SETUP.md) so the workspace reaches live
    Box content.
 3. Start the React workspace with this environment's Salesforce record ID, contract ID, and
    generated Box workspace folder ID.
@@ -163,11 +163,11 @@ For the complete narrative, use the [portable guide](../../../../output/html/01-
 
 ### References
 
-- [Operator setup and activation](../../start-here.md)
-- [Cross-platform deployment](../../start-here.md)
-- [Manual-task register](../../manual-task-register.md)
-- [Salesforce record contract](../../../use-case-creator/salesforce-record-contract.md)
-- [Machine-readable scenario manifest](../../../../config/demo/box-salesforce-clm-demo-manifest.bcl)
-- [Supporting React scripts](supporting-react-scripts/README.md)
+- [Operator setup and activation](SETUP.md)
+- [Cross-platform deployment](SETUP.md)
+- [Manual-task register](MANUAL-TASKS.md)
+- [Salesforce record contract](SALESFORCE-RECORD.md)
+- [Machine-readable scenario manifest](../config/demo/box-salesforce-clm-demo-manifest.bcl)
+- [Supporting React scripts](alternate-scripts/README.md)
 
-[Back to the operator run order](../../README.md)
+[Back to the operator run order](OPERATING.md)

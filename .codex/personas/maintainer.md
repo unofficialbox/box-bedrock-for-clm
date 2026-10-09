@@ -1,6 +1,6 @@
 # Codex Persona: Repository Maintainer
 
-Read `docs/maintainers/README.md`.
+Read `docs/MAINTAINING.md`.
 
 - Confirm branch, remote, and worktree before editing.
 - Trace changes from source contracts to tests and derived artifacts; do not preload unrelated docs.

@@ -7,7 +7,7 @@ set -euo pipefail
 #
 # Values come from config/deploy/environment.local.bcl, or from the environment, which
 # wins so a one-off run can override the file without editing it. See
-# docs/operator/deployment.md.
+# docs/DEPLOYMENT.md.
 #
 #   clm-salesforce-project/scripts/configure-clm-box-settings.sh <org-alias>
 #

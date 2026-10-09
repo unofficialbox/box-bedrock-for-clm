@@ -81,7 +81,7 @@ This POST is **not idempotent** (`idempotency.safe = false`): resubmitting the s
 
 ## 7. Agentforce and optional orchestration
 
-Configure only the Agentforce actions used by the CLM path, then follow [Operator Start Here](start-here.md).
+Configure only the Agentforce actions used by the CLM path, then follow [Operator Start Here](SETUP.md).
 
 Record the new environment's IDs in `demo-environment.json`; never write secrets there.
 

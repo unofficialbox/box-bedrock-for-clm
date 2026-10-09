@@ -16,10 +16,10 @@ class RepositoryNavigationTests(unittest.TestCase):
         readme = (ROOT / "README.md").read_text()
         targets = {target.split("#", 1)[0] for target in MARKDOWN_LINK.findall(readme)}
         expected = {
-            "docs/operator/README.md",
-            "docs/use-case-creator/README.md",
-            "docs/maintainers/README.md",
-            "docs/operator/scenarios/box-salesforce-clm/README.md",
+            "docs/OPERATING.md",
+            "docs/USE-CASE.md",
+            "docs/MAINTAINING.md",
+            "docs/SCENARIO-GUIDE.md",
         }
         self.assertTrue(expected.issubset(targets), expected - targets)
 
@@ -28,8 +28,7 @@ class RepositoryNavigationTests(unittest.TestCase):
             "clm-template-comparison-and-reconciliation.md",
             "docs/runbooks/03-agentcore-demo.md",
             "docs/runbooks/04-box-agentforce-react-demo.md",
-            "docs/operator/scenarios/box-salesforce-clm/"
-            "supporting-react-scripts/component-manifest.md",
+            "docs/alternate-scripts/component-manifest.md",
             "docs/operator/scenarios/box-automate-agentic-orchestration/README.md",
         ]
         for relative_path in removed:

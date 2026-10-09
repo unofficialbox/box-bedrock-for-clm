@@ -54,9 +54,9 @@ Extract and AI outputs remain draft evidence. The approval task is the control p
 
 Two platforms, one set of governed actions between them. Box holds contract content; Salesforce holds structured commercial truth and every path from one to the other.
 
-Rendered diagram: [CLM Architecture](../diagrams/clm-architecture.svg)
+Rendered diagram: [CLM Architecture](diagrams/clm-architecture.svg)
 
-Source: [Mermaid diagram](../diagrams/clm-architecture.mmd)
+Source: [Mermaid diagram](diagrams/clm-architecture.mmd)
 
 ```text
 ┌────────────────────────────────────────────────────────────────────────────┐
@@ -146,9 +146,9 @@ Box Sign + Obligation Monitor
 
 The metadata-triggered intake that opens the scenario. Automate owns the intake sequence, agents enrich individual steps, humans own approvals; the React workspace opens on the record it creates.
 
-Canonical module: [Entry-Point Variation: Box Metadata Trigger to Salesforce Record](../operator/scenarios/box-salesforce-clm/supporting-react-scripts/04-box-metadata-automate-entry.md)
+Canonical module: [Entry-Point Variation: Box Metadata Trigger to Salesforce Record](alternate-scripts/04-box-metadata-automate-entry.md)
 
-Flow: [rendered](../diagrams/clm-box-metadata-automate-entry.svg) · [source](../diagrams/clm-box-metadata-automate-entry.mmd)
+Flow: [rendered](diagrams/clm-box-metadata-automate-entry.svg) · [source](diagrams/clm-box-metadata-automate-entry.mmd)
 
 ### Entry-point rules
 
@@ -162,9 +162,9 @@ Flow: [rendered](../diagrams/clm-box-metadata-automate-entry.svg) · [source](..
 | Mutations are explicit | DocGen file creation requires presenter confirmation; signing stays blocked until approvals complete. |
 | No external agent runtime in intake | Intake itself sends no request to an external agent runtime or custom middleware. |
 
-Workflow contract: [`config/box/automate-workflows.json`](../../config/box/automate-workflows.bcl)
+Workflow contract: [`config/box/automate-workflows.json`](../config/box/automate-workflows.bcl)
 
-Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../../config/agentforce/clm-react-agentforce-spec.bcl)
+Agent contract: [`config/agentforce/clm-react-agentforce-spec.json`](../config/agentforce/clm-react-agentforce-spec.bcl)
 
 ---
 

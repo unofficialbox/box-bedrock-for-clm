@@ -161,7 +161,7 @@ The Salesforce phase deploys the portable CLM data model and UI, including the C
 
 ## 5. Complete the administrator surfaces
 
-Follow [Browser and administrator configuration](browser-configuration.md) in order. It uses logical names and the IDs generated in `bootstrap-state.json`; never reuse another tenant's IDs.
+Follow [Browser and administrator configuration](CLIENT-SETUP.md) in order. It uses logical names and the IDs generated in `bootstrap-state.json`; never reuse another tenant's IDs.
 
 Stop and obtain explicit owner approval immediately before any final **Publish**, **Share**, **Activate**, **Generate**, or **Send** action.
 
@@ -183,13 +183,13 @@ python3 scripts/demo_operator.py validate --scenario box-salesforce-clm
 
 Then run the [integrated smoke test](smoke-test.md). Do not present as ready until that smoke test passes.
 
-After smoke test, capture receipts and complete [Finalization](final-phase.md):
+After smoke test, capture receipts and complete [Finalization](FINALIZATION.md):
 
 ```bash
 cp config/runtime/validation-receipts.example.json config/runtime/validation-receipts.json
 ```
 
-Do not present the environment as ready until [Finalization](final-phase.md) documents passing `python3 scripts/validate_clm.py --presenter-ready`.
+Do not present the environment as ready until [Finalization](FINALIZATION.md) documents passing `python3 scripts/validate_clm.py --presenter-ready`.
 
 The receipt file is ignored by Git and must not contain credentials.
 
@@ -197,17 +197,17 @@ The receipt file is ignored by Git and must not contain credentials.
 
 Use the presenter script inside the scenario guide:
 
-1. [Box + Salesforce Contract Lifecycle](scenarios/box-salesforce-clm/README.md#4-presenter-script)
+1. [Box + Salesforce Contract Lifecycle](SCENARIO-GUIDE.md#4-presenter-script)
 
 Each step tells what matters, shows one proof, then explains the outcome. Avoid narrating every click.
 
 ## Setup flow
 
-![Fresh-environment setup flow](../diagrams/operator-setup-flow.svg)
+![Fresh-environment setup flow](diagrams/operator-setup-flow.svg)
 
-- [CLM configuration workflow (manual steps in red)](../diagrams/clm-configuration-workflow.svg)
-- [Diagram source](../diagrams/operator-setup-flow.mmd)
-- [Configuration workflow source](../diagrams/clm-configuration-workflow.mmd)
-- [Finalization checklist](final-phase.md)
-- [Manual-task register](manual-task-register.md)
-- [Machine-readable operator workflow](../../config/operator/operator-workflow.bcl)
+- [CLM configuration workflow (manual steps in red)](diagrams/clm-configuration-workflow.svg)
+- [Diagram source](diagrams/operator-setup-flow.mmd)
+- [Configuration workflow source](diagrams/clm-configuration-workflow.mmd)
+- [Finalization checklist](FINALIZATION.md)
+- [Manual-task register](MANUAL-TASKS.md)
+- [Machine-readable operator workflow](../config/operator/operator-workflow.bcl)

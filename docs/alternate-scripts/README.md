@@ -10,11 +10,11 @@ These scripts present the React portion of Box + Salesforce Contract Lifecycle a
 
 Supporting artifacts:
 
-- [Calder demo storyboard](../../../../../DEMO-STORYBOARD.html) -- the executive walkthrough as a single presenter page: preflight checks, every prompt as copy-paste, and what each beat should return. Open it in a browser. Site URL and counterparty login are placeholders; bind them to your environment first.
-- [Demo flow diagram](../../../../diagrams/clm-box-agentforce-react-demo-flow.svg)
-- [Box metadata entry-point diagram](../../../../diagrams/clm-box-metadata-automate-entry.svg)
-- [Machine-readable scenario manifest](../../../../../config/demo/box-salesforce-clm-demo-manifest.bcl)
-- [Agentforce action contract](../../../../../config/agentforce/clm-react-agentforce-spec.bcl)
+- [Calder demo storyboard](../../DEMO-STORYBOARD.html) -- the executive walkthrough as a single presenter page: preflight checks, every prompt as copy-paste, and what each beat should return. Open it in a browser. Site URL and counterparty login are placeholders; bind them to your environment first.
+- [Demo flow diagram](../diagrams/clm-box-agentforce-react-demo-flow.svg)
+- [Box metadata entry-point diagram](../diagrams/clm-box-metadata-automate-entry.svg)
+- [Machine-readable scenario manifest](../../config/demo/box-salesforce-clm-demo-manifest.bcl)
+- [Agentforce action contract](../../config/agentforce/clm-react-agentforce-spec.bcl)
 
 ## Experience boundary
 

@@ -25,9 +25,9 @@ SCENARIOS = (
         "order": "00",
         "slug": "operator-setup",
         "sources": [
-            ROOT / "docs" / "operator" / "start-here.md",
-            ROOT / "docs" / "operator" / "browser-configuration.md",
-            ROOT / "docs" / "operator" / "smoke-test.md",
+            ROOT / "docs" / "SETUP.md",
+            ROOT / "docs" / "CLIENT-SETUP.md",
+            ROOT / "docs" / "SMOKE-TEST.md",
         ],
         "accent": "#f4c86a",
         "accent_2": "#5a95ff",
@@ -37,7 +37,7 @@ SCENARIOS = (
     {
         "order": "01",
         "slug": "box-salesforce-clm",
-        "source": ROOT / "docs" / "operator" / "scenarios" / "box-salesforce-clm" / "README.md",
+        "source": ROOT / "docs" / "SCENARIO-GUIDE.md",
         "accent": "#a98bff",
         "accent_2": "#5aaeff",
         "label": "Supervisor-led, multi-platform orchestration",

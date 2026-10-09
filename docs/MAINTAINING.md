@@ -1,4 +1,4 @@
-# Repository Maintainer
+# Maintaining the repository
 
 Use this path when changing code, configuration, tests, documentation structure, generated artifacts, or release state.
 
@@ -84,7 +84,6 @@ The repository provides **Portable specification** and **Local deterministic fix
 - Box owns governed contract content; Salesforce `CLM_Contract__c` owns structured commercial truth.
 - Standard Salesforce external-ID upsert and lookup is the default intake path. Custom Apex is reserved for genuinely custom multi-record, authorization, routing, lifecycle-event, or downscoped-token behavior.
 - Portable Markdown remains authoritative; self-contained HTML remains a derived sharing layer.
-- exist.
 
 ## Forward priority
 
