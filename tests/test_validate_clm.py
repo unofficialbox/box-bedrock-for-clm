@@ -121,14 +121,6 @@ class CLMValidationTests(unittest.TestCase):
             with self.assertRaisesRegex(validation.ValidationError, "Secrets found in live receipts"):
                 validation.check_live_receipts(root, required=True)
 
-    def test_portable_resource_parser_catches_html_and_css_network_dependencies(self) -> None:
-        parser = validation.PortableResourceParser()
-        parser.feed(
-            '<img src = https://example.com/a.png srcset="data:image/png;base64,x 1x, //example.com/b.png 2x">'
-            '<style>.hero{background:url(https://example.com/c.png)}</style>'
-        )
-        self.assertEqual(3, len(parser.external_references))
-
     def test_execute_records_failure_without_stopping_matrix(self) -> None:
         ran: list[str] = []
         results = [

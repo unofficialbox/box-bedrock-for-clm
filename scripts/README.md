@@ -30,12 +30,6 @@ The `config/runtime/*` files are the exception and stay JSON: they are per-opera
 | `demo_operator.py` | Check prerequisites, generate assets, create the Box foundation, deploy portable Salesforce metadata, and validate a new environment |
 | `setup_clm_dev.py` | Install repository dependencies and optionally sync Box/Salesforce context into `config/runtime/demo-environment.json` |
 | `bcl.py` | Dependency-free reader for authored `.bcl` config artifacts; returns the config payload from the `locals.bcl` envelope |
-| `build_clm_experience_gallery.py` | Build the self-contained Box + Salesforce Contract Lifecycle gallery from the Box and React screenshot directories |
-| `build_scenario_guides.py` | Build complete portable scenario guides with embedded assets and full-size diagram dialogs |
-| `build_executive_marketecture.py` | Build the self-contained executive marketecture with business outcomes, platform roles, phased delivery, and real-demo proof |
-| `build_presenter_portal.py` | Build the presenter landing page plus a single self-contained edition that embeds all nine standalone chapters |
-| `build_customer_datasheet.py` | Build the nontechnical Box Solutions datasheet for generalists, sales teams, customers, and IT decision makers |
-| `build_contract_lifecycle_readiness_marketecture.py` | Build the lifecycle swimlane marketecture showing persistent platform responsibilities and human decision authority |
 | `generate_sample_contract_assets.py` | Create synthetic MSA, DPA, SOW, order form, exhibits, JSON records, and analytics CSV |
 | `generate_docgen_templates.py` | Create Box DocGen-ready Word templates for approval memo, order summary, and renewal notice |
 
@@ -109,60 +103,8 @@ python3 scripts/generate_docgen_templates.py
 
 The generated `.docx` files are written to `output/docgen/`. Sample merge data is in `config/box/docgen-template-data.bcl`.
 
-Rebuild both screenshot galleries from the CLM demo root:
+There is one presentation artifact and nothing builds it: `DEMO-STORYBOARD.html` at the
+repository root. The nine generated self-contained HTML pages this section used to describe
+are gone -- 21MB of derived bytes rebuilt on every validation run, with the Markdown under
+`docs/` authoritative throughout. See [docs/PRESENTING.md](../docs/PRESENTING.md).
 
-```bash
-python3 scripts/build_clm_experience_gallery.py
-```
-
-Rebuild the complete portable guides:
-
-```bash
-python3 scripts/build_scenario_guides.py
-```
-
-Rebuild the executive marketecture:
-
-```bash
-python3 scripts/build_executive_marketecture.py
-```
-
-Build the coordinated contract-work variation:
-
-```bash
-```
-
-Build the customer-facing Box Solutions datasheet:
-
-```bash
-python3 scripts/build_customer_datasheet.py
-```
-
-Build the contract lifecycle contribution marketecture:
-
-```bash
-python3 scripts/build_contract_lifecycle_readiness_marketecture.py
-```
-
-Build the presenter landing page and complete embedded edition after the nine standalone chapters exist:
-
-```bash
-python3 scripts/build_presenter_portal.py
-```
-
-Review outputs in this order:
-
-- `output/html/index.html` — landing page and table of contents for the presenter library.
-
-1. `output/html/00-operator-setup-guide.html` — fresh-environment setup and validation.
-2. `output/html/01-box-salesforce-clm-guide.html` — complete narrative.
-3. `output/html/02-box-salesforce-clm-gallery.html` — visual-only companion.
-4. `output/html/03-box-salesforce-clm-guide.html` — complete narrative.
-5. `output/html/04-box-salesforce-clm-gallery.html` — visual-only companion.
-6. `output/html/05-executive-marketecture.html` — executive marketecture for IT and business decision makers.
-8. `output/html/07-customer-solution-datasheet.html` — high-level customer and sales datasheet focused on experience and outcomes.
-9. `output/html/08-contract-lifecycle-readiness-marketecture.html` — executive lifecycle view showing how each platform contributes from intake through lifecycle management.
-
-For one-file sharing, use `output/html/09-complete-presenter-edition.html`. It embeds all nine chapters and supports desktop navigation, a mobile chapter picker, previous/next controls, and `Alt` + arrow-key navigation.
-
-Guide diagrams and screenshots open in a full-size dialog. All eleven files remain portable with no external assets; the combined edition has no sibling-file dependency.

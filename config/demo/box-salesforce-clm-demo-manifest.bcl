@@ -17,9 +17,8 @@ locals {
             "architectureSource" = "docs/diagrams/clm-architecture.mmd"
             "flowRendered" = "docs/diagrams/box-salesforce-clm-flow.svg"
             "flowSource" = "docs/diagrams/box-salesforce-clm-flow.mmd"
-            "gallery" = "output/html/02-box-salesforce-clm-gallery.html"
             "guide" = "docs/SCENARIO-GUIDE.md"
-            "portableGuide" = "output/html/01-box-salesforce-clm-guide.html"
+            "storyboard" = "DEMO-STORYBOARD.html"
             "technicalValidation" = "docs/alternate-scripts/03-technical-validation.md"
           }
           "enterprise_id" = ""

@@ -105,8 +105,7 @@ are workspace-specific.
 
 ![Human approval branch](../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
 
-Optional offline presentation: [self-contained visual gallery](../output/html/02-box-salesforce-clm-gallery.html).
-For the complete narrative, use the [portable guide](../output/html/01-box-salesforce-clm-guide.html).
+To present this, use [DEMO-STORYBOARD.html](../DEMO-STORYBOARD.html); this page is the narrative behind it.
 
 [Continue to components and readiness](#6-components-and-readiness)
 

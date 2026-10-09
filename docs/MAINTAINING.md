@@ -93,12 +93,12 @@ Run the Box + Salesforce Contract Lifecycle path in confirmed target environment
 
 ```bash
 npm ci --prefix clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp
-python3 scripts/validate_clm.py            # expect 15 passed / 0 failed / 1 skipped
-python3 -m unittest discover -s tests -p 'test_*.py'   # expect 72 tests OK
+python3 scripts/validate_clm.py            # expect 14 passed / 0 failed / 1 skipped
+python3 -m unittest discover -s tests -p 'test_*.py'   # expect 63 tests OK
 ```
 
 Requires Python 3.11+ (`validate_clm.py` imports `datetime.UTC`). The `npm ci` is not optional
-on a fresh clone: four of the fifteen checks are React lint/test/build/Playwright, and they
+on a fresh clone: four of the fourteen checks are React lint/test/build/Playwright, and they
 fail closed without `node_modules`.
 
 If validation is red, the first suspects are: a BCL file that doesn't parse (`scripts/bcl.py`), a stale set-comparison contract in `validate_clm.py` (`EXPECTED_SCENARIOS`, `EXPECTED_PRESENTERS`, screenshot/PDF/docx manifests), a runtime JSON drifted from its `.example`, or a new Markdown file with a relative link that doesn't resolve — `check_local_links` walks every non-excluded `.md` in the tree, tracked or not.

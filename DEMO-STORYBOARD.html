@@ -422,7 +422,7 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
         <span class="where">Box</span>
         <h3>Clear the way for Dana's upload</h3>
         <p>Beat 1 has the counterparty upload <code>northstar-msa-redline-v4.pdf</code>. If a copy is already sitting in <strong>CLM Root / Contracts / Northstar Health Master Service Agreement 2026</strong>, the upload becomes a new version of a file that is already there, and the arrival stops being visible. Delete it before the run, and keep a copy at <code>output/pdf/northstar-msa-redline-v4.pdf</code> to upload.</p>
-        <div class="warn"><strong>Then wait a few minutes before beat 3.</strong> Box reindexes metadata after an upload, so a document that arrives during the demo may not answer a portfolio risk search yet. If the run is tight, upload during setup and let beat 1 show the document already in place.</div>
+        <div class="warn"><strong>If beat 3 then misses the document, check the folder's collaborators first.</strong> Box&rsquo;s metadata search only returns what the querying user can reach, and a contract folder provisioned outside <code>ClmBoxFolderService</code> has none &mdash; the token reads it as an admin, so the folder looks fine and its documents are simply absent from every search. That cost a correct-looking demo once, and it was diagnosed as indexing lag for weeks. Indexing lag is real but measured in seconds, not minutes.</div>
       </div>
     </div>
 
@@ -489,7 +489,7 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
         </div>
         <div class="expect"><strong>Expect the document just uploaded</strong> &mdash; <code>northstar-msa-redline-v4.pdf</code> &mdash; flagged when it landed, not when someone asked. In an environment that also carries the Calder sample set, <code>calder-msa-customer-paper-v2.pdf</code> comes back beside it, and the beat reads better: two files, two different papers, one question.</div>
         <div class="warn"><strong>Give it the folder id, not the folder name.</strong> Box metadata search is enterprise-wide, and this enterprise still holds documents from earlier demo environments with the same file names and different IDs. Naming the folder does not scope it either: searching Box for &ldquo;CLM Root&rdquo; returns CLM, CLM Build and two CLM Instructions folders, and not the one you mean. The <code>ancestor_folder_id</code> is the only thing that actually bounds the query. To an audience, an unscoped search reads as the wrong account appearing.</div>
-        <div class="warn"><strong>A freshly moved or uploaded file takes a few minutes to appear here.</strong> Box reindexes metadata after the fact, so a document uploaded in beat 1 may not be searchable by the time you reach this beat. Upload it during setup if the run is tight.</div>
+        <div class="warn"><strong>A document missing here is almost never indexing lag.</strong> It is the folder&rsquo;s collaborators: this search returns only what the querying user can reach, and a folder provisioned outside <code>ClmBoxFolderService</code> has no collaborators at all. See <code>docs/CONSTRAINTS.md</code>.</div>
       </div>
     </div>
 
@@ -551,6 +551,62 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
   </section>
 
   <section>
+    <h2>Setup and runbook</h2>
+    <p class="section-note">This page is the only presentation artifact. Everything below is
+    where to go when something is missing &mdash; the Markdown stays authoritative, and there
+    is nothing to build.</p>
+    <div class="limits">
+      <ul>
+        <li><strong>Bringing an environment up</strong> &mdash; <code>docs/SETUP.md</code>, then
+        <code>docs/DOCUMENTS-SETUP.md</code> for governed Box content and the preview path.</li>
+        <li><strong>Binding it to an org and a Box enterprise</strong> &mdash;
+        <code>docs/DEPLOYMENT.md</code>. Every environment-specific value is declared in
+        <code>config/deploy/environment.bcl</code>; copy it to
+        <code>environment.local.bcl</code>, fill it in, and run
+        <code>python3 scripts/clm_env.py --check</code>.</li>
+        <li><strong>The work no script can do</strong> &mdash; <code>docs/MANUAL-TASKS.md</code>,
+        by ID. Thirty-four of its rows are required.</li>
+        <li><strong>When something fails without saying why</strong> &mdash;
+        <code>docs/CONSTRAINTS.md</code>. Ten behaviours of Box, Salesforce and
+        box-ui-elements this repository has already paid for once.</li>
+        <li><strong>The narrative behind the beats</strong> &mdash;
+        <code>docs/SCENARIO-GUIDE.md</code>. Other framings of the same assets are in
+        <code>docs/alternate-scripts/</code>.</li>
+        <li><strong>What an assistant follows while presenting</strong> &mdash;
+        <code>skills/clm-contract-lifecycle/SKILL.md</code>, in any harness.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <div class="block-label"><span>bash</span><button class="copy" type="button">Copy</button></div>
+      <pre>python3 scripts/validate_clm.py            # expect 14 passed / 0 failed / 1 skipped
+python3 -m unittest discover -s tests      # expect 63 tests OK</pre>
+    </div>
+    <div class="warn"><strong>On a fresh clone, run <code>npm ci</code> first</strong> in
+    <code>clm-salesforce-project/force-app/main/default/uiBundles/clmreactapp</code>. Four of
+    the fourteen checks are React lint, test, build and Playwright, and they fail closed
+    without <code>node_modules</code>.</div>
+  </section>
+
+  <section>
+    <h2>Where the assets are</h2>
+    <div class="limits">
+      <ul>
+        <li><strong>Contract PDFs</strong> &mdash; <code>output/pdf/</code>, generated by
+        <code>scripts/generate_sample_contract_assets.py</code>. Beat 1 uploads
+        <code>northstar-msa-redline-v4.pdf</code> from here.</li>
+        <li><strong>Doc Gen templates</strong> &mdash; <code>output/docgen/</code>, from
+        <code>scripts/generate_docgen_templates.py</code>; merge data in
+        <code>config/box/docgen-template-data.bcl</code>.</li>
+        <li><strong>Clause library and policies</strong> &mdash; <code>sample-data/</code>.</li>
+        <li><strong>Architecture and flow diagrams</strong> &mdash;
+        <code>docs/diagrams/</code>, Mermaid sources with synchronized renders.</li>
+        <li><strong>Screenshots</strong> &mdash; <code>output/screenshots/</code>, described by
+        <code>config/demo/screenshot-manifest.bcl</code>.</li>
+      </ul>
+    </div>
+  </section>
+
+  <section>
     <h2>If someone asks</h2>
     <div class="limits">
       <h3>Three things to answer honestly</h3>
@@ -563,7 +619,7 @@ When I reply &quot;next&quot;, &quot;go&quot; or &quot;yes&quot;, run that promp
   </section>
 
   <footer>
-    Contracts: CLM-2022-0873 · CLM-2024-0596 · CLM-2026-0104 · Northstar CLM-2024-0311. Every beat verified against the live org on 2026-09-01.
+    Northstar Health carries the run: CLM-2026-0042 negotiated, CLM-2026-0017 signed, CLM-2024-0311 and CLM-2025-0148 as precedent. Beats verified against the live org on 2026-09-03.
   </footer>
 
 </div>
