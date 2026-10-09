@@ -6,7 +6,7 @@
  * user reaches their own account's rows through a sharing set, which is org configuration
  * rather than something a test can create -- and granting the test user View All to work
  * around that would grant the exact permission this class exists to avoid. So the bound
- * account is pinned, and the sharing set is called out in HANDOFF as a deployment step.
+ * account is pinned, and the sharing set is MT-045 in docs/MANUAL-TASKS.md.
  */
 @IsTest
 private class ClmCounterpartyContractsTest {
