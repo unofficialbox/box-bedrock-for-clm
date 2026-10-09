@@ -97,13 +97,18 @@ are workspace-specific.
 
 ### Shared governed Box context
 
-![Box App portfolio dashboard](../output/screenshots/box-automate-agentic-orchestration/box-app-dashboard-live.png)
+Four Box surfaces carry the governed context this scenario reads from, and they are worth
+opening live rather than shown as stills:
 
-![Box App Clause Library](../output/screenshots/box-automate-agentic-orchestration/box-app-clause-library-live.png)
+- the **Box App portfolio dashboard**, where contract folders are listed with their metadata;
+- the **Clause Library app view** over the approved positions;
+- the **approved-clause Hub**, which `askContractDocument` queries with `itemType: hub`;
+- the **Automate approval branch**, where a human decision gates the flow.
 
-![Approved Clause Hub](../output/screenshots/box-automate-agentic-orchestration/box-hub-clause-library-live.png)
-
-![Human approval branch](../output/screenshots/box-automate-agentic-orchestration/automate-approval-flow.png)
+These were previously illustrated with screenshots captured for the Box Automate
+orchestration scenario, which this repository no longer carries. Rather than keep evidence
+that claimed to be current for a scenario that is gone, the images were removed; the
+surfaces themselves are unchanged.
 
 To present this, use [DEMO-STORYBOARD.html](../DEMO-STORYBOARD.html); this page is the narrative behind it.
 
